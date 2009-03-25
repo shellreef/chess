@@ -54,32 +54,32 @@ class Board
         end
 
         # Note that rank & file are zero-based here
-        rank = code[0] - ?a
-        file = 7 - (code[1] - ?1)
+        file = code[0] - ?a
+        rank = 7 - (code[1] - ?1)
 
-        validate_rank_file(rank, file)
+        validate_rank_file(file, rank)
 
-        return rank, file
+        return file, rank
     end
 
-    def validate_rank_file(rank, file)
-        if not (0..7) === rank 
-            raise "bad rank: #{rank} in notation #{code}"
-        end
-
+    def validate_rank_file(file, rank)
         if not (0..7) === file
-            raise "bad file: #{file} in notation #{code}"
+            raise "bad file: #{file}"
+        end
+
+        if not (0..7) === rank 
+            raise "bad rank: #{rank}"
         end
     end
 
 
-    def indices2code(rank, file)
-        validate_rank_file(rank, file)
+    def indices2code(file, rank)
+        validate_rank_file(file, rank)
 
-        rank_letter = (rank + ?a).chr
-        file_number = (7 - file + ?1).chr
+        file_letter = (file+ ?a).chr
+        rank_number = (7 - rank+ ?1).chr
 
-        return rank_letter + file_number
+        return file_letter + rank_number
     end
 end
 
@@ -91,6 +91,4 @@ board.squares.each_with_index{|squares, rank|
 
 puts
 
-puts board.indices2code(0, 0)
-puts board.code2indices("a8")
 
