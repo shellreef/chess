@@ -88,12 +88,32 @@ google.setOnLoadCallback(function() {
 	load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
 
 	$$(".square").each(function(square) {
-		Droppables.add(square, {accept:"piece", onDrop: dropped, hoverclass: 'hover'});
+		Droppables.add(square, {accept:"piece", onDrop: move_dropped_piece, hoverclass: 'hover'});
 	});
 });
 
+// Set the active color to white or black, or toggle it
+function set_turn(color)
+{
+	var new_color;
+
+	assert(color == "w" || color == "b" || color == "toggle", "set_turn(" + color + "): invalid color");
+
+	if (color == "toggle") {
+		new_color = (game_state["active_color"] == "w") ? "b" : "w";
+	} else {
+		new_color = color;
+	}
+
+	game_state["active_color"] = new_color;
+
+	$("status").innerHTML = (game_state["active_color"] == "w" ? "White" : "Black") + "'s Turn";
+}
+
 //// BOARD FUNCTIONS
-function dropped(piece, square, event)
+
+// Move a piece
+function move_dropped_piece(piece, square, event)
 {	
 	console.log(piece);
 	console.log(square);
@@ -110,8 +130,11 @@ function dropped(piece, square, event)
 		piece.parentNode.removeChild(piece);
 
 	square.appendChild(piece);
+
+	set_turn("toggle");
 }
 
+// Load board state
 function load_fen(fen)
 {
 	var parts, castling;
@@ -209,6 +232,10 @@ function new_piece(name)
 	);
 
 	// TODO: instead of reverting, check if valid move
+	// TODO: Figure out how to fix how the draggable jumps, by the amount it moved,
+	// when being dropped. http://www.tutorialspoint.com/cgi-bin/practice.cgi?file=scriptaculous_12 
+	// does this too. reverteffect defaults to Effect.Move, and it reverts back to *something*,
+	// figure this point.
 	new Draggable(piece, {revert: true, starteffect: undefined, endeffect: undefined });
 
 	return piece;
@@ -274,6 +301,9 @@ function enableDocumentSelection(enable) {
 </head>
 
 <body>
+<table id="outer">
+ <tr>
+  <td>
 <table class="board" id="board">
 <tbody id="board-body"
 ><tr
@@ -358,5 +388,13 @@ function enableDocumentSelection(enable) {
 ></tr
 ></tbody
 ></table>
+
+
+ </td><td valign="top">
+  <p id="status"></p>
+ </td>
+</tr>
+</table>
+
 </body>
 </html>
