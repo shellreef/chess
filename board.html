@@ -13,6 +13,9 @@ table.board
 {
  border: 2px solid black;
  border-collapse: collapse; 	/* cellspacing=0 cellpadding=0 */
+
+ /* Firefox: disable text selection when dragging */
+ -moz-user-select: none;
 }
 
 td.square
@@ -63,6 +66,9 @@ var game_state = {
 };	
 
 google.setOnLoadCallback(function() {
+	/* Safari & IE7: Disable text selection to stop interfering with dragging */
+	enableDocumentSelection(false);	
+	
 	//load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	//load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
 	load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
@@ -179,6 +185,17 @@ function assert(expression, message)
 {
 	if (!expression) 
 		throw new AssertException(message);
+}
+
+// Based on http://tech.hickorywind.org/articles/2008/10/24/turning-off-text-selection-in-javascript
+function enableDocumentSelection(enable) {
+  if(enable) {
+    document.onselectstart = _original_onselectstart;
+  }
+  else {
+    _original_onselectstart = document.onselectstart;
+    document.onselectstart = function() { return false; }
+  }
 }
 
 
