@@ -159,12 +159,10 @@ google.setOnLoadCallback(function() {
 	//load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
 	load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
 
-	// TODO: only add droppables for valid squares?
+	// TODO: only add droppables for valid squares? Actually, probably just want to change class.
 	$$(".square").each(function(square) {
 		Droppables.add(square, {accept:"active-color", onDrop: move_dropped_piece, hoverclass: 'hover'});
 	});
-
-	test();
 });
 
 //// VALID MOVE FUNCTIONS
@@ -176,12 +174,38 @@ function calculate_valid_moves()
 
 	// Look at all the active pieces
 	$$("img.active-color").each(function(piece) { 
-		console.log(piece.classNames().toString()); 
-		console.log(xy2pgn(piece_location(piece)));
+		var type = piece_type(piece);
+		var xy = piece_location(piece);	// TODO: OO
+		var parlett = piece_types[type];
+	
+		if (type != "knight") return;	// TODO: all
+	
+		var moves = unfiltered_moves(parlett);
+		console.log(type,xy2pgn(xy),moves);
+		console.log(move_rel2abs(xy,moves));
 	});
 }
 
-//// PARLETT NOTATION FUNCTIONS (get the unrestricted, valid moves for a piece)
+// Convert relative move destinations (0,0 = where the piece is,
+// the coordinates are +/-) to absolute (0,0 = top-left board).
+// Note: Coordinates out of bounds *are* discarded, but not those that
+// land on an existing piece (one's own or the enemy's).
+function move_rel2abs(xy_location, moves)
+{
+	var absolutes = new Array();
+
+	for (var i = 0; i < moves.length; ++i) {
+		var rel = moves[i];
+		var abs = [xy_location[0] + rel[0], xy_location[1] + rel[1]];
+
+		if (abs[0] >= 0 && abs[0] <= 7 && abs[1] >= 0 && abs[1] <= 7)
+			absolutes.push(abs);
+	}
+
+	return absolutes;
+}
+
+//// PARLETT NOTATION FUNCTIONS (get the unrestricted, relative valid moves for a piece)
 function unfiltered_moves(parlett)
 {
 	var choice_groups, moves;
@@ -260,17 +284,6 @@ function decode_one_parlett(parlett)
 		moves = expand_hippogonal(distances);
 
 	return moves;
-}
-
-function test()
-{
-	//console.log(unfiltered_moves("o1>, c1X>, io2>"));
-	console.log(unfiltered_moves(piece_types.knight));
-	//console.log(unfiltered_moves(piece_types.camel));
-	//console.log(unfiltered_moves(piece_types.zebra));
-	//console.log(unfiltered_moves(piece_types.squirrel));
-	//console.log(unfiltered_moves(piece_types.zero));
-	console.log(unfiltered_moves(piece_types.king));
 }
 
 // Expand the shorthand for hippogonal moves, such as the knight:
