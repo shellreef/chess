@@ -52,7 +52,8 @@ google.setOnLoadCallback(function() {
 	 * that checks whether the move is valid */
 	//new Draggable($("x"), { revert: true, starteffect: undefined } );
 
-	load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+	//load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+	load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R");
 });
 
 function load_fen(fen)
@@ -71,7 +72,7 @@ function load_fen(fen)
 			x = 0;
 			++y;
 		} else if (/[0-9]/.test(code)) {
-			x += code.charCodeAt(0) - code.charCodeAt("0");
+			x += code.charCodeAt(0) - "0".charCodeAt(0);
 		}
 	}
 }
