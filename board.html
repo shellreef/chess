@@ -184,9 +184,8 @@ function calculate_valid_moves()
 	
 		if (type != "knight" && type != "king") return;	// TODO: all
 	
-		var moves = unfiltered_moves(parlett);
+		var moves = unfiltered_moves(parlett, xy);
 		console.log(type,xy2pgn(xy),moves);
-		moves = move_rel2abs(xy,moves);
 
 		// Convert xy to PGN, so it can be easily used
 		// as a hash key.
@@ -227,8 +226,11 @@ function move_rel2abs(xy_location, moves)
 	return absolutes;
 }
 
-//// PARLETT NOTATION FUNCTIONS (get the unrestricted, relative valid moves for a piece)
-function unfiltered_moves(parlett)
+//// PARLETT NOTATION FUNCTIONS
+
+// Get unfiltered (might be occupied by own piece, cause to put in check) 
+/// list of moves for a piece, with Parlett moves given, at given location
+function unfiltered_moves(parlett, xy)
 {
 	var choice_groups, moves;
 
@@ -241,7 +243,7 @@ function unfiltered_moves(parlett)
 	for (var i = 0; i < choice_groups.length; ++i) {
 		// For each group, gather the move options. 
 		// (Would be nice if JavaScript arrays had a Python-like .extend)
-		moves = moves.concat(decode_one_parlett(choice_groups[i]));
+		moves = moves.concat(decode_one_parlett(choice_groups[i], xy));
 	}	
 
 	// Last step: remove duplicates. Maybe the caller should do this.
@@ -289,9 +291,9 @@ function decode_direction(ch)
 	}
 }
 
-// Decode a single group in extended Parlett notation into unfiltered relative moves
+// Decode a single group in extended Parlett notation into unfiltered absolute moves
 // See http://en.wikipedia.org/wiki/Fairy_chess_piece#Notations
-function decode_one_parlett(parlett)
+function decode_one_parlett(parlett, xy)
 {
 	var movement, initial_only, capture_only, no_capture, hippogonal;
 	var distances, directions, flags, maybe_directions;
@@ -347,12 +349,15 @@ function decode_one_parlett(parlett)
 	console.log(movement);
 	console.log(directions);
 
-	if (hippogonal)
-		moves = expand_hippogonal(distances);
-	else
-		assert(false, "decode_one_parlett TODO: implement parlett " + parlett);
+	if (hippogonal) {	// assumes leaper
+		// First get valid destinations, then convert to absolute coordinates.
+		// Relatively easy, since with leapers, can disregard pieces on the path
+		var rel_moves = add_flags(expand_hippogonal(distances), flags);
 
-	moves = add_flags(moves, flags);
+		moves = move_rel2abs(xy, rel_moves);
+	} else {
+		assert(false, "decode_one_parlett TODO: implement parlett " + parlett);
+	}
 
 	return moves;
 }
@@ -376,7 +381,7 @@ function add_flags(moves, flags)
 
 // Expand the shorthand for hippogonal moves, such as the knight:
 // 	expand_hippogonal([1,2]) -> [[1, 2], [2, 1], [-1, 2], [2, -1], [1, -2], [-2, 1], [-1, -2], [-2, -1]]
-// Requires q and p to be constant, so for example it can't represent the
+// Requires constants, so for example it can't represent the
 // Kraken fairy chess piece, with Parlett notation ~n/m, but there are probably easier
 // ways to handle that, if I get that far (it leaps to any square on the board).
 function expand_hippogonal(a)
