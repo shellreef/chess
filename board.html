@@ -73,7 +73,11 @@ google.setOnLoadCallback(function() {
 	//load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
 	load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
 
-	Droppables.add($("x"), {accept:"piece", onDrop: function(){}});
+	for (var x = 0; x < 7; ++x) {
+		for (var y = 0; y < 7; ++y) {
+			Droppables.add(sq(x,y), {accept:"piece", onDrop: function(){}});
+		}
+	}
 });
 
 
@@ -151,7 +155,7 @@ function new_piece(name)
 	node = Builder.node('img', {'src': filename, 'class': 'piece'});
 
 	// TODO: instead of reverting, check if valid move
-	new Draggable(node, {revert: "failure", starteffect: undefined });
+	new Draggable(node, {revert: "failure", starteffect: undefined, endeffect: undefined });
 
 	return node;
 }
@@ -205,7 +209,6 @@ function enableDocumentSelection(enable) {
 </head>
 
 <body>
-<div id=x style="width:100px;height:50px;background-color:blue"><p>chess piece storage</div>
 <table class="board" id="board">
 <tbody id="board-body"
 ><tr
