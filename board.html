@@ -52,11 +52,9 @@ google.setOnLoadCallback(function() {
 	 * that checks whether the move is valid */
 	//new Draggable($("x"), { revert: true, starteffect: undefined } );
 
-	document.observe("dom:loaded", function() {
-		sq("a8").appendChild(new_piece("r"));
-		sq("b8").appendChild(new_piece("n"));
-		sq("c8").appendChild(new_piece("b"));
-	});
+	sq("a8").appendChild(new_piece("r"));
+	sq("b8").appendChild(new_piece("n"));
+	sq("c8").appendChild(new_piece("b"));
 });
 
 function load_starting_position(fen)
