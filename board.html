@@ -52,16 +52,43 @@ google.setOnLoadCallback(function() {
 	 * that checks whether the move is valid */
 	//new Draggable($("x"), { revert: true, starteffect: undefined } );
 
-	sq(0,0).appendChild(new_piece("br"));
-	sq(1,0).appendChild(new_piece("bn"));
-	sq("c8").appendChild(new_piece("bb"));
+	sq("a8").appendChild(new_piece("r"));
+	sq("b8").appendChild(new_piece("n"));
+	sq("c8").appendChild(new_piece("b"));
 });
 
-// Create a new piece (including pawns), where name is something
-// like br = black rook, wk = white king
+// Based on http://aymanh.com/9-javascript-tips-you-may-not-know
+function AssertException(message) { this.message = message; }
+AssertException.prototype.toString = function() {
+	return 'AssertException: ' + this.message;
+};
+
+function assert(expression, message)
+{
+	if (!exp) 
+		throw new AssertException(message);
+}
+
+// Create a new piece or pawn, given the name in
+// Forsyth-Edwards Notation, for example:
+//  r = black rook, R = white rook, N = white knight
 function new_piece(name)
 {
-	return Builder.node('img', {'src': 'images/' + name + '.gif'});
+	var color;
+	var filename;
+
+	// In FEN, uppercase=white, lower=black
+	if (/^[RNBQKP]/.test(name)) {
+		color = "w";
+	} else if (/^[rnbqkp]/.test(name)) {
+		color = "b";
+	} else {
+		assert("new_piece(" + name + "): unrecognized");
+	}
+
+	filename = 'images/' + color + name.toLowerCase() + '.gif';
+
+	return Builder.node('img', {'src': filename});
 }
 
 // Get a square cell, given location in either
