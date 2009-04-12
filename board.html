@@ -176,7 +176,7 @@ function calculate_valid_moves()
 
 	// Look at all the active pieces
 	$$("img.active-color").each(function(piece) { 
-		console.log(piece); 
+		console.log(piece.classNames().toString()); 
 		console.log(xy2pgn(piece_location(piece)));
 	});
 }
@@ -495,6 +495,30 @@ function load_starting_position(fen)
 
 //// PIECE FUNCTIONS
 
+// Return the type of a piece node (rook, bishop, etc.)
+function piece_type(piece)
+{
+	if (!piece || !piece.classNames)
+		return null;
+
+	var classes = piece.classNames();
+	var type;
+
+	// Loop through all the classes applied to this piece, finding
+	// one that is a valid piece type. Not terribly elegant, but 
+	// for now the type is stored as a class, instead of an attribute
+	// with a value you can directly lookup.
+	classes.each(function(className) {
+		if (piece_types[className] !== undefined) {
+			type = className;
+			// TODO: way to break out of the each? Just curious.
+		}
+	});
+
+	return type;
+}
+
+// Get (x,y) of piece. For PGN notation, use xy2pgn on this.
 function piece_location(piece)
 {
 	return [piece.parentNode.x, piece.parentNode.y];
@@ -503,9 +527,10 @@ function piece_location(piece)
 // Create a new piece or pawn, given the name in
 // Forsyth-Edwards Notation, for example:
 //  r = black rook, R = white rook, N = white knight
+// TODO: make this a class so you can do new Piece().
 function new_piece(name)
 {
-	var color, filename, piece, piece_type, classes;
+	var color, filename, piece, type, classes;
 
 	classes = "piece";	
 
@@ -519,14 +544,14 @@ function new_piece(name)
 	} else {
 		assert("new_piece(" + name + "): unrecognized");
 	}
-	piece_type = name.toLowerCase();
+	type = name.toLowerCase();
 
-	classes += " " + {r: 'rook', n: 'knight', b: 'bishop', q: 'queen', k: 'king', p: 'pawn'}[piece_type];
+	classes += " " + {r: 'rook', n: 'knight', b: 'bishop', q: 'queen', k: 'king', p: 'pawn'}[type];
 
 	// TODO: pngs
 	// TODO: even better, use Unicode characters in a span!! How cool would that be? Infinite resolution.
 	// See for example http://en.wikipedia.org/wiki/Knight_(chess)
-	filename = 'images/' + color + piece_type + '.gif';
+	filename = 'images/' + color + type + '.gif';
 
 
 	piece = Builder.node('img', {'src': filename, 'class': classes});
