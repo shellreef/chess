@@ -73,7 +73,7 @@ td.legal-move-black { background-color: #a15b17; }
 <script language="javascript">
 if (!window.google)
 	alert("Google was not found. Nothing will work.");
-	// Let fall through an error out
+	// Let fall through and error out
 
 google.load("prototype", "1.6.0.3");
 google.load("scriptaculous", "1.8.2");
@@ -108,6 +108,8 @@ google.setOnLoadCallback(function() {
 	$$(".square").each(function(square) {
 		Droppables.add(square, {accept:"active-color", onDrop: move_dropped_piece, hoverclass: 'hover'});
 	});
+
+	console.log(expand_hippogonal([1,2]));
 });
 
 //// VALID MOVE FUNCTIONS
@@ -115,6 +117,13 @@ function expand_moves(moves)
 {
 	var new_moves;
 
+}
+
+// Expand the shorthand for hippogonal moves, such as the knight:
+// [1,2] -> [[1, 2], [2, 1], [1, -2], [-2, 1], [-1, 2], [2, -1]]
+function expand_hippogonal(move)
+{
+	return include_reversed(times_each(move, [1, -1]));
 }
 
 // Return a list of lists, where each element in the first is multiplied
@@ -134,24 +143,55 @@ function times_each(a, b)
 
 }
 
+// Include reversed pairs of nested lists, example:
+// 	include_reversed([[1,2], [1,0]]) == [[1,2], [2,1], [1,0], [0,1]]
+// Removes duplicate entries, so [1,1] etc. won't show up twice.
 function include_reversed(a)
 {
 	var all = [];
 
-	for (var element in a)
+	for (var i = 0; i < a.length; ++i)
 	{
-		all.push(element.clone().reverse());	
+		var element = a[i];
+		var cloned_element;
+
+		all.push(element);
+
+		assert(element.clone, "include_reversed(" + a + "): no clone property (is Prototype loaded?) on element: " + element);
+
+		// Need to clone before reversing, to not modify original
+		all.push(element.clone().reverse());
 	}
+
+	return without_dupes(all);
 }
 
-// Create a "set", implemented as a hash with true values
-// Based on http://laurens.vd.oever.nl/weblog/items2005/setsinjavascript/
-function set()
+// Return an array of objects without any duplicate entries, where
+// duplicity is determined by string equality. This is ugly, but
+//	[1,2] in [[1,2], [3,4]]
+// is false, since 
+//	[1,2] == [1,2]
+// is false, so its not easy (as far as I could tell) to check if
+// a complex element is already in an array before adding it. Worse yet,
+// hash keys can't be complex, so for example the set implementation at
+// http://laurens.vd.oever.nl/weblog/items2005/setsinjavascript/ , even
+// modified to use Prototype's Hash, won't do because the keys will be 
+// converted to strings. But at least the ugliness is confined to this function.
+function without_dupes(a)
 {
-	var result = {};
+	var hash = new Hash();
+	var result = new Array();
 
-	for (var i = 0; i < arguments.length; ++i)
-		result.set(arguments[i], true);
+	for (var i = 0; i < a.length; ++i) {
+		// Add if not a dupe
+		if (!hash.get(a[i]))
+			result.push(a[i]);
+
+		// Record that this element was added. Converts to a string,
+		// unfortunately, so can't just use hash.keys() after filling 
+		// in the hash.
+		hash.set(a[i], true);
+	}
 
 	return result;
 }
@@ -304,6 +344,8 @@ function new_piece(name)
 	classes += " " + {r: 'rook', n: 'knight', b: 'bishop', q: 'queen', k: 'king', p: 'pawn'}[piece_type];
 
 	// TODO: pngs
+	// TODO: even better, use Unicode characters in a span!! How cool would that be? Infinite resolution.
+	// See for example http://en.wikipedia.org/wiki/Knight_(chess)
 	filename = 'images/' + color + piece_type + '.gif';
 
 
