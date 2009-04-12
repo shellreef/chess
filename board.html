@@ -52,19 +52,22 @@ google.setOnLoadCallback(function() {
 	 * that checks whether the move is valid */
 	//new Draggable($("x"), { revert: true, starteffect: undefined } );
 
-	sq("a8").appendChild(new_piece("r"));
-	sq("b8").appendChild(new_piece("n"));
-	sq("c8").appendChild(new_piece("b"));
+	load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
 });
 
-function load_starting_position(fen)
+function load_fen(fen)
 {
-	var i, rank, file;
+	var i, x, y, code;
 
 	// Note that ranks and files internally are represented here by
 	// x,y coordinates, so a8 = 0,0. That is where FEN starts.
-	rank = file = 0;
+	x = y = 0;
 	for (i = 0; i < fen.length; ++i) {
+		code = fen.charAt(i);
+		if (/[a-zA-Z]/.test(code)) {
+			sq(x, y).appendChild(new_piece(code));
+			++x;
+		}
 	}
 }
 
