@@ -14,8 +14,8 @@ td.square
  border-style: none;
  padding: 0em;
  margin: 0em;
- width: 3em;
- height: 3em;
+ width: 50px;
+ height: 50px;
 }
 
 /* Colors based on http://en.wikipedia.org/wiki/Chessboard
@@ -36,9 +36,24 @@ td.black { background-color: #d18b47; }
 /*td:nth-child(2n) { background-color: green } */
 
 </style>
+<script src="http://www.google.com/jsapi"></script>
+<script language="javascript">
+google.load("prototype", "1.6.0.3");
+google.load("scriptaculous", "1.8.2");
+
+google.setOnLoadCallback(function() {
+	/* TODO: for revert, instead of true, use a function
+	 * that checks whether the move is valid */
+	new Draggable($("x"), { revert: true, starteffect: undefined } );
+
+		
+});
+</script>
 </head>
+
 <body>
-<table class="board">
+<img src="images/wk.gif" id="x">
+<table class="board" id="board">
  <tr>
   <td class="white square">&nbsp;</td>
   <td class="black square">&nbsp;</td>
