@@ -67,6 +67,11 @@ function load_fen(fen)
 		if (/[a-zA-Z]/.test(code)) {
 			sq(x, y).appendChild(new_piece(code));
 			++x;
+		} else if (code == "/") {
+			x = 0;
+			++y;
+		} else if (/[0-9]/.test(code)) {
+			x += code.charCodeAt(0) - code.charCodeAt("0");
 		}
 	}
 }
