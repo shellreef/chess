@@ -106,19 +106,24 @@ google.setOnLoadCallback(function() {
 // Set the active color to white or black, or toggle it
 function set_turn(color)
 {
-	var new_color;
+	var new_color, active_pieces;
 
-	assert(color == "w" || color == "b" || color == "toggle", "set_turn(" + color + "): invalid color");
+	assert(color == "white" || color == "black" || color == "toggle", "set_turn(" + color + "): invalid color");
 
 	if (color == "toggle") {
-		new_color = (game_state["active_color"] == "w") ? "b" : "w";
+		new_color = (game_state["active_color"] == "white") ? "black" : "white";
 	} else {
 		new_color = color;
 	}
 
-	game_state["active_color"] = new_color;
 
-	$("status").innerHTML = (game_state["active_color"] == "w" ? "White" : "Black") + "'s Turn";
+	//if (new_color == "w") {
+	//new Draggable(piece, {revert: true, starteffect: undefined, endeffect: undefined });
+
+	$("status").innerHTML = (new_color == "white" ? "White" : "Black") + "'s Turn";
+
+
+	game_state["active_color"] = new_color;
 }
 
 //// BOARD FUNCTIONS
@@ -142,6 +147,8 @@ function move_dropped_piece(piece, square, event)
 
 	square.appendChild(piece);
 
+	// TODO: only toggle if move was successful, or only have droppables for
+	// legal moves?
 	set_turn("toggle");
 }
 
@@ -153,8 +160,8 @@ function load_fen(fen)
 	parts = fen.split(" ");
 	load_starting_position(parts[0]);
 
-	assert(/^[bw]$/.test(parts[1]), "load_fen(" + fen + "): bad active color: " + parts[1]);
-	set_turn(parts[1]);
+	assert(/^[wb]$/.test(parts[1]), "load_fen(" + fen + "): bad active color: " + parts[1]);
+	set_turn({w:"white", b:"black"}[parts[1]]);
 
 	castling = parts[2];
 	game_state["white_castle_short"] = /K/.test(castling);
