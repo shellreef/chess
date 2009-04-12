@@ -118,6 +118,7 @@ var piece_types = {
 	zebra: "~2/3",
 	squirrel: "~0/2, ~1/2, ~2/2",
 	zero: "~0/0",
+	man: "~1/1, ~1/0",	// same as king, but not royale
 
 	// Combined pieces of internal chess
 	cardinal: "nX, ~1/2",
@@ -151,7 +152,8 @@ var piece_types = {
 
 google.setOnLoadCallback(function() {
 	/* Safari & IE7: Disable text selection to stop interfering with dragging */
-	enableDocumentSelection(false);	
+	enable_document_selection(false);	
+	name_squares();	
 	
 	//load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	//load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
@@ -166,12 +168,20 @@ google.setOnLoadCallback(function() {
 });
 
 //// VALID MOVE FUNCTIONS
-function expand_moves(moves)
+
+// After the board changes and it is the next person's turn, calculate what the next possible allowable moves are.
+function calculate_valid_moves()
 {
 	var new_moves;
 
+	// Look at all the active pieces
+	$$("img.active-color").each(function(piece) { 
+		console.log(piece); 
+		console.log(piece.parentNode);
+	});
 }
 
+//// PARLETT NOTATION FUNCTIONS (get the unrestricted, valid moves for a piece)
 function unfiltered_moves(parlett)
 {
 	var choice_groups, moves;
@@ -256,10 +266,10 @@ function test()
 {
 	//console.log(unfiltered_moves("o1>, c1X>, io2>"));
 	console.log(unfiltered_moves(piece_types.knight));
-	console.log(unfiltered_moves(piece_types.camel));
-	console.log(unfiltered_moves(piece_types.zebra));
-	console.log(unfiltered_moves(piece_types.squirrel));
-	console.log(unfiltered_moves(piece_types.zero));
+	//console.log(unfiltered_moves(piece_types.camel));
+	//console.log(unfiltered_moves(piece_types.zebra));
+	//console.log(unfiltered_moves(piece_types.squirrel));
+	//console.log(unfiltered_moves(piece_types.zero));
 	console.log(unfiltered_moves(piece_types.king));
 }
 
@@ -380,9 +390,27 @@ function set_turn(color)
 
 
 	game_state.active_color = new_color;
+	calculate_valid_moves();
 }
 
 //// BOARD FUNCTIONS
+
+// Internally name the square cells with their (x,y) coordinates
+// and PGN notation, once when the page loads. This is only code so I
+// don't have to manually type <td x=0 y=0 pgn=a8> etc. in all the cells.
+function name_squares()
+{
+	for (var x = 0; x < 8; ++x){
+		for (var y = 0; y < 8; ++y) {
+			var square = sq(x, y);
+
+			square.x = x;
+			square.y = y;
+			square.pgn = xy2pgn(x, y);
+			console.log(square);
+		}
+	}
+}	
 
 // Move a piece
 function move_dropped_piece(piece, square, event)
@@ -509,7 +537,7 @@ function new_piece(name)
 
 	// Make all new pieces draggable. I tried only making the active color's
 	// pieces draggable, but then in Safari they can still be selected like text,
-	// even with enableDocumentSelection(false), maybe I need to enable it on the
+	// even with enable_document_selection(false), maybe I need to enable it on the
 	// images too, but it wasn't appealing. In Firefox, the images can be dragged
 	// as ghosts, which is cool, but instead: now pieces can only be dropped anywhere
 	// if they are the active colors move. The player can drag the opponent's pieces
@@ -571,25 +599,54 @@ function moves_for(piece)
 
 //// SQUARE FUNCTIONS
 
+// Convert PGN notation f8 to the x,y coordinate [5,0], etc.
+// Note: does not accept piece name as initial character, yet.
+// Also note: the returned coordinate is useful for looking up in a
+// zero-based table cell with (0,0) at the top-left. In PGN, this
+// square is labeled a8. The bottom-right square (7,7) is PGN's h1.
+function pgn2xy(code)
+{
+	var x = code.charCodeAt(0) - "a".charCodeAt(0);		// corresponds to file (horizontal)
+	var y = 8 - (code.charCodeAt(1) - "0".charCodeAt(0));	// corresponds to rank (vertical)
+
+	assert(x >= 0 && x <= 7, "pgn2xy(" + code + "): bad x: " + x);
+	assert(y >= 0 && y <= 7, "pgn2xy(" + code + "): bad y: " + y);
+
+	return [x, y];
+}
+
+function xy2pgn(x, y)
+{
+	var pgn;
+
+	assert(x >= 0 && x <= 7, "xy2pgn(" + x + ", " + y + "): bad x: " + x);
+	assert(y >= 0 && y <= 7, "xy2pgn(" + x + ", " + y + "): bad y: " + y);
+
+	pgn = String.fromCharCode(x + "a".charCodeAt(0));
+	pgn += String.fromCharCode((8 - y) + "0".charCodeAt(0));
+
+	return pgn;
+}
+
 // Get a square cell, given location in either
 // - algebraic notation (example: "a8", one argument), or
 // - x,y coordinates, (equivalent example: 0,0)
 function sq(code, extra)
 {
-	var rank, file;
+	var x, y;
 
 	if (extra !== undefined) {
-		file = code;
-		rank = extra;
+		x = code;
+		y = extra;
 	} else {
-		file = code.charCodeAt(0) - "a".charCodeAt(0);
-		rank = 8 - (code.charCodeAt(1) - "0".charCodeAt(0));
+		var xy = pgn2xy(code);
+
+		// TODO: can JS do list element assignment like x,y=...?	
+		x = xy[0];
+		y = xy[1];
 	}
 
-	assert(rank >= 0 && rank <= 7, "sq(" + code + ", " + extra + "): bad rank: " + rank);
-	assert(file >= 0 && file <= 7, "sq(" + code + ", " + extra + "): bad file: " + file);
-
-	return $('board-body').childNodes[rank].childNodes[file];
+	return $('board-body').childNodes[y].childNodes[x];
 }
 
 //// LOW-LEVEL FUNCTIONS
@@ -613,7 +670,7 @@ function assert(expression, message)
 }
 
 // Based on http://tech.hickorywind.org/articles/2008/10/24/turning-off-text-selection-in-javascript
-function enableDocumentSelection(enable) {
+function enable_document_selection(enable) {
   if(enable) {
     document.onselectstart = _original_onselectstart;
   }
