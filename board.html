@@ -177,7 +177,7 @@ function calculate_valid_moves()
 	// Look at all the active pieces
 	$$("img.active-color").each(function(piece) { 
 		console.log(piece); 
-		console.log(piece.parentNode);
+		console.log(xy2pgn(piece_location(piece)));
 	});
 }
 
@@ -495,6 +495,11 @@ function load_starting_position(fen)
 
 //// PIECE FUNCTIONS
 
+function piece_location(piece)
+{
+	return [piece.parentNode.x, piece.parentNode.y];
+}
+
 // Create a new piece or pawn, given the name in
 // Forsyth-Edwards Notation, for example:
 //  r = black rook, R = white rook, N = white knight
@@ -599,7 +604,8 @@ function moves_for(piece)
 
 //// SQUARE FUNCTIONS
 
-// Convert PGN notation f8 to the x,y coordinate [5,0], etc.
+// Convert PGN notation f8 to the x,y coordinate [5,0], etc. These coordinates
+// are used internally, but PGN notation is useful for human consumption.
 // Note: does not accept piece name as initial character, yet.
 // Also note: the returned coordinate is useful for looking up in a
 // zero-based table cell with (0,0) at the top-left. In PGN, this
@@ -615,9 +621,18 @@ function pgn2xy(code)
 	return [x, y];
 }
 
+// Convert from x,y coordinates to PGN for human consumption. Can either pass
+// xy2pgn(0, 0) == "a8"
+// xy2pgn([0, 0]) == "a8"
 function xy2pgn(x, y)
 {
 	var pgn;
+
+	if (y === undefined) {
+		// Passed array
+		y = x[1];
+		x = x[0];
+	}
 
 	assert(x >= 0 && x <= 7, "xy2pgn(" + x + ", " + y + "): bad x: " + x);
 	assert(y >= 0 && y <= 7, "xy2pgn(" + x + ", " + y + "): bad y: " + y);
