@@ -250,12 +250,51 @@ function unfiltered_moves(parlett)
 	return moves;
 }
 
+// Decode a Parlett direction character, or return a false value if that is not what it is.
+// Returns an array of two-element arrays of direction vectors.
+function decode_direction(ch)
+{
+	if (ch == "+") { 
+		// orthogonally four possible directions
+		return include_reversed(times_each([1, 0], [1, -1]));
+	//} else if (ch == ">") {
+	//} else if (ch == ">=") {
+	// TODO: orthogonally/diagnonally forwards/backwards, depends on color
+	} else if (ch == "=") {
+		// orthogonally sideways
+		return [[1, 0], [-1, 0]]
+/* could support <> (sideways) easily, but would have to parse it! so its not so easy
+	} else if (ch == "<") {
+		if (i + 1 < parlett.length && parlett[++i] == ">") {
+			// <> orthogonally forwards and backwards
+			return [[0, 1], [0, -1]]
+		} else {
+			assert("decode_one_parlet(" + parlett + "): unsupported: " + ch);
+		}
+		//} else if (ch == "<") {
+		//} else if (ch == "<=") {
+		// TODO: forward/backwards depends on color (direction of pieces)
+*/
+	} else if (ch == "X") { 
+		// diagonally four possible directions
+		return include_reversed(times_each([1, 1], [1, -1]));
+		//} else if (ch == "X>") {	// Note: would need to peek next character below
+		//} else if (ch == "X<") {
+		// TODO: forward/backwards depends on color (direction of pieces)
+	} else if (ch == "*") {	
+		// orthogonally or diagonally (eight possible directions)
+		return decode_direction("+").concat(decode_direction("X"));
+	} else {
+		return null;
+	}
+}
+
 // Decode a single group in extended Parlett notation into unfiltered relative moves
 // See http://en.wikipedia.org/wiki/Fairy_chess_piece#Notations
 function decode_one_parlett(parlett)
 {
 	var movement, initial_only, capture_only, no_capture, hippogonal;
-	var distances, directions, flags;
+	var distances, directions, flags, maybe_directions;
 
 	flags = {};
 	distances = new Array();
@@ -288,20 +327,25 @@ function decode_one_parlett(parlett)
 		} else if (/[0-9]/.test(ch)) {
 			distances.push(parseInt(ch));
 		} else if (ch == "n") {
-			distance.push(Infinity)
+			distances.push(Infinity)
 		} else if (ch == "/") {
 			hippogonal = true;
-
-		// TODO: directions
-
 		} else {
-			assert(false, "decode_one_parlett(" + parlett + "): unknown character: " + ch);
+			maybe_directions = decode_direction(ch);
+			if (maybe_directions) {
+				directions = maybe_directions;
+			} else {
+				assert(false, "decode_one_parlett(" + parlett + "): unsupported: " + ch);
+			}
 		}
 	}
 	if (!movement)
 		// Move unlimited distance in one direction, as long as its not blocked
 		// rook = (1,0)rider, bishop = (1,1)rider, queen (1,1)+(1,0)rider
 		movement = "rider";
+
+	console.log(movement);
+	console.log(directions);
 
 	if (hippogonal)
 		moves = expand_hippogonal(distances);
