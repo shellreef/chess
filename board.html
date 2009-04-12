@@ -57,6 +57,17 @@ google.setOnLoadCallback(function() {
 	sq("c8").appendChild(new_piece("b"));
 });
 
+function load_starting_position(fen)
+{
+	var i, rank, file;
+
+	// Note that ranks and files internally are represented here by
+	// x,y coordinates, so a8 = 0,0. That is where FEN starts.
+	rank = file = 0;
+	for (i = 0; i < fen.length; ++i) {
+	}
+}
+
 // Create a new piece or pawn, given the name in
 // Forsyth-Edwards Notation, for example:
 //  r = black rook, R = white rook, N = white knight
