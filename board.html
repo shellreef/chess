@@ -190,13 +190,14 @@ function calculate_valid_moves()
 // the coordinates are +/-) to absolute (0,0 = top-left board).
 // Note: Coordinates out of bounds *are* discarded, but not those that
 // land on an existing piece (one's own or the enemy's).
+// Note2: moves must be array of [x,y,flags]; the third element is required
 function move_rel2abs(xy_location, moves)
 {
 	var absolutes = new Array();
 
 	for (var i = 0; i < moves.length; ++i) {
 		var rel = moves[i];
-		var abs = [xy_location[0] + rel[0], xy_location[1] + rel[1]];
+		var abs = [xy_location[0] + rel[0], xy_location[1] + rel[1], moves[2]];
 
 		if (abs[0] >= 0 && abs[0] <= 7 && abs[1] >= 0 && abs[1] <= 7)
 			absolutes.push(abs);
@@ -233,8 +234,9 @@ function unfiltered_moves(parlett)
 function decode_one_parlett(parlett)
 {
 	var movement, initial_only, capture_only, no_capture, hippogonal;
-	var distances, directions;
+	var distances, directions, flags;
 
+	flags = {};
 	distances = new Array();
 
 	for (var i = 0; i < parlett.length; ++i) {
@@ -251,16 +253,16 @@ function decode_one_parlett(parlett)
 		} else if (ch == "i") { 
 			// Initial move: Can only if the piece is in its original position
 			// (pawn's 2 move forward)
-			initial_only = true;
+			flags.initial_only = true;
 		} else if (ch == "c") {
 			// Capture only: may only be used if destination is occupied by enemy piece
 			// (pawn's diagnal capture)
-			capture_only = true;
+			flags.capture_only = true;
 		} else if (ch == "o") {
 			// Can not capture: destination square must be unoccupied; since by default, piece
 			// can move to enemy square in order to capture it
 			// (pawn's forward move)
-			no_capture = true;
+			flags.no_capture = true;
 
 		} else if (/[0-9]/.test(ch)) {
 			distances.push(parseInt(ch));
@@ -282,8 +284,29 @@ function decode_one_parlett(parlett)
 
 	if (hippogonal)
 		moves = expand_hippogonal(distances);
+	else
+		assert(false, "decode_one_parlett TODO: implement parlett " + parlett);
+
+	moves = add_flags(moves, flags);
 
 	return moves;
+}
+
+// Add a third element to a list of moves, extra "flags" that describe
+// under what conditions the move is valid. 
+// 	add_flags([[7,2],[4,1],[5,2]], "hi") == [[7,2,"hi"],[[4,1,"hi"], etc.
+// but the flags should be something useful: a dictionary
+function add_flags(moves, flags)
+{
+	var new_moves = new Array();
+
+	for (var i = 0; i < moves.length; ++i) {
+		var move = moves[i];
+
+		new_moves.push([move[0], move[1], flags]);
+	}
+
+	return new_moves;
 }
 
 // Expand the shorthand for hippogonal moves, such as the knight:
@@ -323,13 +346,13 @@ function include_reversed(a)
 	for (var i = 0; i < a.length; ++i)
 	{
 		var element = a[i];
-		var cloned_element;
+		var reversed, flags;
 
 		all.push(element);
 
+		// Need to clone before reversing, to not modify original
 		assert(element.clone, "include_reversed(" + a + "): no clone property (is Prototype loaded?) on element: " + element);
 
-		// Need to clone before reversing, to not modify original
 		all.push(element.clone().reverse());
 	}
 
