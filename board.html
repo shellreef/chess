@@ -47,16 +47,61 @@ td.black { background-color: #d18b47; }
 google.load("prototype", "1.6.0.3");
 google.load("scriptaculous", "1.8.2");
 
+var game_state = {
+	// Whose turn it is
+	active_color: 'w',
+	
+	// Castling privileges
+	white_castle_short: true,
+	white_castle_long: true,
+	black_castle_short: true,
+	black_castle_long: true,
+	enpassant_target: null,
+
+	halfmove_clock: 0,	// Ply since last pawn advance / capture
+	fullmove_number: 1,	// Increment after black moves
+};	
+
 google.setOnLoadCallback(function() {
 	/* TODO: for revert, instead of true, use a function
 	 * that checks whether the move is valid */
 	//new Draggable($("x"), { revert: true, starteffect: undefined } );
 
-	//load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
-	load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R");
+	//load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	//load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
+	load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
 });
 
+
 function load_fen(fen)
+{
+	var parts, castling;
+
+	parts = fen.split(" ");
+	load_starting_position(parts[0]);
+
+	assert(/^[bw]$/.test(parts[1]), "load_fen(" + fen + "): bad active color: " + parts[1]);
+	game_state["active_color"] = parts[1];
+
+	castling = parts[2];
+	game_state["white_castle_short"] = /K/.test(castling);
+	game_state["white_castle_long"] = /Q/.test(castling);
+	game_state["black_castle_short"] = /k/.test(castling);
+	game_state["black__castle_long"] = /q/.test(castling);
+
+	if (parts[3] == "-") {
+		game_state["enpassant_target"] = null;
+	} else {
+		game_state["enpassant_target"] = parts[3]; // for sq()
+	}
+
+	game_state["halfmove_clock"] = parseInt(parts[4]);
+	game_state["fullmove_number"] = parseInt(parts[5]);
+}
+
+// Load starting position in FEN. Example, at beginning of game:
+// rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR
+function load_starting_position(fen)
 {
 	var i, x, y, code;
 
@@ -73,6 +118,10 @@ function load_fen(fen)
 			++y;
 		} else if (/[0-9]/.test(code)) {
 			x += code.charCodeAt(0) - "0".charCodeAt(0);
+		} else if (code == " ") {
+			break;
+		} else {
+			assert("load_starting_position(" + fen + "): unknown code: " + code);
 		}
 	}
 }
@@ -138,8 +187,8 @@ function assert(expression, message)
 
 <body>
 
-<table class="board" id="board"
-><tbody id="board-body"
+<table class="board" id="board">
+<tbody id="board-body"
 ><tr
   ><td class="white square"></td
   ><td class="black square"></td
