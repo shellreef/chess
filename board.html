@@ -52,8 +52,8 @@ google.setOnLoadCallback(function() {
 	 * that checks whether the move is valid */
 	//new Draggable($("x"), { revert: true, starteffect: undefined } );
 
-	sq("a8").appendChild(new_piece("br"));
-	sq("b8").appendChild(new_piece("bn"));
+	sq(0,0).appendChild(new_piece("br"));
+	sq(1,0).appendChild(new_piece("bn"));
 	sq("c8").appendChild(new_piece("bb"));
 });
 
@@ -64,11 +64,20 @@ function new_piece(name)
 	return Builder.node('img', {'src': 'images/' + name + '.gif'});
 }
 
-// Get a square cell, given location in algebraic notation (ex: "a8")
-function sq(code)
+// Get a square cell, given location in either
+// - algebraic notation (example: "a8", one argument), or
+// - x,y coordinates, (equivalent example: 0,0)
+function sq(code, extra)
 {
-	var file = code.charCodeAt(0) - "a".charCodeAt(0);
-	var rank = 8 - (code.charCodeAt(1) - "0".charCodeAt(0));
+	var rank, file;
+
+	if (extra !== undefined) {
+		file = code;
+		rank = extra;
+	} else {
+		file = code.charCodeAt(0) - "a".charCodeAt(0);
+		rank = 8 - (code.charCodeAt(1) - "0".charCodeAt(0));
+	}
 
 	// TODO: validate rank and file
 
