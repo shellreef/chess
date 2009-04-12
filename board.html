@@ -123,17 +123,53 @@ function unfiltered_moves(parlett)
 {
 	var choice_groups, moves;
 
+	moves = new Array();
+
 	// Mutually exclusive choices
 	choice_groups = parlett.split(", ");
 
 	console.log(choice_groups);
+	for (var i = 0; i < choice_groups.length; ++i) {
+		// For each group, gather the move options. 
+		// (Would be nice if JavaScript arrays had a Python-like .extend)
+		moves = moves.concat(decode_one_parlett(choice_groups[i]));
+	}	
 
-	moves = expand_hippogonal(1,2);
-
-	// Last step: remove duplicates
+	// Last step: remove duplicates. Maybe the caller should do this.
 	moves = without_dupes(moves);
 
 	return moves;
+}
+
+// Decode a single group in extended Parlett notation into unfiltered relative moves
+// See http://en.wikipedia.org/wiki/Fairy_chess_piece#Notations
+function decode_one_parlett(parlett)
+{
+	var movement, initial_only, capture_only, no_capture;
+
+	for (var i = 0; i < parlett.length; ++i) {
+		var ch = parlett[i];
+
+		if (ch == "~") {
+			movement = "leaper";
+
+		// Conditional modifiers that all returned moves should note.
+		} else if (ch == "i") { 
+			// Initial move: Can only if the piece is in its original position
+			// (pawn's 2 move forward)
+			initial_only = true;
+		} else if (ch == "c") {
+			// Capture only: may only be used if destination is occupied by enemy piece
+			// (pawn's diagnal capture)
+			capture_only = true;
+		} else if (ch == "o") {
+			// Can not capture: destination square must be unoccupied; since by default, piece
+			// can move to enemy square in order to capture it
+			// (pawn's forward move)
+			no_capture = true;
+		}
+	}
+	console.log(movement, initial_only, capture_only, no_capture);
 }
 
 function test()
@@ -170,7 +206,7 @@ function times_each(a, b)
 
 // Include reversed pairs of nested lists, example:
 // 	include_reversed([[1,2], [1,0]]) == [[1,2], [2,1], [1,0], [0,1]]
-// Note: may return duplicates, so be sure to call without_dupes()!
+// Removes duplicates.
 function include_reversed(a)
 {
 	var all = [];
@@ -188,7 +224,7 @@ function include_reversed(a)
 		all.push(element.clone().reverse());
 	}
 
-	return all;
+	return without_dupes(all);
 }
 
 // Return an array of objects without any duplicate entries, where
