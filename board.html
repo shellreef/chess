@@ -78,7 +78,7 @@ if (!window.google)
 google.load("prototype", "1.6.0.3");
 google.load("scriptaculous", "1.8.2");
 
-var game_state = {
+var GAME_STATE = {
 	// Whose turn it is
 	active_color: 'w',
 	
@@ -97,7 +97,7 @@ var game_state = {
 };	
 
 // Movement of pieces in extended Parlett notation
-var piece_types = {
+var PIECE_TYPES = {
 // TODO: make this into a proper class/hash, where pieces have not only movements
 // but HTML code to represent black and white (img, or Unicode character) pieces,
 // and codes for FEN notation of initial board positions, also black and white
@@ -176,7 +176,7 @@ function calculate_valid_moves()
 	$$("img.active-color").each(function(piece) { 
 		var type = piece_type(piece);
 		var xy = piece_location(piece);	// TODO: OO
-		var parlett = piece_types[type];
+		var parlett = PIECE_TYPES[type];
 	
 		if (type != "knight") return;	// TODO: all
 	
@@ -408,7 +408,7 @@ function set_turn(color)
 	assert(color == "white" || color == "black" || color == "next", "set_turn(" + color + "): invalid color");
 
 	if (color == "next") {
-		new_color = opposite_color(game_state.active_color);
+		new_color = opposite_color(GAME_STATE.active_color);
 	} else {
 		new_color = color;
 	}
@@ -425,7 +425,7 @@ function set_turn(color)
 	$("status").innerHTML = ucfirst(new_color) + "'s Turn";
 
 
-	game_state.active_color = new_color;
+	GAME_STATE.active_color = new_color;
 	calculate_valid_moves();
 }
 
@@ -487,19 +487,19 @@ function load_fen(fen)
 	set_turn({w:"white", b:"black"}[parts[1]]);
 
 	castling = parts[2];
-	game_state.white_castle_short = /K/.test(castling);
-	game_state.white_castle_long = /Q/.test(castling);
-	game_state.black_castle_short = /k/.test(castling);
-	game_state.black__castle_long = /q/.test(castling);
+	GAME_STATE.white_castle_short = /K/.test(castling);
+	GAME_STATE.white_castle_long = /Q/.test(castling);
+	GAME_STATE.black_castle_short = /k/.test(castling);
+	GAME_STATE.black__castle_long = /q/.test(castling);
 
 	if (parts[3] == "-") {
-		game_state.enpassant_target = null;
+		GAME_STATE.enpassant_target = null;
 	} else {
-		game_state.enpassant_target = parts[3]; // for sq()
+		GAME_STATE.enpassant_target = parts[3]; // for sq()
 	}
 
-	game_state.halfmove_clock = parseInt(parts[4]);
-	game_state.fullmove_number = parseInt(parts[5]);
+	GAME_STATE.halfmove_clock = parseInt(parts[4]);
+	GAME_STATE.fullmove_number = parseInt(parts[5]);
 }
 
 // Load starting position in FEN. Example, at beginning of game:
@@ -553,7 +553,7 @@ function piece_type(piece)
 	// for now the type is stored as a class, instead of an attribute
 	// with a value you can directly lookup.
 	classes.each(function(className) {
-		if (piece_types[className] !== undefined) {
+		if (PIECE_TYPES[className] !== undefined) {
 			type = className;
 			// TODO: way to break out of the each? Just curious.
 		}
@@ -626,8 +626,8 @@ function new_piece(name)
 		revert: true, 
 		starteffect: undefined, 
 		endeffect: undefined,
-		onStart: function() { game_state.dragging = true; },
-		onEnd: function() { game_state.dragging = false; },
+		onStart: function() { GAME_STATE.dragging = true; },
+		onEnd: function() { GAME_STATE.dragging = false; },
 	 });
 
 
@@ -640,7 +640,7 @@ function highlight_moves(piece, enable)
 {
 	// If player is dragging a piece over another piece, don't show
 	// legal moves for the piece under it.
-	if (game_state.dragging)
+	if (GAME_STATE.dragging)
 		return;
 
 	moves_for(piece).each(function(square) {
@@ -662,7 +662,7 @@ function moves_for(piece)
 {
 	console.log(piece);
 	// If not this player's turn, no legal moves
-	if (!piece.hasClassName(game_state.active_color))
+	if (!piece.hasClassName(GAME_STATE.active_color))
 		return [];
 
 
