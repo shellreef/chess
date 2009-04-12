@@ -202,7 +202,6 @@ function calculate_valid_moves()
 // Note: Coordinates out of bounds *are* discarded, but not those that
 // land on an existing piece (one's own or the enemy's).
 // Note2: moves must be array of [x,y,flags]; the third element is required
-// A fourth element, the actual square element, is added for convenience.
 function move_rel2abs(xy_location, moves)
 {
 	var absolutes = new Array();
@@ -215,11 +214,9 @@ function move_rel2abs(xy_location, moves)
 
 		// TODO: stop hardcoding dimensions
 		if (x < 0 || x > 7 || y < 0 || y > 7)
-			continue;	// off board
+			continue;	// off board, TODO: option for chess variants to wrap around?
 
-		var square = sq(x, y);
-
-		var abs = [x, y, flags, square];
+		var abs = [x, y, flags];
 
 		absolutes.push(abs);
 	}
@@ -694,7 +691,7 @@ function highlight_moves(piece, enable)
 		x = move[0];
 		y = move[1];
 		flags = move[2];
-		to_square = move[3];
+		to_square = sq(x, y);
 
 		if (enable) {
 			if (to_square.hasClassName("white"))
