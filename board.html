@@ -35,10 +35,6 @@ td.hover
  background-color: blue !important;
 }
 
-td.legal-move
-{
- background-color: #99ffcc !important;
-}
 
 /* Colors based on http://en.wikipedia.org/wiki/Chessboard
  * Useful site: http://www.cssdrive.com/imagepalette/index.php
@@ -51,6 +47,10 @@ td.legal-move
  */
 td.white { background-color: #ffce9e; }
 td.black { background-color: #d18b47; }
+
+td.legal-move-white { background-color: #ffefbf; }
+td.legal-move-black { background-color: #efaf6f; }
+
 
 /* Would be cool to use CSS3 expressions to make the pattern, but they're not in
  * Firefox 3.0.8, maybe in Firefox 3.1. Safari has them though! 
@@ -186,14 +186,19 @@ function new_piece(name)
 	// Highlight/unhighlight legal moves on mouse over
 	Event.observe(piece, 'mouseover', function() {
 			moves_for(piece).each(function(square) {
-				square.addClassName("legal-move");
+				if (square.hasClassName("white"))
+					square.addClassName("legal-move-white");
+				else
+					square.addClassName("legal-move-black");
+
 			});
 		}
 	);
 	Event.observe(piece, 'mouseout', function() 
 		{
 			moves_for(piece).each(function(square) { 
-				square.removeClassName("legal-move");
+				square.removeClassName("legal-move-white");
+				square.removeClassName("legal-move-black");
 			});
 		}
 	);
