@@ -52,9 +52,17 @@ google.setOnLoadCallback(function() {
 	 * that checks whether the move is valid */
 	//new Draggable($("x"), { revert: true, starteffect: undefined } );
 
-	var king = Builder.node('img', {'src': 'images/br.gif'});
-	sq("a8").appendChild(king);
+	sq("a8").appendChild(new_piece("br"));
+	sq("b8").appendChild(new_piece("bn"));
+	sq("c8").appendChild(new_piece("bb"));
 });
+
+// Create a new piece (including pawns), where name is something
+// like br = black rook, wk = white king
+function new_piece(name)
+{
+	return Builder.node('img', {'src': 'images/' + name + '.gif'});
+}
 
 // Get a square cell, given location in algebraic notation (ex: "a8")
 function sq(code)
