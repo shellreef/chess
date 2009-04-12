@@ -75,11 +75,25 @@ google.setOnLoadCallback(function() {
 
 	for (var x = 0; x < 7; ++x) {
 		for (var y = 0; y < 7; ++y) {
-			Droppables.add(sq(x,y), {accept:"piece", onDrop: function(){}});
+			Droppables.add(sq(x,y), {accept:"piece", onDrop: dropped});
 		}
 	}
 });
 
+function dropped(piece, square, event)
+{	
+	console.log(piece);
+	console.log(square);
+
+	// Capture piece on destination square
+	while (square.firstChild)
+		square.removeChild(square.firstChild);
+
+	// Move to new square
+	piece.parentNode.removeChild(piece);
+	square.appendChild(piece);
+	console.log(piece.style);
+}
 
 function load_fen(fen)
 {
