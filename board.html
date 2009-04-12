@@ -95,8 +95,11 @@ function dropped(piece, square, event)
 	// Capture piece on destination square
 	while (square.firstChild)
 		square.removeChild(square.firstChild);
+
 	// Move to new square
-	piece.parentNode.removeChild(piece);
+	if (piece.parentNode)
+		piece.parentNode.removeChild(piece);
+
 	square.appendChild(piece);
 }
 
@@ -174,7 +177,7 @@ function new_piece(name)
 	node = Builder.node('img', {'src': filename, 'class': 'piece'});
 
 	// TODO: instead of reverting, check if valid move
-	new Draggable(node, {revert: "failure", starteffect: undefined, endeffect: undefined });
+	new Draggable(node, {revert: true, starteffect: undefined, endeffect: undefined });
 
 	return node;
 }
