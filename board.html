@@ -143,7 +143,7 @@ function load_fen(fen)
 	load_starting_position(parts[0]);
 
 	assert(/^[bw]$/.test(parts[1]), "load_fen(" + fen + "): bad active color: " + parts[1]);
-	game_state["active_color"] = parts[1];
+	set_turn(parts[1]);
 
 	castling = parts[2];
 	game_state["white_castle_short"] = /K/.test(castling);
