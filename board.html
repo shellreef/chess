@@ -107,6 +107,15 @@ google.setOnLoadCallback(function() {
 	});
 });
 
+function opposite_color(color)
+{
+	var opposite = {white: "black", black: "white"}[color];
+
+	assert(opposite == "black" || opposite == "white", "opposite_color(" + color + "): bad color");
+
+	return opposite;
+}
+
 // Set the active color to white or black, or go to the next color (toggling)
 function set_turn(color)
 {
@@ -115,14 +124,25 @@ function set_turn(color)
 	assert(color == "white" || color == "black" || color == "next", "set_turn(" + color + "): invalid color");
 
 	if (color == "next") {
-		new_color = (game_state["active_color"] == "white") ? "black" : "white";
+		new_color = opposite_color(game_state["active_color"]);
 	} else {
 		new_color = color;
 	}
 
+	// TODO: instead of reverting, check if valid move
+	// TODO: Figure out how to fix how the draggable jumps, by the amount it moved,
+	// when being dropped. http://www.tutorialspoint.com/cgi-bin/practice.cgi?file=scriptaculous_12 
+	// does this too. reverteffect defaults to Effect.Move, and it reverts back to *something*,
+	// figure this point.
+	//new Draggable(piece, {revert: true, starteffect: undefined, endeffect: undefined });
 
-	$$("img.white").each(function(piece) {
-		new Draggable(piece, {revert: true, starteffect: undefined, endeffect: undefined });
+	$$("img." + new_color).each(function(piece) {
+		piece.draggable = new Draggable(piece, {revert: true, starteffect: undefined, endeffect: undefined });
+	});
+
+	$$("img." + opposite_color(new_color)).each(function(piece) {
+		if (piece.draggable)
+			piece.draggable.destroy();
 	});
 
 	$("status").innerHTML = ucfirst(new_color) + "'s Turn";
@@ -245,42 +265,40 @@ function new_piece(name)
 	// Highlight/unhighlight legal moves on mouse over, like Chess with Friends.
 	// Yahoo Games does this too, but uses a yellow outline.
 	Event.observe(piece, 'mouseover', function() {
-			moves_for(piece).each(function(square) {
-				if (square.hasClassName("white"))
-					square.addClassName("legal-move-white");
-				else
-					square.addClassName("legal-move-black");
-
-			});
-		}
-	);
-	Event.observe(piece, 'mouseout', function() 
-		{
-			moves_for(piece).each(function(square) { 
-				square.removeClassName("legal-move-white");
-				square.removeClassName("legal-move-black");
-			});
-		}
-	);
-
-	// TODO: instead of reverting, check if valid move
-	// TODO: Figure out how to fix how the draggable jumps, by the amount it moved,
-	// when being dropped. http://www.tutorialspoint.com/cgi-bin/practice.cgi?file=scriptaculous_12 
-	// does this too. reverteffect defaults to Effect.Move, and it reverts back to *something*,
-	// figure this point.
-	//new Draggable(piece, {revert: true, starteffect: undefined, endeffect: undefined });
+			highlight_moves(piece, true);
+		});
+	Event.observe(piece, 'mouseout', function() {
+			highlight_moves(piece, false);
+		});
 
 	return piece;
 }
+
+// Highlight/unhighlight moves for a given piece.
+function highlight_moves(piece, enable)
+{
+	moves_for(piece).each(function(square) {
+		if (enable) {
+			if (square.hasClassName("white"))
+				square.addClassName("legal-move-white");
+			else
+				square.addClassName("legal-move-black");
+		} else {
+				square.removeClassName("legal-move-white");
+				square.removeClassName("legal-move-black");
+		}
+	});
+}
+
 
 // Get the legal moves for a piece
 function moves_for(piece)
 {
 	console.log(piece);
-
 	// If not this player's turn, no legal moves
 	if (!piece.hasClassName(game_state["active_color"]))
 		return [];
+
 
 	// TODO: calculate moves in set_turn, lookup here
 
