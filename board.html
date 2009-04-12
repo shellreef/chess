@@ -54,20 +54,8 @@ google.setOnLoadCallback(function() {
 
 	sq("a8").appendChild(new_piece("r"));
 	sq("b8").appendChild(new_piece("n"));
-	sq("c9").appendChild(new_piece("b"));
+	sq("c8").appendChild(new_piece("b"));
 });
-
-// Based on http://aymanh.com/9-javascript-tips-you-may-not-know
-function AssertException(message) { this.message = message; }
-AssertException.prototype.toString = function() {
-	return 'AssertException: ' + this.message;
-};
-
-function assert(expression, message)
-{
-	if (!expression) 
-		throw new AssertException(message);
-}
 
 // Create a new piece or pawn, given the name in
 // Forsyth-Edwards Notation, for example:
@@ -111,6 +99,20 @@ function sq(code, extra)
 
 	return $('board-body').children[rank].children[file];
 }
+
+// Based on http://aymanh.com/9-javascript-tips-you-may-not-know
+function AssertException(message) { this.message = message; }
+AssertException.prototype.toString = function() {
+	return 'AssertException: ' + this.message;
+};
+
+function assert(expression, message)
+{
+	if (!expression) 
+		throw new AssertException(message);
+}
+
+
 </script>
 </head>
 
