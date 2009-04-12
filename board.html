@@ -120,7 +120,7 @@ function set_turn(color)
 	//if (new_color == "w") {
 	//new Draggable(piece, {revert: true, starteffect: undefined, endeffect: undefined });
 
-	$("status").innerHTML = (new_color == "white" ? "White" : "Black") + "'s Turn";
+	$("status").innerHTML = ucfirst(new_color) + "'s Turn";
 
 
 	game_state["active_color"] = new_color;
@@ -299,6 +299,12 @@ function sq(code, extra)
 }
 
 //// LOW-LEVEL FUNCTIONS
+
+// Uppercase first character, like in Perl
+function ucfirst(s)
+{
+	return s.substring(0, 1).toUpperCase() + s.substring(1);
+}
 
 // Based on http://aymanh.com/9-javascript-tips-you-may-not-know
 function AssertException(message) { this.message = message; }
