@@ -107,14 +107,14 @@ google.setOnLoadCallback(function() {
 	});
 });
 
-// Set the active color to white or black, or toggle it
+// Set the active color to white or black, or go to the next color (toggling)
 function set_turn(color)
 {
 	var new_color, active_pieces;
 
-	assert(color == "white" || color == "black" || color == "toggle", "set_turn(" + color + "): invalid color");
+	assert(color == "white" || color == "black" || color == "next", "set_turn(" + color + "): invalid color");
 
-	if (color == "toggle") {
+	if (color == "next") {
 		new_color = (game_state["active_color"] == "white") ? "black" : "white";
 	} else {
 		new_color = color;
@@ -151,9 +151,9 @@ function move_dropped_piece(piece, square, event)
 
 	square.appendChild(piece);
 
-	// TODO: only toggle if move was successful, or only have droppables for
+	// TODO: only next if move was successful, or only have droppables for
 	// legal moves?
-	set_turn("toggle");
+	set_turn("next");
 }
 
 // Load board state
