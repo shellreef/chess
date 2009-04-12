@@ -109,7 +109,7 @@ google.setOnLoadCallback(function() {
 		Droppables.add(square, {accept:"active-color", onDrop: move_dropped_piece, hoverclass: 'hover'});
 	});
 
-	console.log(expand_hippogonal([1,2]));
+	test();
 });
 
 //// VALID MOVE FUNCTIONS
@@ -119,11 +119,36 @@ function expand_moves(moves)
 
 }
 
-// Expand the shorthand for hippogonal moves, such as the knight:
-// [1,2] -> [[1, 2], [2, 1], [1, -2], [-2, 1], [-1, 2], [2, -1]]
-function expand_hippogonal(move)
+function unfiltered_moves(parlett)
 {
-	return include_reversed(times_each(move, [1, -1]));
+	var choice_groups, moves;
+
+	// Mutually exclusive choices
+	choice_groups = parlett.split(", ");
+
+	console.log(choice_groups);
+
+	moves = expand_hippogonal(1,2);
+
+	// Last step: remove duplicates
+	moves = without_dupes(moves);
+
+	return moves;
+}
+
+function test()
+{
+	console.log(unfiltered_moves("o1>, c1X>, io2>"));
+}
+
+// Expand the shorthand for hippogonal moves, such as the knight:
+// 	expand_hippogonal(1,2) -> [[1, 2], [2, 1], [1, -2], [-2, 1], [-1, 2], [2, -1]]
+// Requires q and p to be constant, so for example it can't represent the
+// Kraken fairy chess piece, with Parlett notation ~n/m, but there are probably easier
+// ways to handle that, if I get that far (it leaps to any square on the board).
+function expand_hippogonal(q, p)
+{
+	return include_reversed(times_each([q, p], [1, -1]));
 }
 
 // Return a list of lists, where each element in the first is multiplied
@@ -145,7 +170,7 @@ function times_each(a, b)
 
 // Include reversed pairs of nested lists, example:
 // 	include_reversed([[1,2], [1,0]]) == [[1,2], [2,1], [1,0], [0,1]]
-// Removes duplicate entries, so [1,1] etc. won't show up twice.
+// Note: may return duplicates, so be sure to call without_dupes()!
 function include_reversed(a)
 {
 	var all = [];
@@ -163,7 +188,7 @@ function include_reversed(a)
 		all.push(element.clone().reverse());
 	}
 
-	return without_dupes(all);
+	return all;
 }
 
 // Return an array of objects without any duplicate entries, where
