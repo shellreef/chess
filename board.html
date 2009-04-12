@@ -53,18 +53,27 @@ google.setOnLoadCallback(function() {
 	//new Draggable($("x"), { revert: true, starteffect: undefined } );
 
 	var king = Builder.node('img', {'src': 'images/br.gif'});
-	$('x').appendChild(king);
-	alert($('x').clientHeight);
-	alert($('y').clientHeight);
+	sq("a8").appendChild(king);
 });
+
+// Get a square cell, given location in algebraic notation (ex: "a8")
+function sq(code)
+{
+	var file = code.charCodeAt(0) - "a".charCodeAt(0);
+	var rank = 8 - (code.charCodeAt(1) - "0".charCodeAt(0));
+
+	// TODO: validate rank and file
+
+	return $('board-body').children[rank].children[file];
+}
 </script>
 </head>
 
 <body>
 <table class="board" id="board">
-<tbody>
+<tbody id="board-body">
  <tr>
-  <td id=x class="white square"></td>
+  <td class="white square"></td>
   <td class="black square"></td>
   <td class="white square"></td>
   <td class="black square"></td>
