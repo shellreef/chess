@@ -20,8 +20,8 @@ table.board
 
 td.square
 {
- //border-style: none;
- border: 1px solid black;
+ border-style: none;
+ //border: 1px solid black;
  padding: 0em;
  margin: 0em;
  width: 53px;
@@ -33,6 +33,11 @@ td.hover
  //border: 1px solid black;
  //background: url("images/wk.gif");
  background-color: blue !important;
+}
+
+td.legal-move
+{
+ background-color: #99ffcc !important;
 }
 
 /* Colors based on http://en.wikipedia.org/wiki/Chessboard
@@ -181,14 +186,14 @@ function new_piece(name)
 	// Highlight/unhighlight legal moves on mouse over
 	Event.observe(piece, 'mouseover', function() {
 			moves_for(piece).each(function(square) {
-				square.setStyle({border: '1px solid yellow'});
+				square.addClassName("legal-move");
 			});
 		}
 	);
 	Event.observe(piece, 'mouseout', function() 
 		{
 			moves_for(piece).each(function(square) { 
-				square.setStyle({border: '1px solid black'});
+				square.removeClassName("legal-move");
 			});
 		}
 	);
