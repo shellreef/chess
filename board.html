@@ -91,6 +91,9 @@ var game_state = {
 
 	halfmove_clock: 0,	// Ply since last pawn advance / capture
 	fullmove_number: 1,	// Increment after black moves
+
+	// Not game state, but other globals
+	dragging: false
 };	
 
 google.setOnLoadCallback(function() {
@@ -279,16 +282,27 @@ function new_piece(name)
 	// when being dropped. http://www.tutorialspoint.com/cgi-bin/practice.cgi?file=scriptaculous_12 
 	// does this too. reverteffect defaults to Effect.Move, and it reverts back to *something*,
 	// figure this point.
-	new Draggable(piece, {revert: true, starteffect: undefined, endeffect: undefined });
+	new Draggable(piece, { 
+		revert: true, 
+		starteffect: undefined, 
+		endeffect: undefined,
+		onStart: function() { game_state.dragging = true; },
+		onEnd: function() { game_state.dragging = false; },
+	 });
 
 
 
 	return piece;
 }
 
-// Highlight/unhighlight moves for a given piece.
+// Highlight/unhighlight moves for a given piece, unless dragging.
 function highlight_moves(piece, enable)
 {
+	// If player is dragging a piece over another piece, don't show
+	// legal moves for the piece under it.
+	if (game_state.dragging)
+		return;
+
 	moves_for(piece).each(function(square) {
 		if (enable) {
 			if (square.hasClassName("white"))
