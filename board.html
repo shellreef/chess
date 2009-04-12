@@ -44,16 +44,37 @@ google.load("scriptaculous", "1.8.2");
 google.setOnLoadCallback(function() {
 	/* TODO: for revert, instead of true, use a function
 	 * that checks whether the move is valid */
-	new Draggable($("x"), { revert: true, starteffect: undefined } );
+	//new Draggable($("x"), { revert: true, starteffect: undefined } );
 
-		
+	var king = Builder.node('img', {'src': 'images/br.gif'});
+	$('x').appendChild(king);
 });
 </script>
 </head>
 
 <body>
-<img src="images/wk.gif" id="x">
 <table class="board" id="board">
+<tbody>
+ <tr>
+  <td id=x class="white square"></td>
+  <td class="black square">&nbsp;</td>
+  <td class="white square">&nbsp;</td>
+  <td class="black square">&nbsp;</td>
+  <td class="white square">&nbsp;</td>
+  <td class="black square">&nbsp;</td>
+  <td class="white square">&nbsp;</td>
+  <td class="black square">&nbsp;</td>
+ </tr>
+  <tr>
+  <td id=y class="black square">&nbsp;</td>
+  <td class="white square">&nbsp;</td>
+  <td class="black square">&nbsp;</td>
+  <td class="white square">&nbsp;</td>
+  <td class="black square">&nbsp;</td>
+  <td class="white square">&nbsp;</td>
+  <td class="black square">&nbsp;</td>
+  <td class="white square">&nbsp;</td>
+ </tr>
  <tr>
   <td class="white square">&nbsp;</td>
   <td class="black square">&nbsp;</td>
@@ -64,6 +85,51 @@ google.setOnLoadCallback(function() {
   <td class="white square">&nbsp;</td>
   <td class="black square">&nbsp;</td>
  </tr>
+ 
+ <tr>
+  <td class="black square">&nbsp;</td>
+  <td class="white square">&nbsp;</td>
+  <td class="black square">&nbsp;</td>
+  <td class="white square">&nbsp;</td>
+  <td class="black square">&nbsp;</td>
+  <td class="white square">&nbsp;</td>
+  <td class="black square">&nbsp;</td>
+  <td class="white square">&nbsp;</td>
+ </tr>
+ 
+ <tr>
+  <td class="white square">&nbsp;</td>
+  <td class="black square">&nbsp;</td>
+  <td class="white square">&nbsp;</td>
+  <td class="black square">&nbsp;</td>
+  <td class="white square">&nbsp;</td>
+  <td class="black square">&nbsp;</td>
+  <td class="white square">&nbsp;</td>
+  <td class="black square">&nbsp;</td>
+ </tr>
+ 
+ <tr>
+  <td class="black square">&nbsp;</td>
+  <td class="white square">&nbsp;</td>
+  <td class="black square">&nbsp;</td>
+  <td class="white square">&nbsp;</td>
+  <td class="black square">&nbsp;</td>
+  <td class="white square">&nbsp;</td>
+  <td class="black square">&nbsp;</td>
+  <td class="white square">&nbsp;</td>
+ </tr>
+ 
+ <tr>
+  <td class="white square">&nbsp;</td>
+  <td class="black square">&nbsp;</td>
+  <td class="white square">&nbsp;</td>
+  <td class="black square">&nbsp;</td>
+  <td class="white square">&nbsp;</td>
+  <td class="black square">&nbsp;</td>
+  <td class="white square">&nbsp;</td>
+  <td class="black square">&nbsp;</td>
+ </tr>
+ 
   <tr>
   <td class="black square">&nbsp;</td>
   <td class="white square">&nbsp;</td>
@@ -74,72 +140,7 @@ google.setOnLoadCallback(function() {
   <td class="black square">&nbsp;</td>
   <td class="white square">&nbsp;</td>
  </tr>
- <tr>
-  <td class="white square">&nbsp;</td>
-  <td class="black square">&nbsp;</td>
-  <td class="white square">&nbsp;</td>
-  <td class="black square">&nbsp;</td>
-  <td class="white square">&nbsp;</td>
-  <td class="black square">&nbsp;</td>
-  <td class="white square">&nbsp;</td>
-  <td class="black square">&nbsp;</td>
- </tr>
- 
- <tr>
-  <td class="black square">&nbsp;</td>
-  <td class="white square">&nbsp;</td>
-  <td class="black square">&nbsp;</td>
-  <td class="white square">&nbsp;</td>
-  <td class="black square">&nbsp;</td>
-  <td class="white square">&nbsp;</td>
-  <td class="black square">&nbsp;</td>
-  <td class="white square">&nbsp;</td>
- </tr>
- 
- <tr>
-  <td class="white square">&nbsp;</td>
-  <td class="black square">&nbsp;</td>
-  <td class="white square">&nbsp;</td>
-  <td class="black square">&nbsp;</td>
-  <td class="white square">&nbsp;</td>
-  <td class="black square">&nbsp;</td>
-  <td class="white square">&nbsp;</td>
-  <td class="black square">&nbsp;</td>
- </tr>
- 
- <tr>
-  <td class="black square">&nbsp;</td>
-  <td class="white square">&nbsp;</td>
-  <td class="black square">&nbsp;</td>
-  <td class="white square">&nbsp;</td>
-  <td class="black square">&nbsp;</td>
-  <td class="white square">&nbsp;</td>
-  <td class="black square">&nbsp;</td>
-  <td class="white square">&nbsp;</td>
- </tr>
- 
- <tr>
-  <td class="white square">&nbsp;</td>
-  <td class="black square">&nbsp;</td>
-  <td class="white square">&nbsp;</td>
-  <td class="black square">&nbsp;</td>
-  <td class="white square">&nbsp;</td>
-  <td class="black square">&nbsp;</td>
-  <td class="white square">&nbsp;</td>
-  <td class="black square">&nbsp;</td>
- </tr>
- 
-  <tr>
-  <td class="black square">&nbsp;</td>
-  <td class="white square">&nbsp;</td>
-  <td class="black square">&nbsp;</td>
-  <td class="white square">&nbsp;</td>
-  <td class="black square">&nbsp;</td>
-  <td class="white square">&nbsp;</td>
-  <td class="black square">&nbsp;</td>
-  <td class="white square">&nbsp;</td>
- </tr>
- 
+</tbody> 
 </table>
 </body>
 </html>
