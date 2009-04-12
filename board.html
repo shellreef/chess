@@ -3,6 +3,12 @@
 <head>
 <title>Chess</title>
 <style>
+img 
+{ 
+ border: none;
+ margin: 0px;
+}
+
 table.board
 {
  border: 2px solid black;
@@ -14,8 +20,8 @@ td.square
  border-style: none;
  padding: 0em;
  margin: 0em;
- width: 50px;
- height: 50px;
+ width: 53px;
+ height: 53px;
 }
 
 /* Colors based on http://en.wikipedia.org/wiki/Chessboard
@@ -48,8 +54,8 @@ google.setOnLoadCallback(function() {
 
 	var king = Builder.node('img', {'src': 'images/br.gif'});
 	$('x').appendChild(king);
-	alert($('x').offsetHeight);
-	alert($('y').offsetHeight);
+	alert($('x').clientHeight);
+	alert($('y').clientHeight);
 });
 </script>
 </head>
@@ -78,7 +84,7 @@ google.setOnLoadCallback(function() {
   <td class="white square"></td>
  </tr>
  <tr>
-  <td class="white square"></td>
+  <td id=z class="white square"></td>
   <td class="black square"></td>
   <td class="white square"></td>
   <td class="black square"></td>
