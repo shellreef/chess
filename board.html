@@ -96,6 +96,57 @@ var game_state = {
 	dragging: false
 };	
 
+// Movement of pieces in extended Parlett notation
+var piece_types = {
+// TODO: make this into a proper class/hash, where pieces have not only movements
+// but HTML code to represent black and white (img, or Unicode character) pieces,
+// and codes for FEN notation of initial board positions, also black and white
+
+	// Standard international chess pieces
+	king: "1*",		// TODO: royal
+	queen: "n*",
+	bishop: "nX",
+	rook: "n+",
+	pawn: "o1>, c1X>, oi2>",
+	knight: "~1/2",
+
+	// Other hippogonals, good for testing
+	giraffe: "~1/4",
+	camel: "~1/3",
+	zebra: "~2/3",
+	squirrel: "~0/2, ~1/2, ~2/2",
+	zero: "~0/0",
+
+	// Combined pieces of internal chess
+	cardinal: "nX, ~1/2",
+	empress: "n+, ~1/2",
+	amazon: "n*, ~1/2",	
+	colonel: "n>, n=, 2/1> 1*",
+
+	// More complex fairy / non-intl chess pieces
+	// See http://en.wikipedia.org/wiki/Fairy_chess_piece#Notable_examples
+	murray_lion: "~0/2, ~2/2, c1*",
+	lion: "~n*",
+	alfil: "~2X",
+	dabbaba: "~2+",
+	superpawn: "~on>, cnX>",
+	berolina_pawn: "o1X>, c1>, io2X>",
+	colonel: "n>, n=, 2/1>, 1*",	
+	superpawn: "on>, cnX>",
+	elephant: "2X",
+	khohn: "1X, 1>",
+	fers: "1X",
+	wazir: "1+",
+
+	// Pieces that probably won't be supported without significant coding
+	leo: "on*, c^&",	// no & support, whatever that is
+	kraken: "~n/m",		// no n support in hippogonal (just allow any square)
+	knightrider: "n(1/2)",	// no grouping support, sadly
+	checker: "cn(^2X>), o1X> King: cn(^2X), o1x",	// no grouping, kinging
+	spy: "2>, 2=, (1/1)>",	// no grouping
+	// pieces with no notation
+};	
+
 google.setOnLoadCallback(function() {
 	/* Safari & IE7: Disable text selection to stop interfering with dragging */
 	enableDocumentSelection(false);	
@@ -193,7 +244,10 @@ function decode_one_parlett(parlett)
 		// rook = (1,0)rider, bishop = (1,1)rider, queen (1,1)+(1,0)rider
 		movement = "rider";
 
-	console.log(movement, initial_only, capture_only, no_capture);
+	if (hippogonal)
+		moves = expand_hippogonal(distances);
+
+	return moves;
 }
 
 function test()
@@ -203,13 +257,13 @@ function test()
 }
 
 // Expand the shorthand for hippogonal moves, such as the knight:
-// 	expand_hippogonal(1,2) -> [[1, 2], [2, 1], [1, -2], [-2, 1], [-1, 2], [2, -1]]
+// 	expand_hippogonal([1,2]) -> [[1, 2], [2, 1], [1, -2], [-2, 1], [-1, 2], [2, -1]]
 // Requires q and p to be constant, so for example it can't represent the
 // Kraken fairy chess piece, with Parlett notation ~n/m, but there are probably easier
 // ways to handle that, if I get that far (it leaps to any square on the board).
-function expand_hippogonal(q, p)
+function expand_hippogonal(a)
 {
-	return include_reversed(times_each([q, p], [1, -1]));
+	return include_reversed(times_each(a, [1, -1]));
 }
 
 // Return a list of lists, where each element in the first is multiplied
