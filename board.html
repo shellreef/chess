@@ -182,7 +182,7 @@ function calculate_valid_moves()
 		var parlett = PIECE_TYPES[type];
 		var moves, pgn;
 	
-		if (type != "knight") return;	// TODO: all
+		if (type != "knight" && type != "king") return;	// TODO: all
 	
 		var moves = unfiltered_moves(parlett);
 		console.log(type,xy2pgn(xy),moves);
