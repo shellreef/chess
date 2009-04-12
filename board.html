@@ -552,11 +552,17 @@ function load_starting_position(fen)
 
 //// PIECE FUNCTIONS
 
-// Return the piece at (x,y) or PGN notation (like "f7"), or a false value if none.
-// Also see sq(), which returns the square at a given place.
+// Return an existing piece, given:
+// - (x,y) coordinates, like (0,0)
+// - location in algebraic notation, like "a8"
+// - a square, from sq()
 function pc(x, y)
 {
+	if (x.hasClassName && x.hasClassName("square"))
+		return x.childNodes[0];
+
 	var square = sq(x, y);
+
 	return square.childNodes[0];
 }
 
@@ -659,10 +665,14 @@ function new_piece(name)
 // Highlight/unhighlight moves for a given piece, unless dragging.
 function highlight_moves(piece, enable)
 {
+	var from_square;
+
 	// If player is dragging a piece over another piece, don't show
 	// legal moves for the piece under it.
 	if (GAME_STATE.dragging)
 		return;
+
+	from_square = piece.
 
 	moves_for(piece).each(function(square) {
 		if (enable) {
@@ -689,7 +699,9 @@ function moves_for(piece)
 
 	// TODO: calculate moves in set_turn, lookup here
 
-	return new Array(sq("a1"), sq("a2"), sq("f7"));
+	// VALID_MOVES is calculated after each turn, in calculate_valid_moves()
+	
+	return new Array(VALID_MOVES["b8"][0][3], VALID_MOVES["b8"][1][3]);
 }
 
 //// SQUARE FUNCTIONS
@@ -740,7 +752,13 @@ function sq(code, extra)
 {
 	var x, y;
 
-	if (extra !== undefined) {
+	// Accept pieces, too. TODO: update if change piece from <img>
+	if (code.constructor && /HTMLImageElement/.test(code.constructor.toString())) {
+		var xy = piece_location(code);
+
+		x = xy[0];
+		y = xy[0];
+	} else if (extra !== undefined) {
 		x = code;
 		y = extra;
 	} else {
