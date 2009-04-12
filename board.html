@@ -71,6 +71,10 @@ td.legal-move-black { background-color: #a15b17; }
 </style>
 <script src="http://www.google.com/jsapi"></script>
 <script language="javascript">
+if (!window.google)
+	alert("Google was not found. Nothing will work.");
+	// Let fall through an error out
+
 google.load("prototype", "1.6.0.3");
 google.load("scriptaculous", "1.8.2");
 
@@ -131,8 +135,8 @@ function set_turn(color)
 // Move a piece
 function move_dropped_piece(piece, square, event)
 {	
-	console.log(piece);
-	console.log(square);
+	//console.log(piece);
+	//console.log(square);
 
 	// TODO: do some cool effects when a piece is captured, but not too cool
 	//new Effect.Squish(square.firstChild);
@@ -271,8 +275,11 @@ function new_piece(name)
 // Get the legal moves for a piece
 function moves_for(piece)
 {
+	console.log(piece);
+
+	// TODO: calculate moves in set_turn, lookup here
+
 	return new Array(sq("a1"), sq("a2"), sq("f7"));
-	// TODO
 }
 
 //// SQUARE FUNCTIONS
