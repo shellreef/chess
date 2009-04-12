@@ -117,28 +117,43 @@ function expand_moves(moves)
 
 }
 
-// [1,2] * [1,1]
-// [1*1,  2*1]	[a[0]*b[0],a[1]*b[0]]
-// [1*1,  2*-1] [a[0]*b[0],a[1]*b[1]]
-// [1*-1, 2*1]  [a[0]*b[1],a[1]*b[0]]
-// [1*-1, 2*-1] [a[0]*b[1],a[1]*b[0]]
-// 
-function product(a, b)
+// Return a list of lists, where each element in the first is multiplied
+// by each combination of the second. For example, to implement +/-:
+// 	times_each([1,2], [1,-1]) == [[1,2], [1,-2], [-1,2], [-1,2]]
+// This is not the cross product or Cartesian product, something else.
+function times_each(a, b)
 {
-	// TODO: generate cross-product, like on http://code.activestate.com/recipes/159975/
-	var outer = new Array();
+	// Maybe there is a more elegant way to do this, with
+	// arbitrary array sizes..
+	return [
+		[a[0] * b[0], a[1] * b[0]],
+		[a[0] * b[0], a[1] * b[1]],
+		[a[0] * b[1], a[1] * b[0]],
+		[a[0] * b[1], a[1] * b[0]]
+	];
 
-	for (var i = 0; i < a.length; ++i) {
-		var inner = new Array();
+}
 
-		for (var j = 0; j < b.length; ++j) {
-			inner.push(a[i] * b[j]);
-		}
+function include_reversed(a)
+{
+	var all = [];
 
-		outer.push(inner);
+	for (var element in a)
+	{
+		all.push(element.clone().reverse());	
 	}
+}
 
-	return outer;
+// Create a "set", implemented as a hash with true values
+// Based on http://laurens.vd.oever.nl/weblog/items2005/setsinjavascript/
+function set()
+{
+	var result = {};
+
+	for (var i = 0; i < arguments.length; ++i)
+		result.set(arguments[i], true);
+
+	return result;
 }
 
 //// TURN FUNCTIONS
