@@ -96,6 +96,9 @@ var GAME_STATE = {
 	dragging: false
 };	
 
+// Moves that can be made right now, for each active piece.
+var VALID_MOVES = null;
+
 // Movement of pieces in extended Parlett notation
 var PIECE_TYPES = {
 // TODO: make this into a proper class/hash, where pieces have not only movements
@@ -170,19 +173,27 @@ google.setOnLoadCallback(function() {
 // After the board changes and it is the next person's turn, calculate what the next possible allowable moves are.
 function calculate_valid_moves()
 {
-	var new_moves;
+	VALID_MOVES = {};
 
 	// Look at all the active pieces
 	$$("img.active-color").each(function(piece) { 
 		var type = piece_type(piece);
 		var xy = piece_location(piece);	// TODO: OO
 		var parlett = PIECE_TYPES[type];
+		var moves, pgn;
 	
 		if (type != "knight") return;	// TODO: all
 	
 		var moves = unfiltered_moves(parlett);
-		console.log(type,xy2pgn(xy),moves);
-		console.log(move_rel2abs(xy,moves));
+		moves = move_rel2abs(xy,moves);
+
+		// Convert xy to PGN, so it can be easily used
+		// as a hash key.
+		pgn = xy2pgn(xy);
+
+		// Store valid moves for mouseovers etc.
+		VALID_MOVES[pgn] = moves;
+		console.log(pgn, moves);
 	});
 }
 
@@ -191,16 +202,26 @@ function calculate_valid_moves()
 // Note: Coordinates out of bounds *are* discarded, but not those that
 // land on an existing piece (one's own or the enemy's).
 // Note2: moves must be array of [x,y,flags]; the third element is required
+// A fourth element, the actual square element, is added for convenience.
 function move_rel2abs(xy_location, moves)
 {
 	var absolutes = new Array();
 
 	for (var i = 0; i < moves.length; ++i) {
 		var rel = moves[i];
-		var abs = [xy_location[0] + rel[0], xy_location[1] + rel[1], moves[2]];
+		var flags = rel[2];
+		var x = xy_location[0] + rel[0];
+		var y = xy_location[1] + rel[1];
 
-		if (abs[0] >= 0 && abs[0] <= 7 && abs[1] >= 0 && abs[1] <= 7)
-			absolutes.push(abs);
+		// TODO: stop hardcoding dimensions
+		if (x < 0 || x > 7 || y < 0 || y > 7)
+			continue;	// off board
+
+		var square = sq(x, y);
+
+		var abs = [x, y, flags, square];
+
+		absolutes.push(abs);
 	}
 
 	return absolutes;
