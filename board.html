@@ -121,8 +121,9 @@ function set_turn(color)
 	}
 
 
-	//if (new_color == "w") {
-	//new Draggable(piece, {revert: true, starteffect: undefined, endeffect: undefined });
+	$$("img.white").each(function(piece) {
+		new Draggable(piece, {revert: true, starteffect: undefined, endeffect: undefined });
+	});
 
 	$("status").innerHTML = ucfirst(new_color) + "'s Turn";
 
@@ -267,7 +268,7 @@ function new_piece(name)
 	// when being dropped. http://www.tutorialspoint.com/cgi-bin/practice.cgi?file=scriptaculous_12 
 	// does this too. reverteffect defaults to Effect.Move, and it reverts back to *something*,
 	// figure this point.
-	new Draggable(piece, {revert: true, starteffect: undefined, endeffect: undefined });
+	//new Draggable(piece, {revert: true, starteffect: undefined, endeffect: undefined });
 
 	return piece;
 }
@@ -276,6 +277,10 @@ function new_piece(name)
 function moves_for(piece)
 {
 	console.log(piece);
+
+	// If not this player's turn, no legal moves
+	if (!piece.hasClassName(game_state["active_color"]))
+		return [];
 
 	// TODO: calculate moves in set_turn, lookup here
 
