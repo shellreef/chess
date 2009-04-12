@@ -127,7 +127,7 @@ function set_turn(color)
 	assert(color == "white" || color == "black" || color == "next", "set_turn(" + color + "): invalid color");
 
 	if (color == "next") {
-		new_color = opposite_color(game_state["active_color"]);
+		new_color = opposite_color(game_state.active_color);
 	} else {
 		new_color = color;
 	}
@@ -144,7 +144,7 @@ function set_turn(color)
 	$("status").innerHTML = ucfirst(new_color) + "'s Turn";
 
 
-	game_state["active_color"] = new_color;
+	game_state.active_color = new_color;
 }
 
 //// BOARD FUNCTIONS
@@ -187,19 +187,19 @@ function load_fen(fen)
 	set_turn({w:"white", b:"black"}[parts[1]]);
 
 	castling = parts[2];
-	game_state["white_castle_short"] = /K/.test(castling);
-	game_state["white_castle_long"] = /Q/.test(castling);
-	game_state["black_castle_short"] = /k/.test(castling);
-	game_state["black__castle_long"] = /q/.test(castling);
+	game_state.white_castle_short = /K/.test(castling);
+	game_state.white_castle_long = /Q/.test(castling);
+	game_state.black_castle_short = /k/.test(castling);
+	game_state.black__castle_long = /q/.test(castling);
 
 	if (parts[3] == "-") {
-		game_state["enpassant_target"] = null;
+		game_state.enpassant_target = null;
 	} else {
-		game_state["enpassant_target"] = parts[3]; // for sq()
+		game_state.enpassant_target = parts[3]; // for sq()
 	}
 
-	game_state["halfmove_clock"] = parseInt(parts[4]);
-	game_state["fullmove_number"] = parseInt(parts[5]);
+	game_state.halfmove_clock = parseInt(parts[4]);
+	game_state.fullmove_number = parseInt(parts[5]);
 }
 
 // Load starting position in FEN. Example, at beginning of game:
@@ -322,7 +322,7 @@ function moves_for(piece)
 {
 	console.log(piece);
 	// If not this player's turn, no legal moves
-	if (!piece.hasClassName(game_state["active_color"]))
+	if (!piece.hasClassName(game_state.active_color))
 		return [];
 
 
