@@ -110,6 +110,39 @@ google.setOnLoadCallback(function() {
 	});
 });
 
+//// VALID MOVE FUNCTIONS
+function expand_moves(moves)
+{
+	var new_moves;
+
+}
+
+// [1,2] * [1,1]
+// [1*1,  2*1]	[a[0]*b[0],a[1]*b[0]]
+// [1*1,  2*-1] [a[0]*b[0],a[1]*b[1]]
+// [1*-1, 2*1]  [a[0]*b[1],a[1]*b[0]]
+// [1*-1, 2*-1] [a[0]*b[1],a[1]*b[0]]
+// 
+function product(a, b)
+{
+	// TODO: generate cross-product, like on http://code.activestate.com/recipes/159975/
+	var outer = new Array();
+
+	for (var i = 0; i < a.length; ++i) {
+		var inner = new Array();
+
+		for (var j = 0; j < b.length; ++j) {
+			inner.push(a[i] * b[j]);
+		}
+
+		outer.push(inner);
+	}
+
+	return outer;
+}
+
+//// TURN FUNCTIONS
+
 function opposite_color(color)
 {
 	var opposite = {white: "black", black: "white"}[color];
@@ -158,6 +191,7 @@ function move_dropped_piece(piece, square, event)
 	// TODO: do some cool effects when a piece is captured, but not too cool
 	//new Effect.Squish(square.firstChild);
 
+	// TODO: unhighlight all moves, better
 	highlight_moves(piece, false);
 
 	// Capture piece on destination square
