@@ -27,6 +27,13 @@ td.square
  height: 53px;
 }
 
+td.hover 
+{ 
+ //border: 1px solid black;
+ //background: url("images/wk.gif");
+ background-color: blue !important;
+}
+
 /* Colors based on http://en.wikipedia.org/wiki/Chessboard
  * Useful site: http://www.cssdrive.com/imagepalette/index.php
  * Colors palette generator, get colors of an arbitrary image.
@@ -75,7 +82,7 @@ google.setOnLoadCallback(function() {
 
 	for (var x = 0; x < 7; ++x) {
 		for (var y = 0; y < 7; ++y) {
-			Droppables.add(sq(x,y), {accept:"piece", onDrop: dropped});
+			Droppables.add(sq(x,y), {accept:"piece", onDrop: dropped, hoverclass: 'hover'});
 		}
 	}
 });
@@ -88,11 +95,9 @@ function dropped(piece, square, event)
 	// Capture piece on destination square
 	while (square.firstChild)
 		square.removeChild(square.firstChild);
-
 	// Move to new square
 	piece.parentNode.removeChild(piece);
 	square.appendChild(piece);
-	console.log(piece.style);
 }
 
 function load_fen(fen)
