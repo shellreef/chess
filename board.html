@@ -54,7 +54,7 @@ google.setOnLoadCallback(function() {
 
 	sq("a8").appendChild(new_piece("r"));
 	sq("b8").appendChild(new_piece("n"));
-	sq("c8").appendChild(new_piece("b"));
+	sq("c9").appendChild(new_piece("b"));
 });
 
 // Based on http://aymanh.com/9-javascript-tips-you-may-not-know
@@ -65,7 +65,7 @@ AssertException.prototype.toString = function() {
 
 function assert(expression, message)
 {
-	if (!exp) 
+	if (!expression) 
 		throw new AssertException(message);
 }
 
@@ -106,7 +106,8 @@ function sq(code, extra)
 		rank = 8 - (code.charCodeAt(1) - "0".charCodeAt(0));
 	}
 
-	// TODO: validate rank and file
+	assert(rank >= 0 && rank <= 7, "sq(" + code + ", " + extra + "): bad rank: " + rank);
+	assert(file >= 0 && file <= 7, "sq(" + code + ", " + extra + "): bad file: " + file);
 
 	return $('board-body').children[rank].children[file];
 }
