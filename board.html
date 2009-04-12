@@ -9,6 +9,16 @@ img.piece
  margin: 0px;
 }
 
+img.black {}
+img.white {}
+
+img.rook {}
+img.knight {}
+img.bishop {}
+img.queen {}
+img.king {}
+img.pawn {}
+
 table.board
 {
  border: 2px solid black;
@@ -87,6 +97,7 @@ google.setOnLoadCallback(function() {
 	//load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
 	load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
 
+	// TODO: only add droppables for valid squares?
 	$$(".square").each(function(square) {
 		Droppables.add(square, {accept:"piece", onDrop: move_dropped_piece, hoverclass: 'hover'});
 	});
@@ -195,20 +206,29 @@ function load_starting_position(fen)
 //  r = black rook, R = white rook, N = white knight
 function new_piece(name)
 {
-	var color, filename, piece;
+	var color, filename, piece, piece_type, classes;
+
+	classes = "piece";	
 
 	// In FEN, uppercase=white, lower=black
 	if (/^[RNBQKP]/.test(name)) {
 		color = "w";
+		classes += " white";
 	} else if (/^[rnbqkp]/.test(name)) {
 		color = "b";
+		classes += " black";
 	} else {
 		assert("new_piece(" + name + "): unrecognized");
 	}
+	piece_type = name.toLowerCase();
 
-	filename = 'images/' + color + name.toLowerCase() + '.gif';
+	classes += " " + {r: 'rook', n: 'knight', b: 'bishop', q: 'queen', k: 'king', p: 'pawn'}[piece_type];
 
-	piece = Builder.node('img', {'src': filename, 'class': 'piece'});
+	// TODO: pngs
+	filename = 'images/' + color + piece_type + '.gif';
+
+
+	piece = Builder.node('img', {'src': filename, 'class': classes});
 
 	// Highlight/unhighlight legal moves on mouse over, like Chess with Friends.
 	// Yahoo Games does this too, but uses a yellow outline.
