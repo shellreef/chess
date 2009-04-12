@@ -162,6 +162,8 @@ function move_dropped_piece(piece, square, event)
 	// TODO: do some cool effects when a piece is captured, but not too cool
 	//new Effect.Squish(square.firstChild);
 
+	highlight_moves(piece, false);
+
 	// Capture piece on destination square
 	while (square.firstChild)
 		square.removeChild(square.firstChild);
