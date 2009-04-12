@@ -145,12 +145,19 @@ function unfiltered_moves(parlett)
 // See http://en.wikipedia.org/wiki/Fairy_chess_piece#Notations
 function decode_one_parlett(parlett)
 {
-	var movement, initial_only, capture_only, no_capture;
+	var movement, initial_only, capture_only, no_capture, hippogonal;
+	var distances, directions;
+
+	distances = new Array();
 
 	for (var i = 0; i < parlett.length; ++i) {
 		var ch = parlett[i];
 
 		if (ch == "~") {
+			// Moves by leaping to a fixed number (well, it can be
+			// reduced later) of relative positions, jumping over
+			// pieces if needed, capturing where it ends up. 
+			// ex: knight = (2,1)leaper, king (1,0)+(1,1)leaper
 			movement = "leaper";
 
 		// Conditional modifiers that all returned moves should note.
@@ -167,14 +174,32 @@ function decode_one_parlett(parlett)
 			// can move to enemy square in order to capture it
 			// (pawn's forward move)
 			no_capture = true;
+
+		} else if (/[0-9]/.test(ch)) {
+			distances.push(parseInt(ch));
+		} else if (ch == "n") {
+			distance.push(Infinity)
+		} else if (ch == "/") {
+			hippogonal = true;
+
+		// TODO: directions
+
+		} else {
+			assert(false, "decode_one_parlett(" + parlett + "): unknown character: " + ch);
 		}
 	}
+	if (!movement)
+		// Move unlimited distance in one direction, as long as its not blocked
+		// rook = (1,0)rider, bishop = (1,1)rider, queen (1,1)+(1,0)rider
+		movement = "rider";
+
 	console.log(movement, initial_only, capture_only, no_capture);
 }
 
 function test()
 {
-	console.log(unfiltered_moves("o1>, c1X>, io2>"));
+	//console.log(unfiltered_moves("o1>, c1X>, io2>"));
+	console.log(unfiltered_moves("~1/2"));
 }
 
 // Expand the shorthand for hippogonal moves, such as the knight:
