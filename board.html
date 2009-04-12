@@ -48,8 +48,9 @@ td.hover
 td.white { background-color: #ffce9e; }
 td.black { background-color: #d18b47; }
 
-td.legal-move-white { background-color: #ffefbf; }
-td.legal-move-black { background-color: #efaf6f; }
+/* TODO: check out what colors Chess with Friends uses */
+td.legal-move-white { background-color: #cf9e6e; }
+td.legal-move-black { background-color: #a15b17; }
 
 
 /* Would be cool to use CSS3 expressions to make the pattern, but they're not in
@@ -91,6 +92,7 @@ google.setOnLoadCallback(function() {
 	});
 });
 
+//// BOARD FUNCTIONS
 function dropped(piece, square, event)
 {	
 	console.log(piece);
@@ -163,6 +165,8 @@ function load_starting_position(fen)
 	}
 }
 
+//// PIECE FUNCTIONS
+
 // Create a new piece or pawn, given the name in
 // Forsyth-Edwards Notation, for example:
 //  r = black rook, R = white rook, N = white knight
@@ -183,7 +187,8 @@ function new_piece(name)
 
 	piece = Builder.node('img', {'src': filename, 'class': 'piece'});
 
-	// Highlight/unhighlight legal moves on mouse over
+	// Highlight/unhighlight legal moves on mouse over, like Chess with Friends.
+	// Yahoo Games does this too, but uses a yellow outline.
 	Event.observe(piece, 'mouseover', function() {
 			moves_for(piece).each(function(square) {
 				if (square.hasClassName("white"))
@@ -216,6 +221,8 @@ function moves_for(piece)
 	// TODO
 }
 
+//// SQUARE FUNCTIONS
+
 // Get a square cell, given location in either
 // - algebraic notation (example: "a8", one argument), or
 // - x,y coordinates, (equivalent example: 0,0)
@@ -236,6 +243,8 @@ function sq(code, extra)
 
 	return $('board-body').childNodes[rank].childNodes[file];
 }
+
+//// LOW-LEVEL FUNCTIONS
 
 // Based on http://aymanh.com/9-javascript-tips-you-may-not-know
 function AssertException(message) { this.message = message; }
