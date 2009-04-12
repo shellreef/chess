@@ -103,7 +103,9 @@ var piece_types = {
 // and codes for FEN notation of initial board positions, also black and white
 
 	// Standard international chess pieces
-	king: "1*",		// TODO: royal
+
+	//king: "1*",		// TODO: royal, and this notation
+	king: "~1/1, ~1/0",	// equivalent hippogonal leaper
 	queen: "n*",
 	bishop: "nX",
 	rook: "n+",
@@ -253,7 +255,12 @@ function decode_one_parlett(parlett)
 function test()
 {
 	//console.log(unfiltered_moves("o1>, c1X>, io2>"));
-	console.log(unfiltered_moves("~1/2"));
+	console.log(unfiltered_moves(piece_types.knight));
+	console.log(unfiltered_moves(piece_types.camel));
+	console.log(unfiltered_moves(piece_types.zebra));
+	console.log(unfiltered_moves(piece_types.squirrel));
+	console.log(unfiltered_moves(piece_types.zero));
+	console.log(unfiltered_moves(piece_types.king));
 }
 
 // Expand the shorthand for hippogonal moves, such as the knight:
