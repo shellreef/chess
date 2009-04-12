@@ -185,6 +185,7 @@ function calculate_valid_moves()
 		if (type != "knight") return;	// TODO: all
 	
 		var moves = unfiltered_moves(parlett);
+		console.log(type,xy2pgn(xy),moves);
 		moves = move_rel2abs(xy,moves);
 
 		// Convert xy to PGN, so it can be easily used
@@ -213,8 +214,10 @@ function move_rel2abs(xy_location, moves)
 		var y = xy_location[1] + rel[1];
 
 		// TODO: stop hardcoding dimensions
-		if (x < 0 || x > 7 || y < 0 || y > 7)
+		if (x < 0 || x > 7 || y < 0 || y > 7) {
+			console.log("reject", x, y);
 			continue;	// off board, TODO: option for chess variants to wrap around?
+		}
 
 		var abs = [x, y, flags];
 
@@ -328,7 +331,7 @@ function add_flags(moves, flags)
 }
 
 // Expand the shorthand for hippogonal moves, such as the knight:
-// 	expand_hippogonal([1,2]) -> [[1, 2], [2, 1], [1, -2], [-2, 1], [-1, 2], [2, -1]]
+// 	expand_hippogonal([1,2]) -> [[1, 2], [2, 1], [-1, 2], [2, -1], [1, -2], [-2, 1], [-1, -2], [-2, -1]]
 // Requires q and p to be constant, so for example it can't represent the
 // Kraken fairy chess piece, with Parlett notation ~n/m, but there are probably easier
 // ways to handle that, if I get that far (it leaps to any square on the board).
@@ -349,7 +352,7 @@ function times_each(a, b)
 		[a[0] * b[0], a[1] * b[0]],
 		[a[0] * b[0], a[1] * b[1]],
 		[a[0] * b[1], a[1] * b[0]],
-		[a[0] * b[1], a[1] * b[0]]
+		[a[0] * b[1], a[1] * b[1]]
 	];
 
 }
@@ -655,7 +658,7 @@ function new_piece(name)
 		starteffect: undefined, 
 		endeffect: undefined,
 		onStart: function() { GAME_STATE.dragging = true; },
-		onEnd: function() { GAME_STATE.dragging = false; },
+		onEnd: function() { GAME_STATE.dragging = false; unhighlight_all(); },
 	 });
 
 
@@ -705,6 +708,15 @@ function highlight_moves(piece, enable)
 	});
 }
 
+// Unhighlight all highlighted black/white squares. Used in onEnd draggable, for
+// some reason, highlight_moves(piece, false) does not unhighlight, maybe the piece changed..
+function unhighlight_all()
+{
+	$$("td.legal-move-white", "td.legal-move-black").each(function(square) {
+		square.removeClassName("legal-move-white");
+		square.removeClassName("legal-move-black");
+	});
+}
 
 //// SQUARE FUNCTIONS
 
