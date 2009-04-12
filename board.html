@@ -20,7 +20,8 @@ table.board
 
 td.square
 {
- border-style: none;
+ //border-style: none;
+ border: 1px solid black;
  padding: 0em;
  margin: 0em;
  width: 53px;
@@ -89,6 +90,9 @@ function dropped(piece, square, event)
 {	
 	console.log(piece);
 	console.log(square);
+
+	// TODO: do some cool effects when a piece is captured, but not too cool
+	//new Effect.Squish(square.firstChild);
 
 	// Capture piece on destination square
 	while (square.firstChild)
@@ -159,7 +163,7 @@ function load_starting_position(fen)
 //  r = black rook, R = white rook, N = white knight
 function new_piece(name)
 {
-	var color, filename, node;
+	var color, filename, piece;
 
 	// In FEN, uppercase=white, lower=black
 	if (/^[RNBQKP]/.test(name)) {
@@ -172,12 +176,34 @@ function new_piece(name)
 
 	filename = 'images/' + color + name.toLowerCase() + '.gif';
 
-	node = Builder.node('img', {'src': filename, 'class': 'piece'});
+	piece = Builder.node('img', {'src': filename, 'class': 'piece'});
+
+	// Highlight/unhighlight legal moves on mouse over
+	Event.observe(piece, 'mouseover', function() {
+			moves_for(piece).each(function(square) {
+				square.setStyle({border: '1px solid yellow'});
+			});
+		}
+	);
+	Event.observe(piece, 'mouseout', function() 
+		{
+			moves_for(piece).each(function(square) { 
+				square.setStyle({border: '1px solid black'});
+			});
+		}
+	);
 
 	// TODO: instead of reverting, check if valid move
-	new Draggable(node, {revert: true, starteffect: undefined, endeffect: undefined });
+	new Draggable(piece, {revert: true, starteffect: undefined, endeffect: undefined });
 
-	return node;
+	return piece;
+}
+
+// Get the legal moves for a piece
+function moves_for(piece)
+{
+	return new Array(sq("a1"), sq("a2"), sq("f7"));
+	// TODO
 }
 
 // Get a square cell, given location in either
