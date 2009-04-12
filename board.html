@@ -160,7 +160,8 @@ google.setOnLoadCallback(function() {
 	
 	//load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	//load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
-	load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
+	//load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
+	load_fen("rnbqkb1r/pp1ppppp/5n2/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2");
 
 	// TODO: only add droppables for valid squares? Actually, probably just want to change class.
 	$$(".square").each(function(square) {
@@ -182,7 +183,7 @@ function calculate_valid_moves()
 		var parlett = PIECE_TYPES[type];
 		var moves, pgn;
 	
-		if (type != "knight" && type != "king") return;	// TODO: all
+		if (type != "knight" && type != "king" && type != "bishop") return;	// TODO: all
 	
 		var moves = unfiltered_moves(parlett, xy);
 		console.log(type,xy2pgn(xy),moves);
@@ -214,7 +215,7 @@ function move_rel2abs(xy_location, moves)
 
 		// TODO: stop hardcoding dimensions
 		if (x < 0 || x > 7 || y < 0 || y > 7) {
-			console.log("reject", x, y);
+			//console.log("reject", x, y);
 			continue;	// off board, TODO: option for chess variants to wrap around?
 		}
 
@@ -349,17 +350,32 @@ function decode_one_parlett(parlett, xy)
 	console.log(movement);
 	console.log(directions);
 
-	if (hippogonal) {	// assumes leaper
+	if (hippogonal) {
+		assert(movement == "leaper", "decode_one_parlett(" + parlett + 
+			"): only hippogonals that are leapers are currently supported");
+
 		// First get valid destinations, then convert to absolute coordinates.
 		// Relatively easy, since with leapers, can disregard pieces on the path
 		var rel_moves = add_flags(expand_hippogonal(distances), flags);
 
 		moves = move_rel2abs(xy, rel_moves);
+	} else if (movement == "leaper") {
+		assert(false, "decode_one_parlett(" + parlett + 
+			"): only leapers that are hippogonals are currently supported");
+	} else if (movement == "rider") {
+		moves = add_flags(expand_rider(distances, directions, xy), flags);
 	} else {
-		assert(false, "decode_one_parlett TODO: implement parlett " + parlett);
+		assert(false, "decode_one_parlett(" + parlett + "): unsupported movement");
 	}
 
 	return moves;
+}
+
+function expand_rider(distances, directions, xy)
+{
+	console.log("expand_rider",distances, directions, xy);
+
+	return [[0,0]];
 }
 
 // Add a third element to a list of moves, extra "flags" that describe
