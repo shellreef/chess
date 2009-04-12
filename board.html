@@ -629,6 +629,7 @@ function new_piece(name)
 
 	// Highlight/unhighlight legal moves on mouse over, like Chess with Friends.
 	// Yahoo Games does this too, but uses a yellow outline.
+	// TODO: something is wrong, get only one mouseover per file!
 	Event.observe(piece, 'mouseover', function() {
 			highlight_moves(piece, true);
 		});
@@ -665,44 +666,45 @@ function new_piece(name)
 // Highlight/unhighlight moves for a given piece, unless dragging.
 function highlight_moves(piece, enable)
 {
-	var from_square;
+	var from_square, moves;
 
 	// If player is dragging a piece over another piece, don't show
 	// legal moves for the piece under it.
 	if (GAME_STATE.dragging)
 		return;
 
-	from_square = piece.
-
-	moves_for(piece).each(function(square) {
-		if (enable) {
-			if (square.hasClassName("white"))
-				square.addClassName("legal-move-white");
-			else
-				square.addClassName("legal-move-black");
-		} else {
-				square.removeClassName("legal-move-white");
-				square.removeClassName("legal-move-black");
-		}
-	});
-}
-
-
-// Get the legal moves for a piece
-function moves_for(piece)
-{
-	console.log(piece);
 	// If not this player's turn, no legal moves
 	if (!piece.hasClassName(GAME_STATE.active_color))
 		return [];
 
+	from_square = sq(piece);
 
-	// TODO: calculate moves in set_turn, lookup here
+	console.log(from_square.pgn);
+	moves = VALID_MOVES[from_square.pgn];
+	console.log(moves);
+	if (!moves)
+		return;	
 
-	// VALID_MOVES is calculated after each turn, in calculate_valid_moves()
-	
-	return new Array(VALID_MOVES["b8"][0][3], VALID_MOVES["b8"][1][3]);
+	moves.each(function(move) {
+		var x, y, flags, to_square;
+		
+		x = move[0];
+		y = move[1];
+		flags = move[2];
+		to_square = move[3];
+
+		if (enable) {
+			if (to_square.hasClassName("white"))
+				to_square.addClassName("legal-move-white");
+			else
+				to_square.addClassName("legal-move-black");
+		} else {
+				to_square.removeClassName("legal-move-white");
+				to_square.removeClassName("legal-move-black");
+		}
+	});
 }
+
 
 //// SQUARE FUNCTIONS
 
