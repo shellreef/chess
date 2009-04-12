@@ -495,11 +495,19 @@ function load_starting_position(fen)
 
 //// PIECE FUNCTIONS
 
-// Return the type of a piece node (rook, bishop, etc.)
+// Return the piece at (x,y) or PGN notation (like "f7"), or a false value if none.
+// Also see sq(), which returns the square at a given place.
+function pc(x, y)
+{
+	var square = sq(x, y);
+	return square.childNodes[0];
+}
+
+// Return the type of a piece node (rook, bishop, etc.), or a false value
 function piece_type(piece)
 {
 	if (!piece || !piece.classNames)
-		return null;
+		return undefined;	// or should it be null, false?
 
 	var classes = piece.classNames();
 	var type;
