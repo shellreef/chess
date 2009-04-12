@@ -103,7 +103,7 @@ google.setOnLoadCallback(function() {
 
 	// TODO: only add droppables for valid squares?
 	$$(".square").each(function(square) {
-		Droppables.add(square, {accept:"piece", onDrop: move_dropped_piece, hoverclass: 'hover'});
+		Droppables.add(square, {accept:"active-color", onDrop: move_dropped_piece, hoverclass: 'hover'});
 	});
 });
 
@@ -129,20 +129,13 @@ function set_turn(color)
 		new_color = color;
 	}
 
-	// TODO: instead of reverting, check if valid move
-	// TODO: Figure out how to fix how the draggable jumps, by the amount it moved,
-	// when being dropped. http://www.tutorialspoint.com/cgi-bin/practice.cgi?file=scriptaculous_12 
-	// does this too. reverteffect defaults to Effect.Move, and it reverts back to *something*,
-	// figure this point.
-	//new Draggable(piece, {revert: true, starteffect: undefined, endeffect: undefined });
-
+	// Class to tell droppables that they can accept these pieces.
 	$$("img." + new_color).each(function(piece) {
-		piece.draggable = new Draggable(piece, {revert: true, starteffect: undefined, endeffect: undefined });
+		piece.addClassName("active-color");
 	});
 
 	$$("img." + opposite_color(new_color)).each(function(piece) {
-		if (piece.draggable)
-			piece.draggable.destroy();
+		piece.removeClassName("active-color");
 	});
 
 	$("status").innerHTML = ucfirst(new_color) + "'s Turn";
@@ -272,6 +265,23 @@ function new_piece(name)
 	Event.observe(piece, 'mouseout', function() {
 			highlight_moves(piece, false);
 		});
+
+	// Make all new pieces draggable. I tried only making the active color's
+	// pieces draggable, but then in Safari they can still be selected like text,
+	// even with enableDocumentSelection(false), maybe I need to enable it on the
+	// images too, but it wasn't appealing. In Firefox, the images can be dragged
+	// as ghosts, which is cool, but instead: now pieces can only be dropped anywhere
+	// if they are the active colors move. The player can drag the opponent's pieces
+	// around but not drop anywhere.
+
+	// TODO: instead of reverting, check if valid move
+	// TODO: Figure out how to fix how the draggable jumps, by the amount it moved,
+	// when being dropped. http://www.tutorialspoint.com/cgi-bin/practice.cgi?file=scriptaculous_12 
+	// does this too. reverteffect defaults to Effect.Move, and it reverts back to *something*,
+	// figure this point.
+	new Draggable(piece, {revert: true, starteffect: undefined, endeffect: undefined });
+
+
 
 	return piece;
 }
