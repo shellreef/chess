@@ -265,10 +265,12 @@ function unfiltered_moves(parlett, xy)
 }
 
 // Decode a Parlett direction character, or return a false value if that is not what it is.
-// Returns an array of two-element arrays of direction vectors.
+// Returns an 2-element array:
+// 0th element: array of two-element arrays of direction vectors.
+// 1st element: true if ch2 was consumed, false if only ch was used
 function decode_direction(ch, ch2)
 {
-	var forward;
+	var forward, backward;
 
 	// What way pieces go when they move forwards. Remember, these are x,y
 	// vectors so negative is up, positive is down.
@@ -279,41 +281,47 @@ function decode_direction(ch, ch2)
 	} else {
 		assert(false, "decode_direction(" + ch + "): bad active color: " + GAME_STATE.active_color);
 	}
+	backward = -forward;
 
 	if (ch == "+") { 
 		// orthogonally four possible directions
-		return include_reversed(times_each([1, 0], [1, -1]));
-	//} else if (ch == ">") {
-	//} else if (ch == ">=") {
-	// TODO: orthogonally/diagnonally forwards/backwards, depends on color
+		return [include_reversed(times_each([1, 0], [1, -1])), false];
 	} else if (ch == "=") {
 		// orthogonally sideways
-		return [[1, 0], [-1, 0]];
+		return [[[1, 0], [-1, 0]], false];
 	} else if (ch == ">") {
-		// orthogonally forward
-		return [[0, forward]];
-
-/* could support <> (sideways) easily, but would have to parse it! so its not so easy
-	} else if (ch == "<") {
-		if (i + 1 < parlett.length && parlett[++i] == ">") {
-			// <> orthogonally forwards and backwards
-			return [[0, 1], [0, -1]]
+		if (ch2 == "=") {
+			// >= orthogonally forwards or sideways
+			return [decode_direction(">")[0].concat(decode_direction("=")[0]), true];
 		} else {
-			assert("decode_one_parlet(" + parlett + "): unsupported: " + ch);
+			// = orthogonally forward
+			return [[[0, forward]], false];
 		}
-		//} else if (ch == "<") {
-		//} else if (ch == "<=") {
-		// TODO: forward/backwards depends on color (direction of pieces)
-*/
+	} else if (ch == "<") {
+		if (ch2 == ">") {
+			// <> orthogonally forwards and backwards
+			return [[[0, forward], [0, backward]], true];
+		} else if (ch2 == "=") {
+			// <= orthogonally backwards or sideways
+			return [decode_direction("<")[0].concat(decode_direction("=")[0]), true];
+		} else {
+			// < orthogonally backwards
+			return [[[0, backward]], false];
+		}
 	} else if (ch == "X") { 
-		// diagonally four possible directions
-		return include_reversed(times_each([1, 1], [1, -1]));
-		//} else if (ch == "X>") {	// Note: would need to peek next character below
-		//} else if (ch == "X<") {
-		// TODO: forward/backwards depends on color (direction of pieces)
+		if (ch2 == ">") {
+			// X> diagonally forwards
+			return [[[1, forward], [-1, forward]], true];
+		} else if (ch2 == "<") {
+			// X< diagonally backwards
+			return [[[1, backwards], [-1, backwards]], true];
+		} else {
+			// X diagonally four possible directions
+			return [include_reversed(times_each([1, 1], [1, -1])), false];
+		}
 	} else if (ch == "*") {	
 		// orthogonally or diagonally (eight possible directions)
-		return decode_direction("+").concat(decode_direction("X"));
+		return [decode_direction("+")[0].concat(decode_direction("X")[0]), false];
 	} else {
 		return null;
 	}
@@ -363,9 +371,11 @@ function decode_one_parlett(parlett, xy)
 		} else if (ch == "/") {
 			hippogonal = true;
 		} else {
-			maybe_directions = decode_direction(ch);
+			maybe_directions = decode_direction(ch, parlett[i + 1]);
 			if (maybe_directions) {
-				directions = maybe_directions;
+				directions = maybe_directions[0];
+				if (maybe_directions[1])
+					i++;	// two-character direction
 			} else {
 				assert(false, "decode_one_parlett(" + parlett + "): unsupported: " + ch);
 			}
