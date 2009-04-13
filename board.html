@@ -573,7 +573,10 @@ function set_turn(color)
 
 
 	GAME_STATE.active_color = new_color;
-	calculate_valid_moves();
+
+	// Give the player some time to think.. or really, do not calculate
+	// the moves immediately, since then it will lag the piece dropping.
+	setTimeout(calculate_valid_moves, 1000);
 }
 
 //// BOARD FUNCTIONS
