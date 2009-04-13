@@ -359,7 +359,7 @@ function decode_one_parlett(parlett, xy)
 		var rel_moves = add_flags(expand_hippogonal(distances), flags);
 
 		moves = move_rel2abs(xy, rel_moves).reject(function(xy) {
-			return sq(xy).hasClassName("active-color");
+			return sq(xy[0], xy[1]).hasClassName("active-color");
 		});
 
 	} else if (movement == "leaper") {
@@ -895,7 +895,6 @@ function xy2pgn(x, y)
 // Get a square cell, given location in either
 // - algebraic notation (example: "a8", one argument), or
 // - x,y coordinates, (equivalent example: 0,0)
-// - [x,y] coordinates, one argument in an array
 // - a piece, returned by pc(), will return the enclosing square
 function sq(code, extra)
 {
@@ -912,9 +911,6 @@ function sq(code, extra)
 	} else if (extra !== undefined) {
 		x = code;
 		y = extra;
-	} else if (code.length && code.length >= 2 && extra == undefined) {
-		x = code[0];
-		y = code[1];
 	} else {
 		var xy = pgn2xy(code);
 
