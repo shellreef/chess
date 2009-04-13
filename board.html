@@ -359,7 +359,12 @@ function decode_one_parlett(parlett, xy)
 		var rel_moves = add_flags(expand_hippogonal(distances), flags);
 
 		moves = move_rel2abs(xy, rel_moves).reject(function(xy) {
-			return sq(xy[0], xy[1]).hasClassName("active-color");
+			var piece = pc(xy[0], xy[1]);
+			if (!piece)
+				return false;	// unoccupied, good
+
+			// skip squares that are occupied by friendly pieces
+			return piece.hasClassName("active-color");
 		});
 
 	} else if (movement == "leaper") {
@@ -685,7 +690,7 @@ function load_starting_position(fen)
 
 //// PIECE FUNCTIONS
 
-// Return an existing piece, given:
+// Return an existing piece somewhere (or a false value), given:
 // - (x,y) coordinates, like (0,0)
 // - location in algebraic notation, like "a8"
 // - a square, from sq()
@@ -899,8 +904,6 @@ function xy2pgn(x, y)
 function sq(code, extra)
 {
 	var x, y;
-
-	console.log("sq",code,extra);
 
 	// Accept pieces, too. TODO: update if change piece from <img>
 	if (code.constructor && /HTMLImageElement/.test(code.constructor.toString())) {
