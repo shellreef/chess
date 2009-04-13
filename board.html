@@ -175,18 +175,11 @@ function calculate_valid_moves()
 
 	// Look at all the active pieces
 	$$("img.active-color").each(function(piece) { 
-		var type = piece_type(piece);
-		var xy = piece_location(piece);	// TODO: OO
-		var parlett = PIECE_TYPES[type];
-		var moves, pgn;
-	
-		if (type == "pawn") return; // TODO: support
-	
-		var moves = unfiltered_moves(parlett, xy);
+		var moves = filtered_moves(piece);
 
 		// Convert xy to PGN, so it can be easily used
 		// as a hash key.
-		pgn = xy2pgn(xy);
+		pgn = sq(piece).pgn;
 
 		// Create drop targets for the valid destinations, linking
 		// the draggables to droppables using piece- + source square.
@@ -205,8 +198,60 @@ function calculate_valid_moves()
 
 		// Store valid moves for mouseovers etc.
 		VALID_MOVES[pgn] = moves;
-		console.log(pgn, moves);
+		//console.log(pgn, moves);
 	});
+}
+
+// Compute legal moves for a piece, removing illegal moves. This
+// takes a while, so it is only done once when the board changes.
+// Use VALID_MOVES otherwise.
+function filtered_moves(piece)
+{
+	var type = piece_type(piece);
+	var xy = piece_location(piece);	// TODO: OO
+	var x = xy[0], y = xy[1];
+	var parlett = PIECE_TYPES[type];
+	var filtered;
+
+	var unfiltered = unfiltered_moves(parlett, xy);
+
+	filtered = unfiltered.select(function(move) {
+		var allowed = true;
+
+		if (move[2].initial_only) {
+			if (pawn_moved(piece)) 
+				allowed = false;
+		}
+
+		if (move[2].capture_only) {
+			// Destination square must be occupied by enemy piece
+			// TODO: non-royal (can't capture king)
+			allowed = false;
+		}
+
+		return allowed;
+	});
+
+	// TODO: check if puts in check
+
+	return filtered;
+}
+
+// Return whether a pawn has moved from its initial position. Unfortunately,
+// the starting ranks of black and white pawns are hardcoded, so that games
+// in-progress can be loaded and pawns that have moved, but we haven't seen move,
+// are recognized as in fact having moved. Other games with pawns in ranks other
+// than 2nd and 7th (Chinese Chess, etc.) will need to have this modified.
+// TODO: store initial rank in piece information
+function pawn_moved(piece)
+{
+	if (piece.hasClassName("white")) {
+		return sq(piece).y != 6;    // 2nd rank
+	} else if (piece.hasClassName("black")) {
+		return sq(piece).y != 1;    // 7th rank
+	} else {
+		assert("pawn_not_moved(" + piece + "): neither white nor black");
+	}
 }
 
 // Convert relative move destinations (0,0 = where the piece is,
@@ -251,10 +296,11 @@ function unfiltered_moves(parlett, xy)
 	// Mutually exclusive choices
 	choice_groups = parlett.split(", ");
 
-	console.log(choice_groups);
+	//console.log(choice_groups);
 	for (var i = 0; i < choice_groups.length; ++i) {
 		// For each group, gather the move options. 
 		// (Would be nice if JavaScript arrays had a Python-like .extend)
+
 		moves = moves.concat(decode_one_parlett(choice_groups[i], xy));
 	}	
 
@@ -331,7 +377,7 @@ function decode_direction(ch, ch2)
 // See http://en.wikipedia.org/wiki/Fairy_chess_piece#Notations
 function decode_one_parlett(parlett, xy)
 {
-	var movement, initial_only, capture_only, no_capture, hippogonal;
+	var movement, hippogonal;
 	var distances, directions, flags, maybe_directions;
 
 	assert(xy, "decode_one_parlett("+ parlett + ", " + xy + "): piece xy not given");
@@ -386,8 +432,8 @@ function decode_one_parlett(parlett, xy)
 		// rook = (1,0)rider, bishop = (1,1)rider, queen (1,1)+(1,0)rider
 		movement = "rider";
 
-	console.log("movement=",movement);
-	console.log("directions=",directions);
+	//console.log("movement=",movement);
+	//console.log("directions=",directions);
 
 	if (hippogonal) {
 		assert(movement == "leaper", "decode_one_parlett(" + parlett + 
@@ -437,7 +483,7 @@ function expand_rider(limit, directions, xy)
 {
 	var moves = new Array();
 
-	console.log("expand_rider",limit, directions, xy);
+	//console.log("expand_rider",limit, directions, xy);
 
 	directions.each(function(direction) {
 		moves = moves.concat(expand_direction(limit, direction, xy));
@@ -479,7 +525,7 @@ function expand_direction(limit, direction, start_xy)
 			}
 		}
 
-		console.log(xy2pgn(x,y));	
+		//console.log(xy2pgn(x,y));	
 		moves.push([x, y])
 	}
 
@@ -641,7 +687,7 @@ function name_squares()
 			square.x = x;
 			square.y = y;
 			square.pgn = xy2pgn(x, y);
-			console.log(square);
+			//console.log(square);
 		}
 	}
 }	
@@ -656,6 +702,7 @@ function move_dropped_piece(piece, square, event)
 	//if (square.firstChild)
 		//new Effect.Squish(pc(square));
 
+	// Can't drop this piece anywhere anymore.
 	piece.removeClassName("piece-" + piece.prior_position);
 	ALL_DROP_TARGETS.each(function(square) {
 		Droppables.remove(square);
@@ -864,9 +911,9 @@ function highlight_moves(piece, enable)
 
 	from_square = sq(piece);
 
-	console.log(from_square.pgn);
+	//console.log(from_square.pgn);
 	moves = VALID_MOVES[from_square.pgn];
-	console.log(moves);
+	//console.log(moves);
 	if (!moves)
 		return;	
 
