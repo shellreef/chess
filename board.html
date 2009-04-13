@@ -219,6 +219,7 @@ function filtered_moves(piece)
 		var allowed = true;
 
 		if (move[2].initial_only) {
+			// Can only move if have not moved this piece yet
 			if (pawn_moved(piece)) 
 				allowed = false;
 		}
@@ -229,6 +230,13 @@ function filtered_moves(piece)
 			var piece_under = pc(move[0], move[1]);
 			if (!piece_under)
 				allowed = false;	// needs something to capture
+		}
+		
+		if (move[2].no_capture) {
+			// Can only move if unoccupied, not to capture
+			var piece_under = pc(move[0], move[1]);
+			if (piece_under)
+				allowed = false;	// can't capture, man
 		}
 
 		return allowed;
