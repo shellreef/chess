@@ -175,11 +175,28 @@ google.setOnLoadCallback(function() {
 function mv(move)
 {
 	if (!move)
-		return all_algebraic_moves();
+		return all_filerank_moves();
 
-	// TODO: otherwise, accept move in algebraic notation
+	// TODO: otherwise, accept move in filerank notation
 }
+// TODO: Nc6, etc. with overridden toString so can just type it at the console?
 
+function parse_filerank(alg)
+{
+	var type;
+
+	// TODO: file for rooks, to disambiguate. And extended notation.
+
+	// First could be piece type
+	if (/^[A-Z]$/.test(alg[0])) {
+		type = PIECE_LETTER2NAME[alg[0].toLowerCase()];
+	} else {
+		type = "pawn";
+	}
+	assert(type, "parse_filerank(" + alg + ": couldn't figure out piece type");
+
+	return type;
+}
 
 
 //// VALID MOVE FUNCTIONS
@@ -193,28 +210,28 @@ function calculate_valid_moves()
 	$$("img.active-color").each(function(piece) { 
 		var moves = filtered_moves(piece);
 
-		// Convert xy to algebraic notation, so it can be easily used
+		// Convert xy to filerank notation, so it can be easily used
 		// as a hash key.
-		algebraic = sq(piece).algebraic;
+		filerank = sq(piece).filerank;
 
 		// Create drop targets for the valid destinations, linking
 		// the draggables to droppables using piece- + source square.
-		piece.addClassName("piece-" + algebraic);
-		piece.prior_position = algebraic;	// for removal
+		piece.addClassName("piece-" + filerank);
+		piece.prior_position = filerank;	// for removal
 		moves.each(function(move) {
 			var square = sq(move[0], move[1]);
 
 			ALL_DROP_TARGETS.push(square); // for removal
 
 			Droppables.add(square, {
-				accept: "piece-" + algebraic,
+				accept: "piece-" + filerank,
 				onDrop: move_dropped_piece,
 				hoverclass: 'hover'});
 		});
 
 		// Store valid moves for mouseovers etc.
-		VALID_MOVES.set(algebraic, moves);
-		//console.log(algebraic, moves);
+		VALID_MOVES.set(filerank, moves);
+		//console.log(filerank, moves);
 	});
 }
 
@@ -551,7 +568,7 @@ function expand_direction(limit, direction, start_xy)
 			}
 		}
 
-		//console.log(xy2algebraic(x,y));	
+		//console.log(xy2filerank(x,y));	
 		moves.push([x, y])
 	}
 
@@ -702,8 +719,8 @@ function set_turn(color)
 //// BOARD FUNCTIONS
 
 // Internally name the square cells with their (x,y) coordinates
-// and algebraic notation, once when the page loads. This is only code so I
-// don't have to manually type <td x=0 y=0 algebraic=a8> etc. in all the cells.
+// and filerank notation, once when the page loads. This is only code so I
+// don't have to manually type <td x=0 y=0 filerank=a8> etc. in all the cells.
 function name_squares()
 {
 	for (var x = 0; x < 8; ++x){
@@ -712,7 +729,7 @@ function name_squares()
 
 			square.x = x;
 			square.y = y;
-			square.algebraic = xy2algebraic(x, y);
+			square.filerank = xy2filerank(x, y);
 			//console.log(square);
 		}
 	}
@@ -815,11 +832,11 @@ function load_starting_position(fen)
 
 //// PIECE FUNCTIONS
 
-// Return algebraic prefix for a piece
-function algebraic_piece_prefix(piece)
+// Return filerank prefix for a piece
+function filerank_piece_prefix(piece)
 {
 	// TODO: really need to clean this up! Have an attribute, and 
-	// a class to map piece names to character codes for algebraic notation/FEN
+	// a class to map piece names to character codes for filerank notation/FEN
 	if (piece.hasClassName("pawn"))
 		return "";
 
@@ -831,14 +848,14 @@ function algebraic_piece_prefix(piece)
 			return letter.toUpperCase();
 	}
 
-	assert(false, "algebraic_piece_prefix(" + piece + "): unrecognized piece");
+	assert(false, "filerank_piece_prefix(" + piece + "): unrecognized piece");
 }
 
 
 
 // Return an existing piece somewhere (or a false value), given:
 // - (x,y) coordinates, like (0,0)
-// - location in algebraic notation, like "a8"
+// - location in filerank notation, like "a8"
 // - a square, from sq()
 function pc(x, y)
 {
@@ -873,7 +890,7 @@ function piece_type(piece)
 	return type;
 }
 
-// Get (x,y) of piece. For algebraic notation, use xy2algebraic on this.
+// Get (x,y) of piece. For filerank notation, use xy2filerank on this.
 function piece_location(piece)
 {
 	return [piece.parentNode.x, piece.parentNode.y];
@@ -966,8 +983,8 @@ function highlight_moves(piece, enable)
 
 	from_square = sq(piece);
 
-	//console.log(from_square.algebraic);
-	moves = VALID_MOVES.get(from_square.algebraic);
+	//console.log(from_square.filerank);
+	moves = VALID_MOVES.get(from_square.filerank);
 	//console.log(moves);
 	if (!moves)
 		return;	
@@ -1002,10 +1019,10 @@ function unhighlight_all()
 	});
 }
 
-//// SQUARE FUNCTIONS / ALGEBRAIC NOTATION
+//// SQUARE FUNCTIONS / FILE-RANK NOTATION
 
-// Get list of all valid moves right now, in algebraic notation.
-function all_algebraic_moves()
+// Get list of all valid moves right now, in filerank form.
+function all_filerank_moves()
 {
 	var moves = new Array();
 
@@ -1015,40 +1032,40 @@ function all_algebraic_moves()
 		var piece = pc(from);
 		tos.each(function(to) {
 			var x = to[0], y = to[1];
-			moves.push(algebraic_piece_prefix(piece) + xy2algebraic(x, y));
+			moves.push(filerank_piece_prefix(piece) + xy2filerank(x, y));
 		});
 	});
 
 	return moves;
 }
 
-// Convert algebraic notation f8 to the x,y coordinate [5,0], etc. These coordinates
-// are used internally, but algebraic notation is useful for human consumption
+// Convert filerank f8 to the x,y coordinate [5,0], etc. These coordinates
+// are used internally, but filerank notation is useful for human consumption
 // (though I actually think better in descriptive notation, but maybe I'm in the minority there)
 // Note: does not accept piece name as initial character, yet.
 // Also note: the returned coordinate is useful for looking up in a
-// zero-based table cell with (0,0) at the top-left. In algebraic notation, this
-// square is labeled a8. The bottom-right square (7,7) is algebraic's h1.
-function algebraic2xy(code)
+// zero-based table cell with (0,0) at the top-left. In filerank notation, this
+// square is labeled a8. The bottom-right square (7,7) is filerank's h1.
+function filerank2xy(code)
 {
-	assert(code, "algebraic2xy(" + code + "): is false");
-	assert(code.charCodeAt, "algebraic2xy(" + code +"): is missing charCodeAt, is it a string?");
+	assert(code, "filerank2xy(" + code + "): is false");
+	assert(code.charCodeAt, "filerank2xy(" + code +"): is missing charCodeAt, is it a string?");
 
 	var x = code.charCodeAt(0) - "a".charCodeAt(0);		// corresponds to file (horizontal)
 	var y = 8 - (code.charCodeAt(1) - "0".charCodeAt(0));	// corresponds to rank (vertical)
 
-	assert(x >= 0 && x <= 7, "algebraic2xy(" + code + "): bad x: " + x);
-	assert(y >= 0 && y <= 7, "algebraic2xy(" + code + "): bad y: " + y);
+	assert(x >= 0 && x <= 7, "filerank2xy(" + code + "): bad x: " + x);
+	assert(y >= 0 && y <= 7, "filerank2xy(" + code + "): bad y: " + y);
 
 	return [x, y];
 }
 
-// Convert from x,y coordinates to algebraic notation for human consumption. Can either pass
-// xy2algebraic(0, 0) == "a8"
-// xy2algebraic([0, 0]) == "a8"
-function xy2algebraic(x, y)
+// Convert from x,y coordinates to filerank notation for human consumption. Can either pass
+// xy2filerank(0, 0) == "a8"
+// xy2filerank([0, 0]) == "a8"
+function xy2filerank(x, y)
 {
-	var algebraic;
+	var filerank;
 
 	if (y === undefined) {
 		// Passed array
@@ -1056,17 +1073,17 @@ function xy2algebraic(x, y)
 		x = x[0];
 	}
 
-	assert(x >= 0 && x <= 7, "xy2algebraic(" + x + ", " + y + "): bad x: " + x);
-	assert(y >= 0 && y <= 7, "xy2algebraic(" + x + ", " + y + "): bad y: " + y);
+	assert(x >= 0 && x <= 7, "xy2filerank(" + x + ", " + y + "): bad x: " + x);
+	assert(y >= 0 && y <= 7, "xy2filerank(" + x + ", " + y + "): bad y: " + y);
 
-	algebraic = String.fromCharCode(x + "a".charCodeAt(0));
-	algebraic += String.fromCharCode((8 - y) + "0".charCodeAt(0));
+	filerank = String.fromCharCode(x + "a".charCodeAt(0));
+	filerank += String.fromCharCode((8 - y) + "0".charCodeAt(0));
 
-	return algebraic;
+	return filerank;
 }
 
 // Get a square cell, given location in either
-// - algebraic notation (example: "a8", one argument), or
+// - filerank notation (example: "a8", one argument), or
 // - x,y coordinates, (equivalent example: 0,0)
 // - a piece, returned by pc(), will return the enclosing square
 function sq(code, extra)
@@ -1083,7 +1100,7 @@ function sq(code, extra)
 		x = code;
 		y = extra;
 	} else {
-		var xy = algebraic2xy(code);
+		var xy = filerank2xy(code);
 
 		// TODO: can JS do list element assignment like x,y=...?	
 		x = xy[0];
