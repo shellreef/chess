@@ -181,19 +181,22 @@ function mv(move)
 }
 // TODO: Nc6, etc. with overridden toString so can just type it at the console?
 
-function parse_filerank(alg)
+function parse_algebraic(alg)
 {
-	var type;
+	var type, filerank;
 
 	// TODO: file for rooks, to disambiguate. And extended notation.
 
 	// First could be piece type
 	if (/^[A-Z]$/.test(alg[0])) {
 		type = PIECE_LETTER2NAME[alg[0].toLowerCase()];
+		filerank = alg.substring(1);
 	} else {
 		type = "pawn";
+		filerank = alg;
 	}
-	assert(type, "parse_filerank(" + alg + ": couldn't figure out piece type");
+	assert(type, "parse_algebraic(" + alg + ": couldn't figure out piece type");
+	console.log(filerank2xy(filerank));
 
 	return type;
 }
