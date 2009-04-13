@@ -718,8 +718,23 @@ function name_squares()
 	}
 }
 
-function actually_move_piece(piece, square)
+// Manipulate the DOM nodes to move the piece to its new location,
+// and advance to the next move. Does not do anything graphical
+// with dragging.
+function move_piece(piece, square)
 {
+	// Capture piece(s) on destination square
+	while (square.firstChild)
+		square.removeChild(square.firstChild);
+
+	// Move to new square
+	if (piece.parentNode)
+		piece.parentNode.removeChild(piece);
+
+	square.appendChild(piece);
+
+	set_turn("next");
+
 }
 
 // Handle graphically moving of a piece, dropping it to its new location
@@ -741,17 +756,7 @@ function move_dropped_piece(piece, square, event)
 
 	unhighlight_all();
 
-	// Capture piece on destination square
-	while (square.firstChild)
-		square.removeChild(square.firstChild);
-
-	// Move to new square
-	if (piece.parentNode)
-		piece.parentNode.removeChild(piece);
-
-	square.appendChild(piece);
-
-	set_turn("next");
+	move_piece(piece, square);
 }
 
 // Load board state
