@@ -173,13 +173,22 @@ google.setOnLoadCallback(function() {
 });
 
 //// USER FUNCTIONS
-function mv(move)
+function mv(alg_move)
 {
-	if (!move)
+	var piece_square, piece, square;
+
+	if (!alg_move)
 		return VALID_ALGEBRAIC_MOVES.keys();
 
-	// TODO: otherwise, accept move in filerank notation
+	piece_square = VALID_ALGEBRAIC_MOVES.get(alg_move);
+	assert(piece_square, "mv(" + alg_move + "): illegal move");
+
+	piece = piece_square[0];
+	square = piece_square[1];
+
+	move_piece_to_square(piece, square);
 }
+
 // TODO: Nc6, etc. with overridden toString so can just type it at the console?
 
 //// VALID MOVE FUNCTIONS
@@ -222,12 +231,19 @@ function calculate_valid_moves()
 		VALID_MOVES.set(filerank, moves);
 		//console.log(filerank, moves);
 	});
-	
+
+	// AI - artificial intelligence	
+	// TODO: options human vs. computer, computer vs. human, h vs. h, c vs. c
 	if (GAME_STATE.active_color == "black") {
-		var alg_move = VALID_ALGEBRAIC_MOVES.keys()[0];
-		var piece = VALID_ALGEBRAIC_MOVES.get(alg_move)[0];
-		var square = VALID_ALGEBRAIC_MOVES.get(alg_move)[1]
-		move_piece(piece, square);
+		// simply choose a random move
+		// TODO: weak AI, take most valuable piece, checkmate if can, check if can,
+		// 	fork if can.. something to entertain a beginner
+		var keys = VALID_ALGEBRAIC_MOVES.keys();
+		var alg_move = keys[randint(0, keys.length - 1)];
+
+		var piece_square = VALID_ALGEBRAIC_MOVES.get(alg_move);
+
+		mv(alg_move);
 	}
 }
 
@@ -734,10 +750,10 @@ function name_squares()
 // Manipulate the DOM nodes to move the piece to its new location,
 // and advance to the next move. Does not do anything graphical
 // with dragging.
-function move_piece(piece, square)
+function move_piece_to_square(piece, square)
 {
-	assert(piece, "move_piece(" + piece + ", " + square + "): piece is false");
-	assert(square, "move_piece(" + piece + ", " + square + "): square is false");
+	assert(piece, "move_piece_to_square(" + piece + ", " + square + "): piece is false");
+	assert(square, "move_piece_to_square(" + piece + ", " + square + "): square is false");
 
 	// Capture piece(s) on destination square
 	while (square.firstChild)
@@ -772,7 +788,7 @@ function move_dropped_piece(piece, square, event)
 
 	unhighlight_all();
 
-	move_piece(piece, square);
+	move_piece_to_square(piece, square);
 }
 
 // Load board state
@@ -1095,6 +1111,12 @@ function sq(code, extra)
 }
 
 //// LOW-LEVEL FUNCTIONS
+
+// Random integer within range
+function randint(minimum, maximum)
+{
+	return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
+}
 
 // Uppercase first character, like in Perl
 function ucfirst(s)
