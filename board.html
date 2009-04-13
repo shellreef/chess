@@ -1,7 +1,9 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-<title>Chess</title>
+<title>Jeff's Chess</title>
+<!-- Copyright (C) 2009 Jeff Connelly ->
+<!-- Created:20090411 -->
 <style>
 img.piece
 { 
@@ -168,10 +170,22 @@ google.setOnLoadCallback(function() {
 
 //// VALID MOVE FUNCTIONS
 
+function mv(move)
+{
+	if (!move)
+		return all_pgn_moves();
+	// TODO: otherwise, move in pgn notation
+}
+
+function all_pgn_moves()
+{
+	// TODO
+}
+
 // After the board changes and it is the next person's turn, calculate what the next possible allowable moves are.
 function calculate_valid_moves()
 {
-	VALID_MOVES = {};
+	VALID_MOVES = new Hash();
 
 	// Look at all the active pieces
 	$$("img.active-color").each(function(piece) { 
@@ -197,7 +211,7 @@ function calculate_valid_moves()
 		});
 
 		// Store valid moves for mouseovers etc.
-		VALID_MOVES[pgn] = moves;
+		VALID_MOVES.set(pgn, moves);
 		//console.log(pgn, moves);
 	});
 }
@@ -922,7 +936,7 @@ function highlight_moves(piece, enable)
 	from_square = sq(piece);
 
 	//console.log(from_square.pgn);
-	moves = VALID_MOVES[from_square.pgn];
+	moves = VALID_MOVES.get(from_square.pgn);
 	//console.log(moves);
 	if (!moves)
 		return;	
