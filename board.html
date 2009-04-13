@@ -363,7 +363,16 @@ function decode_one_parlett(parlett, xy)
 		assert(false, "decode_one_parlett(" + parlett + 
 			"): only leapers that are hippogonals are currently supported");
 	} else if (movement == "rider") {
-		moves = add_flags(expand_rider(distances, directions, xy), flags);
+		var limit;
+
+		assert(distances.length == 1, "decode_one_parlett(" + parlett + 
+			"): for non-hippogonal parletts, must have exactly one distance, not: " +
+			distances);
+
+		// The distance is the move limit (1 for king, "infinity" for Q, B, R).
+		limit = distances[0];
+
+		moves = add_flags(expand_rider(limit, directions, xy), flags);
 	} else {
 		assert(false, "decode_one_parlett(" + parlett + "): unsupported movement");
 	}
@@ -371,11 +380,62 @@ function decode_one_parlett(parlett, xy)
 	return moves;
 }
 
-function expand_rider(distances, directions, xy)
+// Get the absolute moves for a "rider" piece. It
+// can move up to limit steps, in the direction vectors given,
+// starting at the given location -- but it will be blocked by
+// an occupied square. Note that there could be pieces that move
+// in this way, but won't be blocked (leapers, locusts), but they
+// are not supported here.
+function expand_rider(limit, directions, xy)
 {
-	console.log("expand_rider",distances, directions, xy);
+	var moves = new Array();
 
-	return [[0,0]];
+	console.log("expand_rider",limit, directions, xy);
+
+	directions.each(function(direction) {
+		moves = moves.concat(expand_direction(limit, direction, xy));
+	});
+
+	return without_dupes(moves);
+}
+
+function expand_direction(limit, direction, start_xy)
+{
+	var x, y, moves;
+
+	moves = new Array();
+
+	x = start_xy[0];
+	y = start_xy[0];
+
+	for (var i = 0; i < limit; ++i) {
+		var piece;
+
+		x += direction[0];
+		y += direction[1];
+
+		if (x < 0 || x > 7 || y < 0 || y > 7)
+			break;
+
+		piece = pc(x, y);
+		if (piece) {
+			if (friendly_piece(piece)) {
+				// blocked by own piece, can't move on top
+				break;
+			} else if (enemy_piece(piece)) {
+				// can capture enemy piece
+				moves.push([x, y]);
+				break;
+			} else {
+				assert(false, "expand_direction(" + limit + ", " + direction + ", " +
+					start_xy + "): piece " + piece + " neither friendly nor enemy");
+			}
+		}
+		
+		moves.push([x, y])
+	}
+
+	return moves;
 }
 
 // Add a third element to a list of moves, extra "flags" that describe
@@ -616,6 +676,17 @@ function load_starting_position(fen)
 }
 
 //// PIECE FUNCTIONS
+
+function friendly_piece(piece)
+{
+	return piece.hasClassName("active-color");
+}
+
+
+function enemy_piece(piece)
+{
+	return !piece.hasClassName("active-color");
+}
 
 // Return an existing piece, given:
 // - (x,y) coordinates, like (0,0)
