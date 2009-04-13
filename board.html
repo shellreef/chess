@@ -98,6 +98,7 @@ var GAME_STATE = {
 
 // Moves that can be made right now, for each active piece.
 var VALID_MOVES = null;
+var ALL_DROP_TARGETS = new Array();
 
 // Movement of pieces in extended Parlett notation
 var PIECE_TYPES = {
@@ -163,10 +164,6 @@ google.setOnLoadCallback(function() {
 	//load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
 	load_fen("rnbqkb1r/pp1ppppp/5n2/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2");
 
-	// TODO: only add droppables for valid squares? Actually, probably just want to change class.
-	$$(".square").each(function(square) {
-		Droppables.add(square, {accept:"active-color", onDrop: move_dropped_piece, hoverclass: 'hover'});
-	});
 });
 
 //// VALID MOVE FUNCTIONS
@@ -186,11 +183,25 @@ function calculate_valid_moves()
 		if (type == "pawn") return; // TODO: support
 	
 		var moves = unfiltered_moves(parlett, xy);
-		console.log(type,xy2pgn(xy),moves);
 
 		// Convert xy to PGN, so it can be easily used
 		// as a hash key.
 		pgn = xy2pgn(xy);
+
+		// Create drop targets for the valid destinations, linking
+		// the draggables to droppables using piece- + source square.
+		piece.addClassName("piece-" + pgn);
+		piece.prior_position = pgn;	// for removal
+		moves.each(function(move) {
+			var square = sq(move[0], move[1]);
+
+			ALL_DROP_TARGETS.push(square); // for removal
+
+			Droppables.add(square, {
+				accept: "piece-" + pgn,
+				onDrop: move_dropped_piece,
+				hoverclass: 'hover'});
+		});
 
 		// Store valid moves for mouseovers etc.
 		VALID_MOVES[pgn] = moves;
@@ -579,8 +590,8 @@ function set_turn(color)
 
 	$("status").innerHTML = ucfirst(new_color) + "'s Turn";
 
-
 	GAME_STATE.active_color = new_color;
+
 
 	// Note: this takes some time... is there any way to run it right AFTER the piece has
 	// gone through the endeffect? This is called in onDrop.
@@ -616,6 +627,12 @@ function move_dropped_piece(piece, square, event)
 	// TODO: do some cool effects when a piece is captured, but not too cool
 	//new Effect.Squish(square.firstChild);
 
+	piece.removeClassName("piece-" + piece.prior_position);
+	ALL_DROP_TARGETS.each(function(square) {
+		Droppables.remove(square);
+	});
+	ALL_DROP_TARGETS = new Array();
+
 	// TODO: unhighlight all moves, better
 	highlight_moves(piece, false);
 
@@ -629,8 +646,6 @@ function move_dropped_piece(piece, square, event)
 
 	square.appendChild(piece);
 
-	// TODO: only next if move was successful, or only have droppables for
-	// legal moves?
 	set_turn("next");
 }
 
