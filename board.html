@@ -226,7 +226,9 @@ function filtered_moves(piece)
 		if (move[2].capture_only) {
 			// Destination square must be occupied by enemy piece
 			// TODO: non-royal (can't capture king)
-			allowed = false;
+			var piece_under = pc(move[0], move[1]);
+			if (!piece_under)
+				allowed = false;	// needs something to capture
 		}
 
 		return allowed;
