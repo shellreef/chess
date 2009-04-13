@@ -406,7 +406,7 @@ function expand_direction(limit, direction, start_xy)
 	moves = new Array();
 
 	x = start_xy[0];
-	y = start_xy[0];
+	y = start_xy[1];
 
 	for (var i = 0; i < limit; ++i) {
 		var piece;
@@ -431,7 +431,8 @@ function expand_direction(limit, direction, start_xy)
 					start_xy + "): piece " + piece + " neither friendly nor enemy");
 			}
 		}
-		
+
+		console.log(xy2pgn(x,y));	
 		moves.push([x, y])
 	}
 
