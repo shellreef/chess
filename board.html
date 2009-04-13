@@ -99,8 +99,9 @@ var GAME_STATE = {
 };	
 
 // Moves that can be made right now, for each active piece.
-var VALID_MOVES = null;
-var ALL_DROP_TARGETS = new Array();
+var VALID_MOVES = null;			// Keyed by filerank of source, array of [[x,y,flags]] destinations
+var VALID_ALGEBRAIC_MOVES = null;	// Map algebraic -> [piece, square]
+var ALL_DROP_TARGETS = new Array();	// Droppables for UI
 
 // Movement of pieces in extended Parlett notation
 var PIECE_TYPES = {
@@ -175,32 +176,11 @@ google.setOnLoadCallback(function() {
 function mv(move)
 {
 	if (!move)
-		return all_filerank_moves();
+		return VALID_ALGEBRAIC_MOVES.keys();
 
 	// TODO: otherwise, accept move in filerank notation
 }
 // TODO: Nc6, etc. with overridden toString so can just type it at the console?
-
-function parse_algebraic(alg)
-{
-	var type, filerank;
-
-	// TODO: file for rooks, to disambiguate. And extended notation.
-
-	// First could be piece type
-	if (/^[A-Z]$/.test(alg[0])) {
-		type = PIECE_LETTER2NAME[alg[0].toLowerCase()];
-		filerank = alg.substring(1);
-	} else {
-		type = "pawn";
-		filerank = alg;
-	}
-	assert(type, "parse_algebraic(" + alg + ": couldn't figure out piece type");
-	console.log(filerank2xy(filerank));
-
-	return type;
-}
-
 
 //// VALID MOVE FUNCTIONS
 
@@ -208,13 +188,15 @@ function parse_algebraic(alg)
 function calculate_valid_moves()
 {
 	VALID_MOVES = new Hash();
+	VALID_ALGEBRAIC_MOVES = new Hash();
 
 	// Look at all the active pieces
 	$$("img.active-color").each(function(piece) { 
+		var filerank;
 		var moves = filtered_moves(piece);
 
-		// Convert xy to filerank notation, so it can be easily used
-		// as a hash key.
+		// Convert xy to filerank notation (a string), so it can be easily used
+		// as a hash key (that's the only reason)
 		filerank = sq(piece).filerank;
 
 		// Create drop targets for the valid destinations, linking
@@ -223,6 +205,10 @@ function calculate_valid_moves()
 		piece.prior_position = filerank;	// for removal
 		moves.each(function(move) {
 			var square = sq(move[0], move[1]);
+			var algebraic = filerank_piece_prefix(piece) + xy2filerank(move[0], move[1]);
+
+			// Store algebraic notation -> [piece, square] map for understanding the notation
+			VALID_ALGEBRAIC_MOVES.set(algebraic, [piece, square]);
 
 			ALL_DROP_TARGETS.push(square); // for removal
 
@@ -1023,24 +1009,6 @@ function unhighlight_all()
 }
 
 //// SQUARE FUNCTIONS / FILE-RANK NOTATION
-
-// Get list of all valid moves right now, in filerank form.
-function all_filerank_moves()
-{
-	var moves = new Array();
-
-	VALID_MOVES.each(function(pair) {
-		var from = pair[0], tos = pair[1];
-
-		var piece = pc(from);
-		tos.each(function(to) {
-			var x = to[0], y = to[1];
-			moves.push(filerank_piece_prefix(piece) + xy2filerank(x, y));
-		});
-	});
-
-	return moves;
-}
 
 // Convert filerank f8 to the x,y coordinate [5,0], etc. These coordinates
 // are used internally, but filerank notation is useful for human consumption
