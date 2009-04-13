@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-<title>Jeff's Chess</title>
+<title>Chess</title>
 <!-- Copyright (C) 2009 Jeff Connelly ->
 <!-- Created:20090411 -->
 <style>
@@ -156,6 +156,9 @@ var PIECE_TYPES = {
 	// pieces with no notation
 };	
 
+// TODO: merge into above, better class organization for pieces
+var PIECE_LETTER2NAME = {r: 'rook', n: 'knight', b: 'bishop', q: 'queen', k: 'king', p: 'pawn'};
+
 google.setOnLoadCallback(function() {
 	/* Safari & IE7: Disable text selection to stop interfering with dragging */
 	enable_document_selection(false);	
@@ -168,8 +171,6 @@ google.setOnLoadCallback(function() {
 
 });
 
-//// VALID MOVE FUNCTIONS
-
 function mv(move)
 {
 	if (!move)
@@ -179,8 +180,22 @@ function mv(move)
 
 function all_pgn_moves()
 {
-	// TODO
+	var moves = new Array();
+
+	VALID_MOVES.each(function(pair) {
+		var from = pair[0], tos = pair[1];
+
+		var piece = pc(from);
+		tos.each(function(to) {
+			var x = to[0], y = to[1];
+			moves.push(pgn_piece_prefix(piece) + xy2pgn(x, y));
+		});
+	});
+
+	return moves;
 }
+
+//// VALID MOVE FUNCTIONS
 
 // After the board changes and it is the next person's turn, calculate what the next possible allowable moves are.
 function calculate_valid_moves()
@@ -805,6 +820,27 @@ function load_starting_position(fen)
 
 //// PIECE FUNCTIONS
 
+// Return PGN prefix for a piece
+function pgn_piece_prefix(piece)
+{
+	// TODO: really need to clean this up! Have an attribute, and 
+	// a class to map piece names to character codes for PGN/FEN.
+	if (piece.hasClassName("pawn"))
+		return "";
+
+	for (var letter in PIECE_LETTER2NAME)
+	{
+		var name = PIECE_LETTER2NAME[letter];
+
+		if (piece.hasClassName(name))
+			return letter.toUpperCase();
+	}
+
+	assert(false, "pgn_piece_prefix(" + piece + "): unrecognized piece");
+}
+
+
+
 // Return an existing piece somewhere (or a false value), given:
 // - (x,y) coordinates, like (0,0)
 // - location in algebraic notation, like "a8"
@@ -870,7 +906,7 @@ function new_piece(name)
 	}
 	type = name.toLowerCase();
 
-	classes += " " + {r: 'rook', n: 'knight', b: 'bishop', q: 'queen', k: 'king', p: 'pawn'}[type];
+	classes += " " + PIECE_LETTER2NAME[type];
 
 	// TODO: pngs
 	// TODO: even better, use Unicode characters in a span!! How cool would that be? Infinite resolution.
@@ -981,6 +1017,9 @@ function unhighlight_all()
 // square is labeled a8. The bottom-right square (7,7) is PGN's h1.
 function pgn2xy(code)
 {
+	assert(code, "pgn2xy(" + code + "): is false");
+	assert(code.charCodeAt, "pgn2xy(" + code +"): is missing charCodeAt, is it a string?");
+
 	var x = code.charCodeAt(0) - "a".charCodeAt(0);		// corresponds to file (horizontal)
 	var y = 8 - (code.charCodeAt(1) - "0".charCodeAt(0));	// corresponds to rank (vertical)
 
