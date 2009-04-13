@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-<title>Chess</title>
+<title>Chess by Jeff</title>
 <!-- Copyright (C) 2009 Jeff Connelly ->
 <!-- Created:20090411 -->
 <style>
@@ -165,10 +165,10 @@ google.setOnLoadCallback(function() {
 	enable_document_selection(false);	
 	name_squares();	
 	
-	//load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	//load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
 	//load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
-	load_fen("rnbqkb1r/pp1ppppp/5n2/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2");
+	//load_fen("rnbqkb1r/pp1ppppp/5n2/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2");
 
 });
 
@@ -185,6 +185,8 @@ function mv(alg_move)
 
 	piece = piece_square[0];
 	square = piece_square[1];
+
+	// TODO: do some Effect.Move animation, optionally (make two functions)
 
 	move_piece_to_square(piece, square);
 }
@@ -242,6 +244,8 @@ function calculate_valid_moves()
 		var alg_move = keys[randint(0, keys.length - 1)];
 
 		var piece_square = VALID_ALGEBRAIC_MOVES.get(alg_move);
+
+		// TODO: detect stalemate, checkmate, for both players (set_turn probably)
 
 		mv(alg_move);
 	}
