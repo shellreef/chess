@@ -399,6 +399,9 @@ function expand_rider(limit, directions, xy)
 	return without_dupes(moves);
 }
 
+// Iterate up to limit steps (may be Infinity), in the direction 
+// vector, starting at start_xy. Stop when reaching the end of the
+// board, on an enemy piece, or before a friendly piece.
 function expand_direction(limit, direction, start_xy)
 {
 	var x, y, moves;
@@ -419,16 +422,13 @@ function expand_direction(limit, direction, start_xy)
 
 		piece = pc(x, y);
 		if (piece) {
-			if (friendly_piece(piece)) {
+			if (piece.hasClassName("active-color")) {
 				// blocked by own piece, can't move on top
 				break;
-			} else if (enemy_piece(piece)) {
+			} else {
 				// can capture enemy piece
 				moves.push([x, y]);
 				break;
-			} else {
-				assert(false, "expand_direction(" + limit + ", " + direction + ", " +
-					start_xy + "): piece " + piece + " neither friendly nor enemy");
 			}
 		}
 
@@ -677,17 +677,6 @@ function load_starting_position(fen)
 }
 
 //// PIECE FUNCTIONS
-
-function friendly_piece(piece)
-{
-	return piece.hasClassName("active-color");
-}
-
-
-function enemy_piece(piece)
-{
-	return !piece.hasClassName("active-color");
-}
 
 // Return an existing piece, given:
 // - (x,y) coordinates, like (0,0)
