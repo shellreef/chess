@@ -358,7 +358,10 @@ function decode_one_parlett(parlett, xy)
 		// Relatively easy, since with leapers, can disregard pieces on the path
 		var rel_moves = add_flags(expand_hippogonal(distances), flags);
 
-		moves = move_rel2abs(xy, rel_moves);
+		moves = move_rel2abs(xy, rel_moves).reject(function(xy) {
+			return sq(xy).hasClassName("active-color");
+		});
+
 	} else if (movement == "leaper") {
 		assert(false, "decode_one_parlett(" + parlett + 
 			"): only leapers that are hippogonals are currently supported");
@@ -892,9 +895,13 @@ function xy2pgn(x, y)
 // Get a square cell, given location in either
 // - algebraic notation (example: "a8", one argument), or
 // - x,y coordinates, (equivalent example: 0,0)
+// - [x,y] coordinates, one argument in an array
+// - a piece, returned by pc(), will return the enclosing square
 function sq(code, extra)
 {
 	var x, y;
+
+	console.log("sq",code,extra);
 
 	// Accept pieces, too. TODO: update if change piece from <img>
 	if (code.constructor && /HTMLImageElement/.test(code.constructor.toString())) {
@@ -905,6 +912,9 @@ function sq(code, extra)
 	} else if (extra !== undefined) {
 		x = code;
 		y = extra;
+	} else if (code.length && code.length >= 2 && extra == undefined) {
+		x = code[0];
+		y = code[1];
 	} else {
 		var xy = pgn2xy(code);
 
@@ -912,6 +922,9 @@ function sq(code, extra)
 		x = xy[0];
 		y = xy[1];
 	}
+
+	assert(x >= 0 && x <= 7 && y >= 0 && y <= 7, "sq(" + code + ", " + extra + 
+		"): out of range (" + x + ", " + y + ")");
 
 	return $('board-body').childNodes[y].childNodes[x];
 }
