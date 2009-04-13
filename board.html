@@ -222,6 +222,13 @@ function calculate_valid_moves()
 		VALID_MOVES.set(filerank, moves);
 		//console.log(filerank, moves);
 	});
+	
+	if (GAME_STATE.active_color == "black") {
+		var alg_move = VALID_ALGEBRAIC_MOVES.keys()[0];
+		var piece = VALID_ALGEBRAIC_MOVES.get(alg_move)[0];
+		var square = VALID_ALGEBRAIC_MOVES.get(alg_move)[1]
+		move_piece(piece, square);
+	}
 }
 
 // Compute legal moves for a piece, removing illegal moves. This
@@ -729,6 +736,9 @@ function name_squares()
 // with dragging.
 function move_piece(piece, square)
 {
+	assert(piece, "move_piece(" + piece + ", " + square + "): piece is false");
+	assert(square, "move_piece(" + piece + ", " + square + "): square is false");
+
 	// Capture piece(s) on destination square
 	while (square.firstChild)
 		square.removeChild(square.firstChild);
