@@ -171,29 +171,16 @@ google.setOnLoadCallback(function() {
 
 });
 
+//// USER FUNCTIONS
 function mv(move)
 {
 	if (!move)
-		return all_pgn_moves();
-	// TODO: otherwise, move in pgn notation
+		return all_algebraic_moves();
+
+	// TODO: otherwise, accept move in algebraic notation
 }
 
-function all_pgn_moves()
-{
-	var moves = new Array();
 
-	VALID_MOVES.each(function(pair) {
-		var from = pair[0], tos = pair[1];
-
-		var piece = pc(from);
-		tos.each(function(to) {
-			var x = to[0], y = to[1];
-			moves.push(pgn_piece_prefix(piece) + xy2pgn(x, y));
-		});
-	});
-
-	return moves;
-}
 
 //// VALID MOVE FUNCTIONS
 
@@ -206,28 +193,28 @@ function calculate_valid_moves()
 	$$("img.active-color").each(function(piece) { 
 		var moves = filtered_moves(piece);
 
-		// Convert xy to PGN, so it can be easily used
+		// Convert xy to algebraic notation, so it can be easily used
 		// as a hash key.
-		pgn = sq(piece).pgn;
+		algebraic = sq(piece).algebraic;
 
 		// Create drop targets for the valid destinations, linking
 		// the draggables to droppables using piece- + source square.
-		piece.addClassName("piece-" + pgn);
-		piece.prior_position = pgn;	// for removal
+		piece.addClassName("piece-" + algebraic);
+		piece.prior_position = algebraic;	// for removal
 		moves.each(function(move) {
 			var square = sq(move[0], move[1]);
 
 			ALL_DROP_TARGETS.push(square); // for removal
 
 			Droppables.add(square, {
-				accept: "piece-" + pgn,
+				accept: "piece-" + algebraic,
 				onDrop: move_dropped_piece,
 				hoverclass: 'hover'});
 		});
 
 		// Store valid moves for mouseovers etc.
-		VALID_MOVES.set(pgn, moves);
-		//console.log(pgn, moves);
+		VALID_MOVES.set(algebraic, moves);
+		//console.log(algebraic, moves);
 	});
 }
 
@@ -564,7 +551,7 @@ function expand_direction(limit, direction, start_xy)
 			}
 		}
 
-		//console.log(xy2pgn(x,y));	
+		//console.log(xy2algebraic(x,y));	
 		moves.push([x, y])
 	}
 
@@ -715,8 +702,8 @@ function set_turn(color)
 //// BOARD FUNCTIONS
 
 // Internally name the square cells with their (x,y) coordinates
-// and PGN notation, once when the page loads. This is only code so I
-// don't have to manually type <td x=0 y=0 pgn=a8> etc. in all the cells.
+// and algebraic notation, once when the page loads. This is only code so I
+// don't have to manually type <td x=0 y=0 algebraic=a8> etc. in all the cells.
 function name_squares()
 {
 	for (var x = 0; x < 8; ++x){
@@ -725,13 +712,17 @@ function name_squares()
 
 			square.x = x;
 			square.y = y;
-			square.pgn = xy2pgn(x, y);
+			square.algebraic = xy2algebraic(x, y);
 			//console.log(square);
 		}
 	}
-}	
+}
 
-// Move a piece
+function actually_move_piece(piece, square)
+{
+}
+
+// Handle graphically moving of a piece, dropping it to its new location
 function move_dropped_piece(piece, square, event)
 {	
 	//console.log(piece);
@@ -748,8 +739,7 @@ function move_dropped_piece(piece, square, event)
 	});
 	ALL_DROP_TARGETS = new Array();
 
-	// TODO: unhighlight all moves, better
-	highlight_moves(piece, false);
+	unhighlight_all();
 
 	// Capture piece on destination square
 	while (square.firstChild)
@@ -820,11 +810,11 @@ function load_starting_position(fen)
 
 //// PIECE FUNCTIONS
 
-// Return PGN prefix for a piece
-function pgn_piece_prefix(piece)
+// Return algebraic prefix for a piece
+function algebraic_piece_prefix(piece)
 {
 	// TODO: really need to clean this up! Have an attribute, and 
-	// a class to map piece names to character codes for PGN/FEN.
+	// a class to map piece names to character codes for algebraic notation/FEN
 	if (piece.hasClassName("pawn"))
 		return "";
 
@@ -836,7 +826,7 @@ function pgn_piece_prefix(piece)
 			return letter.toUpperCase();
 	}
 
-	assert(false, "pgn_piece_prefix(" + piece + "): unrecognized piece");
+	assert(false, "algebraic_piece_prefix(" + piece + "): unrecognized piece");
 }
 
 
@@ -878,7 +868,7 @@ function piece_type(piece)
 	return type;
 }
 
-// Get (x,y) of piece. For PGN notation, use xy2pgn on this.
+// Get (x,y) of piece. For algebraic notation, use xy2algebraic on this.
 function piece_location(piece)
 {
 	return [piece.parentNode.x, piece.parentNode.y];
@@ -947,7 +937,7 @@ function new_piece(name)
 		starteffect: undefined, 
 		endeffect: undefined,
 		onStart: function() { GAME_STATE.dragging = true; },
-		onEnd: function() { GAME_STATE.dragging = false; unhighlight_all(); },
+		onEnd: function() { GAME_STATE.dragging = false; },
 	 });
 
 
@@ -971,8 +961,8 @@ function highlight_moves(piece, enable)
 
 	from_square = sq(piece);
 
-	//console.log(from_square.pgn);
-	moves = VALID_MOVES.get(from_square.pgn);
+	//console.log(from_square.algebraic);
+	moves = VALID_MOVES.get(from_square.algebraic);
 	//console.log(moves);
 	if (!moves)
 		return;	
@@ -1007,34 +997,53 @@ function unhighlight_all()
 	});
 }
 
-//// SQUARE FUNCTIONS
+//// SQUARE FUNCTIONS / ALGEBRAIC NOTATION
 
-// Convert PGN notation f8 to the x,y coordinate [5,0], etc. These coordinates
-// are used internally, but PGN notation is useful for human consumption.
+// Get list of all valid moves right now, in algebraic notation.
+function all_algebraic_moves()
+{
+	var moves = new Array();
+
+	VALID_MOVES.each(function(pair) {
+		var from = pair[0], tos = pair[1];
+
+		var piece = pc(from);
+		tos.each(function(to) {
+			var x = to[0], y = to[1];
+			moves.push(algebraic_piece_prefix(piece) + xy2algebraic(x, y));
+		});
+	});
+
+	return moves;
+}
+
+// Convert algebraic notation f8 to the x,y coordinate [5,0], etc. These coordinates
+// are used internally, but algebraic notation is useful for human consumption
+// (though I actually think better in descriptive notation, but maybe I'm in the minority there)
 // Note: does not accept piece name as initial character, yet.
 // Also note: the returned coordinate is useful for looking up in a
-// zero-based table cell with (0,0) at the top-left. In PGN, this
-// square is labeled a8. The bottom-right square (7,7) is PGN's h1.
-function pgn2xy(code)
+// zero-based table cell with (0,0) at the top-left. In algebraic notation, this
+// square is labeled a8. The bottom-right square (7,7) is algebraic's h1.
+function algebraic2xy(code)
 {
-	assert(code, "pgn2xy(" + code + "): is false");
-	assert(code.charCodeAt, "pgn2xy(" + code +"): is missing charCodeAt, is it a string?");
+	assert(code, "algebraic2xy(" + code + "): is false");
+	assert(code.charCodeAt, "algebraic2xy(" + code +"): is missing charCodeAt, is it a string?");
 
 	var x = code.charCodeAt(0) - "a".charCodeAt(0);		// corresponds to file (horizontal)
 	var y = 8 - (code.charCodeAt(1) - "0".charCodeAt(0));	// corresponds to rank (vertical)
 
-	assert(x >= 0 && x <= 7, "pgn2xy(" + code + "): bad x: " + x);
-	assert(y >= 0 && y <= 7, "pgn2xy(" + code + "): bad y: " + y);
+	assert(x >= 0 && x <= 7, "algebraic2xy(" + code + "): bad x: " + x);
+	assert(y >= 0 && y <= 7, "algebraic2xy(" + code + "): bad y: " + y);
 
 	return [x, y];
 }
 
-// Convert from x,y coordinates to PGN for human consumption. Can either pass
-// xy2pgn(0, 0) == "a8"
-// xy2pgn([0, 0]) == "a8"
-function xy2pgn(x, y)
+// Convert from x,y coordinates to algebraic notation for human consumption. Can either pass
+// xy2algebraic(0, 0) == "a8"
+// xy2algebraic([0, 0]) == "a8"
+function xy2algebraic(x, y)
 {
-	var pgn;
+	var algebraic;
 
 	if (y === undefined) {
 		// Passed array
@@ -1042,13 +1051,13 @@ function xy2pgn(x, y)
 		x = x[0];
 	}
 
-	assert(x >= 0 && x <= 7, "xy2pgn(" + x + ", " + y + "): bad x: " + x);
-	assert(y >= 0 && y <= 7, "xy2pgn(" + x + ", " + y + "): bad y: " + y);
+	assert(x >= 0 && x <= 7, "xy2algebraic(" + x + ", " + y + "): bad x: " + x);
+	assert(y >= 0 && y <= 7, "xy2algebraic(" + x + ", " + y + "): bad y: " + y);
 
-	pgn = String.fromCharCode(x + "a".charCodeAt(0));
-	pgn += String.fromCharCode((8 - y) + "0".charCodeAt(0));
+	algebraic = String.fromCharCode(x + "a".charCodeAt(0));
+	algebraic += String.fromCharCode((8 - y) + "0".charCodeAt(0));
 
-	return pgn;
+	return algebraic;
 }
 
 // Get a square cell, given location in either
@@ -1069,7 +1078,7 @@ function sq(code, extra)
 		x = code;
 		y = extra;
 	} else {
-		var xy = pgn2xy(code);
+		var xy = algebraic2xy(code);
 
 		// TODO: can JS do list element assignment like x,y=...?	
 		x = xy[0];
