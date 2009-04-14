@@ -104,9 +104,8 @@ var PIECE_TYPES = {
 
 	// Keys:
 	// parlett: movement of piece in extended Parlett notation
-	// letter: uppercase character representing the piece in FEN *and* algebraic notation
-	// fen_letter: uppercase character for FEN notation
-	// alg_letter: uppercase character for algebraic notation
+	// letter: uppercase character representing the piece in FEN
+	// alg_letter: uppercase character for algebraic notation [defaults to FEN letter]
 	// TODO: html
 	// TODO: royal: if true, if checked, must make move that unthreatens, otherwise checkmate
 
@@ -117,7 +116,7 @@ var PIECE_TYPES = {
 	queen: {parlett: "n*", letter: "Q"},
 	bishop: {parlett: "nX", letter: "B"},
 	rook: {parlett: "n+", letter: "R"},
-	pawn: {parlett: "o1>, c1X>, oi2>", fen_letter: "P", alg_letter: "", promote: ["queen", "knight", "rook", "bishop"]},
+	pawn: {parlett: "o1>, c1X>, oi2>", letter: "P", alg_letter: "", promote: ["queen", "knight", "rook", "bishop"]},
 	knight: {parlett: "~1/2", letter: "N"},
 
 	// Other hippogonals, good for testing
@@ -229,7 +228,7 @@ function promote(piece)
         // Click/tap piece to change it, after moved? Cycle through?
 	promotes_to = PIECE_TYPES[piece.type].promote[0];
 
-	piece.src = image_path_for(PIECE_TYPES[promotes_to].letter || PIECE_TYPES[promotes_to].fen_letter,
+	piece.src = image_path_for(PIECE_TYPES[promotes_to].letter,
                 piece.hasClassName("white") ? "white" : "black");
 
         piece.type = promotes_to;
@@ -920,8 +919,6 @@ function piece_letter2name(letter)
 
 			if (info.letter !== undefined)
 				cache_letter2name.set(info.letter, name);
-			if (info.fen_letter !== undefined)
-				cache_letter2name.set(info.fen_letter, name);
 			if (info.alg_letter !== undefined)
 				cache_letter2name.set(info.alg_letter, name);
 
