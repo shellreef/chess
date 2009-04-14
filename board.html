@@ -182,7 +182,7 @@ function mv(alg_move)
 
     if (!alg_move) {
         return VALID_ALGEBRAIC_MOVES.keys();
-        }
+    }
 
     piece_square = VALID_ALGEBRAIC_MOVES.get(alg_move);
     assert(piece_square, "mv(" + alg_move + "): illegal move");
@@ -205,7 +205,7 @@ function should_promote(piece)
     // Does it promote?
     if (!PIECE_TYPES[piece.type].promote) {
         return false;
-        }
+    }
 
     square = sq(piece);
 
@@ -226,14 +226,14 @@ function promote(piece)
 
     //console.log("promotion");
 
-        // TODO: give option to what to promote to, if more than one.
-        // Click/tap piece to change it, after moved? Cycle through?
+    // TODO: give option to what to promote to, if more than one.
+    // Click/tap piece to change it, after moved? Cycle through?
     promotes_to = PIECE_TYPES[piece.type].promote[0];
 
     piece.src = image_path_for(PIECE_TYPES[promotes_to].letter,
                 piece.hasClassName("white") ? "white" : "black");
 
-        piece.type = promotes_to;
+    piece.type = promotes_to;
 }
 
 //// VALID MOVE FUNCTIONS
@@ -315,7 +315,7 @@ function filtered_moves(piece)
             // Can only move if have not moved this piece yet
             if (pawn_moved(piece)) {
                 allowed = false;
-                        }
+            }
         }
 
         if (move[2].capture_only) {
@@ -324,7 +324,7 @@ function filtered_moves(piece)
             piece_under = pc(move[0], move[1]);
             if (!piece_under) {
                 allowed = false;    // needs something to capture
-                        }
+            }
         }
         
         if (move[2].no_capture) {
@@ -332,7 +332,7 @@ function filtered_moves(piece)
             piece_under = pc(move[0], move[1]);
             if (piece_under) {
                 allowed = false;    // can't capture, man
-                        }
+            }
         }
 
         return allowed;
@@ -407,80 +407,80 @@ function unfiltered_moves(parlett, xy)
             // For each group, gather the move options. 
             // (Would be nice if JavaScript arrays had a Python-like .extend)
             moves = moves.concat(decode_one_parlett(choice_groups[i], xy));
-        }    
+    }    
 
-        // Last step: remove duplicates. Maybe the caller should do this.
-        moves = without_dupes(moves);
+    // Last step: remove duplicates. Maybe the caller should do this.
+    moves = without_dupes(moves);
 
-        return moves;
+    return moves;
+}
+
+// Decode a Parlett direction character, or return a false value if that is not what it is.
+// Returns an 2-element array:
+// 0th element: array of two-element arrays of direction vectors.
+// 1st element: true if ch2 was consumed, false if only ch was used
+function decode_direction(ch, ch2)
+{
+    var forward, backward;
+
+    // What way pieces go when they move forwards. Remember, these are x,y
+    // vectors so negative is up, positive is down.
+    if (GAME_STATE.active_color === "white") {
+        forward = -1;
+    } else if (GAME_STATE.active_color === "black") {
+        forward = 1;
+    } else {
+        assert(false, "decode_direction(" + ch + "): bad active color: " + GAME_STATE.active_color);
     }
+    backward = -forward;
 
-    // Decode a Parlett direction character, or return a false value if that is not what it is.
-    // Returns an 2-element array:
-    // 0th element: array of two-element arrays of direction vectors.
-    // 1st element: true if ch2 was consumed, false if only ch was used
-    function decode_direction(ch, ch2)
-    {
-        var forward, backward;
-
-        // What way pieces go when they move forwards. Remember, these are x,y
-        // vectors so negative is up, positive is down.
-        if (GAME_STATE.active_color === "white") {
-            forward = -1;
-        } else if (GAME_STATE.active_color === "black") {
-            forward = 1;
+    if (ch === "+") { 
+        // orthogonally four possible directions
+        return [include_reversed(times_each([1, 0], [1, -1])), false];
+    } else if (ch === "=") {
+        // orthogonally sideways
+        return [[[1, 0], [-1, 0]], false];
+    } else if (ch === ">") {
+        if (ch2 === "=") {
+            // >= orthogonally forwards or sideways
+            return [decode_direction(">")[0].concat(decode_direction("=")[0]), true];
         } else {
-            assert(false, "decode_direction(" + ch + "): bad active color: " + GAME_STATE.active_color);
+            // = orthogonally forward
+            return [[[0, forward]], false];
         }
-        backward = -forward;
-
-        if (ch === "+") { 
-            // orthogonally four possible directions
-            return [include_reversed(times_each([1, 0], [1, -1])), false];
-        } else if (ch === "=") {
-            // orthogonally sideways
-            return [[[1, 0], [-1, 0]], false];
-        } else if (ch === ">") {
-            if (ch2 === "=") {
-                // >= orthogonally forwards or sideways
-                return [decode_direction(">")[0].concat(decode_direction("=")[0]), true];
-            } else {
-                // = orthogonally forward
-                return [[[0, forward]], false];
-            }
-        } else if (ch === "<") {
-            if (ch2 === ">") {
-                // <> orthogonally forwards and backwards
-                return [[[0, forward], [0, backward]], true];
-            } else if (ch2 === "=") {
-                // <= orthogonally backwards or sideways
-                return [decode_direction("<")[0].concat(decode_direction("=")[0]), true];
-            } else {
-                // < orthogonally backwards
-                return [[[0, backward]], false];
-            }
-        } else if (ch === "X") { 
-            if (ch2 === ">") {
-                // X> diagonally forwards
-                return [[[1, forward], [-1, forward]], true];
-            } else if (ch2 === "<") {
-                // X< diagonally backwards
-                return [[[1, backwards], [-1, backwards]], true];
-            } else {
-                // X diagonally four possible directions
-                return [include_reversed(times_each([1, 1], [1, -1])), false];
-            }
-        } else if (ch === "*") {    
-            // orthogonally or diagonally (eight possible directions)
-            return [decode_direction("+")[0].concat(decode_direction("X")[0]), false];
+    } else if (ch === "<") {
+        if (ch2 === ">") {
+            // <> orthogonally forwards and backwards
+            return [[[0, forward], [0, backward]], true];
+        } else if (ch2 === "=") {
+            // <= orthogonally backwards or sideways
+            return [decode_direction("<")[0].concat(decode_direction("=")[0]), true];
         } else {
-            return null;
+            // < orthogonally backwards
+            return [[[0, backward]], false];
         }
+    } else if (ch === "X") { 
+        if (ch2 === ">") {
+            // X> diagonally forwards
+            return [[[1, forward], [-1, forward]], true];
+        } else if (ch2 === "<") {
+            // X< diagonally backwards
+            return [[[1, backwards], [-1, backwards]], true];
+        } else {
+            // X diagonally four possible directions
+            return [include_reversed(times_each([1, 1], [1, -1])), false];
+        }
+    } else if (ch === "*") {    
+        // orthogonally or diagonally (eight possible directions)
+        return [decode_direction("+")[0].concat(decode_direction("X")[0]), false];
+    } else {
+        return null;
     }
+}
 
-    // Decode a single group in extended Parlett notation into unfiltered absolute moves
-    // See http://en.wikipedia.org/wiki/Fairy_chess_piece#Notations
-    function decode_one_parlett(parlett, xy)
+// Decode a single group in extended Parlett notation into unfiltered absolute moves
+// See http://en.wikipedia.org/wiki/Fairy_chess_piece#Notations
+function decode_one_parlett(parlett, xy)
 {
     var movement, hippogonal;
     var distances, directions, flags, maybe_directions;
@@ -519,7 +519,7 @@ function unfiltered_moves(parlett, xy)
         // Extended Parlett, my own extensions 
         } else if (ch === "m") {
             // TODO: multi-move other pieces, castling: mR2=
-
+            
         // Standard Parlett
         } else if (/[0-9]/.test(ch)) {
             distances.push(parseInt(ch, 10));
@@ -533,7 +533,7 @@ function unfiltered_moves(parlett, xy)
                 directions = maybe_directions[0];
                 if (maybe_directions[1]) {
                     i += 1; // two-character direction
-                                }
+                }
             } else {
                 assert(false, "decode_one_parlett(" + parlett + "): unsupported: " + ch);
             }
@@ -543,7 +543,7 @@ function unfiltered_moves(parlett, xy)
         // Move unlimited distance in one direction, as long as its not blocked
         // rook = (1,0)rider, bishop = (1,1)rider, queen (1,1)+(1,0)rider
         movement = "rider";
-        }
+    }
 
     //console.log("movement=",movement);
     //console.log("directions=",directions);
@@ -560,7 +560,7 @@ function unfiltered_moves(parlett, xy)
             var piece = pc(xy[0], xy[1]);
             if (!piece) {
                 return false;    // unoccupied, good
-                        }
+            }
 
             // skip squares that are occupied by friendly pieces
             return piece.hasClassName("active-color");
@@ -626,7 +626,7 @@ function expand_direction(limit, direction, start_xy)
 
         if (x < 0 || x > 7 || y < 0 || y > 7) {
             break;
-                }
+        }
 
         piece = pc(x, y);
         if (piece) {
@@ -734,7 +734,7 @@ function without_dupes(a)
         // Add if not a dupe
         if (!hash.get(a[i])) {
             result.push(a[i]);
-                }
+        }
 
         // Record that this element was added. Converts to a string,
         // unfortunately, so can't just use hash.keys() after filling 
@@ -822,7 +822,7 @@ function move_piece_to_square(piece, square)
     // Move to new square
     if (piece.parentNode) {
         piece.parentNode.removeChild(piece);
-        }
+    }
 
     square.appendChild(piece);
 
@@ -845,8 +845,8 @@ function move_dropped_piece(piece, square, event)
 
     // TODO: do some cool effects when a piece is captured, but not too cool
     //if (square.firstChild) {
-        //new Effect.Squish(pc(square));
-                // }
+    //   new Effect.Squish(pc(square));
+    // }
 
     // Can't drop this piece anywhere anymore.
     piece.removeClassName("piece-" + piece.prior_position);
@@ -932,10 +932,9 @@ function piece_letter2name(letter)
 
             if (info.letter !== undefined) {
                 cache_letter2name.set(info.letter, name);
-                        } if (info.alg_letter !== undefined) {
+            } if (info.alg_letter !== undefined) {
                 cache_letter2name.set(info.alg_letter, name);
-                        }
-
+            }
         }
     }
 
@@ -948,9 +947,9 @@ function algebraic_piece_prefix(piece)
 {
     if (PIECE_TYPES[piece.type].letter !== undefined) {
         return PIECE_TYPES[piece.type].letter;
-        } else if (PIECE_TYPES[piece.type].alg_letter !== undefined) {
+    } else if (PIECE_TYPES[piece.type].alg_letter !== undefined) {
         return PIECE_TYPES[piece.type].alg_letter;
-        }
+    }
 
     assert(false, "algebraic_piece_prefix(" + piece + "): unrecognized piece");
 }
@@ -965,7 +964,7 @@ function pc(x, y)
 {
     if (x.hasClassName && x.hasClassName("square")) {
         return x.childNodes[0];
-        }
+    }
 
     var square = sq(x, y);
 
@@ -1010,14 +1009,14 @@ function create_piece(name)
     letter = name.toLowerCase();
     type = piece_letter2name(letter);
 
-        // TODO: catch invalid letters, lookup PIECE_TYPES
+    // TODO: catch invalid letters, lookup PIECE_TYPES
 
     filename = image_path_for(letter, color);
 
     piece = Builder.node('img', {'src': filename, 'class': "piece " + color});
 
-        // Property will tell name of piece. To tell what color, or if it is
-        // a piece in the first place, check the class names.
+    // Property will tell name of piece. To tell what color, or if it is
+    // a piece in the first place, check the class names.
     piece.type = type;
 
     // Highlight/unhighlight legal moves on mouse over, like Chess with Friends.
@@ -1045,7 +1044,8 @@ function create_piece(name)
     // when being dropped. http://www.tutorialspoint.com/cgi-bin/practice.cgi?file=scriptaculous_12 
     // does this too. reverteffect defaults to Effect.Move, and it reverts back to *something*,
     // figure this point.
-        // Note: http://www.jslint.com/ stops here for some reason
+
+    // Note: http://www.jslint.com/ stops here for some reason
     new Draggable(piece, { 
         revert: true, 
         starteffect: undefined, 
@@ -1213,20 +1213,19 @@ AssertException.prototype.toString = function() {
 function assert(expression, message)
 {
     if (!expression) {
-                alert(message);
+        alert(message);
         throw new AssertException(message);
-        }
+    }
 }
 
 // Based on http://tech.hickorywind.org/articles/2008/10/24/turning-off-text-selection-in-javascript
 function enable_document_selection(enable) {
-  if(enable) {
-    document.onselectstart = _original_onselectstart;
-  }
-  else {
-    _original_onselectstart = document.onselectstart;
-    document.onselectstart = function() { return false; }
-  }
+    if(enable) {
+        document.onselectstart = _original_onselectstart;
+    } else {
+        _original_onselectstart = document.onselectstart;
+        document.onselectstart = function() { return false; }
+    }
 }
 
 </script>
