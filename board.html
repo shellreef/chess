@@ -491,7 +491,8 @@ function decode_one_parlett(parlett, xy)
     distances = [];
 
     for (var i = 0; i < parlett.length; ++i) {
-        var ch = parlett[i];
+        // Btw, MSIE doesn't support [] for indexing into strings.. I never knew.
+        var ch = parlett.substr(i, 1);
 
         if (ch === "~") {
             // Moves by leaping to a fixed number (well, it can be
