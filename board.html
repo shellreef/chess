@@ -79,10 +79,8 @@ var GAME_STATE = {
     active_color: 'w',
     
     // Castling privileges
-    white_castle_short: true,
-    white_castle_long: true,
-    black_castle_short: true,
-    black_castle_long: true,
+    can_castle: {white: {short: true, long: true}, black: {short: true, long: true}},
+
     enpassant_target: null,
 
     halfmove_clock: 0,    // Ply since last pawn advance / capture
@@ -314,7 +312,7 @@ function filtered_moves(piece)
 
         if (move[2].initial_only) {
             // Can only move if have not moved this piece yet
-            if (pawn_moved(piece)) {
+            if (piece.type === "pawn" && pawn_moved(piece)) {
                 allowed = false;
             }
             // XXX TODO: what if it isn't a pawn? For castling, need to
@@ -841,6 +839,13 @@ function move_piece_to_square(piece, square)
 
     square.appendChild(piece);
 
+    // Moving king makes it ineligible for castling
+    if (piece.type === "king") {
+        GAME_STATE.can_castle[GAME_STATE.active_color].short = false;
+        GAME_STATE.can_castle[GAME_STATE.active_color].long = false;
+
+    } 
+    // TODO: rooks, each side, long and short
 
     if (should_promote(piece)) {
         promote(piece);
@@ -888,10 +893,10 @@ function load_fen(fen)
     set_turn({w:"white", b:"black"}[parts[1]]);
 
     castling = parts[2];
-    GAME_STATE.white_castle_short = /K/.test(castling);
-    GAME_STATE.white_castle_long = /Q/.test(castling);
-    GAME_STATE.black_castle_short = /k/.test(castling);
-    GAME_STATE.black__castle_long = /q/.test(castling);
+    GAME_STATE.can_castle.white.short = /K/.test(castling);
+    GAME_STATE.can_castle.white.long = /Q/.test(castling);
+    GAME_STATE.can_castle.black.short = /k/.test(castling);
+    GAME_STATE.can_castle.white.short = /q/.test(castling);
 
     if (parts[3] === "-") {
         GAME_STATE.enpassant_target = null;
