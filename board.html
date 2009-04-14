@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <title>Chess by Jeff</title>
-<!-- Copyright (C) 2009 Jeff Connelly ->
+<!-- Copyright (C) 2009 Jeff Connelly -->
 <!-- Created:20090411 -->
 <style>
 img.piece
@@ -17,16 +17,18 @@ img.white {}
 table.board
 {
  border: 2px solid black;
- border-collapse: collapse; 	/* cellspacing=0 cellpadding=0 */
 
- /* Firefox: disable text selection when dragging */
+/* This is like cellspacing=0 cellpadding=0 */
+ border-collapse: collapse;
+
+/* Firefox: disable text selection when dragging */
  -moz-user-select: none;
 }
 
 td.square
 {
  border-style: none;
- //border: 1px solid black;
+ /* border: 1px solid black; */
  padding: 0em;
  margin: 0em;
  width: 53px;
@@ -35,8 +37,7 @@ td.square
 
 td.hover 
 { 
- //border: 1px solid black;
- //background: url("images/wk.gif");
+ /* border: 1px solid black; */
  background-color: blue !important;
 }
 
@@ -1192,6 +1193,7 @@ AssertException.prototype.toString = function() {
 function assert(expression, message)
 {
 	if (!expression) 
+                //alert(message);
 		throw new AssertException(message);
 }
 
