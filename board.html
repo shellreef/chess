@@ -67,9 +67,9 @@ td.legal-move-black { background-color: #a15b17; }
 </style>
 <script src="http://www.google.com/jsapi"></script>
 <script language="javascript">
-if (!window.google)
+if (!window.google) {
 	alert("Google was not found. Nothing will work.");
-	// Let fall through and error out
+}
 
 google.load("prototype", "1.6.0.3");
 google.load("scriptaculous", "1.8.2");
@@ -179,8 +179,9 @@ function mv(alg_move)
 {
 	var piece_square, piece, square;
 
-	if (!alg_move)
+	if (!alg_move) {
 		return VALID_ALGEBRAIC_MOVES.keys();
+        }
 
 	piece_square = VALID_ALGEBRAIC_MOVES.get(alg_move);
 	assert(piece_square, "mv(" + alg_move + "): illegal move");
@@ -201,8 +202,9 @@ function should_promote(piece)
 	var square;
 
 	// Does it promote?
-	if (!PIECE_TYPES[piece.type].promote)
+	if (!PIECE_TYPES[piece.type].promote) {
 		return false;
+        }
 
 	square = sq(piece);
 
@@ -318,15 +320,17 @@ function filtered_moves(piece)
 			// Destination square must be occupied by enemy piece
 			// TODO: non-royal (can't capture king)
 			piece_under = pc(move[0], move[1]);
-			if (!piece_under)
+			if (!piece_under) {
 				allowed = false;	// needs something to capture
+                        }
 		}
 		
 		if (move[2].no_capture) {
 			// Can only move if unoccupied, not to capture
 			piece_under = pc(move[0], move[1]);
-			if (piece_under)
+			if (piece_under) {
 				allowed = false;	// can't capture, man
+                        }
 		}
 
 		return allowed;
@@ -525,17 +529,19 @@ function unfiltered_moves(parlett, xy)
 			maybe_directions = decode_direction(ch, parlett[i + 1]);
 			if (maybe_directions) {
 				directions = maybe_directions[0];
-				if (maybe_directions[1])
+				if (maybe_directions[1]) {
 					i += 1; // two-character direction
+                                }
 			} else {
 				assert(false, "decode_one_parlett(" + parlett + "): unsupported: " + ch);
 			}
 		}
 	}
-	if (!movement)
+	if (!movement) {
 		// Move unlimited distance in one direction, as long as its not blocked
 		// rook = (1,0)rider, bishop = (1,1)rider, queen (1,1)+(1,0)rider
 		movement = "rider";
+        }
 
 	//console.log("movement=",movement);
 	//console.log("directions=",directions);
@@ -550,8 +556,9 @@ function unfiltered_moves(parlett, xy)
 
 		moves = move_rel2abs(xy, rel_moves).reject(function(xy) {
 			var piece = pc(xy[0], xy[1]);
-			if (!piece)
+			if (!piece) {
 				return false;	// unoccupied, good
+                        }
 
 			// skip squares that are occupied by friendly pieces
 			return piece.hasClassName("active-color");
@@ -615,8 +622,9 @@ function expand_direction(limit, direction, start_xy)
 		x += direction[0];
 		y += direction[1];
 
-		if (x < 0 || x > 7 || y < 0 || y > 7)
+		if (x < 0 || x > 7 || y < 0 || y > 7) {
 			break;
+                }
 
 		piece = pc(x, y);
 		if (piece) {
@@ -722,8 +730,9 @@ function without_dupes(a)
 
 	for (var i = 0; i < a.length; ++i) {
 		// Add if not a dupe
-		if (!hash.get(a[i]))
+		if (!hash.get(a[i])) {
 			result.push(a[i]);
+                }
 
 		// Record that this element was added. Converts to a string,
 		// unfortunately, so can't just use hash.keys() after filling 
@@ -809,8 +818,9 @@ function move_piece_to_square(piece, square)
 		square.removeChild(square.firstChild);
 
 	// Move to new square
-	if (piece.parentNode)
+	if (piece.parentNode) {
 		piece.parentNode.removeChild(piece);
+        }
 
 	square.appendChild(piece);
 
@@ -832,8 +842,9 @@ function move_dropped_piece(piece, square, event)
 	//console.log(square);
 
 	// TODO: do some cool effects when a piece is captured, but not too cool
-	//if (square.firstChild)
+	//if (square.firstChild) {
 		//new Effect.Squish(pc(square));
+                // }
 
 	// Can't drop this piece anywhere anymore.
 	piece.removeClassName("piece-" + piece.prior_position);
@@ -917,10 +928,11 @@ function piece_letter2name(letter)
 		for (var name in PIECE_TYPES) {
 			var info = PIECE_TYPES[name];
 
-			if (info.letter !== undefined)
+			if (info.letter !== undefined) {
 				cache_letter2name.set(info.letter, name);
-			if (info.alg_letter !== undefined)
+                        } if (info.alg_letter !== undefined) {
 				cache_letter2name.set(info.alg_letter, name);
+                        }
 
 		}
 	}
@@ -932,10 +944,11 @@ function piece_letter2name(letter)
 // string (for pawns, for example).
 function algebraic_piece_prefix(piece)
 {
-	if (PIECE_TYPES[piece.type].letter !== undefined)
+	if (PIECE_TYPES[piece.type].letter !== undefined) {
 		return PIECE_TYPES[piece.type].letter;
-	else if (PIECE_TYPES[piece.type].alg_letter !== undefined)
+        } else if (PIECE_TYPES[piece.type].alg_letter !== undefined) {
 		return PIECE_TYPES[piece.type].alg_letter;
+        }
 
 	assert(false, "algebraic_piece_prefix(" + piece + "): unrecognized piece");
 }
@@ -948,8 +961,9 @@ function algebraic_piece_prefix(piece)
 // - a square, from sq()
 function pc(x, y)
 {
-	if (x.hasClassName && x.hasClassName("square"))
+	if (x.hasClassName && x.hasClassName("square")) {
 		return x.childNodes[0];
+        }
 
 	var square = sq(x, y);
 
@@ -1048,20 +1062,23 @@ function highlight_moves(piece, enable)
 
 	// If player is dragging a piece over another piece, don't show
 	// legal moves for the piece under it.
-	if (GAME_STATE.dragging)
+	if (GAME_STATE.dragging) {
 		return;
+        }
 
 	// If not this player's turn, no legal moves
-	if (!piece.hasClassName(GAME_STATE.active_color))
+	if (!piece.hasClassName(GAME_STATE.active_color)) {
 		return [];
+        }
 
 	from_square = sq(piece);
 
 	//console.log(from_square.filerank);
 	moves = VALID_MOVES.get(from_square.filerank);
 	//console.log(moves);
-	if (!moves)
+	if (!moves) {
 		return;	
+        }
 
 	moves.each(function(move) {
 		var x, y, flags, to_square;
@@ -1072,10 +1089,11 @@ function highlight_moves(piece, enable)
 		to_square = sq(x, y);
 
 		if (enable) {
-			if (to_square.hasClassName("white"))
+			if (to_square.hasClassName("white")) {
 				to_square.addClassName("legal-move-white");
-			else
+                        } else {
 				to_square.addClassName("legal-move-black");
+                        }
 		} else {
 				to_square.removeClassName("legal-move-white");
 				to_square.removeClassName("legal-move-black");
