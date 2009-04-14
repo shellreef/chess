@@ -109,8 +109,14 @@ var PIECE_TYPES = {
 // but HTML code to represent black and white (img, or Unicode character) pieces,
 // and codes for FEN notation of initial board positions, also black and white
 
-	// Standard international chess pieces
+	// Keys:
+	// parlett: movement of piece in extended Parlett notation
+	// letter: uppercase character representing the piece in FEN *and* algebraic notation
+	// fen_letter: uppercase character for FEN notation
+	// alg_letter: uppercase character for algebraic notation
+	// TODO: more
 
+	// Standard international chess pieces
 	king: {parlett: "1*", letter: "K", royal: true},    // TODO: royal
 	// TODO: imR2=, make 'm' move another piece adjacent, for castling, on initial (king+rook) move
 	//king: "~1/1, ~1/0",	// equivalent hippogonal leaper
@@ -158,9 +164,6 @@ var PIECE_TYPES = {
 	spy: {parlett: "2>, 2=, (1/1)>"},  // no grouping
 	// pieces with no notation. WinChloe supports 1400 pieces.
 }
-
-// TODO: merge into above, better class organization for pieces
-var PIECE_LETTER2NAME = {r: 'rook', n: 'knight', b: 'bishop', q: 'queen', k: 'king', p: 'pawn'};
 
 google.setOnLoadCallback(function() {
 	/* Safari & IE7: Disable text selection to stop interfering with dragging */
@@ -218,7 +221,7 @@ function calculate_valid_moves()
 		piece.prior_position = filerank;	// for removal
 		moves.each(function(move) {
 			var square = sq(move[0], move[1]);
-			var algebraic = filerank_piece_prefix(piece) + xy2filerank(move[0], move[1]);
+			var algebraic = algebraic_piece_prefix(piece) + xy2filerank(move[0], move[1]);
 
 			// Store algebraic notation -> [piece, square] map for understanding the notation
 			VALID_ALGEBRAIC_MOVES.set(algebraic, [piece, square]);
@@ -853,23 +856,52 @@ function load_starting_position(fen)
 
 //// PIECE FUNCTIONS
 
-// Return filerank prefix for a piece
-function filerank_piece_prefix(piece)
+// Given a letter, find the name of the piece (R = rook, etc.). The letter
+// can either be for FEN (P = pawn), or algebraic notation (blank = pawn);
+// both are recognized.
+var cache_letter2name;
+function piece_letter2name(letter)
+{
+	letter = letter.toUpperCase();
+
+	if (!cache_letter2name) {
+		cache_letter2name = new Hash();
+
+		for (var name in PIECE_TYPES) {
+			var info = PIECE_TYPES[name];
+
+			if (info.letter !== undefined)
+				cache_letter2name.set(info.letter, name);
+			if (info.fen_letter !== undefined)
+				cache_letter2name.set(info.fen_letter, name);
+			if (info.alg_letter !== undefined)
+				cache_letter2name.set(info.alg_letter, name);
+
+		};
+	}
+
+	return cache_letter2name.get(letter.toUpperCase());
+}
+
+// Return algebraic prefix for a piece
+function algebraic_piece_prefix(piece)
 {
 	// TODO: really need to clean this up! Have an attribute, and 
 	// a class to map piece names to character codes for filerank notation/FEN
 	if (piece.hasClassName("pawn"))
 		return "";
 
-	for (var letter in PIECE_LETTER2NAME)
+	for (var name in PIECE_TYPES)
 	{
-		var name = PIECE_LETTER2NAME[letter];
-
-		if (piece.hasClassName(name))
-			return letter.toUpperCase();
+		if (piece.hasClassName(name)) {
+			if (PIECE_TYPES[name].letter)
+				return PIECE_TYPES[name].letter;
+			else if (PIECE_TYPES[name].alg_letter)
+				return PIECE_TYPES[name].alg_letter;
+		}
 	}
 
-	assert(false, "filerank_piece_prefix(" + piece + "): unrecognized piece");
+	assert(false, "algebraic_piece_prefix(" + piece + "): unrecognized piece");
 }
 
 
@@ -914,6 +946,9 @@ function piece_type(piece)
 // Get (x,y) of piece. For filerank notation, use xy2filerank on this.
 function piece_location(piece)
 {
+	assert(piece, "piece_location(" + piece + "): piece is false");
+	assert(piece.parentNode, "piece_location(" + piece + "): piece.parentNode is false");
+
 	return [piece.parentNode.x, piece.parentNode.y];
 }
 
@@ -939,7 +974,7 @@ function new_piece(name)
 	}
 	type = name.toLowerCase();
 
-	classes += " " + PIECE_LETTER2NAME[type];
+	classes += " " + piece_letter2name(type);
 
 	// TODO: pngs
 	// TODO: even better, use Unicode characters in a span!! How cool would that be? Infinite resolution.
