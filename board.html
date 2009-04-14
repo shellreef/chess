@@ -518,7 +518,7 @@ function decode_one_parlett(parlett, xy)
             // (pawn's forward move)
             flags.no_capture = true;
 
-        // Extended Parlett, my own extensions 
+        // Multi-move, my own extension for castling
         } else if (ch === "m") {
             // TODO: multi-move other pieces, castling: mR2=
             
@@ -530,7 +530,7 @@ function decode_one_parlett(parlett, xy)
         } else if (ch === "/") {
             hippogonal = true;
         } else {
-            maybe_directions = decode_direction(ch, parlett[i + 1]);
+            maybe_directions = decode_direction(ch, parlett.substr(i + 1, 1));
             if (maybe_directions) {
                 directions = maybe_directions[0];
                 if (maybe_directions[1]) {
