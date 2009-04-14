@@ -154,7 +154,7 @@ var PIECE_TYPES = {
 	knightrider: {parlett: "n(1/2)"},  // no grouping support, sadly
 	checker: {parlett: "cn(^2X>), o1X> pD", promote: "checker_kinged"},  // no grouping
 	checker_kinged: {parlett: "cn(^2X), o1x"},
-	spy: {parlett: "2>, 2=, (1/1)>"},  // no grouping
+	spy: {parlett: "2>, 2=, (1/1)>"}  // no grouping
 	// pieces with no notation. WinChloe supports 1400 pieces.
 }
 
@@ -1034,7 +1034,7 @@ function new_piece(name)
 		starteffect: undefined, 
 		endeffect: undefined,
 		onStart: function() { GAME_STATE.dragging = true; },
-		onEnd: function() { GAME_STATE.dragging = false; },
+		onEnd: function() { GAME_STATE.dragging = false; }
 	 });
 
 
