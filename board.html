@@ -114,7 +114,8 @@ var PIECE_TYPES = {
 	// letter: uppercase character representing the piece in FEN *and* algebraic notation
 	// fen_letter: uppercase character for FEN notation
 	// alg_letter: uppercase character for algebraic notation
-	// TODO: more
+	// TODO: html
+	// TODO: royal: if true, if checked, must make move that unthreatens, otherwise checkmate
 
 	// Standard international chess pieces
 	king: {parlett: "1*", letter: "K", royal: true},    // TODO: royal
@@ -123,8 +124,7 @@ var PIECE_TYPES = {
 	queen: {parlett: "n*", letter: "Q"},
 	bishop: {parlett: "nX", letter: "B"},
 	rook: {parlett: "n+", letter: "R"},
-	// TODO: pQBRN for promotion options when at end of board
-	pawn: {parlett: "o1>, c1X>, oi2>", fen_letter: "P", alg_letter: ""},
+	pawn: {parlett: "o1>, c1X>, oi2>", fen_letter: "P", alg_letter: "", promote: ["queen", "knight", "rook", "bishop"]},
 	knight: {parlett: "~1/2", letter: "N"},
 
 	// Other hippogonals, good for testing
@@ -160,7 +160,8 @@ var PIECE_TYPES = {
 	leo: {parlett: "on*, c^&"},        // no & support, whatever that is
 	kraken: {parlett: "~n/m"},         // no n support in hippogonal (just allow any square)
 	knightrider: {parlett: "n(1/2)"},  // no grouping support, sadly
-	checker: {parlett: "cn(^2X>), o1X> King:cn(^2X), o1x"},  // no grouping, kinging
+	checker: {parlett: "cn(^2X>), o1X> pD", promote: "checker_kinged"},  // no grouping
+	checker_kinged: {parlett: "cn(^2X), o1x"},
 	spy: {parlett: "2>, 2=, (1/1)>"},  // no grouping
 	// pieces with no notation. WinChloe supports 1400 pieces.
 }
@@ -169,15 +170,20 @@ google.setOnLoadCallback(function() {
 	/* Safari & IE7: Disable text selection to stop interfering with dragging */
 	enable_document_selection(false);	
 	name_squares();	
-	
-	load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
+		
+	//load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	//load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
 	//load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
 	//load_fen("rnbqkb1r/pp1ppppp/5n2/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2");
-
+	load_fen("7K/8/k1P5/7p/8/8/8/8 w KQkq - 42 42");
 });
 
 //// USER FUNCTIONS
+
+// Convenience function to move given algebraic notation, for use within
+// JavaScript console (Develop -> Show Error Console in Safari) if you want
+// a command-line instead of a GUI.
 function mv(alg_move)
 {
 	var piece_square, piece, square;
@@ -196,8 +202,6 @@ function mv(alg_move)
 	move_piece_to_square(piece, square);
 }
 
-// TODO: Nc6, etc. with overridden toString so can just type it at the console?
-
 //// VALID MOVE FUNCTIONS
 
 // After the board changes and it is the next person's turn, calculate what the next possible allowable moves are.
@@ -205,6 +209,7 @@ function calculate_valid_moves()
 {
 	VALID_MOVES = new Hash();
 	VALID_ALGEBRAIC_MOVES = new Hash();
+
 
 	// Look at all the active pieces
 	$$("img.active-color").each(function(piece) { 
@@ -362,84 +367,83 @@ function unfiltered_moves(parlett, xy)
 
 	//console.log(choice_groups);
 	for (var i = 0; i < choice_groups.length; ++i) {
-		// For each group, gather the move options. 
-		// (Would be nice if JavaScript arrays had a Python-like .extend)
+			// For each group, gather the move options. 
+			// (Would be nice if JavaScript arrays had a Python-like .extend)
+			moves = moves.concat(decode_one_parlett(choice_groups[i], xy));
+		}	
 
-		moves = moves.concat(decode_one_parlett(choice_groups[i], xy));
-	}	
+		// Last step: remove duplicates. Maybe the caller should do this.
+		moves = without_dupes(moves);
 
-	// Last step: remove duplicates. Maybe the caller should do this.
-	moves = without_dupes(moves);
-
-	return moves;
-}
-
-// Decode a Parlett direction character, or return a false value if that is not what it is.
-// Returns an 2-element array:
-// 0th element: array of two-element arrays of direction vectors.
-// 1st element: true if ch2 was consumed, false if only ch was used
-function decode_direction(ch, ch2)
-{
-	var forward, backward;
-
-	// What way pieces go when they move forwards. Remember, these are x,y
-	// vectors so negative is up, positive is down.
-	if (GAME_STATE.active_color == "white") {
-		forward = -1;
-	} else if (GAME_STATE.active_color == "black") {
-		forward = 1;
-	} else {
-		assert(false, "decode_direction(" + ch + "): bad active color: " + GAME_STATE.active_color);
+		return moves;
 	}
-	backward = -forward;
 
-	if (ch == "+") { 
-		// orthogonally four possible directions
-		return [include_reversed(times_each([1, 0], [1, -1])), false];
-	} else if (ch == "=") {
-		// orthogonally sideways
-		return [[[1, 0], [-1, 0]], false];
-	} else if (ch == ">") {
-		if (ch2 == "=") {
-			// >= orthogonally forwards or sideways
-			return [decode_direction(">")[0].concat(decode_direction("=")[0]), true];
+	// Decode a Parlett direction character, or return a false value if that is not what it is.
+	// Returns an 2-element array:
+	// 0th element: array of two-element arrays of direction vectors.
+	// 1st element: true if ch2 was consumed, false if only ch was used
+	function decode_direction(ch, ch2)
+	{
+		var forward, backward;
+
+		// What way pieces go when they move forwards. Remember, these are x,y
+		// vectors so negative is up, positive is down.
+		if (GAME_STATE.active_color == "white") {
+			forward = -1;
+		} else if (GAME_STATE.active_color == "black") {
+			forward = 1;
 		} else {
-			// = orthogonally forward
-			return [[[0, forward]], false];
+			assert(false, "decode_direction(" + ch + "): bad active color: " + GAME_STATE.active_color);
 		}
-	} else if (ch == "<") {
-		if (ch2 == ">") {
-			// <> orthogonally forwards and backwards
-			return [[[0, forward], [0, backward]], true];
-		} else if (ch2 == "=") {
-			// <= orthogonally backwards or sideways
-			return [decode_direction("<")[0].concat(decode_direction("=")[0]), true];
+		backward = -forward;
+
+		if (ch == "+") { 
+			// orthogonally four possible directions
+			return [include_reversed(times_each([1, 0], [1, -1])), false];
+		} else if (ch == "=") {
+			// orthogonally sideways
+			return [[[1, 0], [-1, 0]], false];
+		} else if (ch == ">") {
+			if (ch2 == "=") {
+				// >= orthogonally forwards or sideways
+				return [decode_direction(">")[0].concat(decode_direction("=")[0]), true];
+			} else {
+				// = orthogonally forward
+				return [[[0, forward]], false];
+			}
+		} else if (ch == "<") {
+			if (ch2 == ">") {
+				// <> orthogonally forwards and backwards
+				return [[[0, forward], [0, backward]], true];
+			} else if (ch2 == "=") {
+				// <= orthogonally backwards or sideways
+				return [decode_direction("<")[0].concat(decode_direction("=")[0]), true];
+			} else {
+				// < orthogonally backwards
+				return [[[0, backward]], false];
+			}
+		} else if (ch == "X") { 
+			if (ch2 == ">") {
+				// X> diagonally forwards
+				return [[[1, forward], [-1, forward]], true];
+			} else if (ch2 == "<") {
+				// X< diagonally backwards
+				return [[[1, backwards], [-1, backwards]], true];
+			} else {
+				// X diagonally four possible directions
+				return [include_reversed(times_each([1, 1], [1, -1])), false];
+			}
+		} else if (ch == "*") {	
+			// orthogonally or diagonally (eight possible directions)
+			return [decode_direction("+")[0].concat(decode_direction("X")[0]), false];
 		} else {
-			// < orthogonally backwards
-			return [[[0, backward]], false];
+			return null;
 		}
-	} else if (ch == "X") { 
-		if (ch2 == ">") {
-			// X> diagonally forwards
-			return [[[1, forward], [-1, forward]], true];
-		} else if (ch2 == "<") {
-			// X< diagonally backwards
-			return [[[1, backwards], [-1, backwards]], true];
-		} else {
-			// X diagonally four possible directions
-			return [include_reversed(times_each([1, 1], [1, -1])), false];
-		}
-	} else if (ch == "*") {	
-		// orthogonally or diagonally (eight possible directions)
-		return [decode_direction("+")[0].concat(decode_direction("X")[0]), false];
-	} else {
-		return null;
 	}
-}
 
-// Decode a single group in extended Parlett notation into unfiltered absolute moves
-// See http://en.wikipedia.org/wiki/Fairy_chess_piece#Notations
-function decode_one_parlett(parlett, xy)
+	// Decode a single group in extended Parlett notation into unfiltered absolute moves
+	// See http://en.wikipedia.org/wiki/Fairy_chess_piece#Notations
+	function decode_one_parlett(parlett, xy)
 {
 	var movement, hippogonal;
 	var distances, directions, flags, maybe_directions;
@@ -460,6 +464,7 @@ function decode_one_parlett(parlett, xy)
 			movement = "leaper";
 
 		// Conditional modifiers that all returned moves should note.
+		// Additions to Parlett, documented on http://en.wikipedia.org/wiki/Fairy_chess_piece#Additions_to_Parlett.27s
 		} else if (ch == "i") { 
 			// Initial move: Can only if the piece is in its original position
 			// (pawn's 2 move forward)
@@ -474,6 +479,11 @@ function decode_one_parlett(parlett, xy)
 			// (pawn's forward move)
 			flags.no_capture = true;
 
+		// Extended Parlett, my own extensions 
+		} else if (ch == "m") {
+			// TODO: multi-move other pieces, castling: mR2=
+
+		// Standard Parlett
 		} else if (/[0-9]/.test(ch)) {
 			distances.push(parseInt(ch));
 		} else if (ch == "n") {
@@ -730,7 +740,6 @@ function set_turn(color)
 
 	GAME_STATE.active_color = new_color;
 
-
 	// Note: this takes some time... is there any way to run it right AFTER the piece has
 	// gone through the endeffect? This is called in onDrop.
 	// TODO: find out how to run something *after* the endeffect, for smoother UI.
@@ -773,6 +782,10 @@ function move_piece_to_square(piece, square)
 		piece.parentNode.removeChild(piece);
 
 	square.appendChild(piece);
+
+	// TODO: record move in algebraic notation
+
+	// TODO: promote, if promotes
 
 	set_turn("next");
 
@@ -958,28 +971,29 @@ function piece_location(piece)
 // TODO: make this a class so you can do new Piece().
 function new_piece(name)
 {
-	var color, filename, piece, type, classes;
+	var color, filename, piece, letter, classes;
 
 	classes = "piece";	
 
 	// In FEN, uppercase=white, lower=black
-	if (/^[RNBQKP]/.test(name)) {
+	if (/^[A-Z]/.test(name)) {
 		color = "w";
 		classes += " white";
-	} else if (/^[rnbqkp]/.test(name)) {
+	} else if (/^[a-z]/.test(name)) {
 		color = "b";
 		classes += " black";
 	} else {
 		assert("new_piece(" + name + "): unrecognized");
 	}
-	type = name.toLowerCase();
+	letter = name.toLowerCase();
 
-	classes += " " + piece_letter2name(type);
+	classes += " " + piece_letter2name(letter);
 
 	// TODO: pngs
 	// TODO: even better, use Unicode characters in a span!! How cool would that be? Infinite resolution.
 	// See for example http://en.wikipedia.org/wiki/Knight_(chess)
-	filename = 'images/' + color + type + '.gif';
+	// Unfortunately, MSIE doesn't seem to support it, though it should..
+	filename = 'images/' + color + letter+ '.gif';
 
 
 	piece = Builder.node('img', {'src': filename, 'class': classes});
