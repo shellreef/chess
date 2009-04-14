@@ -244,10 +244,10 @@ function calculate_valid_moves()
     VALID_MOVES = new Hash();
     VALID_ALGEBRAIC_MOVES = new Hash();
 
-
     // Look at all the active pieces
     $$("img.active-color").each(function(piece) { 
         var filerank;
+
         var moves = filtered_moves(piece);
 
         // Convert xy to filerank notation (a string), so it can be easily used
@@ -1014,7 +1014,7 @@ function create_piece(name)
 
     filename = image_path_for(letter, color);
 
-    piece = Builder.node('img', {'src': filename, 'class': "piece " + color});
+    piece = Builder.node('img', {'src': filename, 'class': "piece " + color + " + type});
 
     // Property will tell name of piece. To tell what color, or if it is
     // a piece in the first place, check the class names.
@@ -1127,7 +1127,8 @@ function unhighlight_all()
 function filerank2xy(code)
 {
     assert(code, "filerank2xy(" + code + "): is false");
-    assert(code.charCodeAt, "filerank2xy(" + code +"): is missing charCodeAt, is it a string?");
+    assert(code.charCodeAt, "filerank2xy(" + code +"): is missing charCodeAt, is it a string?" +
+            " code.className=" + code.className);
 
     var x = code.charCodeAt(0) - "a".charCodeAt(0);        // corresponds to file (horizontal)
     var y = 8 - (code.charCodeAt(1) - "0".charCodeAt(0));    // corresponds to rank (vertical)
