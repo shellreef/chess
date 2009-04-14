@@ -14,13 +14,6 @@ img.piece
 img.black {}
 img.white {}
 
-img.rook {}
-img.knight {}
-img.bishop {}
-img.queen {}
-img.king {}
-img.pawn {}
-
 table.board
 {
  border: 2px solid black;
@@ -302,10 +295,9 @@ function calculate_valid_moves()
 // Use VALID_MOVES otherwise.
 function filtered_moves(piece)
 {
-	var type = piece_type(piece);
 	var xy = piece_location(piece);	// TODO: OO
 	var x = xy[0], y = xy[1];
-	var parlett = PIECE_TYPES[type].parlett;
+	var parlett = PIECE_TYPES[piece.type].parlett;
 	var filtered;
 
 	var unfiltered = unfiltered_moves(parlett, xy);
@@ -963,29 +955,6 @@ function pc(x, y)
 	return square.childNodes[0];
 }
 
-// Return the type of a piece node (rook, bishop, etc.), or a false value
-function piece_type(piece)
-{
-	if (!piece || !piece.classNames)
-		return undefined;	// or should it be null, false?
-
-	var classes = piece.classNames();
-	var type;
-
-	// Loop through all the classes applied to this piece, finding
-	// one that is a valid piece type. Not terribly elegant, but 
-	// for now the type is stored as a class, instead of an attribute
-	// with a value you can directly lookup.
-	classes.each(function(className) {
-		if (PIECE_TYPES[className] !== undefined) {
-			type = className;
-			// TODO: way to break out of the each? Just curious.
-		}
-	});
-
-	return type;
-}
-
 // Get (x,y) of piece. For filerank notation, use xy2filerank on this.
 function piece_location(piece)
 {
@@ -1018,16 +987,16 @@ function new_piece(name)
 	letter = name.toLowerCase();
 	type = piece_letter2name(letter);
 
-	classes += " " + type;
-
 	// TODO: pngs
 	// TODO: even better, use Unicode characters in a span!! How cool would that be? Infinite resolution.
 	// See for example http://en.wikipedia.org/wiki/Knight_(chess)
 	// Unfortunately, MSIE doesn't seem to support it, though it should..different font?
-	filename = 'images/' + color + letter+ '.gif';
+	filename = 'images/' + color + letter + '.gif';
 
 	piece = Builder.node('img', {'src': filename, 'class': classes});
 
+        // Property will tell name of piece. To tell what color, or if it is
+        // a piece in the first place, check the class.
 	piece.type = type;
 
 	// Highlight/unhighlight legal moves on mouse over, like Chess with Friends.
