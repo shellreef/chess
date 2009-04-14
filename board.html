@@ -167,7 +167,8 @@ google.setOnLoadCallback(function() {
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
     //load_fen("rnbqkb1r/pp1ppppp/5n2/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2");
-    load_fen("7K/8/k1P5/7p/8/8/8/8 w KQkq - 42 42");
+    //load_fen("7K/8/k1P5/7p/8/8/8/8 w KQkq - 42 42");
+    load_fen("r1bqkb1r/pp1ppppp/2n2n2/2p5/2B2P3/5N2/PPPP1PPP/RN1QK2R w KQkq - 1 2");
 
 });
 
@@ -1053,6 +1054,8 @@ function create_piece(name)
         endeffect: undefined,
         onStart: function() { GAME_STATE.dragging = true; },
         onEnd: function() { GAME_STATE.dragging = false; }
+        // TODO: figure out why on IE7, dragged pieces are below the highlighted squares!
+        // even with zindex: 1001
      });
 
 
