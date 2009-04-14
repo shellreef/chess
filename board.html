@@ -140,9 +140,7 @@ var PIECE_TYPES = {
 	lion: {parlett: "~n*"},
 	alfil: {parlett: "~2X"},
 	dabbaba: {parlett: "~2+"},
-	superpawn: {parlett: "~on>, cnX>"},
 	berolina_pawn: {parlett: "o1X>, c1>, io2X>"},
-	colonel: {parlett: "n>, n=, 2/1>, 1*"},
 	superpawn: {parlett: "on>, cnX>"},
 	elephant: {parlett: "2X"},
 	khohn: {parlett: "1X, 1>"},
@@ -209,10 +207,10 @@ function should_promote(piece)
 	square = sq(piece);
 
 	// Is it on the last rank?
-	if (GAME_STATE.active_color == "white") {
-		return square.y == 0;	// 8th rank
-	} else if (GAME_STATE.active_color == "black") {
-		return square.y == 7;	// 1st rank
+	if (GAME_STATE.active_color === "white") {
+		return square.y === 0;	// 8th rank
+	} else if (GAME_STATE.active_color === "black") {
+		return square.y === 7;	// 1st rank
 	} else {
 		assert(false, "should_promote(" + piece + "): unknown active color");
 	}
@@ -279,7 +277,7 @@ function calculate_valid_moves()
 
 	// AI - artificial intelligence	
 	// TODO: options human vs. computer, computer vs. human, h vs. h, c vs. c
-	if (GAME_STATE.active_color == "black") {
+	if (GAME_STATE.active_color === "black") {
 		// simply choose a random move
 		// TODO: weak AI, take most valuable piece, checkmate if can, check if can,
 		// 	fork if can.. something to entertain a beginner
@@ -420,52 +418,52 @@ function unfiltered_moves(parlett, xy)
 
 		// What way pieces go when they move forwards. Remember, these are x,y
 		// vectors so negative is up, positive is down.
-		if (GAME_STATE.active_color == "white") {
+		if (GAME_STATE.active_color === "white") {
 			forward = -1;
-		} else if (GAME_STATE.active_color == "black") {
+		} else if (GAME_STATE.active_color === "black") {
 			forward = 1;
 		} else {
 			assert(false, "decode_direction(" + ch + "): bad active color: " + GAME_STATE.active_color);
 		}
 		backward = -forward;
 
-		if (ch == "+") { 
+		if (ch === "+") { 
 			// orthogonally four possible directions
 			return [include_reversed(times_each([1, 0], [1, -1])), false];
-		} else if (ch == "=") {
+		} else if (ch === "=") {
 			// orthogonally sideways
 			return [[[1, 0], [-1, 0]], false];
-		} else if (ch == ">") {
-			if (ch2 == "=") {
+		} else if (ch === ">") {
+			if (ch2 === "=") {
 				// >= orthogonally forwards or sideways
 				return [decode_direction(">")[0].concat(decode_direction("=")[0]), true];
 			} else {
 				// = orthogonally forward
 				return [[[0, forward]], false];
 			}
-		} else if (ch == "<") {
-			if (ch2 == ">") {
+		} else if (ch === "<") {
+			if (ch2 === ">") {
 				// <> orthogonally forwards and backwards
 				return [[[0, forward], [0, backward]], true];
-			} else if (ch2 == "=") {
+			} else if (ch2 === "=") {
 				// <= orthogonally backwards or sideways
 				return [decode_direction("<")[0].concat(decode_direction("=")[0]), true];
 			} else {
 				// < orthogonally backwards
 				return [[[0, backward]], false];
 			}
-		} else if (ch == "X") { 
-			if (ch2 == ">") {
+		} else if (ch === "X") { 
+			if (ch2 === ">") {
 				// X> diagonally forwards
 				return [[[1, forward], [-1, forward]], true];
-			} else if (ch2 == "<") {
+			} else if (ch2 === "<") {
 				// X< diagonally backwards
 				return [[[1, backwards], [-1, backwards]], true];
 			} else {
 				// X diagonally four possible directions
 				return [include_reversed(times_each([1, 1], [1, -1])), false];
 			}
-		} else if (ch == "*") {	
+		} else if (ch === "*") {	
 			// orthogonally or diagonally (eight possible directions)
 			return [decode_direction("+")[0].concat(decode_direction("X")[0]), false];
 		} else {
@@ -488,7 +486,7 @@ function unfiltered_moves(parlett, xy)
 	for (var i = 0; i < parlett.length; ++i) {
 		var ch = parlett[i];
 
-		if (ch == "~") {
+		if (ch === "~") {
 			// Moves by leaping to a fixed number (well, it can be
 			// reduced later) of relative positions, jumping over
 			// pieces if needed, capturing where it ends up. 
@@ -497,30 +495,30 @@ function unfiltered_moves(parlett, xy)
 
 		// Conditional modifiers that all returned moves should note.
 		// Additions to Parlett, documented on http://en.wikipedia.org/wiki/Fairy_chess_piece#Additions_to_Parlett.27s
-		} else if (ch == "i") { 
+		} else if (ch === "i") { 
 			// Initial move: Can only if the piece is in its original position
 			// (pawn's 2 move forward)
 			flags.initial_only = true;
-		} else if (ch == "c") {
+		} else if (ch === "c") {
 			// Capture only: may only be used if destination is occupied by enemy piece
 			// (pawn's diagnal capture)
 			flags.capture_only = true;
-		} else if (ch == "o") {
+		} else if (ch === "o") {
 			// Can not capture: destination square must be unoccupied; since by default, piece
 			// can move to enemy square in order to capture it
 			// (pawn's forward move)
 			flags.no_capture = true;
 
 		// Extended Parlett, my own extensions 
-		} else if (ch == "m") {
+		} else if (ch === "m") {
 			// TODO: multi-move other pieces, castling: mR2=
 
 		// Standard Parlett
 		} else if (/[0-9]/.test(ch)) {
 			distances.push(parseInt(ch));
-		} else if (ch == "n") {
+		} else if (ch === "n") {
 			distances.push(Infinity)
-		} else if (ch == "/") {
+		} else if (ch === "/") {
 			hippogonal = true;
 		} else {
 			maybe_directions = decode_direction(ch, parlett[i + 1]);
@@ -542,7 +540,7 @@ function unfiltered_moves(parlett, xy)
 	//console.log("directions=",directions);
 
 	if (hippogonal) {
-		assert(movement == "leaper", "decode_one_parlett(" + parlett + 
+		assert(movement === "leaper", "decode_one_parlett(" + parlett + 
 			"): only hippogonals that are leapers are currently supported");
 
 		// First get valid destinations, then convert to absolute coordinates.
@@ -558,13 +556,13 @@ function unfiltered_moves(parlett, xy)
 			return piece.hasClassName("active-color");
 		});
 
-	} else if (movement == "leaper") {
+	} else if (movement === "leaper") {
 		assert(false, "decode_one_parlett(" + parlett + 
 			"): only leapers that are hippogonals are currently supported");
-	} else if (movement == "rider") {
+	} else if (movement === "rider") {
 		var limit;
 
-		assert(distances.length == 1, "decode_one_parlett(" + parlett + 
+		assert(distances.length === 1, "decode_one_parlett(" + parlett + 
 			"): for non-hippogonal parletts, must have exactly one distance, not: " +
 			distances);
 
@@ -640,7 +638,7 @@ function expand_direction(limit, direction, start_xy)
 
 // Add a third element to a list of moves, extra "flags" that describe
 // under what conditions the move is valid. 
-// 	add_flags([[7,2],[4,1],[5,2]], "hi") == [[7,2,"hi"],[[4,1,"hi"], etc.
+// 	add_flags([[7,2],[4,1],[5,2]], "hi") === [[7,2,"hi"],[[4,1,"hi"], etc.
 // but the flags should be something useful: a dictionary
 function add_flags(moves, flags)
 {
@@ -667,7 +665,7 @@ function expand_hippogonal(a)
 
 // Return a list of lists, where each element in the first is multiplied
 // by each combination of the second. For example, to implement +/-:
-// 	times_each([1,2], [1,-1]) == [[1,2], [1,-2], [-1,2], [-1,2]]
+// 	times_each([1,2], [1,-1]) === [[1,2], [1,-2], [-1,2], [-1,2]]
 // This is not the cross product or Cartesian product, something else.
 function times_each(a, b)
 {
@@ -683,7 +681,7 @@ function times_each(a, b)
 }
 
 // Include reversed pairs of nested lists, example:
-// 	include_reversed([[1,2], [1,0]]) == [[1,2], [2,1], [1,0], [0,1]]
+// 	include_reversed([[1,2], [1,0]]) === [[1,2], [2,1], [1,0], [0,1]]
 // Removes duplicates.
 function include_reversed(a)
 {
@@ -709,7 +707,7 @@ function include_reversed(a)
 // duplicity is determined by string equality. This is ugly, but
 //	[1,2] in [[1,2], [3,4]]
 // is false, since 
-//	[1,2] == [1,2]
+//	[1,2] === [1,2]
 // is false, so its not easy (as far as I could tell) to check if
 // a complex element is already in an array before adding it. Worse yet,
 // hash keys can't be complex, so for example the set implementation at
@@ -741,7 +739,7 @@ function opposite_color(color)
 {
 	var opposite = {white: "black", black: "white"}[color];
 
-	assert(opposite == "black" || opposite == "white", "opposite_color(" + color + "): bad color");
+	assert(opposite === "black" || opposite === "white", "opposite_color(" + color + "): bad color");
 
 	return opposite;
 }
@@ -751,9 +749,9 @@ function set_turn(color)
 {
 	var new_color, active_pieces;
 
-	assert(color == "white" || color == "black" || color == "next", "set_turn(" + color + "): invalid color");
+	assert(color === "white" || color === "black" || color === "next", "set_turn(" + color + "): invalid color");
 
-	if (color == "next") {
+	if (color === "next") {
 		new_color = opposite_color(GAME_STATE.active_color);
 	} else {
 		new_color = color;
@@ -865,7 +863,7 @@ function load_fen(fen)
 	GAME_STATE.black_castle_short = /k/.test(castling);
 	GAME_STATE.black__castle_long = /q/.test(castling);
 
-	if (parts[3] == "-") {
+	if (parts[3] === "-") {
 		GAME_STATE.enpassant_target = null;
 	} else {
 		GAME_STATE.enpassant_target = parts[3]; // for sq()
@@ -889,12 +887,12 @@ function load_starting_position(fen)
 		if (/[a-zA-Z]/.test(code)) {
 			sq(x, y).appendChild(new_piece(code));
 			++x;
-		} else if (code == "/") {
+		} else if (code === "/") {
 			x = 0;
 			++y;
 		} else if (/[0-9]/.test(code)) {
 			x += code.charCodeAt(0) - "0".charCodeAt(0);
-		} else if (code == " ") {
+		} else if (code === " ") {
 			break;
 		} else {
 			assert("load_starting_position(" + fen + "): unknown code: " + code);
@@ -1118,8 +1116,8 @@ function filerank2xy(code)
 }
 
 // Convert from x,y coordinates to filerank notation for human consumption. Can either pass
-// xy2filerank(0, 0) == "a8"
-// xy2filerank([0, 0]) == "a8"
+// xy2filerank(0, 0) === "a8"
+// xy2filerank([0, 0]) === "a8"
 function xy2filerank(x, y)
 {
 	var filerank;
@@ -1193,8 +1191,8 @@ AssertException.prototype.toString = function() {
 function assert(expression, message)
 {
 	if (!expression) 
-                //alert(message);
-		throw new AssertException(message);
+                alert(message);
+		//throw new AssertException(message);
 }
 
 // Based on http://tech.hickorywind.org/articles/2008/10/24/turning-off-text-selection-in-javascript
