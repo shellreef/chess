@@ -111,7 +111,7 @@ var PIECE_TYPES = {
     // TODO: royal: if true, if checked, must make move that unthreatens, otherwise checkmate
 
     // Standard international chess pieces
-    king: {parlett: "1*", letter: "K", royal: true},    // TODO: royal
+    king: {parlett: "1*, imR2=", letter: "K", royal: true},    // TODO: royal
     // TODO: imR2=, make 'm' move another piece adjacent, for castling, on initial (king+rook) move
     //king: "~1/1, ~1/0",    // equivalent hippogonal leaper
     queen: {parlett: "n*", letter: "Q"},
@@ -317,6 +317,10 @@ function filtered_moves(piece)
             if (pawn_moved(piece)) {
                 allowed = false;
             }
+            // XXX TODO: what if it isn't a pawn? For castling, need to
+            // check if king has moved, and if other piece (it'll be a rook)
+            // has moved, for imR2=. Need a better solution for figuring out
+            // whether a piece has moved.
         }
 
         if (move[2].capture_only) {
@@ -520,8 +524,14 @@ function decode_one_parlett(parlett, xy)
 
         // Multi-move, my own extension for castling
         } else if (ch === "m") {
-            // TODO: multi-move other pieces, castling: mR2=
-            
+            // TODO: multi-move other pieces, castling: imR2=
+            var letter = parlett.substr(i + 1, 1);
+            var type = piece_letter2name(letter);
+            assert(type, "decode_one_parlett(" + parlett + "): multimove letter " + letter + 
+                    " piece type not found");
+
+            i += 1;
+
         // Standard Parlett
         } else if (/[0-9]/.test(ch)) {
             distances.push(parseInt(ch, 10));
@@ -529,6 +539,9 @@ function decode_one_parlett(parlett, xy)
             distances.push(Infinity);
         } else if (ch === "/") {
             hippogonal = true;
+
+        } else if (ch == " ") {
+            assert(false, "decode_one_parlett(" + parlett + "): whitespace encountered, did you forget a comma?");
         } else {
             maybe_directions = decode_direction(ch, parlett.substr(i + 1, 1));
             if (maybe_directions) {
@@ -537,7 +550,7 @@ function decode_one_parlett(parlett, xy)
                     i += 1; // two-character direction
                 }
             } else {
-                assert(false, "decode_one_parlett(" + parlett + "): unsupported: " + ch);
+                assert(false, "decode_one_parlett(" + parlett + "): unsupported: '" + ch + "'");
             }
         }
     }
