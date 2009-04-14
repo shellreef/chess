@@ -1014,7 +1014,7 @@ function create_piece(name)
 
     filename = image_path_for(letter, color);
 
-    piece = Builder.node('img', {'src': filename, 'class': "piece " + color + " + type});
+    piece = Builder.node('img', {'src': filename, 'class': "piece " + color + " " + type});
 
     // Property will tell name of piece. To tell what color, or if it is
     // a piece in the first place, check the class names.
@@ -1169,21 +1169,25 @@ function sq(code, extra)
 {
     var x, y;
 
-    // Accept pieces, too. TODO: update if change piece from <img>
-    if (code.constructor && /HTMLImageElement/.test(code.constructor.toString())) {
+    // Is it a piece?
+    if (code.hasClassName && code.hasClassName("piece")) {
         var xy = piece_location(code);
 
         x = xy[0];
         y = xy[1];
+    // Is it x,y passed as separate parameters?
     } else if (extra !== undefined) {
         x = code;
         y = extra;
-    } else {
+    // Is it a string in algebraic notation that can be converted?
+    } else if (code.charCodeAt) {
         var xy = filerank2xy(code);
 
         // TODO: can JS do list element assignment like x,y=...?    
         x = xy[0];
         y = xy[1];
+    } else {
+        assert(false, "sq(" + code + ", " + extra + "): couldn't find out arguments");
     }
 
     assert(x >= 0 && x <= 7 && y >= 0 && y <= 7, "sq(" + code + ", " + extra + 
