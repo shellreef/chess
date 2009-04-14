@@ -95,7 +95,7 @@ var GAME_STATE = {
 // Moves that can be made right now, for each active piece.
 var VALID_MOVES = null;			// Keyed by filerank of source, array of [[x,y,flags]] destinations
 var VALID_ALGEBRAIC_MOVES = null;	// Map algebraic -> [piece, square]
-var ALL_DROP_TARGETS = new Array();	// Droppables for UI
+var ALL_DROP_TARGETS = [];              // Droppables for UI
 
 // Movement of pieces in extended Parlett notation
 var PIECE_TYPES = {
@@ -155,7 +155,7 @@ var PIECE_TYPES = {
 	checker_kinged: {parlett: "cn(^2X), o1x"},
 	spy: {parlett: "2>, 2=, (1/1)>"}  // no grouping
 	// pieces with no notation. WinChloe supports 1400 pieces.
-}
+};
 
 google.setOnLoadCallback(function() {
 	/* Safari & IE7: Disable text selection to stop interfering with dragging */
@@ -221,7 +221,7 @@ function promote(piece)
 {
 	var promotes_to;
 
-	console.log("promotion");
+	//console.log("promotion");
 
         // TODO: give option to what to promote to, if more than one.
         // Click/tap piece to change it, after moved? Cycle through?
@@ -306,6 +306,7 @@ function filtered_moves(piece)
 
 	filtered = unfiltered.select(function(move) {
 		var allowed = true;
+                var piece_under;
 
 		if (move[2].initial_only) {
 			// Can only move if have not moved this piece yet
@@ -316,14 +317,14 @@ function filtered_moves(piece)
 		if (move[2].capture_only) {
 			// Destination square must be occupied by enemy piece
 			// TODO: non-royal (can't capture king)
-			var piece_under = pc(move[0], move[1]);
+			piece_under = pc(move[0], move[1]);
 			if (!piece_under)
 				allowed = false;	// needs something to capture
 		}
 		
 		if (move[2].no_capture) {
 			// Can only move if unoccupied, not to capture
-			var piece_under = pc(move[0], move[1]);
+			piece_under = pc(move[0], move[1]);
 			if (piece_under)
 				allowed = false;	// can't capture, man
 		}
@@ -360,7 +361,7 @@ function pawn_moved(piece)
 // Note2: moves must be array of [x,y,flags]; the third element is required
 function move_rel2abs(xy_location, moves)
 {
-	var absolutes = new Array();
+	var absolutes = [];
 
 	for (var i = 0; i < moves.length; ++i) {
 		var rel = moves[i];
@@ -390,7 +391,7 @@ function unfiltered_moves(parlett, xy)
 {
 	var choice_groups, moves;
 
-	moves = new Array();
+	moves = [];
 
 	// Mutually exclusive choices
 	choice_groups = parlett.split(", ");
@@ -481,7 +482,7 @@ function unfiltered_moves(parlett, xy)
 	assert(xy, "decode_one_parlett("+ parlett + ", " + xy + "): piece xy not given");
 
 	flags = {};
-	distances = new Array();
+	distances = [];
 
 	for (var i = 0; i < parlett.length; ++i) {
 		var ch = parlett[i];
@@ -515,9 +516,9 @@ function unfiltered_moves(parlett, xy)
 
 		// Standard Parlett
 		} else if (/[0-9]/.test(ch)) {
-			distances.push(parseInt(ch));
+			distances.push(parseInt(ch, 10));
 		} else if (ch === "n") {
-			distances.push(Infinity)
+			distances.push(Infinity);
 		} else if (ch === "/") {
 			hippogonal = true;
 		} else {
@@ -525,7 +526,7 @@ function unfiltered_moves(parlett, xy)
 			if (maybe_directions) {
 				directions = maybe_directions[0];
 				if (maybe_directions[1])
-					i++;	// two-character direction
+					i += 1; // two-character direction
 			} else {
 				assert(false, "decode_one_parlett(" + parlett + "): unsupported: " + ch);
 			}
@@ -585,7 +586,7 @@ function unfiltered_moves(parlett, xy)
 // are not supported here.
 function expand_rider(limit, directions, xy)
 {
-	var moves = new Array();
+	var moves = [];
 
 	//console.log("expand_rider",limit, directions, xy);
 
@@ -603,7 +604,7 @@ function expand_direction(limit, direction, start_xy)
 {
 	var x, y, moves;
 
-	moves = new Array();
+	moves = [];
 
 	x = start_xy[0];
 	y = start_xy[1];
@@ -642,7 +643,7 @@ function expand_direction(limit, direction, start_xy)
 // but the flags should be something useful: a dictionary
 function add_flags(moves, flags)
 {
-	var new_moves = new Array();
+	var new_moves = [];
 
 	for (var i = 0; i < moves.length; ++i) {
 		var move = moves[i];
@@ -717,7 +718,7 @@ function include_reversed(a)
 function without_dupes(a)
 {
 	var hash = new Hash();
-	var result = new Array();
+	var result = [];
 
 	for (var i = 0; i < a.length; ++i) {
 		// Add if not a dupe
@@ -839,7 +840,7 @@ function move_dropped_piece(piece, square, event)
 	ALL_DROP_TARGETS.each(function(square) {
 		Droppables.remove(square);
 	});
-	ALL_DROP_TARGETS = new Array();
+	ALL_DROP_TARGETS = [];
 
 	unhighlight_all();
 
@@ -869,8 +870,8 @@ function load_fen(fen)
 		GAME_STATE.enpassant_target = parts[3]; // for sq()
 	}
 
-	GAME_STATE.halfmove_clock = parseInt(parts[4]);
-	GAME_STATE.fullmove_number = parseInt(parts[5]);
+	GAME_STATE.halfmove_clock = parseInt(parts[4], 10);
+	GAME_STATE.fullmove_number = parseInt(parts[5], 10);
 }
 
 // Load starting position in FEN. Example, at beginning of game:
@@ -921,7 +922,7 @@ function piece_letter2name(letter)
 			if (info.alg_letter !== undefined)
 				cache_letter2name.set(info.alg_letter, name);
 
-		};
+		}
 	}
 
 	return cache_letter2name.get(letter.toUpperCase());
