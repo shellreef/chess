@@ -202,6 +202,42 @@ function mv(alg_move)
 	move_piece_to_square(piece, square);
 }
 
+//// SPECIAL MOVE FUNCTIONS
+
+// Return whether a piece should be promoted
+function should_promote(piece)
+{
+	var square;
+
+	// Does it promote?
+	if (!PIECE_TYPES[piece.type].promote)
+		return false;
+
+	square = sq(piece);
+
+	// Is it on the last rank?
+	if (GAME_STATE.active_color == "white") {
+		return square.y == 0;	// 8th rank
+	} else if (GAME_STATE.active_color == "black") {
+		return square.y == 7;	// 1st rank
+	} else {
+		assert(false, "should_promote(" + piece + "): unknown active color");
+	}
+}
+
+// Change a piece to whatever it promotes to.
+function promote(piece)
+{
+	var promotes_to;
+
+	console.log("promotion");
+
+	promotes_to = PIECE_TYPES[piece.type].promote;
+
+        // TODO: really promote
+	piece.src = "images/wq.gif";	
+}
+
 //// VALID MOVE FUNCTIONS
 
 // After the board changes and it is the next person's turn, calculate what the next possible allowable moves are.
@@ -783,9 +819,12 @@ function move_piece_to_square(piece, square)
 
 	square.appendChild(piece);
 
-	// TODO: record move in algebraic notation
 
-	// TODO: promote, if promotes
+	if (should_promote(piece)) {
+		promote(piece);
+	}
+
+	// TODO: record move in algebraic notation, and how about descriptive too?
 
 	set_turn("next");
 
