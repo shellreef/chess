@@ -225,10 +225,14 @@ function promote(piece)
 
 	console.log("promotion");
 
-	promotes_to = PIECE_TYPES[piece.type].promote;
+        // TODO: give option to what to promote to, if more than one.
+        // Click/tap piece to change it, after moved? Cycle through?
+	promotes_to = PIECE_TYPES[piece.type].promote[0];
 
-        // TODO: really promote
-	piece.src = "images/wq.gif";	
+	piece.src = image_path_for(PIECE_TYPES[promotes_to].letter || PIECE_TYPES[promotes_to].fen_letter,
+                piece.hasClassName("white") ? "white" : "black");
+
+        piece.type = promotes_to;
 }
 
 //// VALID MOVE FUNCTIONS
@@ -964,39 +968,43 @@ function piece_location(piece)
 	return [piece.parentNode.x, piece.parentNode.y];
 }
 
+// Return the path to an image for the piece of that color
+function image_path_for(letter, color)
+{
+    // TODO: pngs
+    // TODO: even better, use Unicode characters in a span!! How cool would that be? Infinite resolution.
+    // See for example http://en.wikipedia.org/wiki/Knight_(chess)
+    // Unfortunately, MSIE doesn't seem to support it, though it should..different font?
+    return "images/" + {white:"w", black:"b"}[color] + letter + ".gif";
+}
+
 // Create a new piece or pawn, given the name in
 // Forsyth-Edwards Notation, for example:
 //  r = black rook, R = white rook, N = white knight
 // TODO: make this a class so you can do new Piece().
 function new_piece(name)
 {
-	var color, filename, piece, letter, classes, type;
-
-	classes = "piece";
+	var color, filename, piece, letter, type;
 
 	// In FEN, uppercase=white, lower=black
 	if (/^[A-Z]/.test(name)) {
-		color = "w";
-		classes += " white";
+		color = "white";
 	} else if (/^[a-z]/.test(name)) {
-		color = "b";
-		classes += " black";
+		color = "black";
 	} else {
 		assert("new_piece(" + name + "): not a letter");
 	}
 	letter = name.toLowerCase();
 	type = piece_letter2name(letter);
 
-	// TODO: pngs
-	// TODO: even better, use Unicode characters in a span!! How cool would that be? Infinite resolution.
-	// See for example http://en.wikipedia.org/wiki/Knight_(chess)
-	// Unfortunately, MSIE doesn't seem to support it, though it should..different font?
-	filename = 'images/' + color + letter + '.gif';
+        // TODO: catch invalid letters, lookup PIECE_TYPES
 
-	piece = Builder.node('img', {'src': filename, 'class': classes});
+	filename = image_path_for(letter, color);
+
+	piece = Builder.node('img', {'src': filename, 'class': "piece " + color});
 
         // Property will tell name of piece. To tell what color, or if it is
-        // a piece in the first place, check the class.
+        // a piece in the first place, check the class names.
 	piece.type = type;
 
 	// Highlight/unhighlight legal moves on mouse over, like Chess with Friends.
@@ -1031,7 +1039,6 @@ function new_piece(name)
 		onStart: function() { GAME_STATE.dragging = true; },
 		onEnd: function() { GAME_STATE.dragging = false; },
 	 });
-
 
 
 	return piece;
