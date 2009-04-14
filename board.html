@@ -168,6 +168,7 @@ google.setOnLoadCallback(function() {
 	//load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
 	//load_fen("rnbqkb1r/pp1ppppp/5n2/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2");
 	load_fen("7K/8/k1P5/7p/8/8/8/8 w KQkq - 42 42");
+
 });
 
 //// USER FUNCTIONS
@@ -312,8 +313,9 @@ function filtered_moves(piece)
 
 		if (move[2].initial_only) {
 			// Can only move if have not moved this piece yet
-			if (pawn_moved(piece)) 
+			if (pawn_moved(piece)) {
 				allowed = false;
+                        }
 		}
 
 		if (move[2].capture_only) {
@@ -350,9 +352,9 @@ function filtered_moves(piece)
 function pawn_moved(piece)
 {
 	if (piece.hasClassName("white")) {
-		return sq(piece).y != 6;    // 2nd rank
+		return sq(piece).y !== 6;    // 2nd rank
 	} else if (piece.hasClassName("black")) {
-		return sq(piece).y != 1;    // 7th rank
+		return sq(piece).y !== 1;    // 7th rank
 	} else {
 		assert("pawn_not_moved(" + piece + "): neither white nor black");
 	}
@@ -639,7 +641,7 @@ function expand_direction(limit, direction, start_xy)
 		}
 
 		//console.log(xy2filerank(x,y));	
-		moves.push([x, y])
+		moves.push([x, y]);
 	}
 
 	return moves;
@@ -897,7 +899,7 @@ function load_starting_position(fen)
 	for (i = 0; i < fen.length; ++i) {
 		code = fen.charAt(i);
 		if (/[a-zA-Z]/.test(code)) {
-			sq(x, y).appendChild(new_piece(code));
+			sq(x, y).appendChild(create_piece(code));
 			++x;
 		} else if (code === "/") {
 			x = 0;
@@ -993,7 +995,7 @@ function image_path_for(letter, color)
 // Forsyth-Edwards Notation, for example:
 //  r = black rook, R = white rook, N = white knight
 // TODO: make this a class so you can do new Piece().
-function new_piece(name)
+function create_piece(name)
 {
 	var color, filename, piece, letter, type;
 
@@ -1003,7 +1005,7 @@ function new_piece(name)
 	} else if (/^[a-z]/.test(name)) {
 		color = "black";
 	} else {
-		assert("new_piece(" + name + "): not a letter");
+		assert("create_piece(" + name + "): not a letter");
 	}
 	letter = name.toLowerCase();
 	type = piece_letter2name(letter);
@@ -1043,6 +1045,7 @@ function new_piece(name)
 	// when being dropped. http://www.tutorialspoint.com/cgi-bin/practice.cgi?file=scriptaculous_12 
 	// does this too. reverteffect defaults to Effect.Move, and it reverts back to *something*,
 	// figure this point.
+        // Note: http://www.jslint.com/ stops here for some reason
 	new Draggable(piece, { 
 		revert: true, 
 		starteffect: undefined, 
@@ -1209,9 +1212,10 @@ AssertException.prototype.toString = function() {
 
 function assert(expression, message)
 {
-	if (!expression) 
+	if (!expression) {
                 alert(message);
-		//throw new AssertException(message);
+		throw new AssertException(message);
+        }
 }
 
 // Based on http://tech.hickorywind.org/articles/2008/10/24/turning-off-text-selection-in-javascript
@@ -1224,7 +1228,6 @@ function enable_document_selection(enable) {
     document.onselectstart = function() { return false; }
   }
 }
-
 
 </script>
 </head>
