@@ -896,23 +896,14 @@ function piece_letter2name(letter)
 	return cache_letter2name.get(letter.toUpperCase());
 }
 
-// Return algebraic prefix for a piece
+// Return algebraic prefix for a piece. May return an empty 
+// string (for pawns, for example).
 function algebraic_piece_prefix(piece)
 {
-	// TODO: really need to clean this up! Have an attribute, and 
-	// a class to map piece names to character codes for filerank notation/FEN
-	if (piece.hasClassName("pawn"))
-		return "";
-
-	for (var name in PIECE_TYPES)
-	{
-		if (piece.hasClassName(name)) {
-			if (PIECE_TYPES[name].letter)
-				return PIECE_TYPES[name].letter;
-			else if (PIECE_TYPES[name].alg_letter)
-				return PIECE_TYPES[name].alg_letter;
-		}
-	}
+	if (PIECE_TYPES[piece.type].letter !== undefined)
+		return PIECE_TYPES[piece.type].letter;
+	else if (PIECE_TYPES[piece.type].alg_letter !== undefined)
+		return PIECE_TYPES[piece.type].alg_letter;
 
 	assert(false, "algebraic_piece_prefix(" + piece + "): unrecognized piece");
 }
@@ -971,9 +962,9 @@ function piece_location(piece)
 // TODO: make this a class so you can do new Piece().
 function new_piece(name)
 {
-	var color, filename, piece, letter, classes;
+	var color, filename, piece, letter, classes, type;
 
-	classes = "piece";	
+	classes = "piece";
 
 	// In FEN, uppercase=white, lower=black
 	if (/^[A-Z]/.test(name)) {
@@ -983,24 +974,25 @@ function new_piece(name)
 		color = "b";
 		classes += " black";
 	} else {
-		assert("new_piece(" + name + "): unrecognized");
+		assert("new_piece(" + name + "): not a letter");
 	}
 	letter = name.toLowerCase();
+	type = piece_letter2name(letter);
 
-	classes += " " + piece_letter2name(letter);
+	classes += " " + type;
 
 	// TODO: pngs
 	// TODO: even better, use Unicode characters in a span!! How cool would that be? Infinite resolution.
 	// See for example http://en.wikipedia.org/wiki/Knight_(chess)
-	// Unfortunately, MSIE doesn't seem to support it, though it should..
+	// Unfortunately, MSIE doesn't seem to support it, though it should..different font?
 	filename = 'images/' + color + letter+ '.gif';
-
 
 	piece = Builder.node('img', {'src': filename, 'class': classes});
 
+	piece.type = type;
+
 	// Highlight/unhighlight legal moves on mouse over, like Chess with Friends.
 	// Yahoo Games does this too, but uses a yellow outline.
-	// TODO: something is wrong, get only one mouseover per file!
 	Event.observe(piece, 'mouseover', function() {
 			highlight_moves(piece, true);
 			// for debugging
