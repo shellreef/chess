@@ -71,6 +71,8 @@ if (!window.google) {
     alert("Google was not found. Nothing will work.");
 }
 
+/* TODO: why aren't these miniifed? http://code.google.com/apis/ajaxlibs/documentation/index.html#prototype has
+ * direct paths but neither prototype nor scriptaculous are minified.. others are though. */
 google.load("prototype", "1.6.0.3");
 google.load("scriptaculous", "1.8.2");
 
@@ -276,6 +278,12 @@ function calculate_valid_moves()
         VALID_MOVES.set(filerank, moves);
         //console.log(filerank, moves);
     });
+
+    if (VALID_MOVES.keys().length === 0) {
+        $("status").innerHTML = ucfirst(GAME_STATE.active_color) + " is stalemated";
+        // TODO: some way to note this, show a draw? 1/2-1/2
+        return;
+    }
 
     // AI - artificial intelligence    
     // TODO: options human vs. computer, computer vs. human, h vs. h, c vs. c
@@ -1081,7 +1089,7 @@ function pc(x, y)
 function piece_location(piece)
 {
     assert(piece, "piece_location(" + piece + "): piece is false");
-    assert(piece.parentNode, "piece_location(" + piece + "): piece.parentNode is false");
+    assert(piece.parentNode, "piece_location(" + piece + "): piece.parentNode is false, callee=" + arguments.callee);
 
     return [piece.parentNode.x, piece.parentNode.y];
 }
