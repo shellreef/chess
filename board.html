@@ -109,8 +109,8 @@ var PIECE_TYPES = {
     // TODO: royal: if true, if checked, must make move that unthreatens, otherwise checkmate
 
     // Standard international chess pieces
-    king: {parlett: "1*, imR2=", letter: "K", royal: true},    // TODO: royal
-    // TODO: imR2=, make 'm' move another piece adjacent, for castling, on initial (king+rook) move
+    king: {parlett: "1*, imR2=.", letter: "K", royal: true},    // TODO: royal
+    // TODO: imR2=., make 'm' move another piece adjacent, for castling, on initial (king+rook) move
     //king: "~1/1, ~1/0",    // equivalent hippogonal leaper
     queen: {parlett: "n*", letter: "Q"},
     bishop: {parlett: "nX", letter: "B"},
@@ -486,7 +486,7 @@ function decode_direction(ch, ch2)
 function decode_one_parlett(parlett, xy)
 {
     var movement, hippogonal;
-    var distances, directions, flags, maybe_directions;
+    var distances, directions, flags, maybe_directions, extremities;
 
     assert(xy, "decode_one_parlett("+ parlett + ", " + xy + "): piece xy not given");
 
@@ -522,7 +522,7 @@ function decode_one_parlett(parlett, xy)
 
         // Multi-move, my own extension for castling
         } else if (ch === "m") {
-            // TODO: multi-move other pieces, castling: imR2=
+            // TODO: multi-move other pieces, castling: imR2=., more generic
             var letter = parlett.substr(i + 1, 1);
             var type = piece_letter2name(letter);
             assert(type, "decode_one_parlett(" + parlett + "): multimove letter " + letter + 
@@ -531,6 +531,11 @@ function decode_one_parlett(parlett, xy)
             assert(type === "rook", "sorry, only castling with rooks currently supported");
 
             flags.castle = type;
+        } else if (ch === ".") {
+            // Riders can only go to the max, not any place in between
+            // So 2= means can go two spaces sideways, but not one space sideways.
+            extremities = true;
+
         // Standard Parlett
         } else if (/[0-9]/.test(ch)) {
             distances.push(parseInt(ch, 10));
@@ -593,7 +598,7 @@ function decode_one_parlett(parlett, xy)
         // The distance is the move limit (1 for king, "infinity" for Q, B, R).
         limit = distances[0];
 
-        moves = add_flags(expand_rider(limit, directions, xy), flags);
+        moves = add_flags(expand_rider(limit, directions, xy, extremities), flags);
     } else {
         assert(false, "decode_one_parlett(" + parlett + "): unsupported movement");
     }
@@ -630,14 +635,14 @@ function decode_one_parlett(parlett, xy)
 // an occupied square. Note that there could be pieces that move
 // in this way, but won't be blocked (leapers, locusts), but they
 // are not supported here.
-function expand_rider(limit, directions, xy)
+function expand_rider(limit, directions, xy, extremities)
 {
     var moves = [];
 
     //console.log("expand_rider",limit, directions, xy);
 
     directions.each(function(direction) {
-        moves = moves.concat(expand_direction(limit, direction, xy));
+        moves = moves.concat(expand_direction(limit, direction, xy, extremities));
     });
 
     return without_dupes(moves);
@@ -646,7 +651,8 @@ function expand_rider(limit, directions, xy)
 // Iterate up to limit steps (may be Infinity), in the direction 
 // vector, starting at start_xy. Stop when reaching the end of the
 // board, on an enemy piece, or before a friendly piece.
-function expand_direction(limit, direction, start_xy)
+// If extremities is true, only add square at end of the direction.
+function expand_direction(limit, direction, start_xy, extremities)
 {
     var x, y, moves;
 
@@ -679,6 +685,17 @@ function expand_direction(limit, direction, start_xy)
 
         //console.log(xy2filerank(x,y));    
         moves.push([x, y]);
+    }
+
+    if (extremities) {
+        // End only. Allows using 2=, for example, to move
+        // two spaces sideways, without going 1 space sideways.
+        var end_move = moves[moves.length - 1];
+        if (end_move) {
+            return [end_move];
+        } else {
+            return [];
+       }
     }
 
     return moves;
