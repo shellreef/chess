@@ -287,21 +287,26 @@ function calculate_valid_moves()
         return;
     }
 
-    // AI - artificial intelligence    
-    // TODO: options human vs. computer, computer vs. human, h vs. h, c vs. c
-    if (GAME_STATE.active_color === "black") {
-        // simply choose a random move
-        // TODO: weak AI, take most valuable piece, checkmate if can, check if can,
-        //     fork if can.. something to entertain a beginner
-        var keys = VALID_ALGEBRAIC_MOVES.keys();
-        var alg_move = keys[randint(0, keys.length - 1)];
+}
 
-        var piece_square = VALID_ALGEBRAIC_MOVES.get(alg_move);
-
-        // TODO: detect stalemate, checkmate, for both players (set_turn probably)
-
-        mv(alg_move);
+// Make a move as the computer, if we're supposed to.
+function computer_move_if_applicable()
+{
+    if ($F(GAME_STATE.active_color + "_player") !== "computer") {
+        return;
     }
+
+    // simply choose a random move
+    // TODO: weak AI, take most valuable piece, checkmate if can, check if can,
+    //     fork if can.. something to entertain a beginner. Or better yet,
+    // plugin to a remote network server.
+    var keys = VALID_ALGEBRAIC_MOVES.keys();
+    var alg_move = keys[randint(0, keys.length - 1)];
+
+    var piece_square = VALID_ALGEBRAIC_MOVES.get(alg_move);
+
+    // TODO: do some animation when moving, Effect.Move, to slow it down so we can see it.
+    mv(alg_move);
 }
 
 // Compute legal moves for a piece, removing illegal moves. This
@@ -869,6 +874,9 @@ function set_turn(color)
     // gone through the endeffect? This is called in onDrop.
     // TODO: find out how to run something *after* the endeffect, for smoother UI.
     calculate_valid_moves();
+
+    // AI - artificial intelligence 
+    computer_move_if_applicable();
 }
 
 //// BOARD FUNCTIONS
@@ -1445,20 +1453,19 @@ function enable_document_selection(enable) {
 
 
  </td><td valign="top">
-  <p id="status"></p>
-
-  <select name="white_player">
+  <select name="white_player" id="white_player" onchange="computer_move_if_applicable()">
    <option value="human">Human</option>
    <option value="computer">Computer</option>
    <option value="network" title="TODO: allow playing with a remote user, either human (running this web app) or a computer (chess engine)">Network</option>
   </select>
   vs.
-   <select name="black_player">
+   <select name="black_player" id="black_player" onchange="computer_move_if_applicable()">
    <option value="human">Human</option>
    <option value="computer" selected>Computer</option>
    <option value="network">Network</option>
   </select>
  
+  <p id="status"></p>
  </td>
 </tr>
 </table>
