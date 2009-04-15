@@ -178,7 +178,8 @@ google.setOnLoadCallback(function() {
 
 // Convenience function to move given algebraic notation, for use within
 // JavaScript console (Develop -> Show Error Console in Safari) if you want
-// a command-line instead of a GUI.
+// a command-line instead of a GUI. Computer move also uses this function, but it is
+// not used for drag-and-drop.
 function mv(alg_move)
 {
     var piece_square, piece, square;
@@ -901,9 +902,11 @@ function name_squares()
 // Manipulate the DOM nodes to move the piece to its new location,
 // and advance to the next move. Does not do anything graphical
 // with dragging.
-function move_piece_to_square(piece, square)
+// If suppress is true, this is an internal move part of another move
+// (castling) so it shouldn't be logged.
+function move_piece_to_square(piece, square, suppress)
 {
-    var from_square;
+    var from_square, move_text, castle_move_text;
 
     assert(piece, "move_piece_to_square(" + piece + ", " + square + "): piece is false");
     assert(square, "move_piece_to_square(" + piece + ", " + square + "): square is false");
@@ -923,8 +926,7 @@ function move_piece_to_square(piece, square)
             GAME_STATE.can_castle[GAME_STATE.active_color].long = false;
     }
 
-
-    // TODO: if castling, move rook to piece moved over XXX
+    // If castling, move the rook in place. Ugly hardcoded.
     if (piece.type === "king") {
         var first_rank = (GAME_STATE.active_color === "white" ? 7 : 0);
         from_square = sq(piece);
@@ -932,16 +934,30 @@ function move_piece_to_square(piece, square)
         if (from_square.x === 4) {
             if (square.x === 6) {
                 // TODO: actually calculate square moved over, then move rook there
-                move_piece_to_square(pc(7, first_rank), sq(5, first_rank));
+                // (instead of hardcoding). Short.
+                move_piece_to_square(pc(7, first_rank), sq(5, first_rank), true);
+                castle_move_text = "O-O";
             } else if (square.x === 2) {
-                move_piece_to_square(pc(0, first_rank), sq(3, first_rank));
+                // Castle long.
+                move_piece_to_square(pc(0, first_rank), sq(3, first_rank), true);
+                castle_move_text = "O-O-O";
             }
         }
     }
 
-    // Capture piece(s) on destination square
-    while (square.firstChild)
+    // Generate algebraic move notation
+    move_text = algebraic_letter(piece.type);
+
+    // Capture piece(s) on destination square. Multiple pieces
+    // are supported here, but not elsewhere in the code (yet). Might be
+    // an interesting variation to have multiple pieces occupy same square.
+    while (square.firstChild) {
         square.removeChild(square.firstChild);
+
+        move_text += "x";
+    }
+
+    move_text += xy2filerank([square.x, square.y]);
 
     // Move to new square
     if (piece.parentNode) {
@@ -952,13 +968,22 @@ function move_piece_to_square(piece, square)
 
     if (should_promote(piece)) {
         promote(piece);
+
+        move_text += "=Q";  // TODO: get return value from promote(), different values. Maybe need a callback, user interaction.
+    }
+
+    if (castle_move_text) {
+        move_text = castle_move_text;
     }
 
     // TODO: record move in algebraic notation, and how about descriptive too?
     // TODO: also, CRAN (Concise Reversible Algebraic Notation, see http://www.chessville.com/reviews/PlayStrongerChessExaminingChess960.htm )
 
-    set_turn("next");
-
+    // If not a multi-move (moving rook in castling), log and go to next turn
+    if (!suppress) {
+        console.log(move_text);
+        set_turn("next");
+    }
 }
 
 // Handle graphically moving of a piece, dropping it to its new location
@@ -1039,6 +1064,16 @@ function load_starting_position(fen)
 }
 
 //// PIECE FUNCTIONS
+
+// Return the letter, if any, used for representing the piece type (name)
+// in algebraic notation.
+function algebraic_letter(type)
+{
+    if (PIECE_TYPES[type].alg_letter !== undefined)
+        return PIECE_TYPES[type].alg_letter;
+    else
+        return PIECE_TYPES[type].letter;
+}
 
 // Given a letter, find the name of the piece (R = rook, etc.). The letter
 // can either be for FEN (P = pawn), or algebraic notation (blank = pawn);
