@@ -320,7 +320,6 @@ function filtered_moves(piece)
                 allowed = false;
             } else {
                 // Otherwise, need to find if short/long castle
-
                 if (move[0] === 6) {
                     castle = "short";
                 } else if (move[0] === 2) {
@@ -332,6 +331,23 @@ function filtered_moves(piece)
 
                 if (castle && !GAME_STATE.can_castle[GAME_STATE.active_color][castle])
                     allowed = false;
+            }
+
+            // If intervening pieces, do not allow castling.
+            if (allowed && castle) { // so far..
+                var first_rank = (GAME_STATE.active_color === "white" ? 7 : 0);
+            
+                if (castle === "short") {
+                    if (pc(5, first_rank) || pc(6, first_rank)) {
+                        allowed = false;
+                    } 
+                } else if (castle === "long") {
+                    if (pc(1, first_rank) || pc(2, first_rank) || pc(3, first_rank)) {
+                        allowed = false;
+                    }
+                } else {
+                    assert(false, "filtered_moves: checking intervening pieces, castle wasn't long short: " + castle);
+                }
             }
         }
 
