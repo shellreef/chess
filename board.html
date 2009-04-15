@@ -174,6 +174,8 @@ google.setOnLoadCallback(function() {
 
 //// USER FUNCTIONS
 
+// TOOD: support Smith notation, https://www.chessclub.com/chessviewer/smith.html
+
 // Convenience function to move given algebraic notation, for use within
 // JavaScript console (Develop -> Show Error Console in Safari) if you want
 // a command-line instead of a GUI.
@@ -1444,6 +1446,19 @@ function enable_document_selection(enable) {
 
  </td><td valign="top">
   <p id="status"></p>
+
+  <select name="white_player">
+   <option value="human">Human</option>
+   <option value="computer">Computer</option>
+   <option value="network" title="TODO: allow playing with a remote user, either human (running this web app) or a computer (chess engine)">Network</option>
+  </select>
+  vs.
+   <select name="black_player">
+   <option value="human">Human</option>
+   <option value="computer" selected>Computer</option>
+   <option value="network">Network</option>
+  </select>
+ 
  </td>
 </tr>
 </table>
