@@ -166,9 +166,9 @@ google.setOnLoadCallback(function() {
     //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
-    //load_fen("rnbqkb1r/pp1ppppp/5n2/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2");
+    //load_fen("rnbqkb1r/pp1ppppp/5n2/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 3");
     //load_fen("7K/8/k1P5/7p/8/8/8/8 w KQkq - 42 42");
-    load_fen("r1bqkb1r/pp1ppppp/2n2n2/2p5/2B2P3/5N2/PPPP1PPP/RN1QK2R w KQkq - 1 2");
+    load_fen("r1bqkb1r/pp1ppppp/2n2n2/2p5/2B2P3/5N2/PPPP1PPP/RN1QK2R w KQkq - 1 3");
 
 });
 
@@ -869,8 +869,12 @@ function set_turn(color)
 
     $("status").innerHTML = ucfirst(new_color) + "'s Turn";
 
-    GAME_STATE.active_color = new_color;
+    // Move number is incremented after black moves, according to rules.
+    if (GAME_STATE.active_color === "black") {
+        GAME_STATE.fullmove_number += 1;
+    }
 
+    GAME_STATE.active_color = new_color;
     // Note: this takes some time... is there any way to run it right AFTER the piece has
     // gone through the endeffect? This is called in onDrop.
     // TODO: find out how to run something *after* the endeffect, for smoother UI.
@@ -981,7 +985,7 @@ function move_piece_to_square(piece, square, suppress)
 
     // If not a multi-move (moving rook in castling), log and go to next turn
     if (!suppress) {
-        console.log(move_text);
+        console.log(GAME_STATE.fullmove_number + ". " + (GAME_STATE.active_color === "black" ? " ... " : "") + move_text);
         set_turn("next");
     }
 }
