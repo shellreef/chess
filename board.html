@@ -109,8 +109,8 @@ var PIECE_TYPES = {
     // TODO: royal: if true, if checked, must make move that unthreatens, otherwise checkmate
 
     // Standard international chess pieces
-    king: {parlett: "1*, imR2=.", letter: "K", royal: true},    // TODO: royal
-    // TODO: imR2=., make 'm' move another piece adjacent, for castling, on initial (king+rook) move
+    king: {parlett: "1*, imR2=e", letter: "K", royal: true},    // TODO: royal
+    // TODO: imR2=e, make 'm' move another piece adjacent, for castling, on initial (king+rook) move
     //king: "~1/1, ~1/0",    // equivalent hippogonal leaper
     queen: {parlett: "n*", letter: "Q"},
     bishop: {parlett: "nX", letter: "B"},
@@ -317,7 +317,7 @@ function filtered_moves(piece)
             }
             // XXX TODO: what if it isn't a pawn? For castling, need to
             // check if king has moved, and if other piece (it'll be a rook)
-            // has moved, for imR2=. Need a better solution for figuring out
+            // has moved, for imR2=e. Need a better solution for figuring out
             // whether a piece has moved.
         }
 
@@ -522,7 +522,7 @@ function decode_one_parlett(parlett, xy)
 
         // Multi-move, my own extension for castling
         } else if (ch === "m") {
-            // TODO: multi-move other pieces, castling: imR2=., more generic
+            // TODO: multi-move other pieces, castling: imR2=e, more generic
             var letter = parlett.substr(i + 1, 1);
             var type = piece_letter2name(letter);
             assert(type, "decode_one_parlett(" + parlett + "): multimove letter " + letter + 
@@ -531,7 +531,7 @@ function decode_one_parlett(parlett, xy)
             assert(type === "rook", "sorry, only castling with rooks currently supported");
 
             flags.castle = type;
-        } else if (ch === ".") {
+        } else if (ch === "e") {
             // Riders can only go to the max, not any place in between
             // So 2= means can go two spaces sideways, but not one space sideways.
             extremities = true;
@@ -618,7 +618,6 @@ function decode_one_parlett(parlett, xy)
             } else {
                 // TODO: support arbitrary castling moves. Need to know what
                 // side castling on
-                assert(false, "decode_one_parlett(" + parlett + "): couldn't find name of castle move: " + square.x);
             }
 
             square.castle_square = castle_name;
