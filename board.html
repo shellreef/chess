@@ -886,6 +886,9 @@ function set_turn(color)
 
 //// BOARD FUNCTIONS
 
+// TODO: a "board lab", where can drag pieces onto board in arbitrary
+// positions, or drag off (with an Effect.Puff), to load arbitrary fen.
+
 // Internally name the square cells with their (x,y) coordinates
 // and filerank notation, once when the page loads. This is only code so I
 // don't have to manually type <td x=0 y=0 filerank=a8> etc. in all the cells.
@@ -1044,6 +1047,8 @@ function move_dropped_piece(piece, square, event)
     move_piece_to_square(piece, square);
 }
 
+// TODO: save_fen
+//
 // Load board state
 function load_fen(fen)
 {
@@ -1099,6 +1104,11 @@ function load_starting_position(fen)
 }
 
 //// PIECE FUNCTIONS
+
+/// TODO: a "piece lab", where can dynamically create new pieces,
+// browse existing pieces. Show piece on board by itself, highlighting 
+// valid moves, update when change Parlett movement types, allow to operate
+// the piece and see how it behaves. Then return to the main board.
 
 // Return the letter, if any, used for representing the piece type (name)
 // in algebraic notation.
