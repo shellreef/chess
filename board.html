@@ -314,11 +314,14 @@ function filtered_moves(piece)
             // Can only move if have not moved this piece yet
             if (piece.type === "pawn" && pawn_moved(piece)) {
                 allowed = false;
-            }
-            // XXX TODO: what if it isn't a pawn? For castling, need to
-            // check if king has moved, and if other piece (it'll be a rook)
-            // has moved, for imR2=e. Need a better solution for figuring out
-            // whether a piece has moved.
+            } else if (piece.type === "king" && king_moved(piece)) {
+                allowed = false;
+            } 
+
+            assert(piece.type === "pawn" || piece.type === "king", 
+                "filtered_moves(" + piece + "): parlett " + parlett + " said this move " +
+                    move + " was valid only on initial moves, but couldn't find out if piece " + 
+                    piece.type + " moved, not a king or pawn");
         }
 
         if (move[2].capture_only) {
@@ -359,7 +362,21 @@ function pawn_moved(piece)
     } else if (piece.hasClassName("black")) {
         return sq(piece).y !== 1;    // 7th rank
     } else {
-        assert("pawn_not_moved(" + piece + "): neither white nor black");
+        assert("pawn_moved(" + piece + "): neither white nor black");
+    }
+}
+
+// BROKEN, can move back!
+function king_moved(piece)
+{
+    var square = sq(piece);
+
+    if (piece.hasClassName("white")) {
+        return !(square.x === 4 && square.y === 7);
+    } else if (piece.hasClassName("black")) {
+        return !(square.x === 4 && square.y === 0);
+    } else {
+        assert("king_moved(" + piece + "): its not all black and white");
     }
 }
 
