@@ -308,13 +308,36 @@ function filtered_moves(piece)
 
     filtered = unfiltered.select(function(move) {
         var allowed = true;
-                var piece_under;
+        var piece_under;
+
+        // If castle move, check if castling allowed
+        if (move[2].castle) {
+            var castle;
+
+            // If king moved, won't be able to castle on either side, don't need name
+            if (GAME_STATE.can_castle[GAME_STATE.active_color].long === false &&
+                GAME_STATE.can_castle[GAME_STATE.active_color].short === false) {
+                allowed = false;
+            } else {
+                // Otherwise, need to find if short/long castle
+
+                if (move[0] === 6) {
+                    castle = "short";
+                } else if (move[1] === 2) {
+                    castle = "long";
+                } else {
+                    assert(false, "filtered_moves(" + piece + "): unknown name of castling to x="+x+", not long/short. " +
+                        "filerank = " + xy2filerank([move[0], move[1]]) + ", piece = " + piece);
+                }
+
+                if (castle && !GAME_STATE.can_castle[GAME_STATE.active_color][castle])
+                    allowed = false;
+            }
+        }
 
         if (move[2].initial_only) {
             // Can only move if have not moved this piece yet
             if (piece.type === "pawn" && pawn_moved(piece)) {
-                allowed = false;
-            } else if (piece.type === "king" && king_moved(piece)) {
                 allowed = false;
             } 
 
@@ -363,20 +386,6 @@ function pawn_moved(piece)
         return sq(piece).y !== 1;    // 7th rank
     } else {
         assert("pawn_moved(" + piece + "): neither white nor black");
-    }
-}
-
-// BROKEN, can move back!
-function king_moved(piece)
-{
-    var square = sq(piece);
-
-    if (piece.hasClassName("white")) {
-        return !(square.x === 4 && square.y === 7);
-    } else if (piece.hasClassName("black")) {
-        return !(square.x === 4 && square.y === 0);
-    } else {
-        assert("king_moved(" + piece + "): its not all black and white");
     }
 }
 
@@ -618,28 +627,6 @@ function decode_one_parlett(parlett, xy)
         moves = add_flags(expand_rider(limit, directions, xy, extremities), flags);
     } else {
         assert(false, "decode_one_parlett(" + parlett + "): unsupported movement");
-    }
-
-    // Mark squares that one can castle to, as such. A move by that piece will
-    // be recognized as castling, if GAME_STATE.can_castle.
-    if (flags.castle) {
-        for (i = 0; i < moves.length; ++i) {
-            var move = moves[i];
-            var square = sq(move[0], move[1]);
-            var castle_name;
-
-            if (square.x === 6) {
-                castle_name = "short";
-            } else if (square.x === 2) {
-                castle_name = "long";
-            } else {
-                // TODO: support arbitrary castling moves. Need to know what
-                // side castling on
-            }
-
-            square.castle_square = castle_name;
-            console.log(square);
-        }
     }
 
     return moves;
@@ -901,8 +888,8 @@ function move_piece_to_square(piece, square)
     }
 
 
-    // Castling?
-    if (piece.type === "king" && piece.castle_square) {
+    // TODO: if castling, move rook to piece moved over XXX
+    if (piece.type === "king") {
     }
 
     // Capture piece(s) on destination square
