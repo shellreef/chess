@@ -828,6 +828,22 @@ function move_piece_to_square(piece, square)
     assert(piece, "move_piece_to_square(" + piece + ", " + square + "): piece is false");
     assert(square, "move_piece_to_square(" + piece + ", " + square + "): square is false");
 
+    // Moving king makes it ineligible for castling
+    if (piece.type === "king") {
+        GAME_STATE.can_castle[GAME_STATE.active_color].short = false;
+        GAME_STATE.can_castle[GAME_STATE.active_color].long = false;
+
+    } else if (piece.type === "rook") {
+        var from_square = sq(piece);
+
+        // TODO: More generic, so will work with chess960 or 480
+        // If moved either rook, can't castle on that side.
+        if (from_square.x == 7)
+            GAME_STATE.can_castle[GAME_STATE.active_color].short = false;
+        else if (from_square.x == 0)
+            GAME_STATE.can_castle[GAME_STATE.active_color].long = false;
+    }
+
     // Capture piece(s) on destination square
     while (square.firstChild)
         square.removeChild(square.firstChild);
@@ -838,14 +854,6 @@ function move_piece_to_square(piece, square)
     }
 
     square.appendChild(piece);
-
-    // Moving king makes it ineligible for castling
-    if (piece.type === "king") {
-        GAME_STATE.can_castle[GAME_STATE.active_color].short = false;
-        GAME_STATE.can_castle[GAME_STATE.active_color].long = false;
-
-    } 
-    // TODO: rooks, each side, long and short
 
     if (should_promote(piece)) {
         promote(piece);
@@ -1008,7 +1016,7 @@ function image_path_for(letter, color)
     // TODO: even better, use Unicode characters in a span!! How cool would that be? Infinite resolution.
     // See for example http://en.wikipedia.org/wiki/Knight_(chess)
     // Unfortunately, MSIE doesn't seem to support it, though it should..different font?
-    return "images/" + {white:"w", black:"b"}[color] + letter + ".gif";
+    return "images/" + {white:"w", black:"b"}[color] + letter.toLowerCase() + ".gif";
 }
 
 // Create a new piece or pawn, given the name in
