@@ -323,7 +323,7 @@ function filtered_moves(piece)
 
                 if (move[0] === 6) {
                     castle = "short";
-                } else if (move[1] === 2) {
+                } else if (move[0] === 2) {
                     castle = "long";
                 } else {
                     assert(false, "filtered_moves(" + piece + "): unknown name of castling to x="+x+", not long/short. " +
