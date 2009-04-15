@@ -903,6 +903,36 @@ function name_squares()
     }
 }
 
+// Acknowledge that a piece was captured. Called by move_piece_to_square(), which
+// does all the DOM manipulation.
+function capture_piece(piece)
+{
+    console.log("capture " + piece.type);
+
+    // If rook captured, remove castling privileges
+    if (piece.type === "rook") {
+        // Note that this is the first rank of the *other* player
+        var opponent = opposite_color(GAME_STATE.active_color);
+        var first_rank = opponent === "white" ? 7 : 0;
+        var square = sq(piece);
+        
+        console.log("~~~",first_rank,square.x,square.y);
+
+        // TODO: really would like to not have to hardcode this
+        if (square.y === first_rank) {
+            if (square.x === 0) {
+                GAME_STATE.can_castle[opponent].long = false;
+                console.log("no more long");
+            } else if (square.x === 7) {
+                GAME_STATE.can_castle[opponent].short = false;
+                console.log("no more short");
+            }
+        }
+    }
+
+    // TODO: show as captured, somewhere with icons
+}
+
 // Manipulate the DOM nodes to move the piece to its new location,
 // and advance to the next move. Does not do anything graphical
 // with dragging.
@@ -956,6 +986,7 @@ function move_piece_to_square(piece, square, suppress)
     // are supported here, but not elsewhere in the code (yet). Might be
     // an interesting variation to have multiple pieces occupy same square.
     while (square.firstChild) {
+        capture_piece(square.firstChild);
         square.removeChild(square.firstChild);
 
         move_text += "x";
