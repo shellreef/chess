@@ -885,6 +885,8 @@ function name_squares()
 // with dragging.
 function move_piece_to_square(piece, square)
 {
+    var from_square;
+
     assert(piece, "move_piece_to_square(" + piece + ", " + square + "): piece is false");
     assert(square, "move_piece_to_square(" + piece + ", " + square + "): square is false");
 
@@ -893,7 +895,7 @@ function move_piece_to_square(piece, square)
         GAME_STATE.can_castle[GAME_STATE.active_color].short = false;
         GAME_STATE.can_castle[GAME_STATE.active_color].long = false;
     } else if (piece.type === "rook") {
-        var from_square = sq(piece);
+        from_square = sq(piece);
 
         // TODO: More generic, so will work with chess960 or 480
         // If moved either rook, can't castle on that side.
@@ -906,6 +908,17 @@ function move_piece_to_square(piece, square)
 
     // TODO: if castling, move rook to piece moved over XXX
     if (piece.type === "king") {
+        var first_rank = (GAME_STATE.active_color === "white" ? 7 : 0);
+        from_square = sq(piece);
+
+        if (from_square.x === 4) {
+            if (square.x === 6) {
+                // TODO: actually calculate square moved over, then move rook there
+                move_piece_to_square(pc(7, first_rank), sq(5, first_rank));
+            } else if (square.x === 2) {
+                move_piece_to_square(pc(0, first_rank), sq(3, first_rank));
+            }
+        }
     }
 
     // Capture piece(s) on destination square
