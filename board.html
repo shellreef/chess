@@ -527,9 +527,10 @@ function decode_one_parlett(parlett, xy)
             var type = piece_letter2name(letter);
             assert(type, "decode_one_parlett(" + parlett + "): multimove letter " + letter + 
                     " piece type not found");
-
             i += 1;
+            assert(type === "rook", "sorry, only castling with rooks currently supported");
 
+            flags.castle = type;
         // Standard Parlett
         } else if (/[0-9]/.test(ch)) {
             distances.push(parseInt(ch, 10));
@@ -595,6 +596,29 @@ function decode_one_parlett(parlett, xy)
         moves = add_flags(expand_rider(limit, directions, xy), flags);
     } else {
         assert(false, "decode_one_parlett(" + parlett + "): unsupported movement");
+    }
+
+    // Mark squares that one can castle to, as such. A move by that piece will
+    // be recognized as castling, if GAME_STATE.can_castle.
+    if (flags.castle) {
+        for (i = 0; i < moves.length; ++i) {
+            var move = moves[i];
+            var square = sq(move[0], move[1]);
+            var castle_name;
+
+            if (square.x === 6) {
+                castle_name = "short";
+            } else if (square.x === 2) {
+                castle_name = "long";
+            } else {
+                // TODO: support arbitrary castling moves. Need to know what
+                // side castling on
+                assert(false, "decode_one_parlett(" + parlett + "): couldn't find name of castle move: " + square.x);
+            }
+
+            square.castle_square = castle_name;
+            console.log(square);
+        }
     }
 
     return moves;
@@ -832,7 +856,6 @@ function move_piece_to_square(piece, square)
     if (piece.type === "king") {
         GAME_STATE.can_castle[GAME_STATE.active_color].short = false;
         GAME_STATE.can_castle[GAME_STATE.active_color].long = false;
-
     } else if (piece.type === "rook") {
         var from_square = sq(piece);
 
@@ -842,6 +865,11 @@ function move_piece_to_square(piece, square)
             GAME_STATE.can_castle[GAME_STATE.active_color].short = false;
         else if (from_square.x == 0)
             GAME_STATE.can_castle[GAME_STATE.active_color].long = false;
+    }
+
+
+    // Castling?
+    if (piece.type === "king" && piece.castle_square) {
     }
 
     // Capture piece(s) on destination square
