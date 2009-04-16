@@ -928,8 +928,6 @@ function capture_piece(piece)
         var first_rank = opponent === "white" ? 7 : 0;
         var square = sq(piece);
         
-        console.log("~~~",first_rank,square.x,square.y);
-
         // TODO: really would like to not have to hardcode this
         if (square.y === first_rank) {
             if (square.x === 0) {
