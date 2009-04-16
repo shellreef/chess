@@ -274,6 +274,8 @@ function calculate_valid_moves()
             var algebraic = algebraic_piece_prefix(piece) + xy2filerank(move[0], move[1]);
 
             // Store algebraic notation -> [piece, square] map for understanding the notation
+            // TODO: May need to disambiguate moves. Sometimes the same type of piece can
+            // move to the same square. Fun. Or use long algebraic notation.
             VALID_ALGEBRAIC_MOVES.set(algebraic, [piece, square]);
 
             ALL_DROP_TARGETS.push(square); // for removal
