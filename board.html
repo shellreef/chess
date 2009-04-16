@@ -955,13 +955,13 @@ function move_piece_to_square(piece, square, suppress)
     assert(piece, "move_piece_to_square(" + piece + ", " + square + "): piece is false");
     assert(square, "move_piece_to_square(" + piece + ", " + square + "): square is false");
 
+    from_square = sq(piece);
+
     // Moving king makes it ineligible for castling
     if (piece.type === "king") {
         GAME_STATE.can_castle[GAME_STATE.active_color].short = false;
         GAME_STATE.can_castle[GAME_STATE.active_color].long = false;
     } else if (piece.type === "rook") {
-        from_square = sq(piece);
-
         // TODO: More generic, so will work with chess960 or 480
         // If moved either rook, can't castle on that side.
         if (from_square.x == 7)
@@ -973,8 +973,6 @@ function move_piece_to_square(piece, square, suppress)
     // If castling, move the rook in place. Ugly hardcoded.
     if (piece.type === "king") {
         var first_rank = (GAME_STATE.active_color === "white" ? 7 : 0);
-        from_square = sq(piece);
-
         if (from_square.x === 4) {
             if (square.x === 6) {
                 // TODO: actually calculate square moved over, then move rook there
@@ -996,10 +994,18 @@ function move_piece_to_square(piece, square, suppress)
     // are supported here, but not elsewhere in the code (yet). Might be
     // an interesting variation to have multiple pieces occupy same square.
     while (square.firstChild) {
+
+        // If pawn was capturing, need to show file it came from.
+        if (piece.type === "pawn") {
+            move_text += xy2filerank([from_square.x, from_square.y]).substr(0, 1);
+        }
+
+        move_text += "x";
+
         capture_piece(square.firstChild);
         square.removeChild(square.firstChild);
 
-        move_text += "x";
+
     }
 
     move_text += xy2filerank([square.x, square.y]);
