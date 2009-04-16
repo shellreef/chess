@@ -201,6 +201,7 @@ function mv(alg_move)
     square = piece_square[1];
 
     // TODO: do some Effect.Move animation, optionally (make two functions)
+    //new Effect.Move(piece, { x: 10, y: 20, mode: 'relative' });
 
     move_piece_to_square(piece, square);
 }
@@ -1025,7 +1026,12 @@ function move_piece_to_square(piece, square, suppress)
 
     // If not a multi-move (moving rook in castling), log and go to next turn
     if (!suppress) {
-        console.log(GAME_STATE.fullmove_number + ". " + (GAME_STATE.active_color === "black" ? " ... " : "") + move_text);
+        // TODO: ellipsis if black is first recorded move
+        //var alg_move = GAME_STATE.fullmove_number + ". " + (GAME_STATE.active_color === "black" ? " ... " : "") + move_text;
+        var alg_move = (GAME_STATE.active_color === "white" ? GAME_STATE.fullmove_number + ". " : " ") + move_text + 
+                       (GAME_STATE.active_color === "black" ? "\n" : "");
+
+        $("moves").value += alg_move;
         set_turn("next");
     }
 }
@@ -1037,9 +1043,10 @@ function move_dropped_piece(piece, square, event)
     //console.log(square);
 
     // TODO: do some cool effects when a piece is captured, but not too cool
+    // Any way to finish running the code AFTER the effect finishes? New effect?
     //if (square.firstChild) {
     //   new Effect.Squish(pc(square));
-    // }
+    //}
 
     // Can't drop this piece anywhere anymore.
     piece.removeClassName("piece-" + piece.prior_position);
@@ -1556,8 +1563,7 @@ function enable_document_selection(enable) {
 ></tbody
 ></table>
 
-
- </td><td valign="top">
+ </td><td style="vertical-align: top">
   <select name="white_player" id="white_player" onchange="computer_move_if_applicable()">
    <option value="human">Human</option>
    <option value="computer">Computer</option>
@@ -1571,6 +1577,8 @@ function enable_document_selection(enable) {
   </select>
  
   <p id="status"></p>
+
+  <textarea name="moves" id="moves" rows="20"></textarea>
  </td>
 </tr>
 </table>
