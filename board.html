@@ -604,14 +604,18 @@ function decode_one_parlett(parlett, xy)
             // So 2= means can go two spaces sideways, but not one space sideways.
             extremities = true;
         } else if (ch === "P") {
+            var ep_moves;
+
             // If en passant target square is available, allow it.
-            // TODO: Support this. Why is it null?
+            // TODO: Support this. Why is it null? XXX
             console.log(GAME_STATE.enpassant_target);
             if (GAME_STATE.enpassant_target) {
-                return [GAME_STATE.enpassant_target];
+                ep_moves = [GAME_STATE.enpassant_target];
             } else {
-                return [];
+                ep_moves = [];
             }
+
+            return add_flags(ep_moves, flags);
         // Standard Parlett
         } else if (/[0-9]/.test(ch)) {
             distances.push(parseInt(ch, 10));
