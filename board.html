@@ -16,7 +16,7 @@ img.white {}
 
 table.board
 {
- border: 2px solid black;
+ /*border: 2px solid black;*/
 
 /* This is like cellspacing=0 cellpadding=0 */
  border-collapse: collapse;
@@ -34,6 +34,12 @@ td.square
  width: 50px;
  height: 50px;
 }
+
+td.label { text-align: center; }
+td.file { border-bottom: 2px solid black }
+td.rank { border-right: 2px solid black }
+td.right-edge { border-right: 2px solid black }
+td.bottom-edge { border-bottom: 2px solid black }
 
 td.hover 
 { 
@@ -910,7 +916,7 @@ function name_squares()
 // does all the DOM manipulation.
 function capture_piece(piece)
 {
-    console.log("capture " + piece.type);
+    //console.log("capture " + piece.type);
 
     // If rook captured, remove castling privileges
     if (piece.type === "rook") {
@@ -1398,7 +1404,7 @@ function sq(code, extra)
     assert(x >= 0 && x <= 7 && y >= 0 && y <= 7, "sq(" + code + ", " + extra + 
         "): out of range (" + x + ", " + y + ")");
 
-    return $('board-body').childNodes[y].childNodes[x];
+    return $('board-body').childNodes[y + 1].childNodes[x + 1];
 }
 
 //// LOW-LEVEL FUNCTIONS
@@ -1449,84 +1455,103 @@ function enable_document_selection(enable) {
 <table class="board" id="board">
 <tbody id="board-body"
 ><tr
-  ><td class="white square"></td
-  ><td class="black square"></td
-  ><td class="white square"></td
-  ><td class="black square"></td
-  ><td class="white square"></td
-  ><td class="black square"></td
-  ><td class="white square"></td
-  ><td class="black square"></td
+  ><td></td
+  ><td class="file label">a</td
+  ><td class="file label">b</td
+  ><td class="file label">c</td
+  ><td class="file label">d</td
+  ><td class="file label">e</td
+  ><td class="file label">f</td
+  ><td class="file label">g</td
+  ><td class="file label">h</td
 ></tr
 ><tr
- ><td id=y class="black square"></td
- ><td class="white square"></td
- ><td class="black square"></td
- ><td class="white square"></td
- ><td class="black square"></td
- ><td class="white square"></td
- ><td class="black square"></td
- ><td class="white square"></td
+  ><td class="rank label">8</td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square right-edge"></td
 ></tr
 ><tr
-  ><td class="white square"></td
-  ><td class="black square"></td
-  ><td class="white square"></td
-  ><td class="black square"></td
-  ><td class="white square"></td
-  ><td class="black square"></td
-  ><td class="white square"></td
-  ><td class="black square"></td
+ ><td class="rank label">7</td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square right-edge"></td
 ></tr
 ><tr
- ><td id=y class="black square"></td
- ><td class="white square"></td
- ><td class="black square"></td
- ><td class="white square"></td
- ><td class="black square"></td
- ><td class="white square"></td
- ><td class="black square"></td
- ><td class="white square"></td
+  ><td class="rank label">6</td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square right-edge"></td
 ></tr
 ><tr
-  ><td class="white square"></td
-  ><td class="black square"></td
-  ><td class="white square"></td
-  ><td class="black square"></td
-  ><td class="white square"></td
-  ><td class="black square"></td
-  ><td class="white square"></td
-  ><td class="black square"></td
+ ><td class="rank label">5</td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square right-edge"></td
 ></tr
 ><tr
- ><td id=y class="black square"></td
- ><td class="white square"></td
- ><td class="black square"></td
- ><td class="white square"></td
- ><td class="black square"></td
- ><td class="white square"></td
- ><td class="black square"></td
- ><td class="white square"></td
+  ><td class="rank label">4</td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square right-edge"></td
 ></tr
 ><tr
-  ><td class="white square"></td
-  ><td class="black square"></td
-  ><td class="white square"></td
-  ><td class="black square"></td
-  ><td class="white square"></td
-  ><td class="black square"></td
-  ><td class="white square"></td
-  ><td class="black square"></td
+ ><td class="rank label">3</td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square right-edge"></td
 ></tr
 ><tr
- ><td id=y class="black square"></td
- ><td class="white square"></td
- ><td class="black square"></td
- ><td class="white square"></td
- ><td class="black square"></td
- ><td class="white square"></td
- ><td class="black square"></td
- ><td class="white square"></td
+  ><td class="rank label">2</td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square right-edge"></td
+></tr
+><tr
+ ><td class="rank label">1</td
+ ><td class="black square bottom-edge"></td
+ ><td class="white square bottom-edge"></td
+ ><td class="black square bottom-edge"></td
+ ><td class="white square bottom-edge"></td
+ ><td class="black square bottom-edge"></td
+ ><td class="white square bottom-edge"></td
+ ><td class="black square bottom-edge"></td
+ ><td class="white square bottom-edge right-edge"></td
 ></tr
 ></tbody
 ></table>
