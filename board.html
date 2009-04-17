@@ -926,6 +926,8 @@ function set_turn(color)
 
     if (in_check(GAME_STATE.active_color)) {
         $("check").innerHTML = "Check!";
+    } else {
+        $("check").innerHTML = "";
     }
 
     // Note: this takes some time... is there any way to run it right AFTER the piece has
