@@ -887,10 +887,12 @@ function set_turn(color)
     // Class to tell droppables that they can accept these pieces.
     $$("img." + new_color).each(function(piece) {
         piece.addClassName("active-color");
+        piece.removeClassName("inactive-color");
     });
 
     $$("img." + opposite_color(new_color)).each(function(piece) {
         piece.removeClassName("active-color");
+        piece.addClassName("inactive-color");
     });
 
     $("status").innerHTML = ucfirst(new_color) + "'s Turn";
