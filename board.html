@@ -260,7 +260,7 @@ function in_check(victim_color)
     var attacker_color = opposite_color(victim_color);
         
     // Pieces that can't be captured and need to move if attacked
-    var royals = $$("img.royal-" + victim_color);
+    var royals = $$("img.royal." + victim_color);
 
     // Attack the royal pieces?
     $$("img." + attacker_color).each(function(piece) { 
@@ -1292,12 +1292,9 @@ function create_piece(name)
     // mostly for debugging purposes.
     classes = "piece " + color + " " + type;
 
-    // Royal class is very important. Unfortunately, I couldn't find
-    // a way to easily select elements with two classes, so create
-    // royal-black and royal-white.
+    // Royal class is very important.
     if (PIECE_TYPES[type].royal) {
         classes += " royal";
-        classes += " royal-" + color;
     }
 
     piece = Builder.node('img', {'src': filename, 'class': classes});
