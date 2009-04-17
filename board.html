@@ -254,8 +254,35 @@ function promote(piece)
 
 //// VALID MOVE FUNCTIONS
 
-// After the board changes and it is the next person's turn, calculate what the next possible allowable moves are.
-function calculate_valid_moves(color)
+// TODO
+function in_check(victim_color)
+{
+    var attacker_color = opposite_color(victim_color);
+        
+    // Pieces that can't be captured and need to move if attacked
+    var royals = $$("img.royal-" + victim_color);
+
+    // Attack the royal pieces?
+    $$("img." + attacker_color).each(function(piece) { 
+        var filerank;
+
+        var moves = filtered_moves(piece, attacker_color);
+
+        moves.each(function(move) {
+            royals.each(function(royal) {
+                var square = sq(royal);
+
+                if (move[0] == square.x && move[1] == square.y) { 
+                    console.log("ATTACKED");
+                }
+            });
+        });
+    });
+}
+
+// After the board changes and it is the next person's turn, calculate what the next possible allowable moves are,
+// and update the globals with this information.
+function calculate_and_save_valid_moves(color)
 {
     VALID_MOVES = new Hash();
     VALID_ALGEBRAIC_MOVES = new Hash();
@@ -895,7 +922,7 @@ function set_turn(color)
     // Note: this takes some time... is there any way to run it right AFTER the piece has
     // gone through the endeffect? This is called in onDrop.
     // TODO: find out how to run something *after* the endeffect, for smoother UI.
-    calculate_valid_moves(GAME_STATE.active_color);
+    calculate_and_save_valid_moves(GAME_STATE.active_color);
 
     // AI - artificial intelligence 
     computer_move_if_applicable();
@@ -1244,7 +1271,7 @@ function image_path_for(letter, color)
 // TODO: make this a class so you can do new Piece().
 function create_piece(name)
 {
-    var color, filename, piece, letter, type;
+    var color, filename, piece, letter, type, classes;
 
     // In FEN, uppercase=white, lower=black
     if (/^[A-Z]/.test(name)) {
@@ -1261,7 +1288,19 @@ function create_piece(name)
 
     filename = image_path_for(letter, color);
 
-    piece = Builder.node('img', {'src': filename, 'class': "piece " + color + " " + type});
+    // Color is the most important class. Type is added
+    // mostly for debugging purposes.
+    classes = "piece " + color + " " + type;
+
+    // Royal class is very important. Unfortunately, I couldn't find
+    // a way to easily select elements with two classes, so create
+    // royal-black and royal-white.
+    if (PIECE_TYPES[type].royal) {
+        classes += " royal";
+        classes += " royal-" + color;
+    }
+
+    piece = Builder.node('img', {'src': filename, 'class': classes});
 
     // Property will tell name of piece. To tell what color, or if it is
     // a piece in the first place, check the class names.
@@ -1603,7 +1642,7 @@ function enable_document_selection(enable) {
   vs.
    <select name="black_player" id="black_player" onchange="computer_move_if_applicable()">
    <option value="human">Human</option>
-   <option value="computer" selected>Computer</option>
+   <option value="computer">Computer</option>
    <option value="network">Network</option>
   </select>
  
