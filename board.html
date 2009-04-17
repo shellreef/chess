@@ -261,7 +261,7 @@ function calculate_valid_moves(color)
     VALID_ALGEBRAIC_MOVES = new Hash();
 
     // Look at all the active pieces
-    $$("img.active-color").each(function(piece) { 
+    $$("img." + color).each(function(piece) { 
         var filerank;
 
         var moves = filtered_moves(piece, color);
@@ -666,7 +666,7 @@ function decode_one_parlett(parlett, xy, color)
             }
 
             // skip squares that are occupied by friendly pieces
-            return piece.hasClassName("active-color");
+            return piece.hasClassName(color);
         });
 
     } else if (movement === "leaper") {
@@ -682,7 +682,7 @@ function decode_one_parlett(parlett, xy, color)
         // The distance is the move limit (1 for king, "infinity" for Q, B, R).
         limit = distances[0];
 
-        moves = add_flags(expand_rider(limit, directions, xy, extremities), flags);
+        moves = add_flags(expand_rider(limit, directions, xy, extremities, color), flags);
     } else {
         assert(false, "decode_one_parlett(" + parlett + "): unsupported movement");
     }
@@ -696,14 +696,14 @@ function decode_one_parlett(parlett, xy, color)
 // an occupied square. Note that there could be pieces that move
 // in this way, but won't be blocked (leapers, locusts), but they
 // are not supported here.
-function expand_rider(limit, directions, xy, extremities)
+function expand_rider(limit, directions, xy, extremities, color)
 {
     var moves = [];
 
     //console.log("expand_rider",limit, directions, xy);
 
     directions.each(function(direction) {
-        moves = moves.concat(expand_direction(limit, direction, xy, extremities));
+        moves = moves.concat(expand_direction(limit, direction, xy, extremities, color));
     });
 
     return without_dupes(moves);
@@ -713,7 +713,7 @@ function expand_rider(limit, directions, xy, extremities)
 // vector, starting at start_xy. Stop when reaching the end of the
 // board, on an enemy piece, or before a friendly piece.
 // If extremities is true, only add square at end of the direction.
-function expand_direction(limit, direction, start_xy, extremities)
+function expand_direction(limit, direction, start_xy, extremities, color)
 {
     var x, y, moves;
 
@@ -734,7 +734,7 @@ function expand_direction(limit, direction, start_xy, extremities)
 
         piece = pc(x, y);
         if (piece) {
-            if (piece.hasClassName("active-color")) {
+            if (piece.hasClassName(color)) {
                 // blocked by own piece, can't move on top
                 break;
             } else {
@@ -883,17 +883,6 @@ function set_turn(color)
     } else {
         new_color = color;
     }
-
-    // Class to tell droppables that they can accept these pieces.
-    $$("img." + new_color).each(function(piece) {
-        piece.addClassName("active-color");
-        piece.removeClassName("inactive-color");
-    });
-
-    $$("img." + opposite_color(new_color)).each(function(piece) {
-        piece.removeClassName("active-color");
-        piece.addClassName("inactive-color");
-    });
 
     $("status").innerHTML = ucfirst(new_color) + "'s Turn";
 
