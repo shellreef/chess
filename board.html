@@ -334,7 +334,7 @@ function filtered_moves(piece, color)
     var parlett = PIECE_TYPES[piece.type].parlett;
     var filtered;
 
-    var unfiltered = unfiltered_moves(parlett, xy);
+    var unfiltered = unfiltered_moves(parlett, xy, color);
 
     filtered = unfiltered.select(function(move) {
         var allowed = true;
@@ -468,7 +468,7 @@ function move_rel2abs(xy_location, moves)
 
 // Get unfiltered (might be occupied by own piece, cause to put in check) 
 /// list of moves for a piece, with Parlett moves given, at given location
-function unfiltered_moves(parlett, xy)
+function unfiltered_moves(parlett, xy, color)
 {
     var choice_groups, moves;
 
@@ -481,7 +481,7 @@ function unfiltered_moves(parlett, xy)
     for (var i = 0; i < choice_groups.length; ++i) {
             // For each group, gather the move options. 
             // (Would be nice if JavaScript arrays had a Python-like .extend)
-            moves = moves.concat(decode_one_parlett(choice_groups[i], xy));
+            moves = moves.concat(decode_one_parlett(choice_groups[i], xy, color));
     }    
 
     // Last step: remove duplicates. Maybe the caller should do this.
@@ -494,18 +494,18 @@ function unfiltered_moves(parlett, xy)
 // Returns an 2-element array:
 // 0th element: array of two-element arrays of direction vectors.
 // 1st element: true if ch2 was consumed, false if only ch was used
-function decode_direction(ch, ch2)
+function decode_direction(ch, ch2, color)
 {
     var forward, backward;
 
     // What way pieces go when they move forwards. Remember, these are x,y
     // vectors so negative is up, positive is down.
-    if (GAME_STATE.active_color === "white") {
+    if (color === "white") {
         forward = -1;
-    } else if (GAME_STATE.active_color === "black") {
+    } else if (color === "black") {
         forward = 1;
     } else {
-        assert(false, "decode_direction(" + ch + "): bad active color: " + GAME_STATE.active_color);
+        assert(false, "decode_direction(" + ch + "): bad active color: " + color);
     }
     backward = -forward;
 
@@ -518,7 +518,7 @@ function decode_direction(ch, ch2)
     } else if (ch === ">") {
         if (ch2 === "=") {
             // >= orthogonally forwards or sideways
-            return [decode_direction(">")[0].concat(decode_direction("=")[0]), true];
+            return [decode_direction(">", undefined, color)[0].concat(decode_direction("=", undefined, color)[0]), true];
         } else {
             // = orthogonally forward
             return [[[0, forward]], false];
@@ -529,7 +529,7 @@ function decode_direction(ch, ch2)
             return [[[0, forward], [0, backward]], true];
         } else if (ch2 === "=") {
             // <= orthogonally backwards or sideways
-            return [decode_direction("<")[0].concat(decode_direction("=")[0]), true];
+            return [decode_direction("<", undefined, color)[0].concat(decode_direction("=", undefined, color)[0]), true];
         } else {
             // < orthogonally backwards
             return [[[0, backward]], false];
@@ -547,7 +547,7 @@ function decode_direction(ch, ch2)
         }
     } else if (ch === "*") {    
         // orthogonally or diagonally (eight possible directions)
-        return [decode_direction("+")[0].concat(decode_direction("X")[0]), false];
+        return [decode_direction("+", undefined, color)[0].concat(decode_direction("X", undefined, color)[0]), false];
     } else {
         return null;
     }
@@ -555,7 +555,7 @@ function decode_direction(ch, ch2)
 
 // Decode a single group in extended Parlett notation into unfiltered absolute moves
 // See http://en.wikipedia.org/wiki/Fairy_chess_piece#Notations
-function decode_one_parlett(parlett, xy)
+function decode_one_parlett(parlett, xy, color)
 {
     var movement, hippogonal;
     var distances, directions, flags, maybe_directions, extremities;
@@ -631,7 +631,7 @@ function decode_one_parlett(parlett, xy)
         } else if (ch == " ") {
             assert(false, "decode_one_parlett(" + parlett + "): whitespace encountered, did you forget a comma?");
         } else {
-            maybe_directions = decode_direction(ch, parlett.substr(i + 1, 1));
+            maybe_directions = decode_direction(ch, parlett.substr(i + 1, 1), color);
             if (maybe_directions) {
                 directions = maybe_directions[0];
                 if (maybe_directions[1]) {
