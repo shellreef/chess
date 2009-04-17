@@ -254,10 +254,11 @@ function promote(piece)
 
 //// VALID MOVE FUNCTIONS
 
-// TODO
+// Check if any royal pieces of victim_color are being attacked.
 function in_check(victim_color)
 {
     var attacker_color = opposite_color(victim_color);
+    var attacked = false;
         
     // Pieces that can't be captured and need to move if attacked
     var royals = $$("img.royal." + victim_color);
@@ -273,11 +274,14 @@ function in_check(victim_color)
                 var square = sq(royal);
 
                 if (move[0] == square.x && move[1] == square.y) { 
-                    console.log("ATTACKED");
+                    // Being attacked!
+                    attacked = true;
                 }
             });
         });
     });
+
+    return attacked;
 }
 
 // After the board changes and it is the next person's turn, calculate what the next possible allowable moves are,
@@ -919,6 +923,11 @@ function set_turn(color)
     }
 
     GAME_STATE.active_color = new_color;
+
+    if (in_check(GAME_STATE.active_color)) {
+        $("check").innerHTML = "Check!";
+    }
+
     // Note: this takes some time... is there any way to run it right AFTER the piece has
     // gone through the endeffect? This is called in onDrop.
     // TODO: find out how to run something *after* the endeffect, for smoother UI.
@@ -1644,6 +1653,7 @@ function enable_document_selection(enable) {
   </select>
  
   <p id="status"></p>
+  <p id="check"></p>
 
   <textarea name="moves" id="moves" rows="20"></textarea>
 
