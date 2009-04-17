@@ -611,13 +611,13 @@ function decode_one_parlett(parlett, xy, color)
             var ep_moves;
 
             // If en passant target square is available, allow it.
-            // TODO: Support this. Why is it null? XXX
-            console.log(GAME_STATE.enpassant_target);
+            // XXX TODO: Only for the valid pawn. But it does it for all but that pawn!
+            /*console.log(GAME_STATE.enpassant_target);
             if (GAME_STATE.enpassant_target) {
                 ep_moves = [GAME_STATE.enpassant_target];
-            } else {
+            } else {*/
                 ep_moves = [];
-            }
+            //}
 
             return add_flags(ep_moves, flags);
         // Standard Parlett
@@ -1094,7 +1094,6 @@ function load_fen(fen)
     load_starting_position(parts[0]);
 
     assert(/^[wb]$/.test(parts[1]), "load_fen(" + fen + "): bad active color: " + parts[1]);
-    set_turn({w:"white", b:"black"}[parts[1]]);
 
     castling = parts[2];
     GAME_STATE.can_castle.white.short = /K/.test(castling);
@@ -1110,6 +1109,9 @@ function load_fen(fen)
 
     GAME_STATE.halfmove_clock = parseInt(parts[4], 10);
     GAME_STATE.fullmove_number = parseInt(parts[5], 10);
+
+    // Now that everything is loaded, set the turn.
+    set_turn({w:"white", b:"black"}[parts[1]]);
 }
 
 // Remove all pieces from the board.
