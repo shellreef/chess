@@ -255,7 +255,7 @@ function promote(piece)
 //// VALID MOVE FUNCTIONS
 
 // After the board changes and it is the next person's turn, calculate what the next possible allowable moves are.
-function calculate_valid_moves()
+function calculate_valid_moves(color)
 {
     VALID_MOVES = new Hash();
     VALID_ALGEBRAIC_MOVES = new Hash();
@@ -264,7 +264,7 @@ function calculate_valid_moves()
     $$("img.active-color").each(function(piece) { 
         var filerank;
 
-        var moves = filtered_moves(piece);
+        var moves = filtered_moves(piece, color);
 
         // Convert xy to filerank notation (a string), so it can be easily used
         // as a hash key (that's the only reason)
@@ -297,7 +297,7 @@ function calculate_valid_moves()
     });
 
     if (VALID_MOVES.keys().length === 0) {
-        $("status").innerHTML = ucfirst(GAME_STATE.active_color) + " is stalemated";
+        $("status").innerHTML = ucfirst(color) + " is stalemated";
         // TODO: some way to note this, show a draw? 1/2-1/2
         return;
     }
@@ -327,7 +327,7 @@ function computer_move_if_applicable()
 // Compute legal moves for a piece, removing illegal moves. This
 // takes a while, so it is only done once when the board changes.
 // Use VALID_MOVES otherwise.
-function filtered_moves(piece)
+function filtered_moves(piece, color)
 {
     var xy = piece_location(piece);    // TODO: OO
     var x = xy[0], y = xy[1];
@@ -345,8 +345,8 @@ function filtered_moves(piece)
             var castle;
 
             // If king moved, won't be able to castle on either side, don't need name
-            if (GAME_STATE.can_castle[GAME_STATE.active_color].long === false &&
-                GAME_STATE.can_castle[GAME_STATE.active_color].short === false) {
+            if (GAME_STATE.can_castle[color].long === false &&
+                GAME_STATE.can_castle[color].short === false) {
                 allowed = false;
             } else {
                 // Otherwise, need to find if short/long castle
@@ -359,13 +359,13 @@ function filtered_moves(piece)
                         "filerank = " + xy2filerank([move[0], move[1]]) + ", piece = " + piece);
                 }
 
-                if (castle && !GAME_STATE.can_castle[GAME_STATE.active_color][castle])
+                if (castle && !GAME_STATE.can_castle[color][castle])
                     allowed = false;
             }
 
             // If intervening pieces, do not allow castling.
             if (allowed && castle) { // so far..
-                var first_rank = (GAME_STATE.active_color === "white" ? 7 : 0);
+                var first_rank = (color === "white" ? 7 : 0);
             
                 if (castle === "short") {
                     if (pc(5, first_rank) || pc(6, first_rank)) {
@@ -904,7 +904,7 @@ function set_turn(color)
     // Note: this takes some time... is there any way to run it right AFTER the piece has
     // gone through the endeffect? This is called in onDrop.
     // TODO: find out how to run something *after* the endeffect, for smoother UI.
-    calculate_valid_moves();
+    calculate_valid_moves(GAME_STATE.active_color);
 
     // AI - artificial intelligence 
     computer_move_if_applicable();
