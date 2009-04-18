@@ -101,8 +101,9 @@ var GAME_STATE = {
 
 // Moves that can be made right now, for each active piece.
 var VALID_MOVES = null;            // Keyed by filerank of source, array of [[x,y,flags]] destinations
-var VALID_ALGEBRAIC_MOVES = null;    // Map algebraic -> [piece, square]
-var ALL_DROP_TARGETS = [];              // Droppables for UI
+var VALID_MOVES_OPP = null;        // Moves opponent could make, if it was their turn (attacking)
+var VALID_ALGEBRAIC_MOVES = null;  // Map algebraic -> [piece, square]
+var ALL_DROP_TARGETS = [];         // Droppables for UI
 
 // Board size
 var RANK_MAX = 8;
@@ -276,11 +277,16 @@ function in_check(victim_color)
     // Pieces that can't be captured and need to move if attacked
     var royals = $$("img.royal." + victim_color);
 
-    // Attack the royal pieces?
-    $$("img." + attacker_color).each(function(piece) { 
-        var filerank;
+    if (!VALID_MOVES_OPP) {
+        calculate_and_save_valid_moves(victim_color);
+    }
 
-        var moves = filtered_moves(piece, attacker_color);
+    // Attack the royal pieces?
+    VALID_MOVES_OPP.each(function(pair) { 
+        var filerank = pair.key;
+        var moves = pair.value;
+
+        var piece = pc(filerank);
 
         moves.each(function(move) {
             royals.each(function(royal) {
@@ -342,6 +348,18 @@ function calculate_and_save_valid_moves(color)
         VALID_MOVES.set(filerank, moves);
         //console.log(filerank, moves);
     });
+
+
+    // Compute hypothetically valid "moves" for the opponent, even though
+    // it is not their turn, this tells what they are attacking.
+    VALID_MOVES_OPP = new Hash();
+    $$("img." + opposite_color(color)).each(function(piece) { 
+        var filerank = sq(piece).filerank;
+        var moves = filtered_moves(piece, opposite_color(color));
+
+        VALID_MOVES_OPP.set(filerank, moves);
+    });
+
 
     if (VALID_MOVES.keys().length === 0) {
         $("status").innerHTML = ucfirst(color) + " is stalemated";
@@ -995,16 +1013,18 @@ function set_turn(color)
 
     GAME_STATE.active_color = new_color;
 
+    // Note: this takes some time... is there any way to run it right AFTER the piece has
+    // gone through the endeffect? This is called in onDrop.
+    // TODO: find out how to run something *after* the endeffect, for smoother UI.
+    calculate_and_save_valid_moves(GAME_STATE.active_color);
+
     if (in_check(GAME_STATE.active_color)) {
         $("check").innerHTML = "Check!";
     } else {
         $("check").innerHTML = "";
     }
 
-    // Note: this takes some time... is there any way to run it right AFTER the piece has
-    // gone through the endeffect? This is called in onDrop.
-    // TODO: find out how to run something *after* the endeffect, for smoother UI.
-    calculate_and_save_valid_moves(GAME_STATE.active_color);
+
 
     // AI - artificial intelligence 
     computer_move_if_applicable();
