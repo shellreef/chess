@@ -296,8 +296,8 @@ function in_check(victim_color, all_moves)
 
         moves.each(function(move) {
             royals.each(function(royal) {
-                // TODO: BUG: doesn't properly take into account HYPOTHETICALs (sure??)
-                // really want the *new* square for the piece that it moved to! XXX
+                // Note that sq() will return the hypothetical location of the piece,
+                // if any.
                 var square = sq(royal);
 
                 console.log("||", xy2filerank(move[0], move[1]));
@@ -494,8 +494,7 @@ function filtered_moves(piece, color)
 
         // Can't put in check, or remain in check
         // TODO XXX
-        /*
-        if (would_check(piece, move, color)) { 
+        /*if (would_check(piece, move, color)) { 
             allowed = false; 
             console.log("would_check",color,piece,xy2filerank([move[0], move[1]]));
         }*/
@@ -524,7 +523,7 @@ function would_check(piece, move, color)
     HYPOTHETICAL_PIECE = piece;
     HYPOTHETICAL_TO = [to_square.x, to_square.y];
 
-    all_moves = calculate_moves(color);
+    all_moves = calculate_moves(opposite_color(color));
     checked = in_check(color, all_moves);
 
     HYPOTHETICAL_FROM = HYPOTHETICAL_PIECE = HYPOTHETICAL_TO = null;
