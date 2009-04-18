@@ -130,7 +130,7 @@ var PIECE_TYPES = {
     // Other hippogonals, good for testing
     zero: {parlett: "~0/0", letter: "O"},
     dababba: {parlett: "~2/0", letter: "D"},    // or ~2+
-    alfil: {parlett: "~2X", letter: "A"},    // or ~2/2
+    alfil: {parlett: "~2/2", letter: "A"},    // or ~2X
     alibaba: {parlett: "~2/0 ~2X", letter: "L"},
     squirrel: {parlett: "~0/2, ~1/2, ~2/2", letter: "S"},
     threeleaper: {parlett: "~3/0", letter: "H"},
@@ -157,10 +157,11 @@ var PIECE_TYPES = {
     khohn: {parlett: "1X, 1>"},
     fers: {parlett: "1X"},
     wazir: {parlett: "1+"},
+    kraken_checkmate: {parlett: "~n/m"},     // any square, not realistic since always checkmates!
+    kraken: {parlett: "o~n/m", letter: "J"}, // any square but can't capture, much less powerful
 
     // Pieces that probably won't be supported without significant coding
     leo: {parlett: "on*, c^&"},        // no & support, whatever that is
-    kraken: {parlett: "~n/m"},         // no n support in hippogonal (just allow any square)
     knightrider: {parlett: "n(1/2)"},  // no grouping support, sadly
     checker: {parlett: "cn(^2X>), o1X>", promote: "checker_kinged"},  // no grouping
     checker_kinged: {parlett: "cn(^2X), o1x"},
@@ -181,6 +182,7 @@ google.setOnLoadCallback(function() {
     //load_fen("7K/8/k1P5/7p/8/8/8/8 w KQkq - 42 42");
     //load_fen("r1bqkb1r/pp1ppppp/2n2n2/2p5/2B2P3/5N2/PPPP1PPP/RN1QK2R w KQkq - 1 3");
     load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5");
+    //load_fen("cabdgcab/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5");
 });
 
 //// USER FUNCTIONS
@@ -253,6 +255,8 @@ function promote(piece)
 }
 
 //// VALID MOVE FUNCTIONS
+//
+// TODO: step through moves, like http://www.zenpawn.com/chessblog/
 
 // Check if any royal pieces of victim_color are being attacked.
 function in_check(victim_color)
@@ -290,6 +294,9 @@ function calculate_and_save_valid_moves(color)
 {
     VALID_MOVES = new Hash();
     VALID_ALGEBRAIC_MOVES = new Hash();
+
+    assert(color === "black" || color === "white",
+            "calculate_and_save_valid_moves(" + color + "): bad color or no color given");
 
     // Look at all the active pieces
     $$("img." + color).each(function(piece) { 
@@ -439,6 +446,12 @@ function filtered_moves(piece, color)
             if (piece_under) {
                 allowed = false;    // can't capture, man
             }
+        }
+
+        // Can't move to self-occupied square. Most pieces already
+        // don't return these squares, even unfiltered, but not kraken.
+        if (pc(move[0], move[1]) && pc(move[0], move[1]).hasClassName(color)) {
+                allowed = false;
         }
 
         return allowed;
@@ -622,6 +635,23 @@ function decode_one_parlett(parlett, xy, color)
             // can move to enemy square in order to capture it
             // (pawn's forward move)
             flags.no_capture = true;
+
+        // Kraken can go to any square, represented by n/m arbitrary
+        // hippogonal moves in any direction, but its not necessary to
+        // calculate it as a hippogonal, since its every square.
+        } else if (parlett.substring(i).indexOf("n/m") != -1) {
+            i += "n/m".length;
+
+            var kraken_moves = [];
+            for (var a = 0; a < 8; ++a) {
+                for (var b = 0; b < 8; ++b) {
+                    kraken_moves.push([a, b]);
+                }
+            }
+
+            kraken_moves = add_flags(kraken_moves, flags);
+
+            return kraken_moves;
 
         // Multi-move, my own extension for castling
         } else if (ch === "m") {
@@ -1483,7 +1513,7 @@ function sq(code, extra)
         x = xy[0];
         y = xy[1];
     } else {
-        assert(false, "sq(" + code + ", " + extra + "): couldn't find out arguments");
+        assert(false, "sq(" + code + ", " + extra + "): couldn't find out what I was given");
     }
 
     assert(x >= 0 && x <= 7 && y >= 0 && y <= 7, "sq(" + code + ", " + extra + 
@@ -1503,6 +1533,8 @@ function randint(minimum, maximum)
 // Uppercase first character, like in Perl
 function ucfirst(s)
 {
+    assert(s.substring, "ucfirst(" + s + "): no substring method, not a string? callee=" + 
+            arguments.callee);
     return s.substring(0, 1).toUpperCase() + s.substring(1);
 }
 
