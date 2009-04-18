@@ -178,6 +178,8 @@ var PIECE_TYPES = {
 // Hypothetical board squares. Pieces or lack thereof.
 // TODO
 var HYPOTHETICAL = {};
+var HYPOTHETICAL_PIECE = null;
+var HYPOTHETICAL_TO = null;
 
 google.setOnLoadCallback(function() {
     /* Safari & IE7: Disable text selection to stop interfering with dragging */
@@ -277,9 +279,7 @@ function in_check(victim_color)
     // Pieces that can't be captured and need to move if attacked
     var royals = $$("img.royal." + victim_color);
 
-    if (!VALID_MOVES_OPP) {
-        calculate_and_save_valid_moves(victim_color);
-    }
+    assert(VALID_MOVES_OPP, "in_check(" + victim_color + "): VALID_MOVES_OPP not yet initialized");
 
     // Attack the royal pieces?
     VALID_MOVES_OPP.each(function(pair) { 
@@ -290,10 +290,13 @@ function in_check(victim_color)
 
         moves.each(function(move) {
             royals.each(function(royal) {
+                // TODO: BUG: doesn't properly take into account HYPOTHETICALs
+                // really want the *new* square for the piece that it moved to! XXX
                 var square = sq(royal);
 
-                if (move[0] == square.x && move[1] == square.y) { 
+                if (move[0] === square.x && move[1] === square.y) { 
                     // Being attacked!
+                    console.log("CHECKED BY",piece,filerank,xy2filerank(move[0],move[1]));
                     attacked = true;
                 }
             });
@@ -312,6 +315,17 @@ function calculate_and_save_valid_moves(color)
 
     assert(color === "black" || color === "white",
             "calculate_and_save_valid_moves(" + color + "): bad color or no color given");
+
+    // Compute hypothetically valid "moves" for the opponent, even though
+    // it is not their turn, this tells what they are attacking.
+    VALID_MOVES_OPP = new Hash();
+    $$("img." + opposite_color(color)).each(function(piece) { 
+        var filerank = sq(piece).filerank;
+        var moves = filtered_moves(piece, opposite_color(color));
+
+        VALID_MOVES_OPP.set(filerank, moves);
+    });
+
 
     // Look at all the active pieces
     $$("img." + color).each(function(piece) { 
@@ -349,16 +363,6 @@ function calculate_and_save_valid_moves(color)
         //console.log(filerank, moves);
     });
 
-
-    // Compute hypothetically valid "moves" for the opponent, even though
-    // it is not their turn, this tells what they are attacking.
-    VALID_MOVES_OPP = new Hash();
-    $$("img." + opposite_color(color)).each(function(piece) { 
-        var filerank = sq(piece).filerank;
-        var moves = filtered_moves(piece, opposite_color(color));
-
-        VALID_MOVES_OPP.set(filerank, moves);
-    });
 
 
     if (VALID_MOVES.keys().length === 0) {
@@ -483,7 +487,13 @@ function filtered_moves(piece, color)
         }
         */
 
-        //console.log(would_check(piece, move, opposite_color(color));
+        // Can't put in check, or remain in check
+        // TODO XXX
+        /*
+        if (would_check(piece, move, color)) { 
+            allowed = false; 
+            console.log("would_check",color,piece,xy2filerank([move[0], move[1]]));
+        }*/
 
         return allowed;
     });
@@ -503,14 +513,19 @@ function would_check(piece, move, color)
     var to_square = sq(move[0], move[1]);
     var checked;
 
+    assert(piece, "would_check(" + piece + ", " + move + ", " + color +"): piece false");
+
     HYPOTHETICAL = {};
 
     HYPOTHETICAL[from_square.filerank] = null;
     HYPOTHETICAL[to_square.filerank] = piece;
+    HYPOTHETICAL_PIECE = piece;
+    HYPOTHETICAL_TO = [to_square.x, to_square.y];
 
     checked = in_check(color);
 
     HYPOTHETICAL = {};
+    HYPOTHETICAL_PIECE = HYPOTHETICAL_TO = null;
 
     return checked;
 }
@@ -1363,6 +1378,10 @@ function piece_location(piece)
     assert(piece, "piece_location(" + piece + "): piece is false");
     assert(piece.parentNode, "piece_location(" + piece + "): piece.parentNode is false, callee=" + arguments.callee);
 
+    if (HYPOTHETICAL_PIECE === piece) {
+        return HYPOTHETICAL_TO;
+    }
+
     return [piece.parentNode.x, piece.parentNode.y];
 }
 
@@ -1591,6 +1610,8 @@ function sq(code, extra)
 
     assert(x >= 1 && x <= FILE_MAX && y >= 1 && y <= RANK_MAX, "sq(" + code + ", " + extra + 
         "): out of range (" + x + ", " + y + ")");
+
+    // TODO: check HYPOTHETICALs!
 
     return $('board-body').childNodes[9 - y].childNodes[x];
 }
