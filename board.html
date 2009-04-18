@@ -448,11 +448,13 @@ function filtered_moves(piece, color)
             }
         }
 
-        // Can't move to self-occupied square. Most pieces already
-        // don't return these squares, even unfiltered, but not kraken.
+        // Used to have this rule to not move to self-occupied squares,
+        // but unfiltered_moves() should already not return these moves.
+        /*
         if (pc(move[0], move[1]) && pc(move[0], move[1]).hasClassName(color)) {
                 allowed = false;
         }
+        */
 
         return allowed;
     });
@@ -645,6 +647,13 @@ function decode_one_parlett(parlett, xy, color)
             var kraken_moves = [];
             for (var a = 0; a < 8; ++a) {
                 for (var b = 0; b < 8; ++b) {
+                    var piece = pc(a, b);
+
+                    // Can't move to self-occupied squares, of course.
+                    if (piece && piece.hasClassName(color)) {
+                        continue;
+                    }
+
                     kraken_moves.push([a, b]);
                 }
             }
