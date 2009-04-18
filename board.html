@@ -465,12 +465,36 @@ function filtered_moves(piece, color)
         }
         */
 
+        //console.log(would_check(piece, move, opposite_color(color));
+
         return allowed;
     });
 
     // TODO: check if puts in check
 
     return filtered;
+}
+
+// Return whether moving piece to move would mean that
+// color is in check. Note, that doesn't mean that the move
+// *caused* the check, they could have already been in check and
+// this move didn't take them out. Either way, its illegal.
+function would_check(piece, move, color)
+{
+    var from_square = sq(piece);
+    var to_square = sq(move[0], move[1]);
+    var checked;
+
+    HYPOTHETICAL = {};
+
+    HYPOTHETICAL[from_square.filerank] = null;
+    HYPOTHETICAL[to_square.filerank] = piece;
+
+    checked = in_check(color);
+
+    HYPOTHETICAL = {};
+
+    return checked;
 }
 
 // Return whether a pawn has moved from its initial position. Unfortunately,
@@ -1298,17 +1322,16 @@ function pc(x, y)
 {
     var square;
 
-    // A virtual, off-board "hypothetical" position
-    /*
-    if (HYPOTHETICAL[xy2filerank(x, y)]) {
-        return HYPOTHETICAL[xy2filerank(x, y)];
-    }*/
-
     // Get square
     if (x.hasClassName && x.hasClassName("square")) {
         square = x;
     } else {
         square = sq(x, y);
+    }
+
+    // A virtual, off-board "hypothetical" piece, or lack of (null, empty square).
+    if (HYPOTHETICAL[square.filerank] !== undefined) {
+        return HYPOTHETICAL[square.filerank];
     }
 
     return square.childNodes[0];
@@ -1521,6 +1544,9 @@ function xy2filerank(x, y)
 function sq(code, extra)
 {
     var x, y;
+
+    assert(code !== undefined, "sq(" + code + ", " + extra + "): code is undefined");
+    assert(code !== null, "sq(" + code + ", " + extra + "): code is null");
 
     // Is it a piece?
     if (code.hasClassName && code.hasClassName("piece")) {
