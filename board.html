@@ -292,7 +292,7 @@ function in_check(victim_color, all_moves)
 
         var piece = pc(filerank);
 
-        console.log("|",filerank,piece);
+        //console.log("|",filerank,piece);
 
         moves.each(function(move) {
             royals.each(function(royal) {
@@ -300,11 +300,11 @@ function in_check(victim_color, all_moves)
                 // if any.
                 var square = sq(royal);
 
-                console.log("||", xy2filerank(move[0], move[1]));
+                //console.log("||", xy2filerank(move[0], move[1]));
 
                 if (move[0] === square.x && move[1] === square.y) { 
                     // Being attacked!
-                    console.log("CHECKED BY",piece,filerank,xy2filerank(move[0],move[1]));
+                    //console.log("CHECKED BY",piece,filerank,xy2filerank(move[0],move[1]));
                     attacked = true;
                 }
             });
@@ -314,8 +314,11 @@ function in_check(victim_color, all_moves)
     return attacked;
 }
 
-// After the board changes and it is the next person's turn, calculate what the next possible allowable moves are,
-// and update the globals with this information.
+// After the board changes and it is the next person's turn, calculate 
+// what the next possible allowable moves are, and update the globals with this information.
+//
+// If get_only, do not update globals, and allow "moves" that put in
+// check (useful for attacks, see no_check_check).
 function calculate_moves(color, get_only)
 {
     var valid_moves = new Hash();
@@ -328,7 +331,7 @@ function calculate_moves(color, get_only)
     $$("img." + color).each(function(piece) { 
         var filerank;
 
-        var moves = filtered_moves(piece, color);
+        var moves = filtered_moves(piece, color, get_only);
 
         // Convert xy to filerank notation (a string), so it can be easily used
         // as a hash key (that's the only reason)
@@ -401,7 +404,10 @@ function computer_move_if_applicable()
 // Compute legal moves for a piece, removing illegal moves. This
 // takes a while, so it is only done once when the board changes.
 // Use VALID_MOVES otherwise.
-function filtered_moves(piece, color)
+//
+// Also filters moves that after making, color would be in check,
+// unless no_check_check is true (for checking for attacks, see comment).
+function filtered_moves(piece, color, no_check_check)
 {
     var xy = piece_location(piece);    // TODO: OO
     var x = xy[0], y = xy[1];
@@ -493,11 +499,20 @@ function filtered_moves(piece, color)
         */
 
         // Can't put in check, or remain in check
-        // TODO XXX
-        /*if (would_check(piece, move, color)) { 
+        // Note that this isn't called in hypothetical moves: because royal
+        // pieces can't actually be captured, checks that can't be cashed are
+        // still valid. Consider:
+        //
+        //    K
+        // R p    k
+        //
+        // p couldn't actually capture K, because then k would be in check by R,
+        // but royal pieces can't be captured in the first place, so K is still
+        // in check and has to move.
+        if (!no_check_check && would_check(piece, move, color)) { 
             allowed = false; 
-            console.log("would_check",color,piece,xy2filerank([move[0], move[1]]));
-        }*/
+            //console.log("would_check",color,piece,xy2filerank([move[0], move[1]]));
+        }
 
         return allowed;
     });
@@ -523,7 +538,7 @@ function would_check(piece, move, color)
     HYPOTHETICAL_PIECE = piece;
     HYPOTHETICAL_TO = [to_square.x, to_square.y];
 
-    all_moves = calculate_moves(opposite_color(color));
+    all_moves = calculate_moves(opposite_color(color), true);
     checked = in_check(color, all_moves);
 
     HYPOTHETICAL_FROM = HYPOTHETICAL_PIECE = HYPOTHETICAL_TO = null;
@@ -1085,10 +1100,10 @@ function capture_piece(piece)
         if (square.y === first_rank) {
             if (square.x === 1) {
                 GAME_STATE.can_castle[opponent].long = false;
-                console.log("no more long");
+                //console.log("no more long");
             } else if (square.x === 8) {
                 GAME_STATE.can_castle[opponent].short = false;
-                console.log("no more short");
+                //console.log("no more short");
             }
         }
     }
@@ -1502,7 +1517,7 @@ function highlight_moves(piece, enable)
     //console.log(moves);
     if (!moves) {
         return;    
-        }
+    }
 
     moves.each(function(move) {
         var x, y, flags, to_square;
@@ -1617,13 +1632,6 @@ function sq(code, extra)
         "): out of range (" + x + ", " + y + ")");
 
     // TODO: check HYPOTHETICALs?
-    /*
-    if (HYPOTHETICAL_TO && x === HYPOTHETICAL_TO[0] && y === HYPOTHETICAL_TO[1]) {
-        console.log("to");
-    } else if (HYPOTHETICAL_FROM && x === HYPOTHETICAL_FROM[0] && y === HYPOTHETICAL_FROM[1]) {
-        console.log("from");
-    }
-    */
 
     return $('board-body').childNodes[9 - y].childNodes[x];
 }
