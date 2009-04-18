@@ -177,7 +177,7 @@ var PIECE_TYPES = {
 
 // Hypothetical board squares. Pieces or lack thereof.
 // TODO
-var HYPOTHETICAL = {};
+var HYPOTHETICAL_FROM = null;
 var HYPOTHETICAL_PIECE = null;
 var HYPOTHETICAL_TO = null;
 
@@ -275,24 +275,37 @@ function in_check(victim_color)
 {
     var attacker_color = opposite_color(victim_color);
     var attacked = false;
-        
+    var all_moves;
+
+    // Valid moves for active player are in VALID_MOVES, but for
+    // opponent are in VALID_MOVES_OPP.
+    if (victim_color === GAME_STATE.active_color) {
+        all_moves = VALID_MOVES_OPP;
+    } else {
+        all_moves = VALID_MOVES;
+    }
+     
     // Pieces that can't be captured and need to move if attacked
     var royals = $$("img.royal." + victim_color);
 
-    assert(VALID_MOVES_OPP, "in_check(" + victim_color + "): VALID_MOVES_OPP not yet initialized");
+    assert(all_moves, "in_check(" + victim_color + "): all_moves not yet initialized");
 
     // Attack the royal pieces?
-    VALID_MOVES_OPP.each(function(pair) { 
+    all_moves.each(function(pair) { 
         var filerank = pair.key;
         var moves = pair.value;
 
         var piece = pc(filerank);
+
+        console.log("|",filerank,piece);
 
         moves.each(function(move) {
             royals.each(function(royal) {
                 // TODO: BUG: doesn't properly take into account HYPOTHETICALs
                 // really want the *new* square for the piece that it moved to! XXX
                 var square = sq(royal);
+
+                console.log("||", xy2filerank(move[0], move[1]));
 
                 if (move[0] === square.x && move[1] === square.y) { 
                     // Being attacked!
@@ -308,13 +321,13 @@ function in_check(victim_color)
 
 // After the board changes and it is the next person's turn, calculate what the next possible allowable moves are,
 // and update the globals with this information.
-function calculate_and_save_valid_moves(color)
+function calculate_moves(color)
 {
     VALID_MOVES = new Hash();
     VALID_ALGEBRAIC_MOVES = new Hash();
 
     assert(color === "black" || color === "white",
-            "calculate_and_save_valid_moves(" + color + "): bad color or no color given");
+            "calculate_moves(" + color + "): bad color or no color given");
 
     // Compute hypothetically valid "moves" for the opponent, even though
     // it is not their turn, this tells what they are attacking.
@@ -515,17 +528,15 @@ function would_check(piece, move, color)
 
     assert(piece, "would_check(" + piece + ", " + move + ", " + color +"): piece false");
 
-    HYPOTHETICAL = {};
-
-    HYPOTHETICAL[from_square.filerank] = null;
-    HYPOTHETICAL[to_square.filerank] = piece;
+    HYPOTHETICAL_FROM = [from_square.x, from_square.y];
     HYPOTHETICAL_PIECE = piece;
     HYPOTHETICAL_TO = [to_square.x, to_square.y];
 
+    // XXX infinite..
+    calculate_moves(color);
     checked = in_check(color);
 
-    HYPOTHETICAL = {};
-    HYPOTHETICAL_PIECE = HYPOTHETICAL_TO = null;
+    HYPOTHETICAL_FROM = HYPOTHETICAL_PIECE = HYPOTHETICAL_TO = null;
 
     return checked;
 }
@@ -1031,7 +1042,7 @@ function set_turn(color)
     // Note: this takes some time... is there any way to run it right AFTER the piece has
     // gone through the endeffect? This is called in onDrop.
     // TODO: find out how to run something *after* the endeffect, for smoother UI.
-    calculate_and_save_valid_moves(GAME_STATE.active_color);
+    calculate_moves(GAME_STATE.active_color);
 
     if (in_check(GAME_STATE.active_color)) {
         $("check").innerHTML = "Check!";
@@ -1365,8 +1376,12 @@ function pc(x, y)
     }
 
     // A virtual, off-board "hypothetical" piece, or lack of (null, empty square).
-    if (HYPOTHETICAL[square.filerank] !== undefined) {
-        return HYPOTHETICAL[square.filerank];
+    if (HYPOTHETICAL_TO && square.x === HYPOTHETICAL_TO[0] && square.y === HYPOTHETICAL_TO[1]) {
+        // As if it moved here
+        return HYPOTHETICAL_PIECE;
+    } else if (HYPOTHETICAL_FROM && square.x === HYPOTHETICAL_FROM[0] && square.y === HYPOTHETICAL_FROM[1]) {
+        // As if it moved off of here, so empty
+        return null;
     }
 
     return square.childNodes[0];
@@ -1611,7 +1626,14 @@ function sq(code, extra)
     assert(x >= 1 && x <= FILE_MAX && y >= 1 && y <= RANK_MAX, "sq(" + code + ", " + extra + 
         "): out of range (" + x + ", " + y + ")");
 
-    // TODO: check HYPOTHETICALs!
+    // TODO: check HYPOTHETICALs?
+    /*
+    if (HYPOTHETICAL_TO && x === HYPOTHETICAL_TO[0] && y === HYPOTHETICAL_TO[1]) {
+        console.log("to");
+    } else if (HYPOTHETICAL_FROM && x === HYPOTHETICAL_FROM[0] && y === HYPOTHETICAL_FROM[1]) {
+        console.log("from");
+    }
+    */
 
     return $('board-body').childNodes[9 - y].childNodes[x];
 }
