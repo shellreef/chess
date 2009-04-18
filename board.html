@@ -361,17 +361,14 @@ function calculate_moves(color, get_only)
         });
 
         // Store valid moves for mouseovers etc.
-        valid_moves.set(filerank, moves);
+        if (moves.length !== 0) {
+            valid_moves.set(filerank, moves);
+        }
+
         //console.log(filerank, moves);
     });
 
 
-
-    if (valid_moves.keys().length === 0) {
-        $("status").innerHTML = ucfirst(color) + " is stalemated";
-        // TODO: some way to note this, show a draw? 1/2-1/2
-        return;
-    }
 
     if (!get_only) {
         VALID_MOVES = valid_moves;
@@ -508,7 +505,7 @@ function filtered_moves(piece, color, no_check_check)
         //
         // p couldn't actually capture K, because then k would be in check by R,
         // but royal pieces can't be captured in the first place, so K is still
-        // in check and has to move.
+        // in check and has to move (even though p is pinned!)
         if (!no_check_check && would_check(piece, move, color)) { 
             allowed = false; 
             //console.log("would_check",color,piece,xy2filerank([move[0], move[1]]));
@@ -1025,7 +1022,7 @@ function opposite_color(color)
 // Set the active color to white or black, or go to the next color (toggling)
 function set_turn(color)
 {
-    var new_color, active_pieces;
+    var new_color, active_pieces, checked, no_moves;
 
     assert(color === "white" || color === "black" || color === "next", "set_turn(" + color + "): invalid color");
 
@@ -1049,13 +1046,19 @@ function set_turn(color)
     // TODO: find out how to run something *after* the endeffect, for smoother UI.
     calculate_moves(GAME_STATE.active_color);
 
-    if (in_check(GAME_STATE.active_color, calculate_moves(opposite_color(new_color), true))) {
-        $("check").innerHTML = "Check!";
-    } else {
-        $("check").innerHTML = "";
+    checked = in_check(GAME_STATE.active_color, calculate_moves(opposite_color(new_color), true));
+    no_moves = VALID_MOVES.keys().length == 0;
+
+    // TODO: notate in endgame
+   
+    // Results
+    if (checked && !no_moves) {
+        $("check").innerHTML = "Check";
+    } else if (!checked && no_moves) {
+        $("check").innerHTML = "Draw (stalemate)";
+    } else if (checked && no_moves) {
+        $("check").innerHTML = "Checkmate!";
     }
-
-
 
     // AI - artificial intelligence 
     computer_move_if_applicable();
