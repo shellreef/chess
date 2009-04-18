@@ -209,17 +209,17 @@ google.setOnLoadCallback(function() {
 // not used for drag-and-drop.
 function mv(alg_move)
 {
-    var piece_square, piece, square;
+    var piece_at, piece, square;
 
     if (!alg_move) {
         return VALID_ALGEBRAIC_MOVES.keys();
     }
 
-    piece_square = VALID_ALGEBRAIC_MOVES.get(alg_move);
-    assert(piece_square, "mv(" + alg_move + "): illegal move");
+    from_xy = VALID_ALGEBRAIC_MOVES.get(alg_move);
+    assert(from_xy, "mv(" + alg_move + "): illegal move");
 
-    piece = piece_square[0];
-    square = piece_square[1];
+    piece = from_xy[0];
+    square = from_xy[1];
 
     // TODO: do some Effect.Move animation, optionally (make two functions)
     //new Effect.Move(piece, { x: 10, y: 20, mode: 'relative' });
@@ -239,7 +239,7 @@ function should_promote(piece)
         return false;
     }
 
-    square = sq(piece);
+    square = piece_at(piece);
 
     // Is it on the last rank?
     if (GAME_STATE.active_color === "white") {
@@ -300,7 +300,7 @@ function in_check(victim_color, all_moves)
             royals.each(function(royal) {
                 // Note that sq() will return the hypothetical location of the piece,
                 // if any.
-                var square = sq(royal);
+                var square = piece_at(royal);
 
                 //console.log("||", xy2filerank(move[0], move[1]));
 
@@ -337,7 +337,7 @@ function calculate_moves(color, get_only)
 
         // Convert xy to filerank notation (a string), so it can be easily used
         // as a hash key (that's the only reason)
-        filerank = sq(piece).filerank;
+        filerank = piece_at(piece).filerank;
 
         // Create drop targets for the valid destinations, linking
         // the draggables to droppables using piece- + source square.
@@ -394,8 +394,6 @@ function computer_move_if_applicable()
     var keys = VALID_ALGEBRAIC_MOVES.keys();
     var alg_move = keys[randint(0, keys.length - 1)];
 
-    var piece_square = VALID_ALGEBRAIC_MOVES.get(alg_move);
-
     // TODO: do some animation when moving, Effect.Move, to slow it down so we can see it.
     mv(alg_move);
 }
@@ -408,12 +406,12 @@ function computer_move_if_applicable()
 // unless no_check_check is true (for checking for attacks, see comment).
 function filtered_moves(piece, color, no_check_check)
 {
-    var xy = piece_location(piece);    // TODO: OO
-    var x = xy[0], y = xy[1];
+    var square = piece_at(piece);    // TODO: OO
+    var x = square.x, y = square.y;
     var parlett = PIECE_TYPES[piece.type].parlett;
     var filtered;
 
-    var unfiltered = unfiltered_moves(parlett, xy, color);
+    var unfiltered = unfiltered_moves(parlett, square, color);
 
     filtered = unfiltered.select(function(move) {
         var allowed = true;
@@ -525,9 +523,11 @@ function filtered_moves(piece, color, no_check_check)
 // color is in check. Note, that doesn't mean that the move
 // *caused* the check, they could have already been in check and
 // this move didn't take them out. Either way, its illegal.
+//
+// XXX: Serious bug: can't take attacking piece to get out of check! Must be able to do this!! TODO
 function would_check(piece, move, color)
 {
-    var from_square = sq(piece);
+    var from_square = piece_at(piece);
     var to_square = sq(move[0], move[1]);
     var checked, all_moves;
 
@@ -553,10 +553,12 @@ function would_check(piece, move, color)
 // TODO: store initial rank in piece information
 function pawn_moved(piece)
 {
+    var square = piece_at(piece);
+
     if (piece.hasClassName("white")) {
-        return sq(piece).y !== 2;    // 2nd rank
+        return square.y !== 2;    // 2nd rank
     } else if (piece.hasClassName("black")) {
-        return sq(piece).y !== 7;    // 7th rank
+        return square.y !== 7;    // 7th rank
     } else {
         assert("pawn_moved(" + piece + "): neither white nor black");
     }
@@ -567,15 +569,15 @@ function pawn_moved(piece)
 // Note: Coordinates out of bounds *are* discarded, but not those that
 // land on an existing piece (one's own or the enemy's).
 // Note2: moves must be array of [x,y,flags]; the third element is required
-function move_rel2abs(xy_location, moves)
+function move_rel2abs(square, moves)
 {
     var absolutes = [];
 
     for (var i = 0; i < moves.length; ++i) {
         var rel = moves[i];
         var flags = rel[2];
-        var x = xy_location[0] + rel[0];
-        var y = xy_location[1] + rel[1];
+        var x = square.x + rel[0];
+        var y = square.y + rel[1];
 
         if (x < 1 || x > FILE_MAX || y < 1 || y > RANK_MAX) {
             //console.log("reject", x, y);
@@ -594,7 +596,7 @@ function move_rel2abs(xy_location, moves)
 
 // Get unfiltered (might be occupied by own piece, cause to put in check) 
 /// list of moves for a piece, with Parlett moves given, at given location
-function unfiltered_moves(parlett, xy, color)
+function unfiltered_moves(parlett, square, color)
 {
     var choice_groups, moves;
 
@@ -607,7 +609,7 @@ function unfiltered_moves(parlett, xy, color)
     for (var i = 0; i < choice_groups.length; ++i) {
             // For each group, gather the move options. 
             // (Would be nice if JavaScript arrays had a Python-like .extend)
-            moves = moves.concat(decode_one_parlett(choice_groups[i], xy, color));
+            moves = moves.concat(decode_one_parlett(choice_groups[i], square, color));
     }    
 
     // Last step: remove duplicates. Maybe the caller should do this.
@@ -681,12 +683,12 @@ function decode_direction(ch, ch2, color)
 
 // Decode a single group in extended Parlett notation into unfiltered absolute moves
 // See http://en.wikipedia.org/wiki/Fairy_chess_piece#Notations
-function decode_one_parlett(parlett, xy, color)
+function decode_one_parlett(parlett, square, color)
 {
     var movement, hippogonal;
     var distances, directions, flags, maybe_directions, extremities;
 
-    assert(xy, "decode_one_parlett("+ parlett + ", " + xy + "): piece xy not given");
+    assert(square, "decode_one_parlett("+ parlett + ", " + square + "): piece square not given");
 
     flags = {};
     distances = [];
@@ -809,7 +811,7 @@ function decode_one_parlett(parlett, xy, color)
         // Relatively easy, since with leapers, can disregard pieces on the path
         var rel_moves = add_flags(expand_hippogonal(distances), flags);
 
-        moves = move_rel2abs(xy, rel_moves).reject(function(xy) {
+        moves = move_rel2abs(square, rel_moves).reject(function(xy) {
             var piece = pc(xy[0], xy[1]);
             if (!piece) {
                 return false;    // unoccupied, good
@@ -832,7 +834,7 @@ function decode_one_parlett(parlett, xy, color)
         // The distance is the move limit (1 for king, "infinity" for Q, B, R).
         limit = distances[0];
 
-        moves = add_flags(expand_rider(limit, directions, xy, extremities, color), flags);
+        moves = add_flags(expand_rider(limit, directions, square, extremities, color), flags);
     } else {
         assert(false, "decode_one_parlett(" + parlett + "): unsupported movement");
     }
@@ -846,14 +848,14 @@ function decode_one_parlett(parlett, xy, color)
 // an occupied square. Note that there could be pieces that move
 // in this way, but won't be blocked (leapers, locusts), but they
 // are not supported here.
-function expand_rider(limit, directions, xy, extremities, color)
+function expand_rider(limit, directions, square, extremities, color)
 {
     var moves = [];
 
-    //console.log("expand_rider",limit, directions, xy);
+    //console.log("expand_rider",limit, directions, square);
 
     directions.each(function(direction) {
-        moves = moves.concat(expand_direction(limit, direction, xy, extremities, color));
+        moves = moves.concat(expand_direction(limit, direction, square, extremities, color));
     });
 
     return without_dupes(moves);
@@ -863,14 +865,14 @@ function expand_rider(limit, directions, xy, extremities, color)
 // vector, starting at start_xy. Stop when reaching the end of the
 // board, on an enemy piece, or before a friendly piece.
 // If extremities is true, only add square at end of the direction.
-function expand_direction(limit, direction, start_xy, extremities, color)
+function expand_direction(limit, direction, start_square, extremities, color)
 {
     var x, y, moves;
 
     moves = [];
 
-    x = start_xy[0];
-    y = start_xy[1];
+    x = start_square.x;
+    y = start_square.y;
 
     for (var i = 0; i < limit; ++i) {
         var piece;
@@ -1110,7 +1112,7 @@ function capture_piece(piece)
         // Note that this is the first rank of the *other* player
         var opponent = opposite_color(GAME_STATE.active_color);
         var first_rank = opponent === "white" ? 1 : 8;
-        var square = sq(piece);
+        var square = piece_at(piece);
         
         // TODO: really would like to not have to hardcode this
         if (square.y === first_rank) {
@@ -1139,7 +1141,7 @@ function move_piece_to_square(piece, square, suppress)
     assert(piece, "move_piece_to_square(" + piece + ", " + square + "): piece is false");
     assert(square, "move_piece_to_square(" + piece + ", " + square + "): square is false");
 
-    from_square = sq(piece);
+    from_square = piece_at(piece);
 
     // Moving king makes it ineligible for castling
     if (piece.type === "king") {
@@ -1408,17 +1410,18 @@ function pc(x, y)
     return square.childNodes[0];
 }
 
-// Get (x,y) of piece. For filerank notation, use xy2filerank on this.
-function piece_location(piece)
+// Get the square that a piece resides on.
+function piece_at(piece)
 {
-    assert(piece, "piece_location(" + piece + "): piece is false");
-    assert(piece.parentNode, "piece_location(" + piece + "): piece.parentNode is false, callee=" + arguments.callee);
+    assert(piece, "piece_at(" + piece + "): piece is false");
+    assert(piece.parentNode, "piece_at(" + piece + "): piece.parentNode is false, callee=" + arguments.callee);
+    // TODO: what to return if the piece is nowhere to be found?!
 
     if (HYPOTHETICAL_PIECE === piece) {
         return HYPOTHETICAL_TO;
     }
 
-    return [piece.parentNode.x, piece.parentNode.y];
+    return piece.parentNode;
 }
 
 // Return the path to an image for the piece of that color
@@ -1526,7 +1529,7 @@ function highlight_moves(piece, enable)
         return [];
     }
 
-    from_square = sq(piece);
+    from_square = piece_at(piece);
 
     //console.log(from_square.filerank);
     moves = VALID_MOVES.get(from_square.filerank);
@@ -1546,9 +1549,9 @@ function highlight_moves(piece, enable)
         if (enable) {
             if (to_square.hasClassName("white")) {
                 to_square.addClassName("legal-move-white");
-                        } else {
+            } else {
                 to_square.addClassName("legal-move-black");
-                        }
+            }
         } else {
                 to_square.removeClassName("legal-move-white");
                 to_square.removeClassName("legal-move-black");
@@ -1615,7 +1618,7 @@ function xy2filerank(x, y)
 // Get a square cell, given location in either
 // - filerank notation (example: "a8", one argument), or
 // - x,y coordinates, (equivalent example: 1,8)
-// - a piece, returned by pc(), will return the enclosing square
+// To get the square given a piece, use piece_at()
 function sq(code, extra)
 {
     var x, y;
@@ -1623,14 +1626,8 @@ function sq(code, extra)
     assert(code !== undefined, "sq(" + code + ", " + extra + "): code is undefined");
     assert(code !== null, "sq(" + code + ", " + extra + "): code is null");
 
-    // Is it a piece?
-    if (code.hasClassName && code.hasClassName("piece")) {
-        var xy = piece_location(code);
-
-        x = xy[0];
-        y = xy[1];
     // Is it x,y passed as separate parameters?
-    } else if (extra !== undefined) {
+    if (extra !== undefined) {
         x = code;
         y = extra;
     // Is it a string in algebraic notation that can be converted?
@@ -1646,8 +1643,6 @@ function sq(code, extra)
 
     assert(x >= 1 && x <= FILE_MAX && y >= 1 && y <= RANK_MAX, "sq(" + code + ", " + extra + 
         "): out of range (" + x + ", " + y + ")");
-
-    // TODO: check HYPOTHETICALs?
 
     return $('board-body').childNodes[9 - y].childNodes[x];
 }
