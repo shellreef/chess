@@ -280,15 +280,17 @@ function in_check(victim_color)
     // Valid moves for active player are in VALID_MOVES, but for
     // opponent are in VALID_MOVES_OPP.
     if (victim_color === GAME_STATE.active_color) {
-        all_moves = VALID_MOVES_OPP;
-    } else {
         all_moves = VALID_MOVES;
+    } else {
+        all_moves = VALID_MOVES_OPP;
     }
      
     // Pieces that can't be captured and need to move if attacked
     var royals = $$("img.royal." + victim_color);
 
-    assert(all_moves, "in_check(" + victim_color + "): all_moves not yet initialized");
+    assert(all_moves, "in_check(" + victim_color + "): moves not yet calculated, " +
+            "VALID_MOVES="+VALID_MOVES+", VALID_MOVES_OPP="+VALID_MOVES_OPP+
+            "active_color="+GAME_STATE.active_color);
 
     // Attack the royal pieces?
     all_moves.each(function(pair) { 
@@ -321,24 +323,13 @@ function in_check(victim_color)
 
 // After the board changes and it is the next person's turn, calculate what the next possible allowable moves are,
 // and update the globals with this information.
-function calculate_moves(color)
+function calculate_moves(color, get_only)
 {
-    VALID_MOVES = new Hash();
-    VALID_ALGEBRAIC_MOVES = new Hash();
+    var valid_moves = new Hash();
+    var valid_alg_moves = new Hash();
 
     assert(color === "black" || color === "white",
             "calculate_moves(" + color + "): bad color or no color given");
-
-    // Compute hypothetically valid "moves" for the opponent, even though
-    // it is not their turn, this tells what they are attacking.
-    VALID_MOVES_OPP = new Hash();
-    $$("img." + opposite_color(color)).each(function(piece) { 
-        var filerank = sq(piece).filerank;
-        var moves = filtered_moves(piece, opposite_color(color));
-
-        VALID_MOVES_OPP.set(filerank, moves);
-    });
-
 
     // Look at all the active pieces
     $$("img." + color).each(function(piece) { 
@@ -361,9 +352,11 @@ function calculate_moves(color)
             // Store algebraic notation -> [piece, square] map for understanding the notation
             // TODO: May need to disambiguate moves. Sometimes the same type of piece can
             // move to the same square. Fun. Or use long algebraic notation.
-            VALID_ALGEBRAIC_MOVES.set(algebraic, [piece, square]);
+            valid_alg_moves.set(algebraic, [piece, square]);
 
-            ALL_DROP_TARGETS.push(square); // for removal
+            if (!get_only) {
+                ALL_DROP_TARGETS.push(square); // for removal
+            }
 
             Droppables.add(square, {
                 accept: "piece-" + filerank,
@@ -372,18 +365,22 @@ function calculate_moves(color)
         });
 
         // Store valid moves for mouseovers etc.
-        VALID_MOVES.set(filerank, moves);
+        valid_moves.set(filerank, moves);
         //console.log(filerank, moves);
     });
 
 
 
-    if (VALID_MOVES.keys().length === 0) {
+    if (valid_moves.keys().length === 0) {
         $("status").innerHTML = ucfirst(color) + " is stalemated";
         // TODO: some way to note this, show a draw? 1/2-1/2
         return;
     }
 
+    if (!get_only) {
+        VALID_MOVES = valid_moves;
+        VALID_ALGEBRAIC_MOVES = valid_alg_moves;
+    }
 }
 
 // Make a move as the computer, if we're supposed to.
@@ -532,8 +529,8 @@ function would_check(piece, move, color)
     HYPOTHETICAL_PIECE = piece;
     HYPOTHETICAL_TO = [to_square.x, to_square.y];
 
-    // XXX infinite..
-    calculate_moves(color);
+    // XXX infinite.. TODO
+    //calculate_moves(color);
     checked = in_check(color);
 
     HYPOTHETICAL_FROM = HYPOTHETICAL_PIECE = HYPOTHETICAL_TO = null;
