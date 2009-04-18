@@ -176,7 +176,7 @@ var PIECE_TYPES = {
 
 // Hypothetical board squares. Pieces or lack thereof.
 // TODO
-var HYPOTHETICAL = [];
+var HYPOTHETICAL = {};
 
 google.setOnLoadCallback(function() {
     /* Safari & IE7: Disable text selection to stop interfering with dragging */
@@ -1296,11 +1296,20 @@ function algebraic_piece_prefix(piece)
 // - a square, from sq()
 function pc(x, y)
 {
-    if (x.hasClassName && x.hasClassName("square")) {
-        return x.childNodes[0];
-    }
+    var square;
 
-    var square = sq(x, y);
+    // A virtual, off-board "hypothetical" position
+    /*
+    if (HYPOTHETICAL[xy2filerank(x, y)]) {
+        return HYPOTHETICAL[xy2filerank(x, y)];
+    }*/
+
+    // Get square
+    if (x.hasClassName && x.hasClassName("square")) {
+        square = x;
+    } else {
+        square = sq(x, y);
+    }
 
     return square.childNodes[0];
 }
