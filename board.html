@@ -270,27 +270,20 @@ function promote(piece)
 //
 // TODO: step through moves, like http://www.zenpawn.com/chessblog/
 
-// Check if any royal pieces of victim_color are being attacked.
-function in_check(victim_color)
+// Check if any royal pieces of victim_color are being attacked; that is:
+// victim_color's royal pieces could be captured after any of all_moves
+function in_check(victim_color, all_moves)
 {
     var attacker_color = opposite_color(victim_color);
     var attacked = false;
-    var all_moves;
 
-    // Valid moves for active player are in VALID_MOVES, but for
-    // opponent are in VALID_MOVES_OPP.
-    if (victim_color === GAME_STATE.active_color) {
-        all_moves = VALID_MOVES;
-    } else {
-        all_moves = VALID_MOVES_OPP;
-    }
+    assert(victim_color === "black" || victim_color === "white",
+            "in_check(" + victim_color + ", " + all_moves + "): color not given");
+    assert(all_moves, "in_check(" + victim_color + ", " + all_moves +
+            "): all_moves is false");
      
     // Pieces that can't be captured and need to move if attacked
     var royals = $$("img.royal." + victim_color);
-
-    assert(all_moves, "in_check(" + victim_color + "): moves not yet calculated, " +
-            "VALID_MOVES="+VALID_MOVES+", VALID_MOVES_OPP="+VALID_MOVES_OPP+
-            "active_color="+GAME_STATE.active_color);
 
     // Attack the royal pieces?
     all_moves.each(function(pair) { 
@@ -303,7 +296,7 @@ function in_check(victim_color)
 
         moves.each(function(move) {
             royals.each(function(royal) {
-                // TODO: BUG: doesn't properly take into account HYPOTHETICALs
+                // TODO: BUG: doesn't properly take into account HYPOTHETICALs (sure??)
                 // really want the *new* square for the piece that it moved to! XXX
                 var square = sq(royal);
 
@@ -381,6 +374,8 @@ function calculate_moves(color, get_only)
         VALID_MOVES = valid_moves;
         VALID_ALGEBRAIC_MOVES = valid_alg_moves;
     }
+
+    return valid_moves;
 }
 
 // Make a move as the computer, if we're supposed to.
@@ -521,7 +516,7 @@ function would_check(piece, move, color)
 {
     var from_square = sq(piece);
     var to_square = sq(move[0], move[1]);
-    var checked;
+    var checked, all_moves;
 
     assert(piece, "would_check(" + piece + ", " + move + ", " + color +"): piece false");
 
@@ -529,9 +524,8 @@ function would_check(piece, move, color)
     HYPOTHETICAL_PIECE = piece;
     HYPOTHETICAL_TO = [to_square.x, to_square.y];
 
-    // XXX infinite.. TODO
-    //calculate_moves(color);
-    checked = in_check(color);
+    all_moves = calculate_moves(color);
+    checked = in_check(color, all_moves);
 
     HYPOTHETICAL_FROM = HYPOTHETICAL_PIECE = HYPOTHETICAL_TO = null;
 
@@ -1041,7 +1035,7 @@ function set_turn(color)
     // TODO: find out how to run something *after* the endeffect, for smoother UI.
     calculate_moves(GAME_STATE.active_color);
 
-    if (in_check(GAME_STATE.active_color)) {
+    if (in_check(GAME_STATE.active_color, calculate_moves(opposite_color(new_color), true))) {
         $("check").innerHTML = "Check!";
     } else {
         $("check").innerHTML = "";
