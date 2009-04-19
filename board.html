@@ -191,6 +191,7 @@ var PIECE_TYPES = {
 var HYPOTHETICAL_FROM = null;
 var HYPOTHETICAL_PIECE = null;
 var HYPOTHETICAL_TO = null;
+var HYPOTHETICAL_CAPTURED = null;
 
 var CACHE_HIPPOGONAL = {};
 
@@ -210,8 +211,8 @@ google.setOnLoadCallback(function() {
     //load_fen("cabdgcab/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); // test fairies
     //load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5");
     //load_fen("k7/8/K7/8/8/8/8/8 b - - 0 30"); // K against K
-    //load_fen("4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5"); // remove check by capture
-    load_fen("k1K5/8/8/8/8/8/p/88888888 b - - 0 5"); // pawn promotion
+    load_fen("4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5"); // remove check by capture
+    //load_fen("k1K5/8/8/8/8/8/p/88888888 b - - 0 5"); // pawn promotion
 
     // TODO: library of interesting games, see
     // http://www.xs4all.nl/~timkr/records/records.htm and http://www.xs4all.nl/~timkr/ChessTutor/pgnview.htm
@@ -338,7 +339,7 @@ function in_check(victim_color, all_moves)
 
                 if (move[0] === square.x && move[1] === square.y) { 
                     // Being attacked!
-                    console.log("CHECKED BY",piece,filerank,xy2filerank(move[0],move[1]));
+                    //console.log("CHECKED BY",piece,filerank,xy2filerank(move[0],move[1]));
                     attacked = true;
                 }
             });
@@ -363,13 +364,19 @@ function calculate_moves(color, get_only)
 
     // Look at all the active pieces
     $$("img." + color).each(function(piece) { 
-        var filerank;
+        var filerank, square_from, moves;
 
-        var moves = filtered_moves(piece, color, get_only);
+        moves = filtered_moves(piece, color, get_only);
+        square_from = sq(piece);
+
+        if (!square_from) {
+            // Piece was hypothetically captured
+            return;
+        }
 
         // Convert xy to filerank notation (a string), so it can be easily used
         // as a hash key (that's the only reason)
-        filerank = sq(piece).filerank;
+        filerank = square_from.filerank;
 
         // Create drop targets for the valid destinations, linking
         // the draggables to droppables using piece- + source square.
@@ -557,8 +564,6 @@ function filtered_moves(piece, color, no_check_check)
         return allowed;
     });
 
-    // TODO: check if puts in check
-
     return filtered;
 }
 
@@ -575,6 +580,7 @@ function would_check(piece, move, color)
     assert(piece, "would_check(" + piece + ", " + move + ", " + color +"): piece false");
 
     HYPOTHETICAL_PIECE = piece;
+    HYPOTHETICAL_CAPTURED = pc(to_square.x, to_square.y);
     HYPOTHETICAL_FROM = [from_square.x, from_square.y];
     HYPOTHETICAL_TO = [to_square.x, to_square.y];
 
@@ -582,7 +588,7 @@ function would_check(piece, move, color)
     all_moves = calculate_moves(opposite_color(color), true);
     checked = in_check(color, all_moves);
 
-    HYPOTHETICAL_FROM = HYPOTHETICAL_PIECE = HYPOTHETICAL_TO = null;
+    HYPOTHETICAL_FROM = HYPOTHETICAL_PIECE = HYPOTHETICAL_TO = HYPOTHETICAL_CAPTURED = null;
 
     return checked;
 }
@@ -1473,8 +1479,14 @@ function piece_location(piece)
 {
     assert(piece, "piece_location(" + piece + "): piece is false");
 
+    // If the piece would have moved.. 
     if (HYPOTHETICAL_PIECE === piece) {
         return HYPOTHETICAL_TO;
+    }
+
+    // .. or was captured and is no longer on-board
+    if (HYPOTHETICAL_CAPTURED === piece) {
+        return null;
     }
 
     // TODO: fix this, it happens sometimes when the computer takes a piece to get out of check, caller is sq()
