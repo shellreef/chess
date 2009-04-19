@@ -14,7 +14,13 @@ img.piece
  /* TODO: Transition when promote, would be nice to be
   * able to do with a CSS transition, but img src is not
   * a CSS property, but a tag attribute */
- /*-webkit-transition: src 1s linear;*/
+ /* Could change background url() instead, see 
+  * http://archivist.incutio.com/viewlist/css-discuss/81171 , and
+  * maybe transition it, but that is an ugly hack. */
+ /* Or could have two images and change their opacity, see
+  * http://www.the-art-of-web.com/css/timing-function/ section 4, but
+  * that is even worse. */
+ /*-webkit-transition: background 1s linear;*/
 }
 
 img.black {}
@@ -283,9 +289,11 @@ function promote(piece)
     // http://sachiniscool.blogspot.com/2006/01/implementing-page-transitions-in.html
     // ... except when changing images. Safari has CSS animations.
     // new Effect.Puff(piece);
+    // or try CSS transitions, see CSS at the top of this document.
+    //piece.style.background = image_path_for(PIECE_TYPES[promotes_to].letter, piece.hasClassName("white") ? "white" : "black");
+    
+    piece.src = image_path_for(PIECE_TYPES[promotes_to].letter, piece.hasClassName("white") ? "white" : "black");
 
-    piece.src = image_path_for(PIECE_TYPES[promotes_to].letter,
-                piece.hasClassName("white") ? "white" : "black");
 
     piece.type = promotes_to;
 }
