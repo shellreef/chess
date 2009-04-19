@@ -1244,9 +1244,16 @@ function move_piece_to_square(piece, square, suppress)
 
 // Handle graphically moving of a piece, dropping it to its new location
 function move_dropped_piece(piece, square, event)
-{    
+{
     //console.log(piece);
     //console.log(square);
+   
+    // Scriptaculous sets position:relative when creating a draggable,
+    // but this will cause the relative position when it was in the container it
+    // moved from, to apply to the new container it moved to, so either it will be
+    // positioned at the wrong place (if revert:false) or will jump by an amount
+    // proportionate to the amount it first moved, then be moved back. This fixes it.
+    piece.style.position = "static";
 
     // TODO: do some cool effects when a piece is captured, but not too cool
     // Any way to finish running the code AFTER the effect finishes? New effect?
@@ -1521,7 +1528,7 @@ function create_piece(name)
 
     // Note: http://www.jslint.com/ stops here for some reason
     new Draggable(piece, { 
-        revert: true, 
+        revert: false, 
         starteffect: undefined, 
         endeffect: undefined,
         onStart: function() { GAME_STATE.dragging = true; },
