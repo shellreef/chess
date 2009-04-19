@@ -1264,9 +1264,9 @@ function load_fen(fen)
 
     castling = parts[2];
     GAME_STATE.can_castle.white.short = /K/.test(castling);
-    GAME_STATE.can_castle.white.long = /Q/.test(castling);
+    GAME_STATE.can_castle.white.long  = /Q/.test(castling);
     GAME_STATE.can_castle.black.short = /k/.test(castling);
-    GAME_STATE.can_castle.white.short = /q/.test(castling);
+    GAME_STATE.can_castle.black.long  = /q/.test(castling);
 
     if (parts[3] === "-") {
         GAME_STATE.enpassant_target = null;
