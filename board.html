@@ -1071,6 +1071,8 @@ function set_turn(color)
         $("check").innerHTML = "Draw (stalemate)";
     } else if (checked && no_moves) {
         $("check").innerHTML = "Checkmate!";
+    } else {
+        $("check").innerHTML = "";
     }
 
     // AI - artificial intelligence 
