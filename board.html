@@ -196,8 +196,11 @@ google.setOnLoadCallback(function() {
     //load_fen("r1bqkb1r/pp1ppppp/2n2n2/2p5/2B2P3/5N2/PPPP1PPP/RN1QK2R w KQkq - 1 3");
     //load_fen("k7/8/8/8/8/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); // test draw
     //load_fen("cabdgcab/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); // test fairies
-    //load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5");
-    load_fen("k7/8/K7/8/8/8/8/8 b - - 0 30");
+    load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5");
+    //load_fen("k7/8/K7/8/8/8/8/8 b - - 0 30");
+
+    // TODO: library of interesting games, see
+    // http://www.xs4all.nl/~timkr/records/records.htm and http://www.xs4all.nl/~timkr/ChessTutor/pgnview.htm
 });
 
 //// USER FUNCTIONS
@@ -413,6 +416,11 @@ function computer_move_if_applicable()
 function filtered_moves(piece, color, no_check_check)
 {
     var xy = piece_location(piece);    // TODO: OO
+    if (!xy) {
+        // Piece was taken, so no moves for it
+        return [];
+    }
+
     var x = xy[0], y = xy[1];
     var parlett = PIECE_TYPES[piece.type].parlett;
     var filtered;
@@ -1070,11 +1078,11 @@ function set_turn(color)
    
     // Results
     if (checked && !no_moves) {
-        $("check").innerHTML = "Check";
+        $("check").innerHTML = "Check!";
     } else if (!checked && no_moves) {
         $("check").innerHTML = "Draw (stalemate)";
     } else if (checked && no_moves) {
-        $("check").innerHTML = "Checkmate!";
+        $("check").innerHTML = "Checkmate.";
     } else {
         $("check").innerHTML = "";
     }
@@ -1415,13 +1423,21 @@ function pc(x, y)
 }
 
 // Get (x,y) of piece. For filerank notation, use xy2filerank on this.
+// TODO: Make this return the square, and replace sq() use with this. 
+// (But be sure not to break filtering moves that put in check)
+// Returns null if the piece was taken.
 function piece_location(piece)
 {
     assert(piece, "piece_location(" + piece + "): piece is false");
-    assert(piece.parentNode, "piece_location(" + piece + "): piece.parentNode is false, callee=" + arguments.callee);
 
     if (HYPOTHETICAL_PIECE === piece) {
         return HYPOTHETICAL_TO;
+    }
+
+    // TODO: fix this, it happens sometimes when the computer takes a piece to get out of check, caller is sq()
+    //assert(piece.parentNode, "piece_location(" + piece + "): piece.parentNode is false");
+    if (!piece.parentNode) { 
+        return null;
     }
 
     return [piece.parentNode.x, piece.parentNode.y];
@@ -1534,6 +1550,12 @@ function highlight_moves(piece, enable)
 
     from_square = sq(piece);
 
+    if (!from_square) {
+        // Could not find a square for the piece, it no longer exists,
+        // so no need to concern ourselves with highlighting its moves.
+        return;
+    }
+
     //console.log(from_square.filerank);
     moves = VALID_MOVES.get(from_square.filerank);
     //console.log(moves);
@@ -1631,7 +1653,14 @@ function sq(code, extra)
 
     // Is it a piece?
     if (code.hasClassName && code.hasClassName("piece")) {
+        // TODO: replace all uses of sq() to get the square of a piece, with
+        // direct calls to piece_location(), but make it return a square
         var xy = piece_location(code);
+
+        if (!xy) {
+            // Piece was taken, no square
+            return null;
+        }
 
         x = xy[0];
         y = xy[1];
@@ -1652,8 +1681,6 @@ function sq(code, extra)
 
     assert(x >= 1 && x <= FILE_MAX && y >= 1 && y <= RANK_MAX, "sq(" + code + ", " + extra + 
         "): out of range (" + x + ", " + y + ")");
-
-    // TODO: check HYPOTHETICALs?
 
     return $('board-body').childNodes[9 - y].childNodes[x];
 }
