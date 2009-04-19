@@ -10,6 +10,11 @@ img.piece
 { 
  border: none;
  margin: 0px;
+
+ /* TODO: Transition when promote, would be nice to be
+  * able to do with a CSS transition, but img src is not
+  * a CSS property, but a tag attribute */
+ /*-webkit-transition: src 1s linear;*/
 }
 
 img.black {}
@@ -186,19 +191,21 @@ var CACHE_HIPPOGONAL = {};
 google.setOnLoadCallback(function() {
     /* Safari & IE7: Disable text selection to stop interfering with dragging */
     enable_document_selection(false);    
+
     name_squares();    
 
-        
     //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
     //load_fen("rnbqkb1r/pp1ppppp/5n2/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 3");
     //load_fen("7K/8/k1P5/7p/8/8/8/8 w KQkq - 42 42");
     //load_fen("r1bqkb1r/pp1ppppp/2n2n2/2p5/2B2P3/5N2/PPPP1PPP/RN1QK2R w KQkq - 1 3");
-    //load_fen("k7/8/8/8/8/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); // test draw
+    //load_fen("k7/8/8/8/8/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); // test draw, en passant(TODO)
     //load_fen("cabdgcab/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); // test fairies
-    load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5");
-    //load_fen("k7/8/K7/8/8/8/8/8 b - - 0 30");
+    //load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5");
+    //load_fen("k7/8/K7/8/8/8/8/8 b - - 0 30"); // K against K
+    //load_fen("4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5"); // remove check by capture
+    load_fen("k1K5/8/8/8/8/8/p/88888888 b - - 0 5"); // pawn promotion
 
     // TODO: library of interesting games, see
     // http://www.xs4all.nl/~timkr/records/records.htm and http://www.xs4all.nl/~timkr/ChessTutor/pgnview.htm
@@ -265,7 +272,17 @@ function promote(piece)
 
     // TODO: give option to what to promote to, if more than one.
     // Click/tap piece to change it, after moved? Cycle through?
+    // Most people choose queen, but it is really important, as 
+    // sometimes a queen promotion can lead to a stalemate, or a 
+    // knight promotion etc. might actually be a better move.
+    // TODO: would also need to codify this in algebraic move, =Q, etc.
     promotes_to = PIECE_TYPES[piece.type].promote[0];
+
+    // TODO: Puff out, or fade in from new to old piece. Is there an
+    // effect that can fade from one image to another? LikE IE page transitions.
+    // http://sachiniscool.blogspot.com/2006/01/implementing-page-transitions-in.html
+    // ... except when changing images. Safari has CSS animations.
+    // new Effect.Puff(piece);
 
     piece.src = image_path_for(PIECE_TYPES[promotes_to].letter,
                 piece.hasClassName("white") ? "white" : "black");
@@ -311,7 +328,7 @@ function in_check(victim_color, all_moves)
 
                 if (move[0] === square.x && move[1] === square.y) { 
                     // Being attacked!
-                    //console.log("CHECKED BY",piece,filerank,xy2filerank(move[0],move[1]));
+                    console.log("CHECKED BY",piece,filerank,xy2filerank(move[0],move[1]));
                     attacked = true;
                 }
             });
@@ -448,7 +465,8 @@ function filtered_moves(piece, color, no_check_check)
                     castle = "long";
                 } else {
                     assert(false, "filtered_moves(" + piece + "): unknown name of castling to x="+x+", not long/short. " +
-                        "filerank = " + xy2filerank([move[0], move[1]]) + ", piece = " + piece);
+                        "filerank = " + xy2filerank([move[0], move[1]]) + ", piece = " + piece + "\n\n" +
+                        "Note: you might get this if you specified in FEN that castling was possible, but it really isn't.");
                 }
 
                 if (castle && !GAME_STATE.can_castle[color][castle])
@@ -546,8 +564,8 @@ function would_check(piece, move, color)
 
     assert(piece, "would_check(" + piece + ", " + move + ", " + color +"): piece false");
 
-    HYPOTHETICAL_FROM = [from_square.x, from_square.y];
     HYPOTHETICAL_PIECE = piece;
+    HYPOTHETICAL_FROM = [from_square.x, from_square.y];
     HYPOTHETICAL_TO = [to_square.x, to_square.y];
 
     // TODO: This is a lot of calculation to do, see if can speed it up
