@@ -196,7 +196,8 @@ google.setOnLoadCallback(function() {
     //load_fen("r1bqkb1r/pp1ppppp/2n2n2/2p5/2B2P3/5N2/PPPP1PPP/RN1QK2R w KQkq - 1 3");
     //load_fen("k7/8/8/8/8/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); // test draw
     //load_fen("cabdgcab/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); // test fairies
-    load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5");
+    //load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5");
+    load_fen("4k3/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQ d6 0 5");
 });
 
 //// USER FUNCTIONS
@@ -294,19 +295,15 @@ function in_check(victim_color, all_moves)
 
         var piece = pc(filerank);
 
-        //console.log("|",filerank,piece);
-
         moves.each(function(move) {
             royals.each(function(royal) {
                 // Note that sq() will return the hypothetical location of the piece,
                 // if any.
                 var square = piece_at(royal);
 
-                //console.log("||", xy2filerank(move[0], move[1]));
-
                 if (move[0] === square.x && move[1] === square.y) { 
                     // Being attacked!
-                    //console.log("CHECKED BY",piece,filerank,xy2filerank(move[0],move[1]));
+                    console.log("CHECKED BY",piece,filerank,xy2filerank(move[0],move[1]));
                     attacked = true;
                 }
             });
@@ -505,7 +502,7 @@ function filtered_moves(piece, color, no_check_check)
         //
         // p couldn't actually capture K, because then k would be in check by R,
         // but royal pieces can't be captured in the first place, so K is still
-        // in check and has to move (even though p is pinned!)
+        // in check and has to move (even though p is pinned).
         if (!no_check_check && would_check(piece, move, color)) { 
             allowed = false; 
             //console.log("would_check",color,piece,xy2filerank([move[0], move[1]]));
@@ -525,6 +522,7 @@ function filtered_moves(piece, color, no_check_check)
 // this move didn't take them out. Either way, its illegal.
 //
 // XXX: Serious bug: can't take attacking piece to get out of check! Must be able to do this!! TODO
+// Worse bug: can sometimes move into check!! Why?
 function would_check(piece, move, color)
 {
     var from_square = piece_at(piece);
@@ -533,8 +531,8 @@ function would_check(piece, move, color)
 
     assert(piece, "would_check(" + piece + ", " + move + ", " + color +"): piece false");
 
-    HYPOTHETICAL_FROM = [from_square.x, from_square.y];
     HYPOTHETICAL_PIECE = piece;
+    HYPOTHETICAL_FROM = [from_square.x, from_square.y];
     HYPOTHETICAL_TO = [to_square.x, to_square.y];
 
     all_moves = calculate_moves(opposite_color(color), true);
@@ -1266,9 +1264,9 @@ function load_fen(fen)
 
     castling = parts[2];
     GAME_STATE.can_castle.white.short = /K/.test(castling);
-    GAME_STATE.can_castle.white.long = /Q/.test(castling);
+    GAME_STATE.can_castle.white.long  = /Q/.test(castling);
     GAME_STATE.can_castle.black.short = /k/.test(castling);
-    GAME_STATE.can_castle.white.short = /q/.test(castling);
+    GAME_STATE.can_castle.black.long  = /q/.test(castling);
 
     if (parts[3] === "-") {
         GAME_STATE.enpassant_target = null;
