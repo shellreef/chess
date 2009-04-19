@@ -1253,6 +1253,7 @@ function move_dropped_piece(piece, square, event)
     // moved from, to apply to the new container it moved to, so either it will be
     // positioned at the wrong place (if revert:false) or will jump by an amount
     // proportionate to the amount it first moved, then be moved back. This fixes it.
+    // XXX TODO: But this breaks dragging it a second time! Need to run code after..
     piece.style.position = "static";
 
     // TODO: do some cool effects when a piece is captured, but not too cool
@@ -1271,6 +1272,12 @@ function move_dropped_piece(piece, square, event)
     unhighlight_all();
 
     move_piece_to_square(piece, square);
+
+    // Scriptaculous requires position:relative; with static, you can drag it
+    // but it won't move with the cursor, so set it and crucially, reset the
+    // relative position so that it won' be misaligned.
+    piece.style.position = "relative";
+    piece.style.left = piece.style.right = piece.style.top = piece.style.bottom = 0;
 }
 
 // TODO: save_fen
