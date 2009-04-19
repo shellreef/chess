@@ -6,6 +6,7 @@
 <!-- Copyright (C) 2009 Jeff Connelly -->
 <!-- Created:20090411 -->
 <style type="text/css">
+/* TODO: switch to divs, for flexibility, and use background-image */
 img.piece
 { 
  border: none;
@@ -13,12 +14,9 @@ img.piece
 
  /* TODO: Transition when promote, would be nice to be
   * able to do with a CSS transition, but img src is not
-  * a CSS property, but a tag attribute */
- /* Could change background url() instead, see 
-  * http://archivist.incutio.com/viewlist/css-discuss/81171 , and
-  * maybe transition it, but that is an ugly hack. Or is it? Maybe use
-  * div's for all pieces, not imgs.. TODO: SWITCH TO DIVS!
-  * */
+  * a CSS property, but a tag attribute. And even if tried to animate
+  * background-image, it wouldn't work until 6806248 is fixed.
+  *
  /* Or could have two images and change their opacity, see
   * http://www.the-art-of-web.com/css/timing-function/ section 4, but
   * that is even worse. */
@@ -293,6 +291,8 @@ function promote(piece)
     // new Effect.Puff(piece);
     // or try CSS transitions, see CSS at the top of this document.
     //piece.style.background = image_path_for(PIECE_TYPES[promotes_to].letter, piece.hasClassName("white") ? "white" : "black");
+    // or TODO: create another img, same place same time, change opacity to reveal it
+    // but this leaves the old image behind..
     
     piece.src = image_path_for(PIECE_TYPES[promotes_to].letter, piece.hasClassName("white") ? "white" : "black");
 
