@@ -1,10 +1,11 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
 <title>Chess by Jeff</title>
 <!-- Copyright (C) 2009 Jeff Connelly -->
 <!-- Created:20090411 -->
-<style>
+<style type="text/css">
 img.piece
 { 
  border: none;
@@ -72,8 +73,8 @@ td.legal-move-black { background-color: #a15b17; }
 /*td:nth-child(2n) { background-color: green } */
 
 </style>
-<script src="http://www.google.com/jsapi"></script>
-<script language="javascript">
+<script src="http://www.google.com/jsapi" type="text/javascript"></script>
+<script type="text/javascript">
 if (!window.google) {
     alert("Google was not found. Nothing will work.");
 }
@@ -549,6 +550,7 @@ function would_check(piece, move, color)
     HYPOTHETICAL_PIECE = piece;
     HYPOTHETICAL_TO = [to_square.x, to_square.y];
 
+    // TODO: This is a lot of calculation to do, see if can speed it up
     all_moves = calculate_moves(opposite_color(color), true);
     checked = in_check(color, all_moves);
 
@@ -1837,7 +1839,7 @@ function enable_document_selection(enable) {
 ></table>
 
  </td><td style="vertical-align: top">
- <noscript>JavaScript is disabled, nothing will work!<br></noscript>
+ <noscript><p>JavaScript is disabled, nothing will work!</p></noscript>
   <select name="white_player" id="white_player" onchange="computer_move_if_applicable()">
    <option value="human">Human</option>
    <option value="computer">Computer</option>
@@ -1853,7 +1855,7 @@ function enable_document_selection(enable) {
   <p id="status"></p>
   <p id="check"></p>
 
-  <textarea name="moves" id="moves" rows="20"></textarea>
+  <textarea name="moves" id="moves" rows="20" cols="20" readonly></textarea>
 
   <!-- TODO: give current FEN from save_fen(), so can edit -->
   <p><a href="javascript:load_fen(prompt('Enter game state in FEN notation:'))">Load FEN</a>
