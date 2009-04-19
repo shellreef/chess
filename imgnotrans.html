@@ -1,0 +1,35 @@
+<html>
+<head>
+<title>CSS image transitions</title>
+<style>
+.c1 {
+background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9YGARc5KB0XV+IAAAAddEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIFRoZSBHSU1Q72QlbgAAAF1JREFUGNO9zL0NglAAxPEfdLTs4BZM4DIO4C7OwQg2JoQ9LE1exdlYvBBeZ7jqch9//q1uH4TLzw4d6+ErXMMcXuHWxId3KOETnnXXV6MJpcq2MLaI97CER3N0vr4MkhoXe0rZigAAAABJRU5ErkJggg==) no-repeat top left;
+width: 100px; 
+height: 100px; 
+-webkit-transition: background 1s linear;
+/* Also tried:
+-webkit-transition: background-image 1s linear;
+-webkit-transition: all 1s linear;
+*/
+}
+
+.c1#bad:hover {
+background: transparent url(data:image/gif;base64,R0lGODdhMAAwAPAAAAAAAP///ywAAAAAMAAwAAAC8IyPqcvt3wCcDkiLc7C0qwyGHhSWpjQu5yqmCYsapyuvUUlvONmOZtfzgFzByTB10QgxOR0TqBQejhRNzOfkVJ+5YiUqrXF5Y5lKh/DeuNcP5yLWGsEbtLiOSpa/TPg7JpJHxyendzWTBfX0cxOnKPjgBzi4diinWGdkF8kjdfnycQZXZeYGejmJlZeGl9i2icVqaNVailT6F5iJ90m6mvuTS4OK05M0vDk0Q4XUtwvKOzrcd3iq9uisF81M1OIcR7lEewwcLp7tuNNkM3uNna3F2JQFo97Vriy/Xl4/f1cf5VWzXyym7PHhhx4dbgYKAAA7) no-repeat top left;
+}
+
+.c1#good:hover {
+background: green;
+}
+
+
+</style>
+</head>
+<body>
+<p><a href="rdar://problem/680624">rdar://problem/680624 CSS background-image property not animated</a>
+
+<p>Mouse over each image:
+
+<p>Transitioning to another image is not animated at all: <div id="bad" class="c1"></div>
+<p>But transitioning to fixed color works fine: <div id="good" class="c1"></div>
+</body>
+</html>
