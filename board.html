@@ -209,9 +209,9 @@ google.setOnLoadCallback(function() {
     //load_fen("r1bqkb1r/pp1ppppp/2n2n2/2p5/2B2P3/5N2/PPPP1PPP/RN1QK2R w KQkq - 1 3");
     //load_fen("k7/8/8/8/8/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); // test draw, en passant(TODO)
     //load_fen("cabdgcab/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); // test fairies
-    //load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5");
+    load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5");
     //load_fen("k7/8/K7/8/8/8/8/8 b - - 0 30"); // K against K
-    load_fen("4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5"); // remove check by capture
+    //load_fen("4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5"); // remove check by capture
     //load_fen("k1K5/8/8/8/8/8/p/88888888 b - - 0 5"); // pawn promotion
 
     // TODO: library of interesting games, see
@@ -1895,6 +1895,9 @@ function enable_document_selection(enable) {
 
  </td><td style="vertical-align: top">
  <noscript><p>JavaScript is disabled, nothing will work!</p></noscript>
+
+ <!-- TODO: hide all this, since the purpose of this app is
+ not to implement chess AI. But having automatic moves is useful for testing. -->
   <select name="white_player" id="white_player" onchange="computer_move_if_applicable()">
    <option value="human">Human</option>
    <option value="computer">Computer</option>
