@@ -16,7 +16,9 @@ img.piece
   * a CSS property, but a tag attribute */
  /* Could change background url() instead, see 
   * http://archivist.incutio.com/viewlist/css-discuss/81171 , and
-  * maybe transition it, but that is an ugly hack. */
+  * maybe transition it, but that is an ugly hack. Or is it? Maybe use
+  * div's for all pieces, not imgs.. TODO: SWITCH TO DIVS!
+  * */
  /* Or could have two images and change their opacity, see
   * http://www.the-art-of-web.com/css/timing-function/ section 4, but
   * that is even worse. */
@@ -1526,6 +1528,8 @@ function create_piece(name)
         classes += " royal";
     }
 
+    // TODO XXX Use a div with background-image instead, then can have arbitrary
+    // characters, instead of just images, more flexible, maybe transition too.
     piece = Builder.node('img', {'src': filename, 'class': classes});
 
     // Property will tell name of piece. To tell what color, or if it is
