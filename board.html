@@ -387,9 +387,11 @@ function calculate_moves(color, get_only)
             var algebraic = algebraic_piece_prefix(piece) + xy2filerank(move[0], move[1]);
 
             // Store algebraic notation -> [piece, square] map for understanding the notation
-            // TODO: May need to disambiguate moves. Sometimes the same type of piece can
+            // XXX TODO: Need to disambiguate moves! Sometimes the same type of piece can
             // move to the same square. Fun. Or use long algebraic notation.
             valid_alg_moves.set(algebraic, [piece, square]);
+
+            // TODO: NAGs, $7 etc. some can auto detect http://www.markalowery.net/Chess/Notation/NAG.html
 
             if (!get_only) {
                 // For removal
@@ -1329,6 +1331,9 @@ function move_dropped_piece(piece, square, event)
 // TODO: save_fen
 //
 // Load board state
+// TODO: load_pgn, see http://www.very-best.de/pgn-spec.htm
+//  and recognize various ECO codes, see http://scid.sourceforge.net/help/ECO.html
+//  and http://scid.sourceforge.net/help/EPD.html
 function load_fen(fen)
 {
     var parts, castling;
@@ -1446,6 +1451,7 @@ function piece_letter2name(letter)
 // string (for pawns, for example).
 function algebraic_piece_prefix(piece)
 {
+    // TODO: option for Figurine Algebraic Notation, FAN
     if (PIECE_TYPES[piece.type].letter !== undefined) {
         return PIECE_TYPES[piece.type].letter;
     } else if (PIECE_TYPES[piece.type].alg_letter !== undefined) {
