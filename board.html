@@ -212,7 +212,7 @@ google.setOnLoadCallback(function() {
     //load_fen("k7/8/K7/8/8/8/8/8 b - - 0 30"); // K against K
     //load_fen("4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5"); // remove check by capture
     //load_fen("k1K5/8/8/8/8/8/p/88888888 b - - 0 5"); // pawn promotion
-    load_fen("8/8/8/3pP3/8/8/8/k6K w - d6 0 5"); // en passant
+    load_fen("8/8/8/3pP3/8/8/8/8 w - d6 0 5"); // en passant
     //load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); 
 
     // TODO: library of interesting games, see
@@ -838,12 +838,10 @@ function decode_one_parlett(parlett, xy, color)
             if (GAME_STATE.ep_target && xy[1] === GAME_STATE.ep_target[1] + forward &&
                 (GAME_STATE.ep_target[0] === xy[0] + 1 || GAME_STATE.ep_target[0] === xy[0] - 1)) {
 
-                console.log("EP");
                 // We can move to the ep target square.. even though there is no piece there, we'll
                 // capture the pawn in front of it.
-                // TODO: handle moving to this special ep_target square
                 ep_moves = [[GAME_STATE.ep_target[0], GAME_STATE.ep_target[1]]];
-                flags.en_passant = true; // not needed
+                flags.en_passant = true; // not needed, but informative
             } else {
                 ep_moves = [];
             }
@@ -1281,8 +1279,17 @@ function move_piece_to_square(piece, square, suppress)
 
         capture_piece(square.firstChild);
         square.removeChild(square.firstChild);
+    }
 
+    // Special case: en passant captures to an empty square
+    if (square.x === GAME_STATE.ep_target[0] && 
+        square.y === GAME_STATE.ep_target[1]) {
 
+        var forward = forwards_vector(GAME_STATE.active_color);
+        var dead_pawn_square = sq(square.x, square.y - forward);
+
+        capture_piece(pc(dead_pawn_square));
+        dead_pawn_square.removeChild(dead_pawn_square.firstChild);
     }
 
     move_text += xy2filerank([square.x, square.y]);
