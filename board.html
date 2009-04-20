@@ -141,8 +141,8 @@ var PIECE_TYPES = {
     queen: {parlett: "n*", letter: "Q"},
     bishop: {parlett: "nX", letter: "B"},
     rook: {parlett: "n+", letter: "R"},
-    // P allows for moving to GAME_STATE.ep_target square
-    pawn: {parlett: "o1>, c1X>, oi2>, P", letter: "P", alg_letter: "", promote: ["queen", "knight", "rook", "bishop"]},
+    // P allows for moving to GAME_STATE.ep_target square (must be before other capture move)
+    pawn: {parlett: "o1>, P, c1X>, oi2>", letter: "P", alg_letter: "", promote: ["queen", "knight", "rook", "bishop"]},
     knight: {parlett: "~1/2", letter: "N"},
 
     // Other hippogonals, good for testing
@@ -209,10 +209,11 @@ google.setOnLoadCallback(function() {
     //load_fen("r1bqkb1r/pp1ppppp/2n2n2/2p5/2B2P3/5N2/PPPP1PPP/RN1QK2R w KQkq - 1 3");
     //load_fen("k7/8/8/8/8/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); // test draw
     //load_fen("cabdgcab/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); // test fairies
-    load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); // en passant
     //load_fen("k7/8/K7/8/8/8/8/8 b - - 0 30"); // K against K
     //load_fen("4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5"); // remove check by capture
     //load_fen("k1K5/8/8/8/8/8/p/88888888 b - - 0 5"); // pawn promotion
+    load_fen("8/8/8/3pP3/8/8/8/k6K w - d6 0 5"); // en passant
+    //load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); 
 
     // TODO: library of interesting games, see
     // http://www.xs4all.nl/~timkr/records/records.htm and http://www.xs4all.nl/~timkr/ChessTutor/pgnview.htm
@@ -524,7 +525,6 @@ function filtered_moves(piece, color, no_check_check)
 
         if (move[2].capture_only) {
             // Destination square must be occupied by enemy piece
-            // TODO: non-royal (can't capture king)
             piece_under = pc(move[0], move[1]);
             if (!piece_under) {
                 allowed = false;    // needs something to capture
@@ -562,6 +562,7 @@ function filtered_moves(piece, color, no_check_check)
             allowed = false; 
             //console.log("would_check",color,piece,xy2filerank([move[0], move[1]]));
         }
+
 
         return allowed;
     });
@@ -814,7 +815,7 @@ function decode_one_parlett(parlett, xy, color)
             extremities = true;
         } else if (ch === "P") {
             var ep_moves;
-            var forward = forwards_vector(color);
+            var forward = forwards_vector(opposite_color(color));
 
             // It looks like this:
             //
@@ -824,14 +825,23 @@ function decode_one_parlett(parlett, xy, color)
             // 1 = ep target square
             // 3 = opponent's pawn that will be captured 
             // 2, 4 = squares where you can capture from, we must be on
-          
+         
+            /* debug
+            if (GAME_STATE.ep_target && xy[1] === GAME_STATE.ep_target[1] + forward) {
+                console.log("RANK");
+                console.log(GAME_STATE.ep_target[0], xy[0], pc(xy[0], xy[1]));
+                console.log(xy[0] + 1, xy[0] - 1);
+            }
+            */
+           
             // Are we on the capture-from squares, (2) or (3) in the diagram above?
             if (GAME_STATE.ep_target && xy[1] === GAME_STATE.ep_target[1] + forward &&
-                (GAME_STATE.ep_target[0] === xy[0] + 1 || GAME_STATE.ep_target[0] === xy[1] - 1)) {
-            
+                (GAME_STATE.ep_target[0] === xy[0] + 1 || GAME_STATE.ep_target[0] === xy[0] - 1)) {
+
+                console.log("EP");
                 // We can move to the ep target square.. even though there is no piece there, we'll
                 // capture the pawn in front of it.
-                // TODO: handle moving to this special ep_target square:w
+                // TODO: handle moving to this special ep_target square
                 ep_moves = [[GAME_STATE.ep_target[0], GAME_STATE.ep_target[1]]];
                 flags.en_passant = true; // not needed
             } else {
