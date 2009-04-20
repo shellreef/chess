@@ -1806,6 +1806,11 @@ function assert(expression, message)
 {
     if (!expression) {
         alert(message);
+        if (window.console && console.trace) {
+            // Give a stack trace for Firebug
+            console.trace();
+        }
+
         throw new AssertException(message);
     }
 }
