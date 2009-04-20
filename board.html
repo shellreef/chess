@@ -43,8 +43,8 @@ td.square
  /* border: 1px solid black; */
  padding: 0em;
  margin: 0em;
- width: 52px;
- height: 52px;
+ width: 54px;
+ height: 54px;
  text-align: center;
 }
 
@@ -391,7 +391,7 @@ function calculate_moves(color, get_only)
             // move to the same square. Fun. Or use long algebraic notation.
             valid_alg_moves.set(algebraic, [piece, square]);
 
-            // TODO: NAGs, $7 etc. some can auto detect http://www.markalowery.net/Chess/Notation/NAG.html
+            // TODO: NAGs, $7 (only move) etc. some can auto detect http://www.markalowery.net/Chess/Notation/NAG.html
 
             if (!get_only) {
                 // For removal
@@ -833,6 +833,7 @@ function decode_one_parlett(parlett, xy, color)
                 // capture the pawn in front of it.
                 // TODO: handle moving to this special ep_target square:w
                 ep_moves = [[GAME_STATE.ep_target[0], GAME_STATE.ep_target[1]]];
+                flags.en_passant = true; // not needed
             } else {
                 ep_moves = [];
             }
