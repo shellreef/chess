@@ -135,14 +135,15 @@ var PIECE_TYPES = {
     // TODO: royal: if true, if checked, must make move that unthreatens, otherwise checkmate
 
     // Standard international chess pieces
-    king: {parlett: "1*, imR2=e", letter: "K", royal: true},    // TODO: royal
-    // TODO: imR2=e, make 'm' move another piece adjacent, for castling, on initial (king+rook) move
-    //king: "~1/1, ~1/0",    // equivalent hippogonal leaper
+    king: {parlett: "1*, imR2=e", letter: "K", royal: true},    // or: ~1/1, ~1/0
     queen: {parlett: "n*", letter: "Q"},
     bishop: {parlett: "nX", letter: "B"},
     rook: {parlett: "n+", letter: "R"},
     // P allows for moving to GAME_STATE.ep_target square (must be before other capture move)
-    pawn: {parlett: "o1>, P, c1X>, oi2>", letter: "P", alg_letter: "", promote: ["queen", "knight", "rook", "bishop"]},
+    // oi2> is another way to write the one/two-forward move, but it is really two possible moves:
+    // - oi2>eE: exactly two forward, store piece behind in ep_target (notated by "E")
+    // - oi1>e: exactly one forward
+    pawn: {parlett: "o1>, P, c1X>, oi2>eE, oi1>e", letter: "P", alg_letter: "", promote: ["queen", "knight", "rook", "bishop"]},
     knight: {parlett: "~1/2", letter: "N"},
 
     // Other hippogonals, good for testing
@@ -212,8 +213,8 @@ google.setOnLoadCallback(function() {
     //load_fen("k7/8/K7/8/8/8/8/8 b - - 0 30"); // K against K
     //load_fen("4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5"); // remove check by capture
     //load_fen("k1K5/8/8/8/8/8/p/88888888 b - - 0 5"); // pawn promotion
-    load_fen("8/8/8/3pP3/8/8/8/8 w - d6 0 5"); // en passant
-    //load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); 
+    //load_fen("8/8/8/3pP3/8/8/8/8 w - d6 0 5"); // en passant
+    load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); 
 
     // TODO: library of interesting games, see
     // http://www.xs4all.nl/~timkr/records/records.htm and http://www.xs4all.nl/~timkr/ChessTutor/pgnview.htm
@@ -826,14 +827,6 @@ function decode_one_parlett(parlett, xy, color)
             // 3 = opponent's pawn that will be captured 
             // 2, 4 = squares where you can capture from, we must be on
          
-            /* debug
-            if (GAME_STATE.ep_target && xy[1] === GAME_STATE.ep_target[1] + forward) {
-                console.log("RANK");
-                console.log(GAME_STATE.ep_target[0], xy[0], pc(xy[0], xy[1]));
-                console.log(xy[0] + 1, xy[0] - 1);
-            }
-            */
-           
             // Are we on the capture-from squares, (2) or (3) in the diagram above?
             if (GAME_STATE.ep_target && xy[1] === GAME_STATE.ep_target[1] + forward &&
                 (GAME_STATE.ep_target[0] === xy[0] + 1 || GAME_STATE.ep_target[0] === xy[0] - 1)) {
@@ -841,12 +834,15 @@ function decode_one_parlett(parlett, xy, color)
                 // We can move to the ep target square.. even though there is no piece there, we'll
                 // capture the pawn in front of it.
                 ep_moves = [[GAME_STATE.ep_target[0], GAME_STATE.ep_target[1]]];
-                flags.en_passant = true; // not needed, but informative
+                flags.en_passant_capture = true; // not needed, but informative
             } else {
                 ep_moves = [];
             }
 
             return add_flags(ep_moves, flags);
+        } else if (ch === "E") {
+            // TODO: save GAME_STATE.ep_target, if actually make this move
+            flags.mark_en_passant = true;
 
         // Standard Parlett
         } else if (/[0-9]/.test(ch)) {
