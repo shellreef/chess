@@ -832,7 +832,7 @@ function decode_one_parlett(parlett, xy, color)
                 // We can move to the ep target square.. even though there is no piece there, we'll
                 // capture the pawn in front of it.
                 // TODO: handle moving to this special ep_target square:w
-                ep_moves = [GAME_STATE.ep_target[0], GAME_STATE.ep_target[1]];
+                ep_moves = [[GAME_STATE.ep_target[0], GAME_STATE.ep_target[1]]];
             } else {
                 ep_moves = [];
             }
