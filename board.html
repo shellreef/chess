@@ -207,9 +207,9 @@ google.setOnLoadCallback(function() {
     //load_fen("rnbqkb1r/pp1ppppp/5n2/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 3");
     //load_fen("7K/8/k1P5/7p/8/8/8/8 w KQkq - 42 42");
     //load_fen("r1bqkb1r/pp1ppppp/2n2n2/2p5/2B2P3/5N2/PPPP1PPP/RN1QK2R w KQkq - 1 3");
-    //load_fen("k7/8/8/8/8/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); // test draw, en passant(TODO)
+    //load_fen("k7/8/8/8/8/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); // test draw
     //load_fen("cabdgcab/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); // test fairies
-    load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5");
+    load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); // en passant
     //load_fen("k7/8/K7/8/8/8/8/8 b - - 0 30"); // K against K
     //load_fen("4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5"); // remove check by capture
     //load_fen("k1K5/8/8/8/8/8/p/88888888 b - - 0 5"); // pawn promotion
@@ -814,17 +814,31 @@ function decode_one_parlett(parlett, xy, color)
             extremities = true;
         } else if (ch === "P") {
             var ep_moves;
+            var forward = forwards_vector(color);
 
-            // If en passant target square is available, allow it.
-            // XXX TODO: Only for the valid pawn. But it does it for all but that pawn!
-            /*console.log(GAME_STATE.ep_target);
-            if (GAME_STATE.ep_target) {
-                ep_moves = [GAME_STATE.ep_target];
-            } else {*/
+            // It looks like this:
+            //
+            //   1
+            //  234
+            //
+            // 1 = ep target square
+            // 3 = opponent's pawn that will be captured 
+            // 2, 4 = squares where you can capture from, we must be on
+          
+            // Are we on the capture-from squares, (2) or (3) in the diagram above?
+            if (GAME_STATE.ep_target && xy[1] === GAME_STATE.ep_target[1] + forward &&
+                (GAME_STATE.ep_target[0] === xy[0] + 1 || GAME_STATE.ep_target[0] === xy[1] - 1)) {
+            
+                // We can move to the ep target square.. even though there is no piece there, we'll
+                // capture the pawn in front of it.
+                // TODO: handle moving to this special ep_target square:w
+                ep_moves = [GAME_STATE.ep_target[0], GAME_STATE.ep_target[1]];
+            } else {
                 ep_moves = [];
-            //}
+            }
 
             return add_flags(ep_moves, flags);
+
         // Standard Parlett
         } else if (/[0-9]/.test(ch)) {
             distances.push(parseInt(ch, 10));
