@@ -666,6 +666,19 @@ function unfiltered_moves(parlett, xy, color)
     return moves;
 }
 
+// Get the direction vector (y component only) that is "forward" for the given color
+function forwards_vector(color)
+{
+    if (color === "white") {
+        return 1;
+    } else if (color === "black") {
+        return -1;
+    } else {
+        assert(false, "forwards_vector(" + color+ "): bad active color");
+    }
+}
+
+ 
 // Decode a Parlett direction character, or return a false value if that is not what it is.
 // Returns an 2-element array:
 // 0th element: array of two-element arrays of direction vectors.
@@ -674,15 +687,7 @@ function decode_direction(ch, ch2, color)
 {
     var forward, backward;
 
-    // What way pieces go when they move forwards. Remember, these are x,y
-    // vectors so positive is up, negative is down.
-    if (color === "white") {
-        forward = 1;
-    } else if (color === "black") {
-        forward = -1;
-    } else {
-        assert(false, "decode_direction(" + ch + "): bad active color: " + color);
-    }
+    forward = forwards_vector(color);
     backward = -forward;
 
     if (ch === "+") { 
