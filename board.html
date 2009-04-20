@@ -1080,10 +1080,11 @@ function opposite_color(color)
     return opposite;
 }
 
-// Set the active color to white or black, or go to the next color (toggling)
+// Set the active color to white or black, or go to the next color (toggling).
+// Returns a character for algebraic notation, + = check, etc., if applicable
 function set_turn(color)
 {
-    var new_color, active_pieces, checked, no_moves;
+    var new_color, active_pieces, checked, no_moves, ret;
 
     assert(color === "white" || color === "black" || color === "next", "set_turn(" + color + "): invalid color");
 
@@ -1110,21 +1111,31 @@ function set_turn(color)
     checked = in_check(GAME_STATE.active_color, calculate_moves(opposite_color(new_color), true));
     no_moves = VALID_MOVES.keys().length == 0;
 
-    // TODO: notate in endgame
-   
-    // Results
+    // Results. 
+    ret = "";
     if (checked && !no_moves) {
         $("check").innerHTML = "Check!";
+        ret = "+";
+
+        // TODO: can't castle out of check, but can castle if was checked before
     } else if (!checked && no_moves) {
         $("check").innerHTML = "Draw (stalemate)";
+        ret = "\n1/2-1/2";
     } else if (checked && no_moves) {
         $("check").innerHTML = "Checkmate.";
+        if (new_color == "white") { 
+            ret = "#\n0-1";  // white lost
+        } else {
+            ret = "#\n1-0";
+        }
     } else {
         $("check").innerHTML = "";
     }
 
     // AI - artificial intelligence 
     computer_move_if_applicable();
+
+    return ret;
 }
 
 //// BOARD FUNCTIONS
@@ -1268,11 +1279,13 @@ function move_piece_to_square(piece, square, suppress)
     if (!suppress) {
         // TODO: ellipsis if black is first recorded move
         //var alg_move = GAME_STATE.fullmove_number + ". " + (GAME_STATE.active_color === "black" ? " ... " : "") + move_text;
-        var alg_move = (GAME_STATE.active_color === "white" ? GAME_STATE.fullmove_number + ". " : " ") + move_text + 
-                       (GAME_STATE.active_color === "black" ? "\n" : "");
+        var alg_move = (GAME_STATE.active_color === "white" ? GAME_STATE.fullmove_number + ". " : " ") + move_text;
+
+        alg_move += set_turn("next");
+        alg_move += (GAME_STATE.active_color === "black" ? "\n" : "");
+
 
         $("moves").value += alg_move;
-        set_turn("next");
     }
 }
 
