@@ -102,7 +102,7 @@ var GAME_STATE = {
     // Castling privileges
     can_castle: {white: {short: true, long: true}, black: {short: true, long: true}},
 
-    enpassant_target: null,
+    ep_target: null,
 
     halfmove_clock: 0,    // Ply since last pawn advance / capture
     fullmove_number: 1,    // Increment after black moves
@@ -141,7 +141,7 @@ var PIECE_TYPES = {
     queen: {parlett: "n*", letter: "Q"},
     bishop: {parlett: "nX", letter: "B"},
     rook: {parlett: "n+", letter: "R"},
-    // P allows for moving to GAME_STATE.enpassant_target square
+    // P allows for moving to GAME_STATE.ep_target square
     pawn: {parlett: "o1>, c1X>, oi2>, P", letter: "P", alg_letter: "", promote: ["queen", "knight", "rook", "bishop"]},
     knight: {parlett: "~1/2", letter: "N"},
 
@@ -812,9 +812,9 @@ function decode_one_parlett(parlett, xy, color)
 
             // If en passant target square is available, allow it.
             // XXX TODO: Only for the valid pawn. But it does it for all but that pawn!
-            /*console.log(GAME_STATE.enpassant_target);
-            if (GAME_STATE.enpassant_target) {
-                ep_moves = [GAME_STATE.enpassant_target];
+            /*console.log(GAME_STATE.ep_target);
+            if (GAME_STATE.ep_target) {
+                ep_moves = [GAME_STATE.ep_target];
             } else {*/
                 ep_moves = [];
             //}
@@ -1350,9 +1350,9 @@ function load_fen(fen)
     GAME_STATE.can_castle.black.long  = /q/.test(castling);
 
     if (parts[3] === "-") {
-        GAME_STATE.enpassant_target = null;
+        GAME_STATE.ep_target = null;
     } else {
-        GAME_STATE.enpassant_target = filerank2xy(parts[3]);
+        GAME_STATE.ep_target = filerank2xy(parts[3]);
     }
 
     GAME_STATE.halfmove_clock = parseInt(parts[4], 10);
