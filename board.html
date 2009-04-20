@@ -1191,7 +1191,7 @@ function name_squares()
 }
 
 // Acknowledge that a piece was captured. Called by move_piece_to_square(), which
-// does all the DOM manipulation.
+// does all the DOM manipulation. Returns part of algebraic notation.
 function capture_piece(piece)
 {
     //console.log("capture " + piece.type);
@@ -1216,6 +1216,8 @@ function capture_piece(piece)
     }
 
     // TODO: show as captured, somewhere with icons
+    
+    return "x";
 }
 
 // Manipulate the DOM nodes to move the piece to its new location,
@@ -1275,9 +1277,7 @@ function move_piece_to_square(piece, square, suppress)
             move_text += xy2filerank([from_square.x, from_square.y]).substr(0, 1);
         }
 
-        move_text += "x";
-
-        capture_piece(square.firstChild);
+        move_text += capture_piece(square.firstChild);
         square.removeChild(square.firstChild);
     }
 
@@ -1288,7 +1288,7 @@ function move_piece_to_square(piece, square, suppress)
         var forward = forwards_vector(GAME_STATE.active_color);
         var dead_pawn_square = sq(square.x, square.y - forward);
 
-        capture_piece(pc(dead_pawn_square));
+        move_text += capture_piece(pc(dead_pawn_square));
         dead_pawn_square.removeChild(dead_pawn_square.firstChild);
     }
 
