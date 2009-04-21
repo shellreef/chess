@@ -116,6 +116,7 @@ var VALID_MOVES = null;            // Keyed by filerank of source, array of [[x,
 var VALID_MOVES_OPP = null;        // Moves opponent could make, if it was their turn (attacking)
 var VALID_ALGEBRAIC_MOVES = null;  // Map algebraic -> [piece, square]
 var ALL_DROP_TARGETS = [];         // Droppables for UI
+var POSSIBLE_EP_TARGETS = null;             // If move to key, set en passant target to value
 
 // Board size
 var RANK_MAX = 8;
@@ -564,6 +565,15 @@ function filtered_moves(piece, color, no_check_check)
             //console.log("would_check",color,piece,xy2filerank([move[0], move[1]]));
         }
 
+        if (!no_check_check && allowed && move[2].mark_en_passant) {
+            var backward = -forwards_vector(color);
+            var ep_target = [move[0], move[1] + backward];
+            var pawn_dest = xy2filerank([move[0], move[1]]);
+
+            // Map pawn moves to what the en passant target will be if
+            // the pawn moves there.
+            POSSIBLE_EP_TARGETS[pawn_dest] = ep_target;
+        }
 
         return allowed;
     });
@@ -842,6 +852,7 @@ function decode_one_parlett(parlett, xy, color)
             return add_flags(ep_moves, flags);
         } else if (ch === "E") {
             // TODO: save GAME_STATE.ep_target, if actually make this move
+           
             flags.mark_en_passant = true;
 
         // Standard Parlett
@@ -1128,11 +1139,15 @@ function set_turn(color)
     }
 
     GAME_STATE.active_color = new_color;
+    POSSIBLE_EP_TARGETS = {};
 
     // Note: this takes some time... is there any way to run it right AFTER the piece has
     // gone through the endeffect? This is called in onDrop.
     // TODO: find out how to run something *after* the endeffect, for smoother UI.
     calculate_moves(GAME_STATE.active_color);
+
+    // En passant possibility depends immediately after move
+    GAME_STATE.ep_target = null;
 
     checked = in_check(GAME_STATE.active_color, calculate_moves(opposite_color(new_color), true));
     no_moves = VALID_MOVES.keys().length == 0;
@@ -1261,7 +1276,14 @@ function move_piece_to_square(piece, square, suppress)
     }
 
     // Generate algebraic move notation
+    filerank = xy2filerank([square.x, square.y]);
     move_text = algebraic_letter(piece.type);
+    
+    // If double pawn move, set en passant target square
+    if (POSSIBLE_EP_TARGETS[filerank]) {
+        GAME_STATE.ep_target = POSSIBLE_EP_TARGETS[filerank];
+        //console.log("NEW EP TARGET",GAME_STATE.ep_target);
+    }
 
     // Capture piece(s) on destination square. Multiple pieces
     // are supported here, but not elsewhere in the code (yet). Might be
@@ -1278,7 +1300,8 @@ function move_piece_to_square(piece, square, suppress)
     }
 
     // Special case: en passant captures to an empty square
-    if (square.x === GAME_STATE.ep_target[0] && 
+    if (GAME_STATE.ep_target &&
+        square.x === GAME_STATE.ep_target[0] && 
         square.y === GAME_STATE.ep_target[1]) {
 
         var forward = forwards_vector(GAME_STATE.active_color);
@@ -1288,7 +1311,7 @@ function move_piece_to_square(piece, square, suppress)
         dead_pawn_square.removeChild(dead_pawn_square.firstChild);
     }
 
-    move_text += xy2filerank([square.x, square.y]);
+    move_text += filerank;
 
     // Move to new square
     if (piece.parentNode) {
