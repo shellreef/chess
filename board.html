@@ -476,6 +476,8 @@ function filtered_moves(piece, color, no_check_check)
             var castle;
 
             // If king moved, won't be able to castle on either side, don't need name
+            // XXX TODO: Very important, can't castle through check, or out of check!!
+            // But see http://www.flickr.com/photos/theyoungthousands/3456432277/
             if (GAME_STATE.can_castle[color].long === false &&
                 GAME_STATE.can_castle[color].short === false) {
                 allowed = false;
@@ -1615,7 +1617,7 @@ function create_piece(name)
         classes += " royal";
     }
 
-    // TODO XXX Use a div with background-image instead, then can have arbitrary
+    // TODO Use a div with background-image instead, then can have arbitrary
     // characters, instead of just images, more flexible, maybe transition too.
     piece = Builder.node('img', {'src': filename, 'class': classes});
 
