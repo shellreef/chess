@@ -6,7 +6,17 @@
 <!-- Copyright (C) 2009 Jeff Connelly -->
 <!-- Created:20090411 -->
 <style type="text/css">
-/* TODO: switch to divs, for flexibility, and use background-image */
+/* Based on code From diveintomark.org */.
+/*dive into minimalism(c)2008 Mark Pilgrim,MIT-licensed including graphics*/
+body{font:normal medium 'Gill Sans','Gill Sans MT','Ikarius ADF',Candara,Jara,sans-serif;margin:1.75em auto;width:40em;line-height:1.75;word-spacing:0.1em}
+a{background:transparent;text-decoration:none;border-bottom:1px dotted}
+a:hover{border-bottom:1px solid}
+a:link{color:#1b67c9}
+a:visited{color:darkorchid}
+
+
+
+/* TODO: switch to divs, for flexibility, and use background-image.. or maybe not */
 img.piece
 { 
  border: none;
@@ -1582,6 +1592,7 @@ function image_path_for(letter, color)
     // TODO: even better, use Unicode characters in a span!! How cool would that be? Infinite resolution.
     // See for example http://en.wikipedia.org/wiki/Knight_(chess)
     // Unfortunately, MSIE doesn't seem to support it, though it should..different font?
+    // TODO: use web fonts! Supported on Firefox 3.1+, Opera 10+, Safari 3.1+, IE4+
     return "images/" + {white:"w", black:"b"}[color] + letter.toLowerCase() + ".gif";
 }
 
