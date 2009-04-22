@@ -159,22 +159,23 @@ var PIECE_TYPES = {
 
     // Other hippogonals, good for testing
     zero: {parlett: "~0/0", letter: "O"},
-    dababba: {parlett: "~2/0", letter: "D"},    // or ~2+
-    alfil: {parlett: "~2/2", letter: "A"},    // or ~2X
+    dababba: {parlett: "~2/0", letter: "D"},  // or ~2+
+    alfil: {parlett: "~2/2", letter: "Y"},    // or ~2X
     alibaba: {parlett: "~2/0 ~2X", letter: "L"},
     squirrel: {parlett: "~0/2, ~1/2, ~2/2", letter: "S"},
     threeleaper: {parlett: "~3/0", letter: "H"},
     tripper: {parlett: "~3/3", letter: "T"},
-    camel: {parlett: "~1/3", letter: "C"},
+    camel: {parlett: "~1/3", letter: "W"},
     zebra: {parlett:"~2/3", letter: "Z"},
     man: {parlett: "1*", letter: "M"},    // same as king, but not royale
     frog: {parlett: "~1/1, ~0/3", letter: "F"},   // amphibian
     giraffe: {parlett: "~1/4", letter: "G"},
 
-    // Combined pieces of internal chess
-    cardinal: {parlett: "nX, ~1/2"},
-    empress: {parlett: "n+, ~1/2", letter: "E"},
-    amazon: {parlett: "n*, ~1/2"},
+    // Combined pieces of International Chess
+    archbishop: {parlett: "nX, ~1/2", letter: "A"}, // B+K, aka cardinal, princess, janus (Capablanca, X-FEN standard)
+    chancellor: {parlett: "n+, ~1/2", letter: "C"}, // R+K, aka empress, marshal (Capablanca, X-FEN standard)
+    amazon: {parlett: "n*, ~1/2", letter: "V"},     // Q+K, aka superqueen
+
     colonel: {parlett: "n>, n=, 2/1> 1*"},
 
     // More complex fairy / non-intl chess pieces
@@ -187,8 +188,10 @@ var PIECE_TYPES = {
     khohn: {parlett: "1X, 1>"},
     fers: {parlett: "1X"},
     wazir: {parlett: "1+"},
-    kraken_checkmate: {parlett: "~n/m"},     // any square, not realistic since always checkmates!
-    kraken: {parlett: "o~n/m", letter: "J"}, // any square but can't capture, much less powerful
+    kraken_checkmate: {parlett: "~n/m ~0/0"},     // any square, not realistic since always checkmates!
+    kraken: {parlett: "o~n/m ~0/0", letter: "J"}, // any square but can't capture, much less powerful
+    universal_leaper_checkmate: {parlett: "~n/m"},// like kraken, but can't go to square it is on (like a zero)
+    universal_leaper: {parlett: "o~n/m"},
 
     // Pieces that probably won't be supported without significant coding
     leo: {parlett: "on*, c^&"},        // no & support, whatever that is
