@@ -225,7 +225,9 @@ google.setOnLoadCallback(function() {
     //load_fen("4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5"); // remove check by capture
     //load_fen("k1K5/8/8/8/8/8/p/88888888 b - - 0 5"); // pawn promotion
     //load_fen("8/8/8/3pP3/8/8/8/8 w - d6 0 5"); // en passant
-    load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); 
+    //load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); 
+    load_fen("k7/8/8/8/8/8/8/6KQ w - d6 0 50");  // K + KQ
+    //load_fen("r7/8/8/8/8/8/8/6KQ w - d6 0 50");  // K + KR
 
     // TODO: library of interesting games, see
     // http://www.xs4all.nl/~timkr/records/records.htm and http://www.xs4all.nl/~timkr/ChessTutor/pgnview.htm
@@ -1593,6 +1595,7 @@ function image_path_for(letter, color)
     // See for example http://en.wikipedia.org/wiki/Knight_(chess)
     // Unfortunately, MSIE doesn't seem to support it, though it should..different font?
     // TODO: use web fonts! Supported on Firefox 3.1+, Opera 10+, Safari 3.1+, IE4+
+    // See http://fonts.philip.html5.org/
     return "images/" + {white:"w", black:"b"}[color] + letter.toLowerCase() + ".gif";
 }
 
