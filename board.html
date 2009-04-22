@@ -176,17 +176,21 @@ var PIECE_TYPES = {
     chancellor: {parlett: "n+, ~1/2", letter: "C"}, // R+K, aka empress, marshal (Capablanca, X-FEN standard)
     amazon: {parlett: "n*, ~1/2", letter: "V"},     // Q+K, aka superqueen
 
-    colonel: {parlett: "n>, n=, 2/1> 1*"},
+    colonel: {parlett: "n>, n=, 2/1> 1*", letter: "XC"},
 
     // More complex fairy / non-intl chess pieces
     // See http://en.wikipedia.org/wiki/Fairy_chess_piece#Notable_examples
-    murray_lion: {parlett: "~0/2, ~2/2, c1*"},
-    lion: {parlett: "~n*"},
-    berolina_pawn: {parlett: "o1X>, c1>, io2X>"},
-    superpawn: {parlett: "on>, cnX>"},
+    
+    // TODO: support two-letter expanded FEN codes (my invention), since A-Z leaves
+    // only 26 possibilities, X indicates another letter follows, so XA-XZ are available,
+    // and XXA-XXZ, XXXA-XXXZ, to infinity, if needed. Straightforward FEN extension.
+    murray_lion: {parlett: "~0/2, ~2/2, c1*", letter: "XM"},
+    lion: {parlett: "~n*", letter: "XL"},
+    berolina_pawn: {parlett: "o1X>, c1>, io2X>", letter: "XB"},
+    superpawn: {parlett: "on>, cnX>", letter: "XP"},
     elephant: {parlett: "2X", letter: "E"},
-    khohn: {parlett: "1X, 1>"},
-    fers: {parlett: "1X"},
+    khohn: {parlett: "1X, 1>", letter: "XK"},
+    fers: {parlett: "1X", letter: "XF"},
     wazir: {parlett: "1+", letter: "I"},
     kraken_checkmate: {parlett: "~n/m ~0/0"},     // any square, not realistic since always checkmates!
     kraken: {parlett: "o~n/m ~0/0", letter: "J"}, // any square but can't capture, much less powerful
@@ -194,11 +198,11 @@ var PIECE_TYPES = {
     universal_leaper: {parlett: "o~n/m", letter: "U"},
 
     // Pieces that probably won't be supported without significant coding
-    leo: {parlett: "on*, c^&"},        // no & support, whatever that is
-    knightrider: {parlett: "n(1/2)"},  // no grouping support, sadly
-    checker: {parlett: "cn(^2X>), o1X>", promote: "checker_kinged"},  // no grouping
-    checker_kinged: {parlett: "cn(^2X), o1x"},
-    spy: {parlett: "2>, 2=, (1/1)>"}  // no grouping
+    leo: {parlett: "on*, c^&", letter:"XO"},        // no & support, whatever that is
+    knightrider: {parlett: "n(1/2)", letter:"XN"},  // no grouping support, sadly
+    checker: {parlett: "cn(^2X>), o1X>", promote: "checker_kinged", letter:"XY"},  // no grouping
+    checker_kinged: {parlett: "cn(^2X), o1x", letter:"XZ"},
+    spy: {parlett: "2>, 2=, (1/1)>", letter:"XS"}  // no grouping
     // pieces with no notation. WinChloe supports 1400 pieces.
 };
 
