@@ -184,14 +184,14 @@ var PIECE_TYPES = {
     lion: {parlett: "~n*"},
     berolina_pawn: {parlett: "o1X>, c1>, io2X>"},
     superpawn: {parlett: "on>, cnX>"},
-    elephant: {parlett: "2X"},
+    elephant: {parlett: "2X", letter: "E"},
     khohn: {parlett: "1X, 1>"},
     fers: {parlett: "1X"},
-    wazir: {parlett: "1+"},
+    wazir: {parlett: "1+", letter: "I"},
     kraken_checkmate: {parlett: "~n/m ~0/0"},     // any square, not realistic since always checkmates!
     kraken: {parlett: "o~n/m ~0/0", letter: "J"}, // any square but can't capture, much less powerful
     universal_leaper_checkmate: {parlett: "~n/m"},// like kraken, but can't go to square it is on (like a zero)
-    universal_leaper: {parlett: "o~n/m"},
+    universal_leaper: {parlett: "o~n/m", letter: "U"},
 
     // Pieces that probably won't be supported without significant coding
     leo: {parlett: "on*, c^&"},        // no & support, whatever that is
