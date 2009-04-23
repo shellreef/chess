@@ -33,7 +33,9 @@
 
 <p>The assigned letters and canonical piece names are are described below. Due to their
 decentralized development, mythical chess pieces have many conflicting or synonymous names.
-E-FEN standardizes on the names below. Piece movement is given in <em>Extended Parlett</em>.
+E-FEN standardizes on the names below. Piece movement is given in <em>Extended Parlett</em>. A
+piece's movement must be representable in Extended Parlett before having a letter assigned. Like FEN,
+uppercase is for white, lowercase for black.
 
 <p><a name="table"></a>
 <table border="1">
@@ -302,7 +304,7 @@ E-FEN standardizes on the names below. Piece movement is given in <em>Extended P
  </tr><tr>
   <td>XX</td>
   <td></td>
-  <td><em>Extended code, see below</td>
+  <td><em>Extended code, see below</em></td>
   <td></td>
  </tr><tr>
   <td>XY</td>
@@ -317,8 +319,30 @@ E-FEN standardizes on the names below. Piece movement is given in <em>Extended P
  </tr>
 </table>
 
+<p>The X's can be extended indefinitely. Once XA-XZ are assigned, you can use XXA-XXZ, and then XXXA-XXXZ.
+
+<p>A parenthesis after the initial X indicates a piece name follows, terminated by a closing parenthesis.
+This allows for greater flexibility than assigning possibly obscure letter codes, if the pieces are even
+more obscure. As a bad example, X(pawn) is a pawn. This would be most useful for custom designed pieces,
+perhaps loaded from a file or other user data.
+
+<p>The most verbose, but flexible notation is to enclose a |-separated key/value pair (denoted by =) of
+the piece attributes in square brackets: X[image=king.gif|parlett=1*|royal=true]. This is to be used sparingly.
+
 <h1>Extended Parlett</h1>
-<p><a href="http://en.wikipedia.org/wiki/Fairy_chess_piece#Parlett.27s_movement_notation">Parlett movement notation</a>
+<p>Based on <a href="http://en.wikipedia.org/wiki/Fairy_chess_piece#Parlett.27s_movement_notation">Parlett movement notation</a>, with extensions
+described on that page. Additionally:
+
+<p>~n/m is a special token representing all squares on the board, except where the piece is currently at. For all squares everywhere, combine
+with ~0/0 for ~n/m, ~0/0.
+
+<!-- TODO: m for multi-move, to represent castling rooks? -->
+
+<p>The "e" flag indicates that the piece can only move to the last square in the direction given, exactly not any less. For example, 2&gt;e means the piece must move exactly two squares forward, not one square, even though it is still a rider (cannot leap).
+
+<p>"E" says to store the square behind where the piece moved, in a special global GAME_STATE.ep_target. This is used for pawn en passant moves. The two-move causes this variable to be updated, for example: oi2&gt;eE.
+
+<p>"P", by itself, is a move to the en passant target square, as long as the pawn can diagonally move forwards towards it. See the pawn Parlett notation for an example. The pawn in front of the target square will be captured.
 
 </table>
 </body>
