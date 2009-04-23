@@ -1405,8 +1405,48 @@ function move_dropped_piece(piece, square, event)
     piece.style.left = piece.style.right = piece.style.top = piece.style.bottom = 0;
 }
 
-// TODO: save_fen
-//
+// Generate FEN from board state
+function save_fen()
+{
+    var fen = "";
+
+    // Board position
+    for (var y = RANK_MAX; y > 0; --y) {
+        var blanks = 0;
+        for (var x = 1; x <= FILE_MAX; ++x) {
+            var piece = pc(x, y);
+            var letter;
+
+            if (piece) {
+                if (blanks) {
+                    fen += blanks.toString();
+                    blanks = 0;
+                }
+                letter = PIECE_TYPES[piece.type].letter;
+
+                // Uppercase = white, lowercase = black
+                if (piece.hasClassName("black")) {
+                    letter = letter.toLowerCase();
+                }
+
+                fen += letter;
+            } else {
+                blanks += 1;
+            }
+        }
+        if (blanks) {
+            fen += blanks.toString();
+        }
+        if (y != 1) {
+            fen += "/";
+        }
+    }
+    
+    // TODO: other information
+
+    return fen;
+}
+
 // Load board state
 // TODO: load_pgn, see http://www.very-best.de/pgn-spec.htm
 //  and recognize various ECO codes, see http://scid.sourceforge.net/help/ECO.html
