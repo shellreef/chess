@@ -376,7 +376,7 @@ function in_check(victim_color, all_moves)
 // what the next possible allowable moves are, and update the globals with this information.
 //
 // If get_only, do not update globals, and allow "moves" that put in
-// check (useful for attacks, see no_check_check).
+// check (useful for attacks, see is_hypothetical).
 function calculate_moves(color, get_only)
 {
     var valid_moves = new Hash();
@@ -472,8 +472,8 @@ function computer_move_if_applicable()
 // Use VALID_MOVES otherwise.
 //
 // Also filters moves that after making, color would be in check,
-// unless no_check_check is true (for checking for attacks, see comment).
-function filtered_moves(piece, color, no_check_check)
+// unless is_hypothetical is true (for checking for attacks, see comment).
+function filtered_moves(piece, color, is_hypothetical)
 {
     var xy = piece_location(piece);    // TODO: OO
     if (!xy) {
@@ -582,12 +582,12 @@ function filtered_moves(piece, color, no_check_check)
         // p couldn't actually capture K, because then k would be in check by R,
         // but royal pieces can't be captured in the first place, so K is still
         // in check and has to move (even though p is pinned!)
-        if (!no_check_check && would_check(piece, move, color)) { 
+        if (!is_hypothetical && would_check(piece, move, color)) { 
             allowed = false; 
             //console.log("would_check",color,piece,xy2filerank([move[0], move[1]]));
         }
 
-        if (!no_check_check && allowed && move[2].mark_en_passant) {
+        if (!is_hypothetical && allowed && move[2].mark_en_passant) {
             var backward = -forwards_vector(color);
             var ep_target = [move[0], move[1] + backward];
             var pawn_dest = xy2filerank([move[0], move[1]]);
@@ -1276,9 +1276,9 @@ function capture_piece(piece)
 // Manipulate the DOM nodes to move the piece to its new location,
 // and advance to the next move. Does not do anything graphical
 // with dragging.
-// If suppress is true, this is an internal move part of another move
+// If is_hypothetical is true, this is an internal move part of another move
 // (castling) so it shouldn't be logged.
-function move_piece_to_square(piece, square, suppress)
+function move_piece_to_square(piece, square, is_hypothetical)
 {
     var from_square, move_text, castle_move_text;
 
@@ -1376,7 +1376,7 @@ function move_piece_to_square(piece, square, suppress)
     // TODO: also, CRAN (Concise Reversible Algebraic Notation, see http://www.chessville.com/reviews/PlayStrongerChessExaminingChess960.htm )
 
     // If not a multi-move (moving rook in castling), log and go to next turn
-    if (!suppress) {
+    if (!is_hypothetical) {
         // TODO: ellipsis if black is first recorded move
         //var alg_move = GAME_STATE.fullmove_number + ". " + (GAME_STATE.active_color === "black" ? " ... " : "") + move_text;
         var alg_move = (GAME_STATE.active_color === "white" ? GAME_STATE.fullmove_number + ". " : " ") + move_text;
