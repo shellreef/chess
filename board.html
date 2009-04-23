@@ -220,7 +220,7 @@ google.setOnLoadCallback(function() {
 
     name_squares();    
 
-    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
     //load_fen("rnbqkb1r/pp1ppppp/5n2/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 3");
@@ -231,7 +231,7 @@ google.setOnLoadCallback(function() {
     //load_fen("4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5"); // remove check by capture
     //load_fen("k1K5/8/8/8/8/8/p/88888888 b - - 0 5"); // pawn promotion
     //load_fen("8/8/8/3pP3/8/8/8/8 w - d6 0 5"); // en passant
-    load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); 
+    //load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); 
     //load_fen("k7/8/8/8/8/8/8/5KQ1 w - d6 0 50");  // K + KQ
     //load_fen("k7/8/8/8/8/8/8/5KR1 w - d6 0 50");  // K + KR
 
@@ -1462,6 +1462,8 @@ function save_fen()
     fen += " ";
     if (GAME_STATE.ep_target) {
         fen += xy2filerank(GAME_STATE.ep_target);
+    } else {
+        fen += "-";
     }
 
     fen += " " + GAME_STATE.halfmove_clock;
