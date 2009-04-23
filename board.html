@@ -115,10 +115,11 @@ var GAME_STATE = {
     ep_target: null,
 
     halfmove_clock: 0,    // Ply since last pawn advance / capture
-    fullmove_number: 1,    // Increment after black moves
+    fullmove_number: 1,   // Increment after black moves
 
     // Not game state, but other globals
-    dragging: false
+    dragging: false,
+    positions: {}        // Board positions for 3 move repetition
 };    
 
 // Moves that can be made right now, for each active piece.
@@ -220,7 +221,8 @@ google.setOnLoadCallback(function() {
 
     name_squares();    
 
-    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
+    //load_fen("rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w KQkq - 0 1"); // pawnless chess
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
     //load_fen("rnbqkb1r/pp1ppppp/5n2/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 3");
@@ -1190,10 +1192,33 @@ function set_turn(color)
         $("check").innerHTML = "";
     }
 
+    check_repetition();
+
     // AI - artificial intelligence 
     computer_move_if_applicable();
 
     return ret;
+}
+
+// Check for three-move repetition
+function check_repetition()
+{
+    // Save new board state for three-move repetition
+    var new_state = save_fen(true);
+    if (GAME_STATE.positions[new_state] === undefined) {
+        GAME_STATE.positions[new_state] = 1;
+    } else {
+        // Count # of times this occurs
+        GAME_STATE.positions[new_state] += 1; 
+
+        if (GAME_STATE.positions[new_state] === 3) {
+            // TODO: Draw (repetition)
+            // TOOD: Is this compulsary? Does it have to be drawn, or
+            // only if the opponent claims? Sometimes it will be advantageous
+            // (if losing), but sometimes not (if winning).
+            $("check").innerHTML = "Draw (repetition)";
+        }
+    }
 }
 
 //// BOARD FUNCTIONS
@@ -1363,6 +1388,7 @@ function move_piece_to_square(piece, square, suppress)
         $("moves").value += alg_move;
     }
 
+
     // En passant possibility disappears immediately after move
     GAME_STATE.ep_target = null;
 }
@@ -1404,8 +1430,9 @@ function move_dropped_piece(piece, square, event)
     piece.style.left = piece.style.right = piece.style.top = piece.style.bottom = 0;
 }
 
-// Generate FEN from board state
-function save_fen()
+// Generate FEN from board state. If strip_moves, does not
+// include move count.
+function save_fen(strip_moves)
 {
     var fen = "", castles;
 
@@ -1466,8 +1493,10 @@ function save_fen()
         fen += "-";
     }
 
-    fen += " " + GAME_STATE.halfmove_clock;
-    fen += " " + GAME_STATE.fullmove_number;
+    if (!strip_moves) {
+        fen += " " + GAME_STATE.halfmove_clock;
+        fen += " " + GAME_STATE.fullmove_number;
+    }
 
     return fen;
 }
@@ -1499,6 +1528,8 @@ function load_fen(fen)
 
     GAME_STATE.halfmove_clock = parseInt(parts[4], 10);
     GAME_STATE.fullmove_number = parseInt(parts[5], 10);
+
+    GAME_STATE.positions = {};
 
     // Now that everything is loaded, set the turn.
     set_turn({w:"white", b:"black"}[parts[1]]);
