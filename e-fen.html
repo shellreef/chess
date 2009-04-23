@@ -1,0 +1,72 @@
+<html>
+<head>
+<title>Expanded FEN (E-FEN) Specification</title>
+</head>
+<body>
+<h1>Expanded FEN (E-FEN) Specification</h1>
+<p>This document proposes <em>E-FEN</em>, a superset of FEN, X-FEN, and Shredder FEN.
+
+<h2>Precursors</h2>
+<p><a href="http://en.wikipedia.org/wiki/FEN">Forsyth-Edwards Notation</a> was invented by David Forsyth (1854-1909), and later extended by Steven J. Edwards for computer use. FEN contains six fields which record the state of a chess game, including board position, castling possibilities, active color, and so on. White pieces are represented by uppercase letters, black pieces by lowercase. For example, in FEN notation the starting position of a standard chess game is:
+<pre>rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1</pre>
+
+<p><a href="http://en.wikipedia.org/wiki/X-FEN">X-FEN</a> (aka FRC-FEN) extends FEN in several ways to support:
+<ul>
+<li><a href="http://en.wikipedia.org/wiki/Chess960">Chess960 (Fischer Random Chess, FRC)</a>
+<li><a href="http://en.wikipedia.org/wiki/Chess960#Chess480">Chess480</a>
+<li><a href="http://en.wikipedia.org/wiki/Capablanca_chess">Capablanca chess</a>
+<li><a href="http://en.wikipedia.org/wiki/Capablanca_random_chess">Capablanca Random Chess (CRC)</a>
+<li><a href="http://en.wikipedia.org/wiki/Gothic_chess">Gothic Chess</a>
+<li><a href="http://en.wikipedia.org/wiki/Embassy_Chess">Embassy Chess</a>
+<li><a href="http://en.wikipedia.org/wiki/Janus_Chess">Janus chess</a>
+<li><a href="http://en.wikipedia.org/wiki/Grand_chess">Grand chess</a> - 10x10 board
+<li>... and perhaps more(?)
+</ul>
+
+<p>Notably, X-FEN allows an 8x10 board, adds support for encoding archbishop/janus/cardinal (knight + bishop) and chancellor/empress/marshall (knight + rook), in addition to extending castling possibilities indicated by the KQkq notation.
+
+<p>Shredder-FEN is similar, but uses the starting file of the rook for indicating castle privileges (for regular chess, AHah would be used for full castling privileges instead of KQkq).
+
+<h2>Piece Types</h2>
+<p>E-FEN primarily extends the "board positon" portion of FEN, to allow for a large variety of 
+<a href="http://en.wikipedia.org/wiki/Fairy_chess_piece">fairy chess pieces</a>
+
+<table border="1">
+ <tr>
+  <th>Letter</th>
+  <th>Source</th>
+  <th>Extended Parlett</th>
+  <th>Name</th>
+  <th>Description</th>
+</tr><tr>
+  <td>A</td>
+  <td>X-FEN</td>
+  <td>nX, ~1/2</td>
+  <td>Archbishop</th>
+  <td>Bishop + knight, also known as cardinal, princess, or janus</td>
+ </tr><tr>
+  <td>B</td>
+  <td>FEN</td>
+  <td>nX</td>
+  <td>Bishop</td>
+  <td>Standard chess, moves diagonally on same color
+ </tr><tr>
+  <td>C</td>
+  <td>X-FEN</td>
+  <td>n+, ~1/2</td>
+  <td>Chancellor</td>
+  <td>Rook + knight, also known as empress, marshall
+ </tr><tr>
+  <td>D</td>
+  <td></td>
+  <td></td>
+  <td></td>
+ </tr>
+</table>
+
+<h1>Extended Parlett</h1>
+<p><a href="http://en.wikipedia.org/wiki/Fairy_chess_piece#Parlett.27s_movement_notation">Parlett movement notation</a>
+
+</table>
+</body>
+</html>
