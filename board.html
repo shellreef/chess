@@ -1463,8 +1463,9 @@ function save_fen()
     if (GAME_STATE.ep_target) {
         fen += xy2filerank(GAME_STATE.ep_target);
     }
-    
-    // TODO: other information
+
+    fen += " " + GAME_STATE.halfmove_clock;
+    fen += " " + GAME_STATE.fullmove_number;
 
     return fen;
 }
@@ -2081,7 +2082,7 @@ function enable_document_selection(enable) {
   <textarea name="moves" id="moves" rows="20" cols="20" readonly></textarea>
 
   <!-- TODO: give current FEN from save_fen(), so can edit -->
-  <p><a href="javascript:load_fen(prompt('Enter game state in FEN notation:'))">Load FEN</a>
+  <p><a href="javascript:load_fen(prompt('Enter game state in FEN notation:', save_fen()))">Load FEN</a>
  </td>
 </tr>
 </table>
