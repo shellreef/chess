@@ -147,10 +147,10 @@ var PIECE_TYPES = {
     // TODO: royal: if true, if checked, must make move that unthreatens, otherwise checkmate
 
     // Standard international chess pieces
-    king: {parlett: "1*, imR2=e", letter: "K", royal: true},    // or: ~1/1, ~1/0
+    king: {parlett: "1*, imR2=e", letter: "K", royal: true, castle_with: "rook"},    // or: ~1/1, ~1/0
     queen: {parlett: "n*", letter: "Q"},
     bishop: {parlett: "nX", letter: "B"},
-    rook: {parlett: "n+", letter: "R"},
+    rook: {parlett: "n+", letter: "R", castle: true},
     // P allows for moving to GAME_STATE.ep_target square (must be before other capture move)
     // oi2> is another way to write the one/two-forward move, but it is really two possible moves:
     // - oi2>eE: exactly two forward, store piece behind in ep_target (notated by "E")
@@ -164,7 +164,7 @@ var PIECE_TYPES = {
     alfil: {parlett: "~2/2", letter: "Y"},    // or ~2X
     alibaba: {parlett: "~2/0, ~2X", letter: "L"},
     squirrel: {parlett: "~0/2, ~1/2, ~2/2", letter: "S"},
-    threeleaper: {parlett: "~3/0", letter: "H"},
+    kangaroo: {parlett: "~3/0", letter: "H"},    // aka threeleaper
     tripper: {parlett: "~3/3", letter: "T"},
     camel: {parlett: "~1/3", letter: "W"},
     zebra: {parlett:"~2/3", letter: "Z"},
@@ -449,6 +449,8 @@ function calculate_moves(color, get_only)
 }
 
 // Make a move as the computer, if we're supposed to.
+// TODO: also get moves from network via Ajax, maybe a third-party 
+// chess engine, or a real live human, remotely
 function computer_move_if_applicable()
 {
     if ($F(GAME_STATE.active_color + "_player") !== "computer") {
@@ -1289,10 +1291,10 @@ function move_piece_to_square(piece, square, is_hypothetical)
     from_square = sq(piece);
 
     // Moving king makes it ineligible for castling
-    if (piece.type === "king") {
+    if (PIECE_TYPES[piece.type].castles_with) {
         GAME_STATE.can_castle[GAME_STATE.active_color].short = false;
         GAME_STATE.can_castle[GAME_STATE.active_color].long = false;
-    } else if (piece.type === "rook") {
+    } else if (PIECE_TYPES[piece.type].castle) {
         // TODO: More generic, so will work with chess960 or 480
         // If moved either rook, can't castle on that side.
         if (from_square.x == 8)
@@ -2101,13 +2103,11 @@ function enable_document_selection(enable) {
   <select name="white_player" id="white_player" onchange="computer_move_if_applicable()">
    <option value="human">Human</option>
    <option value="computer">Computer</option>
-   <option value="network" title="TODO: allow playing with a remote user, either human (running this web app) or a computer (chess engine)">Network</option>
   </select>
   vs.
    <select name="black_player" id="black_player" onchange="computer_move_if_applicable()">
    <option value="human">Human</option>
    <option value="computer">Computer</option>
-   <option value="network">Network</option>
   </select>
  
   <p id="status"></p>
