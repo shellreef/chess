@@ -173,11 +173,11 @@ var PIECE_TYPES = {
     giraffe: {parlett: "~1/4", letter: "G"},
 
     // Combined pieces of International Chess
-    archbishop: {parlett: "nX, ~1/2", letter: "A"}, // B+K, aka cardinal, princess, janus (Capablanca, X-FEN standard)
-    chancellor: {parlett: "n+, ~1/2", letter: "C"}, // R+K, aka empress, marshal (Capablanca, X-FEN standard)
-    amazon: {parlett: "n*, ~1/2", letter: "V"},     // Q+K, aka superqueen
-
-    colonel: {parlett: "n>, n=, 2/1>, 1*", letter: "XC"},
+    archbishop: {parlett: "nX, ~1/2", letter: "A"}, // B+N, aka cardinal, princess, janus (Capablanca, X-FEN standard)
+    chancellor: {parlett: "n+, ~1/2", letter: "C"}, // R+N, aka empress, marshal (Capablanca, X-FEN standard)
+    amazon: {parlett: "n*, ~1/2", letter: "V"},     // Q+N, aka superqueen
+    maharajah: {parlett: "n*, ~1/2", letter: "XJ", royal: true},   // Q+N+K, Maharajah chess
+    royal_knight: {parlett: "~1/2", letter: "XR", royal: true},  // Knightmate chess (for king, use a man)
 
     // More complex fairy / non-intl chess pieces
     // See http://en.wikipedia.org/wiki/Fairy_chess_piece#Notable_examples
@@ -185,6 +185,7 @@ var PIECE_TYPES = {
     // TODO: support two-letter expanded FEN codes (my invention), since A-Z leaves
     // only 26 possibilities, X indicates another letter follows, so XA-XZ are available,
     // and XXA-XXZ, XXXA-XXXZ, to infinity, if needed. Straightforward FEN extension.
+    colonel: {parlett: "n>, n=, 2/1>, 1*", letter: "XC"}, 
     murray_lion: {parlett: "~0/2, ~2/2, c1*", letter: "XM"},
     lion: {parlett: "~n*", letter: "XL"},
     berolina_pawn: {parlett: "o1X>, c1>, io2X>", letter: "XB"},
