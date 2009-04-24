@@ -424,7 +424,8 @@ function calculate_moves(color, get_only)
                 // You can drop here
                 Droppables.add(square, {
                     accept: "piece-" + filerank,
-                    onDrop: move_dropped_piece,
+                    //onDrop: move_dropped_piece,
+                    onDrop: function(piece, square, event) { GAME_STATE.dropped_square = square; },
                     hoverclass: 'hover'});
 
             }
@@ -1775,7 +1776,7 @@ function create_piece(name)
         starteffect: undefined, 
         endeffect: undefined,
         onStart: function() { GAME_STATE.dragging = true; },
-        onEnd: function() { GAME_STATE.dragging = false; }
+        onEnd: function() { GAME_STATE.dragging = false; move_dropped_piece(piece, GAME_STATE.dropped_square, null); }
         // TODO: figure out why on IE7, dragged pieces are below the highlighted squares!
         // even with zindex: 1001
      });
