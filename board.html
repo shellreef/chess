@@ -511,6 +511,7 @@ function filtered_moves(piece, color, is_hypothetical)
                 } else if (move[0] === 3) {
                     castle = "long";
                 } else {
+                    return false; // not allowed
                     assert(false, "filtered_moves(" + piece + "): unknown name of castling to x="+x+", not long/short. " +
                         "filerank = " + xy2filerank([move[0], move[1]]) + ", piece = " + piece + "\n\n" +
                         "Note: you might get this if you specified in FEN that castling was possible, but it really isn't.");
@@ -1250,7 +1251,7 @@ function name_squares()
 // does all the DOM manipulation. Returns part of algebraic notation.
 function capture_piece(piece)
 {
-    //console.log("capture " + piece.type);
+    assert(piece, "capture_piece(" + piece + "): piece is false");
 
     // If rook captured, remove castling privileges
     if (piece.type === "rook") {
@@ -1384,8 +1385,9 @@ function move_piece_to_square(piece, square, is_hypothetical)
         //var alg_move = GAME_STATE.fullmove_number + ". " + (GAME_STATE.active_color === "black" ? " ... " : "") + move_text;
         var alg_move = (GAME_STATE.active_color === "white" ? GAME_STATE.fullmove_number + ". " : " ") + move_text;
 
-        alg_move += set_turn("next");
         alg_move += (GAME_STATE.active_color === "black" ? "\n" : "");
+
+        alg_move += set_turn("next");
 
 
         $("moves").value += alg_move;
