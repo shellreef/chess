@@ -1198,9 +1198,6 @@ function set_turn(color)
 
     check_repetition();
 
-    // AI - artificial intelligence 
-    computer_move_if_applicable();
-
     return ret;
 }
 
@@ -1389,13 +1386,15 @@ function move_piece_to_square(piece, square, is_hypothetical)
 
         alg_move += set_turn("next");
 
-
         $("moves").value += alg_move;
     }
 
-
     // En passant possibility disappears immediately after move
     GAME_STATE.ep_target = null;
+
+
+    // AI - artificial intelligence 
+    computer_move_if_applicable();
 }
 
 // Handle graphically moving of a piece, dropping it to its new location
