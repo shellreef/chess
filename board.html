@@ -1274,9 +1274,11 @@ function opposite_color(color)
 // Returns a character for algebraic notation, + = check, etc., if applicable
 function set_turn(color)
 {
-    var new_color, active_pieces, checked, no_moves, ret;
+    var new_color, active_pieces, checked, no_moves, ret, old_color, old_fullmove;
 
     assert(color === "white" || color === "black" || color === "next", "set_turn(" + color + "): invalid color");
+
+    old_color = GAME_STATE.active_color;
 
     if (color === "next") {
         new_color = opposite_color(GAME_STATE.active_color);
@@ -1287,6 +1289,7 @@ function set_turn(color)
     $("status").innerHTML = ucfirst(new_color) + "'s Turn";
 
     // Move number is incremented after black moves, according to rules.
+    old_fullmove = GAME_STATE.fullmove_number;
     if (GAME_STATE.active_color === "black") {
         GAME_STATE.fullmove_number += 1;
     }
@@ -1324,16 +1327,21 @@ function set_turn(color)
         $("check").innerHTML = "";
     }
 
-    check_repetition();
+    var new_state = save_fen();
+    check_repetition(new_state);
+    
+    if (color === "next") { 
+        var key = old_fullmove + old_color;
+        GAME_STATE.position_at[key] = new_state;
+    }
 
     return ret;
 }
 
 // Check for three-move repetition
-function check_repetition()
+function check_repetition(new_state)
 {
     // Save new board state for three-move repetition
-    var new_state = save_fen(true);
     if (GAME_STATE.position_count[new_state] === undefined) {
         GAME_STATE.position_count[new_state] = 1;
     } else {
