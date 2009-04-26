@@ -1543,8 +1543,12 @@ function move_piece_to_square(piece, square, is_hypothetical)
             alg_move = " ";
         }
 
+        alg_move += '<a href="javascript:load_fen(GAME_STATE.position_at[\'' + 
+            GAME_STATE.fullmove_number + GAME_STATE.active_color +
+            '\'])">';
         alg_move += move_text;
         alg_move += set_turn("next");
+        alg_move += '</a>';
 
         alg_move += (opposite_color(GAME_STATE.active_color) === "black" ? "\n" : "");
 
