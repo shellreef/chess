@@ -14,8 +14,6 @@ a:hover{border-bottom:1px solid}
 a:link{color:#1b67c9}
 a:visited{color:darkorchid}
 
-
-
 /* TODO: switch to divs, for flexibility, and use background-image.. or maybe not */
 img.piece
 { 
@@ -244,6 +242,12 @@ google.setOnLoadCallback(function() {
     // TODO: library of interesting games, see
     // http://www.xs4all.nl/~timkr/records/records.htm and http://www.xs4all.nl/~timkr/ChessTutor/pgnview.htm
 });
+
+// PGN (PORTABLE GAME NOTATION) FUNCTIONS
+function load_pgn()
+{
+    // TODO
+}
 
 //// USER FUNCTIONS
 
@@ -1434,9 +1438,8 @@ function move_piece_to_square(piece, square, is_hypothetical)
         //var alg_move = GAME_STATE.fullmove_number + ". " + (GAME_STATE.active_color === "black" ? " ... " : "") + move_text;
         var alg_move = (GAME_STATE.active_color === "white" ? GAME_STATE.fullmove_number + ". " : " ") + move_text;
 
-        alg_move += (GAME_STATE.active_color === "black" ? "\n" : "");
-
         alg_move += set_turn("next");
+        alg_move += (opposite_color(GAME_STATE.active_color) === "black" ? "\n" : "");
 
         $("moves").value += alg_move;
     }
