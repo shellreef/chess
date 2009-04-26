@@ -255,6 +255,23 @@ function load_pgn(pgn)
 {
     var game = parse_pgn(pgn);
 
+    $("white_player").innerHTML = game.White; 
+    $("black_player").innerHTML = game.Black; 
+
+    if (game.WhiteElo) { 
+        $("white_elo").innerHTML = "(" + game.WhiteElo + ")";
+    } else {
+        $("white_elo").hide();
+    }
+
+    if (game.BlackElo) { 
+        $("black_elo").innerHTML = "(" + game.BlackElo + ")";
+    } else {
+        $("black_elo").hide();
+    }
+
+
+
     load_fen(game.FEN);
 }
 
