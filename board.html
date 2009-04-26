@@ -221,7 +221,7 @@ google.setOnLoadCallback(function() {
 
     name_squares();    
 
-    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
+    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
     //load_fen("rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w KQkq - 0 1"); // pawnless chess
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
@@ -237,7 +237,7 @@ google.setOnLoadCallback(function() {
     //load_fen("k7/8/8/8/8/8/8/5KQ1 w - d6 0 50");  // K + KQ
     //load_fen("k7/8/8/8/8/8/8/5KR1 w - d6 0 50");  // K + KR
     //load_fen("4r3/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle out of check
-    load_fen("5r2/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle through check
+    //load_fen("5r2/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle through check
 
     // TODO: library of interesting games, see
     // http://www.xs4all.nl/~timkr/records/records.htm and http://www.xs4all.nl/~timkr/ChessTutor/pgnview.htm
@@ -250,16 +250,38 @@ google.setOnLoadCallback(function() {
 function load_pgn(pgn)
 {
     var lines = pgn.split("\n");
+    var dict = {};
 
+    // Parse header into dictionary
     for (var i = 0; i < lines.length; ++i) {
         var line = lines[i];
 
         if (line.substr(0, 1) === "[") {
             for (var j = 0; j < line.length; ++j) {
-                // TODO: parse [tag<space>data]
+                var between, ary, tag, key, value;
+                    
+                between = line.substring(1, line.length - 1);
+                // Would have liked to use the 2nd parameter to split here, but it
+                // doesn't behave the same as in Perl. It just truncates the array,
+                // instead of stopping splitting after the deliminator.
+                // "foo,bar,baz".split(",", 2) === ["foo", "bar"]
+                // instead of ["foo", "bar,baz"].
+                ary = between.split(" ");
+                key = ary.shift();
+                value = ary.join(" ");
+
+                if (value.substr(0, 1) === '"') {
+                    value = value.substring(1, value.length - 1);
+                }
+
+                dict[key] = value;
             }
         }
     }
+    
+    // TODO: parse move list
+
+    return dict;
 }
 
 
@@ -512,7 +534,6 @@ function filtered_moves(piece, color, is_hypothetical)
     var unfiltered = unfiltered_moves(parlett, xy, color);
 
     filtered = unfiltered.select(function(move) {
-        var allowed = true;
         var piece_under;
 
         // If castle move, check if castling allowed
@@ -521,11 +542,11 @@ function filtered_moves(piece, color, is_hypothetical)
           
             if (GAME_STATE.active_in_check) {
                 // Can't castle out of check
-                allowed = false;
+                return false;
             // If king moved, won't be able to castle on either side, don't need to check anything else
             } else if (GAME_STATE.can_castle[color].long === false &&
                 GAME_STATE.can_castle[color].short === false) {
-                allowed = false;
+                return false;
             } 
             
         }
@@ -533,7 +554,7 @@ function filtered_moves(piece, color, is_hypothetical)
         if (move[2].initial_only) {
             // Can only move if have not moved this piece yet
             if (piece.type === "pawn" && pawn_moved(piece)) {
-                allowed = false;
+                return false;
             } 
 
             assert(piece.type === "pawn" || piece.type === "king", 
@@ -546,7 +567,7 @@ function filtered_moves(piece, color, is_hypothetical)
             // Destination square must be occupied by enemy piece
             piece_under = pc(move[0], move[1]);
             if (!piece_under) {
-                allowed = false;    // needs something to capture
+                return false;    // needs something to capture
             }
         }
         
@@ -554,7 +575,7 @@ function filtered_moves(piece, color, is_hypothetical)
             // Can only move if unoccupied, not to capture
             piece_under = pc(move[0], move[1]);
             if (piece_under) {
-                allowed = false;    // can't capture, man
+                return false;    // can't capture, man
             }
         }
 
@@ -562,7 +583,7 @@ function filtered_moves(piece, color, is_hypothetical)
         // but unfiltered_moves() should already not return these moves.
         /*
         if (pc(move[0], move[1]) && pc(move[0], move[1]).hasClassName(color)) {
-                allowed = false;
+                return false;
         }
         */
 
@@ -578,11 +599,11 @@ function filtered_moves(piece, color, is_hypothetical)
         // but royal pieces can't be captured in the first place, so K is still
         // in check and has to move (even though p is pinned!)
         if (!is_hypothetical && would_check(piece, move, color)) { 
-            allowed = false; 
+            return false; 
             //console.log("would_check",color,piece,xy2filerank([move[0], move[1]]));
         }
 
-        if (!is_hypothetical && allowed && move[2].mark_en_passant) {
+        if (!is_hypothetical && move[2].mark_en_passant) {
             var backward = -forwards_vector(color);
             var ep_target = [move[0], move[1] + backward];
             var pawn_dest = xy2filerank([move[0], move[1]]);
@@ -592,14 +613,12 @@ function filtered_moves(piece, color, is_hypothetical)
             POSSIBLE_EP_TARGETS[pawn_dest] = ep_target;
         }
 
-        return allowed;
+        return true;
     });
 
 
     // Filter castle-through-check moves. 
     filtered2 = filtered.select(function(move) {
-        var allowed = true;
-
         if (move[2].castle) {
             var castle;
 
@@ -616,7 +635,7 @@ function filtered_moves(piece, color, is_hypothetical)
 
             // Has privileges?
             if (!GAME_STATE.can_castle[color][castle]) {
-                allowed = false;
+                return false;
             }
 
             // If intervening pieces, or the king would move through an attacked
@@ -629,31 +648,31 @@ function filtered_moves(piece, color, is_hypothetical)
                 var found = false;
 
                 if (!find_move(filtered, [6, first_rank])) { 
-                    allowed = false;
+                    return false;
                 }
 
                 if (!find_move(filtered, [7, first_rank])) {
-                    allowed = false;
+                    return false;
                 } 
 
             } else if (castle === "long") {
                 // Square must not be occupied, but it can be attacked. See
                 // http://www.flickr.com/photos/theyoungthousands/3456432277
                 if (pc(2, first_rank)) {
-                    allowed = false;
+                    return false;
                 }
 
                 if (!find_move(filtered, [3, first_rank])) {
-                    allowed = false;
+                    return false;
                 }
 
                 if (!find_move(filtered, [4, first_rank])) {
-                    allowed = false;
+                    return false;
                 }
             }
         }
             
-        return allowed;
+        return true;
     });
 
     return filtered2;
