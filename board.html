@@ -14,6 +14,11 @@ a:hover{border-bottom:1px solid}
 a:link{color:#1b67c9}
 a:visited{color:darkorchid}
 
+/* Header */
+span.players { font-size: large; }
+span.player_name { font-weight: bold; }
+span.player_elo { font-size: small; }
+
 /* TODO: switch to divs, for flexibility, and use background-image.. or maybe not */
 img.piece
 { 
@@ -221,7 +226,7 @@ google.setOnLoadCallback(function() {
 
     name_squares();    
 
-    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
+    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
     //load_fen("rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w KQkq - 0 1"); // pawnless chess
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
@@ -242,8 +247,9 @@ google.setOnLoadCallback(function() {
     // TODO: library of interesting games, see
     // http://www.xs4all.nl/~timkr/records/records.htm and http://www.xs4all.nl/~timkr/ChessTutor/pgnview.htm
    
-    load_pgn('[Event "10:00 PM"]\n[Site "Shredder for iPhone / iPod touch"]\n[Date "2009.04.23"]\n[Round "?"]\n[White "Player"]\n[Black "Shredder"]\n[WhiteElo "1230"]\n[BlackElo "1236"]\n[Result "1-0"]\n\n1. e4 e5 2. Nf3 d6 3. Bb5 Nc6 4. Bxc6 bxc6 5. d4 Bg4 6. dxe5 dxe5 7. O-O f6\n8. Nc3 Kf7 9. Be3 Qxd1 10. Raxd1 Bxf3 11. gxf3 Bb4 12. Rd7 Ne7 13. Rxc7 Bxc3\n14. bxc3 a6 15. Bc5 Rhe8 16. Bxe7 Rxe7 17. Rxc6 Rb7 18. Rd1 Rb2 19. Rd7 Kg6\n20. Rcc7 Rb1 21. Kg2 Ra1 22. Rxg7 Kh6 23. Rxh7 Kg5 24. Rhg7 Kh4 25. Rg4 Kh5\n26. Rh7 1-0');
+    pgn = load_pgn('[Event "10:00 PM"]\n[Site "Shredder for iPhone / iPod touch"]\n[Date "2009.04.23"]\n[Round "?"]\n[White "Player"]\n[Black "Shredder"]\n[WhiteElo "1230"]\n[BlackElo "1236"]\n[Result "1-0"]\n\n1. e4 e5 2. Nf3 d6 3. Bb5 Nc6 4. Bxc6 bxc6 5. d4 Bg4 6. dxe5 dxe5 7. O-O f6\n8. Nc3 Kf7 9. Be3 Qxd1 10. Raxd1 Bxf3 11. gxf3 Bb4 12. Rd7 Ne7 13. Rxc7 Bxc3\n14. bxc3 a6 15. Bc5 Rhe8 16. Bxe7 Rxe7 17. Rxc6 Rb7 18. Rd1 Rb2 19. Rd7 Kg6\n20. Rcc7 Rb1 21. Kg2 Ra1 22. Rxg7 Kh6 23. Rxh7 Kg5 24. Rhg7 Kh4 25. Rg4 Kh5\n26. Rh7 1-0');
 
+    load_fen(pgn.FEN);
 });
 
 // PGN (PORTABLE GAME NOTATION) FUNCTIONS
@@ -2084,7 +2090,7 @@ function enable_document_selection(enable) {
 <body>
 <table id="outer">
  <tr>
-  <td>
+  <td style="vertical-align: top">
 <table class="board" id="board">
 <tbody id="board-body"
 ><tr
@@ -2191,6 +2197,24 @@ function enable_document_selection(enable) {
 
  </td><td style="vertical-align: top">
  <noscript><p>JavaScript is disabled, nothing will work!</p></noscript>
+
+ <p id="header" style="xdisplay: none; text-align: center">
+  <span class="players">
+   <span id="white_player" class="player_name">White</span>
+   <span id="white_elo" class="player_elo">(1500)</span>
+   vs.
+   <span id="black_player" class="player_name">Black</span>
+   <span id="black_elo" class="player_elo">(1500)</span>
+  </span>
+   <br>
+
+   <span id="event">Event</span>
+   <span id="round">(Round), 
+   <span id="site">Site</span><br>
+
+   <span id="date">Date</span>
+   <span id="time">Time</span>
+ </p> 
 
  <!-- TODO: hide all this, since the purpose of this app is
  not to implement chess AI. But having automatic moves is useful for testing. -->
