@@ -1369,11 +1369,9 @@ function check_repetition()
         GAME_STATE.position_count[new_state] += 1; 
 
         if (GAME_STATE.position_count[new_state] === 3) {
-            // TODO: Draw (repetition)
-            // TOOD: Is this compulsary? Does it have to be drawn, or
-            // only if the opponent claims? Sometimes it will be advantageous
-            // (if losing), but sometimes not (if winning).
-            set_check_message("Draw (repetition)");
+            // Player can claim a draw, but its not required (you might have a better position)
+            // See http://en.wikipedia.org/wiki/Threefold_repetition
+            set_check_message("Draw (repetition) claimable");
         }
     }
 }
@@ -1704,7 +1702,6 @@ function load_fen(fen, clear)
 
     if (clear) { GAME_STATE.position_count = {}; }
     if (clear) { GAME_STATE.position_at = {}; }
-    // TODO: add to repetition count?
 
     // Now that everything is loaded, set the turn.
     set_turn({w:"white", b:"black"}[parts[1]]);
