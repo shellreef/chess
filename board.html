@@ -122,7 +122,8 @@ var GAME_STATE = {
 
     // Not game state, but other globals
     dragging: false,
-    positions: {},        // Board positions for 3 move repetition
+    position_count: {},        // Board position counts for 3 move repetition
+    position_at: {},           // Board positions at each move
     active_in_check: false
 };    
 
@@ -534,7 +535,7 @@ function calculate_moves(color, get_only)
 // chess engine, or a real live human, remotely
 function computer_move_if_applicable()
 {
-    if ($F(GAME_STATE.active_color + "_player") !== "computer") {
+    if (!$F(GAME_STATE.active_color + "_computer")) {
         return;
     }
 
@@ -1333,13 +1334,13 @@ function check_repetition()
 {
     // Save new board state for three-move repetition
     var new_state = save_fen(true);
-    if (GAME_STATE.positions[new_state] === undefined) {
-        GAME_STATE.positions[new_state] = 1;
+    if (GAME_STATE.position_count[new_state] === undefined) {
+        GAME_STATE.position_count[new_state] = 1;
     } else {
         // Count # of times this occurs
-        GAME_STATE.positions[new_state] += 1; 
+        GAME_STATE.position_count[new_state] += 1; 
 
-        if (GAME_STATE.positions[new_state] === 3) {
+        if (GAME_STATE.position_count[new_state] === 3) {
             // TODO: Draw (repetition)
             // TOOD: Is this compulsary? Does it have to be drawn, or
             // only if the opponent claims? Sometimes it will be advantageous
@@ -1659,7 +1660,8 @@ function load_fen(fen)
     GAME_STATE.halfmove_clock = parseInt(parts[4], 10);
     GAME_STATE.fullmove_number = parseInt(parts[5], 10);
 
-    GAME_STATE.positions = {};
+    GAME_STATE.position_count = {};
+    GAME_STATE.position_at = {};
 
     // Now that everything is loaded, set the turn.
     set_turn({w:"white", b:"black"}[parts[1]]);
@@ -2244,15 +2246,8 @@ function enable_document_selection(enable) {
 
  <!-- TODO: hide all this, since the purpose of this app is
  not to implement chess AI. But having automatic moves is useful for testing. -->
-  <select name="white_player" id="white_player" onchange="computer_move_if_applicable()">
-   <option value="human">Human</option>
-   <option value="computer">Computer</option>
-  </select>
-  vs.
-   <select name="black_player" id="black_player" onchange="computer_move_if_applicable()">
-   <option value="human">Human</option>
-   <option value="computer">Computer</option>
-  </select>
+ <label for="white_computer">White PC<input type="checkbox" id="white_computer" name="white_computer" onclick="computer_move_if_applicable()"></label> 
+ <label for="black_computer">Black PC<input type="checkbox" id="black_computer" name="black_computer" onclick="computer_move_if_applicable()"></label><br>
  
   <p id="status"></p>
   <p id="check"></p>
