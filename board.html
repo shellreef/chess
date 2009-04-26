@@ -6,7 +6,7 @@
 <!-- Copyright (C) 2009 Jeff Connelly -->
 <!-- Created:20090411 -->
 <style type="text/css">
-/* Based on code From diveintomark.org */
+/* Body and link formatting based on code From diveintomark.org */
 /*dive into minimalism(c)2008 Mark Pilgrim,MIT-licensed including graphics*/
 body{font:normal medium 'Gill Sans','Gill Sans MT','Ikarius ADF',Candara,Jara,sans-serif;line-height:1.3;word-spacing:0.1em}
 a{background:transparent;text-decoration:none;border-bottom:1px dotted}
@@ -18,6 +18,9 @@ a:visited{color:darkorchid}
 span.players { font-size: large; }
 span.player_name { font-weight: bold; }
 span.player_elo { font-size: small; }
+
+/* PGN */
+span.fullmove_number { font-weight: bold; }
 
 /* TODO: switch to divs, for flexibility, and use background-image.. or maybe not */
 img.piece
@@ -1514,14 +1517,23 @@ function move_piece_to_square(piece, square, is_hypothetical)
 
     // If not a multi-move (moving rook in castling), log and go to next turn
     if (!is_hypothetical) {
-        // TODO: ellipsis if black is first recorded move
+        // TODO: ellipsis if black is first recorded move, or intervening commentary
         //var alg_move = GAME_STATE.fullmove_number + ". " + (GAME_STATE.active_color === "black" ? " ... " : "") + move_text;
-        var alg_move = (GAME_STATE.active_color === "white" ? GAME_STATE.fullmove_number + ". " : " ") + move_text;
+        var alg_move;
+       
+        if (GAME_STATE.active_color === "white") {
+            alg_move = '<span class="fullmove_number">' + GAME_STATE.fullmove_number + '</span>. ';
+        } else {
+            alg_move = " ";
+        }
 
+        alg_move += move_text;
         alg_move += set_turn("next");
+
         alg_move += (opposite_color(GAME_STATE.active_color) === "black" ? "\n" : "");
 
-        $("moves").value += alg_move;
+        // TODO: formatting
+        $("moves").innerHTML += alg_move;
     }
 
     // En passant possibility disappears immediately after move
@@ -2260,7 +2272,11 @@ function enable_document_selection(enable) {
   <p id="status"></p>
   <p id="check"></p>
 
-  <textarea name="moves" id="moves" rows="20" cols="20" readonly></textarea>
+  <div id="moves_container" style="width: 500px; text-align: justify">
+  <p id="moves"></p>
+  </div>
+  <!-- TODO: edit PGN -->
+  <!--<textarea name="moves" id="moves" rows="20" cols="20" readonly></textarea>-->
 
   <!-- TODO: give current FEN from save_fen(), so can edit -->
   <p><a href="javascript:load_fen(prompt('Enter game state in FEN notation:', save_fen()))">Load FEN</a>
