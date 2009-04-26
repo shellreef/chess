@@ -238,7 +238,8 @@ google.setOnLoadCallback(function() {
     //load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); 
     //load_fen("k7/8/8/8/8/8/8/5KQ1 w - d6 0 50");  // K + KQ
     //load_fen("k7/8/8/8/8/8/8/5KR1 w - d6 0 50");  // K + KR
-    load_fen("4r3/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle out of check
+    //load_fen("4r3/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle out of check
+    load_fen("5r2/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle through check
 
     // TODO: library of interesting games, see
     // http://www.xs4all.nl/~timkr/records/records.htm and http://www.xs4all.nl/~timkr/ChessTutor/pgnview.htm
@@ -499,10 +500,7 @@ function filtered_moves(piece, color, is_hypothetical)
         // If castle move, check if castling allowed
         if (move[2].castle) {
             var castle;
-
-            // XXX TODO: Very important, can't castle through check, or out of check!!
-            // But see http://www.flickr.com/photos/theyoungthousands/3456432277/
-           
+          
             if (GAME_STATE.active_in_check) {
                 // Can't castle out of check
                 allowed = false;
@@ -510,39 +508,8 @@ function filtered_moves(piece, color, is_hypothetical)
             } else if (GAME_STATE.can_castle[color].long === false &&
                 GAME_STATE.can_castle[color].short === false) {
                 allowed = false;
-            } else {
-                // Otherwise, need to find if short/long castle
-                if (move[0] === 7) {
-                    castle = "short";
-                } else if (move[0] === 3) {
-                    castle = "long";
-                } else {
-                    return false; // not allowed
-                    assert(false, "filtered_moves(" + piece + "): unknown name of castling to x="+x+", not long/short. " +
-                        "filerank = " + xy2filerank([move[0], move[1]]) + ", piece = " + piece + "\n\n" +
-                        "Note: you might get this if you specified in FEN that castling was possible, but it really isn't.");
-                }
-
-                if (castle && !GAME_STATE.can_castle[color][castle])
-                    allowed = false;
-            }
-
-            // If intervening pieces, do not allow castling.
-            if (allowed && castle) { // so far..
-                var first_rank = (color === "white" ? 1 : 8);
+            } 
             
-                if (castle === "short") {
-                    if (pc(6, first_rank) || pc(7, first_rank)) {
-                        allowed = false;
-                    } 
-                } else if (castle === "long") {
-                    if (pc(2, first_rank) || pc(3, first_rank) || pc(4, first_rank)) {
-                        allowed = false;
-                    }
-                } else {
-                    assert(false, "filtered_moves: checking intervening pieces, castle wasn't long short: " + castle);
-                }
-            }
         }
 
         if (move[2].initial_only) {
@@ -610,7 +577,85 @@ function filtered_moves(piece, color, is_hypothetical)
         return allowed;
     });
 
-    return filtered;
+
+    // Filter castle-through-check moves. 
+    filtered2 = filtered.select(function(move) {
+        var allowed = true;
+
+        if (move[2].castle) {
+            var castle;
+
+            if (move[0] === 7) {
+                castle = "short";
+            } else if (move[0] === 3) {
+                castle = "long";
+            } else {
+                return false; // not allowed
+                assert(false, "filtered_moves(" + piece + "): unknown name of castling to x="+x+", not long/short. " +
+                    "filerank = " + xy2filerank([move[0], move[1]]) + ", piece = " + piece + "\n\n" +
+                    "Note: you might get this if you specified in FEN that castling was possible, but it really isn't.");
+            }
+
+            // Has privileges?
+            if (!GAME_STATE.can_castle[color][castle]) {
+                allowed = false;
+            }
+
+            // If intervening pieces, or the king would move through an attacked
+            // square, do not allow castling. To check for this, see if the king
+            // could normally move to the intervening squares, since if not,
+            // it'll have been filtered in the first loop.
+            var first_rank = (color === "white" ? 1 : 8);
+        
+            if (castle === "short") {
+                var found = false;
+
+                if (!find_move(filtered, [6, first_rank])) { 
+                    allowed = false;
+                }
+
+                if (!find_move(filtered, [7, first_rank])) {
+                    allowed = false;
+                } 
+
+            } else if (castle === "long") {
+                // Square must not be occupied, but it can be attacked. See
+                // http://www.flickr.com/photos/theyoungthousands/3456432277
+                if (pc(2, first_rank)) {
+                    allowed = false;
+                }
+
+                if (!find_move(filtered, [3, first_rank])) {
+                    allowed = false;
+                }
+
+                if (!find_move(filtered, [4, first_rank])) {
+                    allowed = false;
+                }
+            }
+        }
+            
+        return allowed;
+    });
+
+    return filtered2;
+}
+
+
+
+// Return true if "move" is found in the move list "moves", used by filtered_moves()
+function find_move(moves, move)
+{
+    var found = false;
+
+    moves.each(function(m) {
+            if (m[0] === move[0] && m[1] === move[1]) {
+                found = true;
+                throw $break;
+            }
+    });
+
+    return found;
 }
 
 // Return whether moving piece to move would mean that
