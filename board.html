@@ -332,6 +332,19 @@ function parse_pgn(pgn)
     return dict;
 }
 
+// Load a move by ID, which is fullmove_number + active_color
+function load_move(move_id)
+{
+    $$("a.active_move").each(function(m) {
+            m.removeClassName("active_move");
+    });
+
+    load_fen(GAME_STATE.position_at[move_id]);
+
+    $$("a#move_" + move_id).each(function(m) {
+        m.addClassName("active_move");
+    });
+}
 
 //// USER FUNCTIONS
 
@@ -1546,9 +1559,9 @@ function move_piece_to_square(piece, square, is_hypothetical)
         move_id = GAME_STATE.fullmove_number + GAME_STATE.active_color;
 
         alg_move += '<a id="move_' + move_id + '" class="active_move" ' +
-            'href="javascript:load_fen(GAME_STATE.position_at[\'' + 
+            'href="javascript:load_move(\'' + 
             move_id +
-            '\'])">';
+            '\')">';
         alg_move += move_text;
         alg_move += set_turn("next");
         alg_move += '</a>';
