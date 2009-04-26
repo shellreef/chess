@@ -119,7 +119,8 @@ var GAME_STATE = {
 
     // Not game state, but other globals
     dragging: false,
-    positions: {}        // Board positions for 3 move repetition
+    positions: {},        // Board positions for 3 move repetition
+    active_in_check: false
 };    
 
 // Moves that can be made right now, for each active piece.
@@ -222,7 +223,7 @@ google.setOnLoadCallback(function() {
 
     name_squares();    
 
-    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
+    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
     //load_fen("rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w KQkq - 0 1"); // pawnless chess
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
@@ -237,6 +238,7 @@ google.setOnLoadCallback(function() {
     //load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); 
     //load_fen("k7/8/8/8/8/8/8/5KQ1 w - d6 0 50");  // K + KQ
     //load_fen("k7/8/8/8/8/8/8/5KR1 w - d6 0 50");  // K + KR
+    load_fen("4r3/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle out of check
 
     // TODO: library of interesting games, see
     // http://www.xs4all.nl/~timkr/records/records.htm and http://www.xs4all.nl/~timkr/ChessTutor/pgnview.htm
@@ -498,10 +500,14 @@ function filtered_moves(piece, color, is_hypothetical)
         if (move[2].castle) {
             var castle;
 
-            // If king moved, won't be able to castle on either side, don't need name
             // XXX TODO: Very important, can't castle through check, or out of check!!
             // But see http://www.flickr.com/photos/theyoungthousands/3456432277/
-            if (GAME_STATE.can_castle[color].long === false &&
+           
+            if (GAME_STATE.active_in_check) {
+                // Can't castle out of check
+                allowed = false;
+            // If king moved, won't be able to castle on either side, don't need to check anything else
+            } else if (GAME_STATE.can_castle[color].long === false &&
                 GAME_STATE.can_castle[color].short === false) {
                 allowed = false;
             } else {
@@ -1166,13 +1172,16 @@ function set_turn(color)
 
     GAME_STATE.active_color = new_color;
     POSSIBLE_EP_TARGETS = {};
+   
+    // Active player in check?
+    checked = GAME_STATE.active_in_check = in_check(GAME_STATE.active_color, calculate_moves(opposite_color(new_color), true));
 
     // Note: this takes some time... is there any way to run it right AFTER the piece has
     // gone through the endeffect? This is called in onDrop.
     // TODO: find out how to run something *after* the endeffect, for smoother UI.
     calculate_moves(GAME_STATE.active_color);
 
-    checked = in_check(GAME_STATE.active_color, calculate_moves(opposite_color(new_color), true));
+    // Zero mobility? For detecting stalemate, checkmate.
     no_moves = VALID_MOVES.keys().length == 0;
 
     // Results. 
@@ -1180,8 +1189,6 @@ function set_turn(color)
     if (checked && !no_moves) {
         $("check").innerHTML = "Check!";
         ret = "+";
-
-        // TODO: can't castle out of check, but can castle if was checked before
     } else if (!checked && no_moves) {
         $("check").innerHTML = "Draw (stalemate)";
         ret = "\n1/2-1/2";
