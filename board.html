@@ -22,6 +22,7 @@ span.player_elo { font-size: small; }
 
 /* PGN */
 span.fullmove_number { font-weight: bold; }
+a.active_move { font-weight: bold; }
 
 /* TODO: switch to divs, for flexibility, and use background-image.. or maybe not */
 img.piece
@@ -1534,7 +1535,7 @@ function move_piece_to_square(piece, square, is_hypothetical)
     if (!is_hypothetical) {
         // TODO: ellipsis if black is first recorded move, or intervening commentary
         //var alg_move = GAME_STATE.fullmove_number + ". " + (GAME_STATE.active_color === "black" ? " ... " : "") + move_text;
-        var alg_move;
+        var alg_move, move_id;
        
         if (GAME_STATE.active_color === "white") {
             alg_move = '<span class="fullmove_number">' + GAME_STATE.fullmove_number + '</span>. ';
@@ -1542,8 +1543,11 @@ function move_piece_to_square(piece, square, is_hypothetical)
             alg_move = " ";
         }
 
-        alg_move += '<a href="javascript:load_fen(GAME_STATE.position_at[\'' + 
-            GAME_STATE.fullmove_number + GAME_STATE.active_color +
+        move_id = GAME_STATE.fullmove_number + GAME_STATE.active_color;
+
+        alg_move += '<a id="move_' + move_id + '" class="active_move" ' +
+            'href="javascript:load_fen(GAME_STATE.position_at[\'' + 
+            move_id +
             '\'])">';
         alg_move += move_text;
         alg_move += set_turn("next");
@@ -1551,7 +1555,10 @@ function move_piece_to_square(piece, square, is_hypothetical)
 
         alg_move += (opposite_color(GAME_STATE.active_color) === "black" ? "\n" : "");
 
-        // TODO: formatting
+        $$("a.active_move").each(function(m) {
+                m.removeClassName("active_move");
+            });
+
         $("moves").innerHTML += alg_move;
     }
 
