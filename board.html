@@ -1318,24 +1318,24 @@ function set_turn(color)
     // Results. 
     ret = "";
     if (checked && !no_moves) {
-        $("check").innerHTML = "Check!";
+        set_check_message("Check!");
         ret = "+";
     } else if (!checked && no_moves) {
-        $("check").innerHTML = "Draw (stalemate)";
+        set_check_message("Draw (stalemate)");
         ret = "\n1/2-1/2";
     } else if (checked && no_moves) {
-        $("check").innerHTML = "Checkmate.";
+        set_check_message("Checkmate.");
         if (new_color == "white") { 
             ret = "#\n0-1";  // white lost
         } else {
             ret = "#\n1-0";
         }
     } else {
-        $("check").innerHTML = "";
+        set_check_message("");
     }
 
     var new_state = save_fen();
-    check_repetition(new_state);
+    check_repetition();
     
     if (color === "next") { 
         var key = old_fullmove + old_color;
@@ -1345,9 +1345,21 @@ function set_turn(color)
     return ret;
 }
 
-// Check for three-move repetition
-function check_repetition(new_state)
+function set_check_message(msg)
 {
+    $("check").innerHTML = msg;
+    if (msg) {
+        $("dash").show();
+    } else {
+        $("dash").hide();
+    }
+}
+
+// Check for three-move repetition
+function check_repetition()
+{
+    var new_state = save_fen(true);
+
     // Save new board state for three-move repetition
     if (GAME_STATE.position_count[new_state] === undefined) {
         GAME_STATE.position_count[new_state] = 1;
@@ -1360,7 +1372,7 @@ function check_repetition(new_state)
             // TOOD: Is this compulsary? Does it have to be drawn, or
             // only if the opponent claims? Sometimes it will be advantageous
             // (if losing), but sometimes not (if winning).
-            $("check").innerHTML = "Draw (repetition)";
+            set_check_message("Draw (repetition)");
         }
     }
 }
@@ -2273,9 +2285,12 @@ function enable_document_selection(enable) {
  not to implement chess AI. But having automatic moves is useful for testing. -->
  <label for="white_computer">White PC<input type="checkbox" id="white_computer" name="white_computer" onclick="computer_move_if_applicable()"></label> 
  <label for="black_computer">Black PC<input type="checkbox" id="black_computer" name="black_computer" onclick="computer_move_if_applicable()"></label><br>
- 
-  <p id="status"></p>
-  <p id="check"></p>
+
+ <p>
+  <span id="status"></span> 
+  <span id="dash" style="display: none">&mdash;</span>
+  <span id="check"></span>
+ </p>
 
   <div id="moves_container" style="width: 500px; text-align: justify">
   <p id="moves"></p>
