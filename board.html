@@ -254,23 +254,26 @@ google.setOnLoadCallback(function() {
 function load_pgn(pgn)
 {
     var game = parse_pgn(pgn);
+    var tags = ["White", "WhiteElo", "Black", "BlackElo", "Event", "Round", "Site", "Date", "Time"];
+    var parenthetize = {WhiteElo: 1, BlackElo: 1, Round: 1};
 
-    $("white_player").innerHTML = game.White; 
-    $("black_player").innerHTML = game.Black; 
+    for (var i = 0; i < tags.length; ++i) {
+        var tag = tags[i];
+        var node = $(tag);
 
-    if (game.WhiteElo) { 
-        $("white_elo").innerHTML = "(" + game.WhiteElo + ")";
-    } else {
-        $("white_elo").hide();
+        assert(node, "load_pgn(" + pgn + "): no element for tag " + tag);
+
+        if (game[tag] && game[tag].substr(0, 1) !== "?") {
+            $(tag).show();
+            if (parenthetize[tag]) {
+                $(tag).innerHTML = "(" + game[tag] + ")";
+            } else {
+                $(tag).innerHTML = game[tag];
+            }
+        } else {
+            $(tag).hide();
+        }
     }
-
-    if (game.BlackElo) { 
-        $("black_elo").innerHTML = "(" + game.BlackElo + ")";
-    } else {
-        $("black_elo").hide();
-    }
-
-
 
     load_fen(game.FEN);
 }
@@ -2223,20 +2226,20 @@ function enable_document_selection(enable) {
 
  <p id="header" style="xdisplay: none; text-align: center">
   <span class="players">
-   <span id="white_player" class="player_name">White</span>
-   <span id="white_elo" class="player_elo">(1500)</span>
+   <span id="White" class="player_name">White</span>
+   <span id="WhiteElo" class="player_elo">(1500)</span>
    vs.
-   <span id="black_player" class="player_name">Black</span>
-   <span id="black_elo" class="player_elo">(1500)</span>
+   <span id="Black" class="player_name">Black</span>
+   <span id="BlackElo" class="player_elo">(1500)</span>
   </span>
    <br>
 
-   <span id="event">Event</span>
-   <span id="round">(Round), 
-   <span id="site">Site</span><br>
+   <span id="Event">Event</span
+   ><span id="Round">(Round)</span>, 
+   <span id="Site">Site</span><br>
 
-   <span id="date">Date</span>
-   <span id="time">Time</span>
+   <span id="Date">Date</span>
+   <span id="Time">Time</span>
  </p> 
 
  <!-- TODO: hide all this, since the purpose of this app is
