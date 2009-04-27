@@ -367,7 +367,12 @@ function load_ply(ply)
             m.addClassName("active_move");
         });
 
-    // Next/back navigation
+    set_next_back_accesskeys(ply);
+}
+
+// Setup accesskeys for next and back given the current ply.
+function set_next_back_accesskeys(ply)
+{
     $$("a.accessible_move").each(function(m) {
             m.removeClassName("accessible_move");
             m.removeAttribute("accesskey");
@@ -1682,6 +1687,8 @@ function move_piece_to_square(piece, square, is_hypothetical)
         $$("a.active_move").each(function(m) {
                 m.removeClassName("active_move");
             });
+
+        set_next_back_accesskeys(ply);
 
         $("moves").innerHTML += alg_move;
 
