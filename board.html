@@ -131,7 +131,7 @@ var GAME_STATE = {
     // Not game state, but other globals
     dragging: false,
     position_moves: {},        // Board position -> move IDs, for 3n move repetition
-    position_at: {},           // Board positions at each move, for playback
+    position_after: {},           // Board positions at each move, for playback
     active_in_check: false
 };    
 
@@ -301,7 +301,7 @@ function load_pgn(pgn)
 
     // Starting position
     load_fen(game.FEN, true);
-    GAME_STATE.position_at[0] = game.FEN;
+    GAME_STATE.position_after[0] = game.FEN;
 }
 
 // Parse PGN into a dictionary
@@ -356,7 +356,7 @@ function load_move(move_id)
             m.removeClassName("active_move");
     });
 
-    load_fen(GAME_STATE.position_at[move_id]);
+    load_fen(GAME_STATE.position_after[move_id]);
 
     $$("a#move_" + move_id).each(function(m) {
         m.addClassName("active_move");
@@ -1385,7 +1385,7 @@ function set_turn(color, historical)
     
     if (color === "next") { 
         var key = old_fullmove + old_color;
-        GAME_STATE.position_at[key] = new_state;
+        GAME_STATE.position_after[key] = new_state;
     }
 
     return {text_move: text_move, text_end: text_end, repeats: repeats};
@@ -1811,7 +1811,7 @@ function load_fen(fen, clear)
     GAME_STATE.fullmove_number = parseInt(parts[5], 10);
 
     if (clear) { GAME_STATE.position_moves = {}; }
-    if (clear) { GAME_STATE.position_at = {}; }
+    if (clear) { GAME_STATE.position_after = {}; }
 
     // Now that everything is loaded, set the turn.
     set_turn({w:"white", b:"black"}[parts[1]], !clear);
