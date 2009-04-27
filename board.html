@@ -1299,7 +1299,7 @@ function opposite_color(color)
 // If historical, do not check for threefold repetition.
 function set_turn(color, historical)
 {
-    var new_color, active_pieces, checked, no_moves, ret, old_color, old_fullmove;
+    var new_color, active_pieces, checked, no_moves, text, old_color, old_fullmove, repeats;
 
     assert(color === "white" || color === "black" || color === "next", "set_turn(" + color + "): invalid color");
 
@@ -1334,19 +1334,19 @@ function set_turn(color, historical)
     no_moves = VALID_MOVES.keys().length == 0;
 
     // Results. 
-    ret = "";
+    text = "";
     if (checked && !no_moves) {
         set_check_message("Check!");
-        ret = "+";
+        text = "+";
     } else if (!checked && no_moves) {
         set_check_message("Draw (stalemate)");
-        ret = "\n1/2-1/2";
+        text = "\n1/2-1/2";
     } else if (checked && no_moves) {
         set_check_message("Checkmate.");
         if (new_color == "white") { 
-            ret = "#\n0-1";  // white lost
+            text = "#\n0-1";  // white lost
         } else {
-            ret = "#\n1-0";
+            text = "#\n1-0";
         }
     } else {
         set_check_message("");
@@ -1354,7 +1354,7 @@ function set_turn(color, historical)
 
     var new_state = save_fen();
     if (!historical) {
-        check_repetition();
+        repeats = check_repetition();
     }
     
     if (color === "next") { 
@@ -1362,7 +1362,7 @@ function set_turn(color, historical)
         GAME_STATE.position_at[key] = new_state;
     }
 
-    return ret;
+    return [text, repeats];
 }
 
 function set_check_message(msg)
@@ -1388,28 +1388,17 @@ function check_repetition()
         // Count # of times this occurs
         GAME_STATE.position_moves[new_state].push(move_id);
 
-        var reps = GAME_STATE.position_moves[new_state];
-
         if (GAME_STATE.position_moves[new_state].length === 3) {
             // Player can claim a draw, but its not required (you might have a better position)
             // See http://en.wikipedia.org/wiki/Threefold_repetition
             set_check_message("Draw (repetition) claimable");
 
-            // Highlight the repeated moves so they trust us. Unfortunately,
-            // we highlight the move *after* the board state was repeated. This is
-            // because the first clickable link, say 1. Nf3, loads the move after
-            // Nf3 was made, not before (the initial board position). But you can
-            // repeat the initial board position (although it'd be silly to do so).
-            // 1. Nf3 Nf6 2. Ng1 Ng8 3. Nf3 Nf6 4. Ng1 Ng8
-            for (var i = 0; i < reps.length; ++i) {
-                var move_id = reps[i];
-
-                $$("a#move_" + move_id).each(function(m) {
-                        m.addClassName("repeated_move");
-                    });
-            }
+            // Return moves for highlighting
+            return GAME_STATE.position_moves[new_state];
         }
     }
+
+    return null;
 }
 
 //// BOARD FUNCTIONS
@@ -1570,7 +1559,7 @@ function move_piece_to_square(piece, square, is_hypothetical)
     if (!is_hypothetical) {
         // TODO: ellipsis if black is first recorded move, or intervening commentary
         //var alg_move = GAME_STATE.fullmove_number + ". " + (GAME_STATE.active_color === "black" ? " ... " : "") + move_text;
-        var alg_move, move_id;
+        var alg_move, move_id, turn_info;
        
         if (GAME_STATE.active_color === "white") {
             alg_move = '<span class="fullmove_number">' + GAME_STATE.fullmove_number + '</span>. ';
@@ -1585,7 +1574,8 @@ function move_piece_to_square(piece, square, is_hypothetical)
             move_id +
             '\')">';
         alg_move += move_text;
-        alg_move += set_turn("next");
+        turn_info = set_turn("next");
+        alg_move += turn_info[0];
         alg_move += '</a>';
 
         alg_move += (opposite_color(GAME_STATE.active_color) === "black" ? "\n" : "");
@@ -1595,6 +1585,10 @@ function move_piece_to_square(piece, square, is_hypothetical)
             });
 
         $("moves").innerHTML += alg_move;
+
+        if (turn_info[1]) { 
+            mark_repeated_moves(turn_info[1]);
+        }
     }
 
     // En passant possibility disappears immediately after move
@@ -1606,6 +1600,24 @@ function move_piece_to_square(piece, square, is_hypothetical)
     setTimeout(function() { 
             computer_move_if_applicable()
             }, 100);
+}
+
+// Visually indicate the moves which after threefold repetition
+function mark_repeated_moves(reps)
+{
+    // Highlight the repeated moves so they trust us. Unfortunately,
+    // we highlight the move *after* the board state was repeated. This is
+    // because the first clickable link, say 1. Nf3, loads the move after
+    // Nf3 was made, not before (the initial board position). But you can
+    // repeat the initial board position:
+    // 1. Nf3 Nf6 2. Ng1 Ng8 3. Nf3 Nf6 4. Ng1 Ng8
+    for (var i = 0; i < reps.length; ++i) {
+        var move_id = reps[i];
+
+        $$("a#move_" + move_id).each(function(m) {
+                m.addClassName("repeated_move");
+            });
+    }
 }
 
 // Handle graphically moving of a piece, dropping it to its new location
