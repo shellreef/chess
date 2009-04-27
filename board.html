@@ -1417,7 +1417,7 @@ function check_repetition(move_id)
         // This occurred here, too.
         GAME_STATE.position_moves[new_state].push(move_id);
 
-        if (GAME_STATE.position_moves[new_state].length === 3) {
+        if (GAME_STATE.position_moves[new_state].length >= 3) {
             // Player can claim a draw, but its not required (you might have a better position)
             // See http://en.wikipedia.org/wiki/Threefold_repetition
             set_check_message("Draw (repetition) claimable");
