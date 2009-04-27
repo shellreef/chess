@@ -1380,12 +1380,16 @@ function check_repetition()
 {
     var new_state = save_fen(true);
     var move_id = GAME_STATE.fullmove_number + GAME_STATE.active_color;
+    var reps;
 
     // Save new board state for three-move repetition
     if (GAME_STATE.position_moves[new_state] === undefined) {
         GAME_STATE.position_moves[new_state] = [move_id];
     } else {
-        // Count # of times this occurs
+
+        reps = GAME_STATE.position_moves[new_state].slice();
+
+        // This occurred here, too.
         GAME_STATE.position_moves[new_state].push(move_id);
 
         if (GAME_STATE.position_moves[new_state].length === 3) {
@@ -1393,8 +1397,10 @@ function check_repetition()
             // See http://en.wikipedia.org/wiki/Threefold_repetition
             set_check_message("Draw (repetition) claimable");
 
-            // Return moves for highlighting
-            return GAME_STATE.position_moves[new_state];
+            // Return moves for highlighting, except this move (it is too early
+            // for mark_repeated_moves to highlight, so move_piece_to_square will
+            // add the current move, if we return something).
+            return reps;
         }
     }
 
@@ -1559,7 +1565,7 @@ function move_piece_to_square(piece, square, is_hypothetical)
     if (!is_hypothetical) {
         // TODO: ellipsis if black is first recorded move, or intervening commentary
         //var alg_move = GAME_STATE.fullmove_number + ". " + (GAME_STATE.active_color === "black" ? " ... " : "") + move_text;
-        var alg_move, move_id, turn_info;
+        var alg_move, move_id, turn_info, this_move_id;
        
         if (GAME_STATE.active_color === "white") {
             alg_move = '<span class="fullmove_number">' + GAME_STATE.fullmove_number + '</span>. ';
@@ -1574,6 +1580,7 @@ function move_piece_to_square(piece, square, is_hypothetical)
             move_id +
             '\')">';
         alg_move += move_text;
+        this_move_id = GAME_STATE.fullmove_number + GAME_STATE.active_color;
         turn_info = set_turn("next");
         alg_move += turn_info[0];
         alg_move += '</a>';
@@ -1586,7 +1593,9 @@ function move_piece_to_square(piece, square, is_hypothetical)
 
         $("moves").innerHTML += alg_move;
 
+        // If there was a repetition, it occurred on this move. Indicate the moves.
         if (turn_info[1]) { 
+            turn_info[1].push(this_move_id);
             mark_repeated_moves(turn_info[1]);
         }
     }
