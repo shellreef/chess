@@ -398,9 +398,6 @@ function decode_ply(ply)
 
 // Encode color and fullmove number back to ply. Ply is useful for 
 // arrays of moves, since it is one integer, instead of integer+color.
-// TODO: replace "move_id"s of color+fullmove with plys, easier to
-// increment/decrement, and then could add accesskey attributes
-// for , and . to go to next and previous move easily.
 function encode_ply(color, fullmove_number)
 {
     var ply;
@@ -413,7 +410,8 @@ function encode_ply(color, fullmove_number)
 
 //// USER FUNCTIONS
 
-// TOOD: support Smith notation, https://www.chessclub.com/chessviewer/smith.html
+// TODO: support Smith notation, https://www.chessclub.com/chessviewer/smith.html
+// Big TODO: support descriptive notation, to help read older (but good!) chess books
 
 // Convenience function to move given algebraic notation, for use within
 // JavaScript console (Develop -> Show Error Console in Safari) if you want
@@ -1416,14 +1414,18 @@ function set_turn(color, historical)
     }
 
     var new_state = save_fen();
+    var ply = encode_ply(old_color, old_fullmove);
+
+    if (!old_color) {
+        // If no one has moved yet, ply is 0 for initial board position.
+        ply = 0;
+    }
+
     if (!historical) {
-        // TODO: find out why the zeroth position is incorrectly recorded as '1'; the
-        // rep is detected but the 0th position isn't correctly notated.
-        repeats = check_repetition(old_fullmove + old_color);
+        repeats = check_repetition(ply);
     }
     
     if (color === "next") { 
-        var ply = encode_ply(old_color, old_fullmove);
         GAME_STATE.position_after[ply] = new_state;
     }
 
@@ -1441,30 +1443,20 @@ function set_check_message(msg)
 }
 
 // Check for three-move repetition
-function check_repetition(move_id)
+function check_repetition(ply)
 {
     var new_state = save_fen(true);
     var reps;
 
-    // This is weird, but "position 0" is hereby defined to be
-    // the board's initial state, even though the positions are 
-    // usually named as fullmove_number + active_color, and the
-    // initial FEN begins at fullmove_number = 1, even before
-    // anyone has moved.
-    if (move_id.indexOf("white") === -1 &&
-        move_id.indexOf("black") === -1) {
-        move_id = "0";
-    }
-
     // Save new board state for three-move repetition
     if (GAME_STATE.position_moves[new_state] === undefined) {
-        GAME_STATE.position_moves[new_state] = [move_id];
+        GAME_STATE.position_moves[new_state] = [ply];
     } else {
 
         reps = GAME_STATE.position_moves[new_state].slice();
 
         // This occurred here, too.
-        GAME_STATE.position_moves[new_state].push(move_id);
+        GAME_STATE.position_moves[new_state].push(ply);
 
         if (GAME_STATE.position_moves[new_state].length >= 3) {
             // Player can claim a draw, but its not required (you might have a better position)
