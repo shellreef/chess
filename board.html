@@ -349,36 +349,40 @@ function parse_pgn(pgn)
     return dict;
 }
 
-// Load a move by ID, which is fullmove_number + active_color
-function load_move(move_id)
+// Load a move by ply. Used to navigate to past moves.
+function load_ply(ply)
 {
+    // TODO: would be tool to be able to also decode
+    // color + fullmove number, for ease of human use.
+    // Make "1." be ply 1, and "1..." or "1. ..." be ply 2.
+    
     $$("a.active_move").each(function(m) {
             m.removeClassName("active_move");
     });
 
-    load_fen(GAME_STATE.position_after[move_id]);
+    load_fen(GAME_STATE.position_after[ply]);
 
-    $$("a#move_" + move_id).each(function(m) {
+    $$("a#ply_" + ply).each(function(m) {
         m.addClassName("active_move");
     });
 }
 
 // Make a link to a move, click it and it loads the board after it.
-function move_link(move_id, text)
+function move_link(ply, text)
 {
     var extra;
 
     // ctrl+option+/ (at least on Safari 4) to go to initial position
-    if (move_id === "0") {
+    if (ply === 0) {
         extra = ' accesskey="/"';
     } else {
         extra = "";
     }
 
-    return '<a' + extra + ' id="move_' + move_id + '" class="active_move" ' +
-        'href="javascript:load_move(\'' + 
-            move_id +
-        '\')">' + text + "</a>";
+    return '<a' + extra + ' id="ply_' + ply + '" class="active_move" ' +
+        'href="javascript:load_ply(' + 
+            ply +
+        ')">' + text + "</a>";
 }
 
 // Decode ply number to color and fullmove number.
@@ -1419,8 +1423,8 @@ function set_turn(color, historical)
     }
     
     if (color === "next") { 
-        var key = old_fullmove + old_color;
-        GAME_STATE.position_after[key] = new_state;
+        var ply = encode_ply(old_color, old_fullmove);
+        GAME_STATE.position_after[ply] = new_state;
     }
 
     return {text_move: text_move, text_end: text_end, repeats: repeats};
@@ -1631,13 +1635,13 @@ function move_piece_to_square(piece, square, is_hypothetical)
     // If not a multi-move (moving rook in castling), log and go to next turn
     if (!is_hypothetical) {
         // TODO: ellipsis if black is first recorded move, or intervening commentary
-        var alg_move, move_id, turn_info, this_move_id;
+        var alg_move, ply, turn_info;
        
         if (GAME_STATE.active_color === "white") {
             alg_move = '<span class="fullmove_number">' + GAME_STATE.fullmove_number + '</span>';
             if (GAME_STATE.fullmove_number === 1) {
                 // Period goes to initial position, kind of strange, but its uninstrusive
-                alg_move += move_link("0", ".");
+                alg_move += move_link(0, ".");
             } else {
                 alg_move += ".";
             }
@@ -1649,9 +1653,8 @@ function move_piece_to_square(piece, square, is_hypothetical)
         // TODO: also, CRAN (Concise Reversible Algebraic Notation), see 
         // http://www.chessville.com/reviews/PlayStrongerChessExaminingChess960.htm
 
-        move_id = GAME_STATE.fullmove_number + GAME_STATE.active_color;
+        ply = encode_ply(GAME_STATE.active_color, GAME_STATE.fullmove_number);
 
-        this_move_id = GAME_STATE.fullmove_number + GAME_STATE.active_color;
         only_move = VALID_MOVES.keys().length === 1;
 
         turn_info = set_turn("next");
@@ -1659,7 +1662,7 @@ function move_piece_to_square(piece, square, is_hypothetical)
             move_text += turn_info.text_move;
         }
 
-        alg_move += move_link(move_id, move_text) + " ";
+        alg_move += move_link(ply, move_text) + " ";
 
         if (only_move) {
             // NAG for "only move", see http://www.markalowery.net/Chess/Notation/NAG.html
@@ -1679,7 +1682,7 @@ function move_piece_to_square(piece, square, is_hypothetical)
 
         // If there was a repetition, it occurred on this move. Indicate the moves.
         if (turn_info.repeats) { 
-            turn_info.repeats.push(this_move_id);
+            turn_info.repeats.push(ply);
             mark_repeated_moves(turn_info.repeats);
         }
     }
@@ -1709,9 +1712,9 @@ function mark_repeated_moves(reps)
 
     REPEAT_COLOR_COUNT += 1;
     for (var i = 0; i < reps.length; ++i) {
-        var move_id = reps[i];
+        var ply = reps[i];
 
-        $$("a#move_" + move_id).each(function(m) {
+        $$("a#ply_" + ply).each(function(m) {
                 //m.addClassName("repeated_move");
                 m.setStyle({backgroundColor: color});
             });
