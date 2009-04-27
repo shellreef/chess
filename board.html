@@ -366,7 +366,16 @@ function load_move(move_id)
 // Make a link to a move, click it and it loads the board after it.
 function move_link(move_id, text)
 {
-    return '<a id="move_' + move_id + '" class="active_move" ' +
+    var extra;
+
+    // ctrl+option+/ (at least on Safari 4) to go to initial position
+    if (move_id === "0") {
+        extra = ' accesskey="/"';
+    } else {
+        extra = "";
+    }
+
+    return '<a' + extra + ' id="move_' + move_id + '" class="active_move" ' +
         'href="javascript:load_move(\'' + 
             move_id +
         '\')">' + text + "</a>";
@@ -2384,7 +2393,11 @@ function enable_document_selection(enable) {
  <noscript><p>JavaScript is disabled, nothing will work!</p></noscript>
 
  <!-- Header elements, game metadata. Hidden/shown as needed. -->
- <p id="header" style="xdisplay: none; text-align: center">
+  <!-- TODO: click header to edit as PGN, instead of FEN. Overlay header and
+    move text with a text field, output PGN, then when saved, load PGN and
+    with new header and move text -->
+ <p id="header" style="xdisplay: none; text-align: center" 
+  onclick="javascript:load_fen(prompt('Enter game state in FEN notation:', save_fen()))">
   <span class="players">
    <span id="White" class="player_name" style="display: none">White</span>
    <span id="WhiteElo" class="player_elo" style="display: none">(1500)</span>
@@ -2414,14 +2427,10 @@ function enable_document_selection(enable) {
  </p>
 
   <div id="moves_container" style="width: 500px; text-align: justify">
-  <!-- TODO: click to edit moves container and header as PGN, turn into a text --
-    -- field, output PGN, then when saved, load PGN. -->
   <!-- TODO: scrollbar, http://livepipe.net/control/scrollbar -->
   <p id="moves"></p>
   </div>
 
-  <!-- TODO: give current FEN from save_fen(), so can edit -->
-  <p><a href="javascript:load_fen(prompt('Enter game state in FEN notation:', save_fen()))">Load FEN</a>
  </td>
 </tr>
 </table>
