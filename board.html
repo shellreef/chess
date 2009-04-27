@@ -300,9 +300,8 @@ function load_pgn(pgn)
     }
 
     // Starting position
-    GAME_STATE.position_at[0] = game.FEN;
-
     load_fen(game.FEN, true);
+    GAME_STATE.position_at[0] = game.FEN;
 }
 
 // Parse PGN into a dictionary
@@ -1592,7 +1591,14 @@ function move_piece_to_square(piece, square, is_hypothetical)
         var alg_move, move_id, turn_info, this_move_id;
        
         if (GAME_STATE.active_color === "white") {
-            alg_move = '<span class="fullmove_number">' + GAME_STATE.fullmove_number + '</span>. ';
+            alg_move = '<span class="fullmove_number">' + GAME_STATE.fullmove_number + '</span>';
+            if (GAME_STATE.fullmove_number === 1) {
+                // Period goes to initial position, kind of strange, but its uninstrusive
+                alg_move += move_link("0", ".");
+            } else {
+                alg_move += ".";
+            }
+            alg_move += " " 
         } else {
             alg_move = " ";
         }
