@@ -381,6 +381,29 @@ function move_link(move_id, text)
         '\')">' + text + "</a>";
 }
 
+// Decode ply number to color and fullmove number.
+function decode_ply(ply)
+{
+    var color, fullmove_number;
+
+    color = (ply % 2 === 1) ? "white" : "black";
+    fullmove_number = Math.ceil(ply / 2);
+
+    return {color: color, fullmove_number: fullmove_number};
+}
+
+// Encode color and fullmove number back to ply. Ply is useful for 
+// arrays of moves.
+function encode_ply(color, fullmove_number)
+{
+    var ply;
+
+    ply = fullmove_number * 2;
+    ply -= (color === "white" ? 1 : 0);
+
+    return ply;
+}
+
 //// USER FUNCTIONS
 
 // TOOD: support Smith notation, https://www.chessclub.com/chessviewer/smith.html
