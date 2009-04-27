@@ -393,7 +393,10 @@ function decode_ply(ply)
 }
 
 // Encode color and fullmove number back to ply. Ply is useful for 
-// arrays of moves.
+// arrays of moves, since it is one integer, instead of integer+color.
+// TODO: replace "move_id"s of color+fullmove with plys, easier to
+// increment/decrement, and then could add accesskey attributes
+// for , and . to go to next and previous move easily.
 function encode_ply(color, fullmove_number)
 {
     var ply;
