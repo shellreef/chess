@@ -355,16 +355,34 @@ function load_ply(ply)
     // TODO: would be tool to be able to also decode
     // color + fullmove number, for ease of human use.
     // Make "1." be ply 1, and "1..." or "1. ..." be ply 2.
+    // Maybe make it a user function, go()
     
     $$("a.active_move").each(function(m) {
             m.removeClassName("active_move");
-    });
+        });
 
     load_fen(GAME_STATE.position_after[ply]);
 
     $$("a#ply_" + ply).each(function(m) {
-        m.addClassName("active_move");
-    });
+            m.addClassName("active_move");
+        });
+
+    // Next/back navigation
+    $$("a.accessible_move").each(function(m) {
+            m.removeClassName("accessible_move");
+            m.removeAttribute("accesskey");
+        });
+
+
+    $$("a#ply_" + (ply + 1)).each(function(m) {
+            m.setAttribute("accesskey", ".");   // ctrl+option+.
+            m.addClassName("accessible_move");
+        });
+
+    $$("a#ply_" + (ply - 1)).each(function(m) {
+            m.setAttribute("accesskey", ",");   // ctrl+option+,
+            m.addClassName("accessible_move");
+        });
 }
 
 // Make a link to a move, click it and it loads the board after it.
