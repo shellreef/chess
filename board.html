@@ -363,9 +363,7 @@ function load_ply(ply)
 
     load_fen(GAME_STATE.position_after[ply]);
 
-    $$("a#ply_" + ply).each(function(m) {
-            m.addClassName("active_move");
-        });
+    $("ply_" + ply).addClassName("active_move");
 
     set_next_back_accesskeys(ply);
 }
