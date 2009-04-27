@@ -1593,9 +1593,6 @@ function move_piece_to_square(piece, square, is_hypothetical)
         move_text = castle_move_text;
     }
 
-    // TODO: record move in algebraic notation, and how about descriptive too?
-    // TODO: also, CRAN (Concise Reversible Algebraic Notation, see http://www.chessville.com/reviews/PlayStrongerChessExaminingChess960.htm )
-
     // If not a multi-move (moving rook in castling), log and go to next turn
     if (!is_hypothetical) {
         // TODO: ellipsis if black is first recorded move, or intervening commentary
@@ -1613,6 +1610,9 @@ function move_piece_to_square(piece, square, is_hypothetical)
         } else {
             alg_move = " ";
         }
+
+        // TODO: also, CRAN (Concise Reversible Algebraic Notation), see 
+        // http://www.chessville.com/reviews/PlayStrongerChessExaminingChess960.htm
 
         move_id = GAME_STATE.fullmove_number + GAME_STATE.active_color;
 
@@ -2414,10 +2414,11 @@ function enable_document_selection(enable) {
  </p>
 
   <div id="moves_container" style="width: 500px; text-align: justify">
+  <!-- TODO: click to edit moves container and header as PGN, turn into a text --
+    -- field, output PGN, then when saved, load PGN. -->
+  <!-- TODO: scrollbar, http://livepipe.net/control/scrollbar -->
   <p id="moves"></p>
   </div>
-  <!-- TODO: edit PGN -->
-  <!--<textarea name="moves" id="moves" rows="20" cols="20" readonly></textarea>-->
 
   <!-- TODO: give current FEN from save_fen(), so can edit -->
   <p><a href="javascript:load_fen(prompt('Enter game state in FEN notation:', save_fen()))">Load FEN</a>
