@@ -112,6 +112,7 @@ if (!window.google) {
 
 /* TODO: why aren't these miniifed? http://code.google.com/apis/ajaxlibs/documentation/index.html#prototype has
  * direct paths but neither prototype nor scriptaculous are minified.. others are though. */
+/* TODO: http://compressorrater.thruhere.net/ */
 google.load("prototype", "1.6.0.3");
 google.load("scriptaculous", "1.8.2");
 
@@ -271,6 +272,7 @@ function load_pgn(pgn)
     var parenthetize = {WhiteElo: 1, BlackElo: 1, Round: 1};
     var show_vs = false;
 
+    // Header
     for (var i = 0; i < tags.length; ++i) {
         var tag = tags[i];
         var node = $(tag);
@@ -297,9 +299,13 @@ function load_pgn(pgn)
         $("vs").hide();
     }
 
+    // Starting position
+    GAME_STATE.position_at[0] = game.FEN;
+
     load_fen(game.FEN, true);
 }
 
+// Parse PGN into a dictionary
 function parse_pgn(pgn)
 {
     var lines = pgn.split("\n");
@@ -356,6 +362,15 @@ function load_move(move_id)
     $$("a#move_" + move_id).each(function(m) {
         m.addClassName("active_move");
     });
+}
+
+// Make a link to a move, click it and it loads the board after it.
+function move_link(move_id, text)
+{
+    return '<a id="move_' + move_id + '" class="active_move" ' +
+        'href="javascript:load_move(\'' + 
+            move_id +
+        '\')">' + text + "</a>";
 }
 
 //// USER FUNCTIONS
@@ -1574,7 +1589,6 @@ function move_piece_to_square(piece, square, is_hypothetical)
     // If not a multi-move (moving rook in castling), log and go to next turn
     if (!is_hypothetical) {
         // TODO: ellipsis if black is first recorded move, or intervening commentary
-        //var alg_move = GAME_STATE.fullmove_number + ". " + (GAME_STATE.active_color === "black" ? " ... " : "") + move_text;
         var alg_move, move_id, turn_info, this_move_id;
        
         if (GAME_STATE.active_color === "white") {
@@ -1585,28 +1599,20 @@ function move_piece_to_square(piece, square, is_hypothetical)
 
         move_id = GAME_STATE.fullmove_number + GAME_STATE.active_color;
 
-        alg_move += '<a id="move_' + move_id + '" class="active_move" ' +
-            'href="javascript:load_move(\'' + 
-            move_id +
-            '\')">';
-        alg_move += move_text;
-
         this_move_id = GAME_STATE.fullmove_number + GAME_STATE.active_color;
         only_move = VALID_MOVES.keys().length === 1;
 
         turn_info = set_turn("next");
         if (turn_info.text_move) {
-            alg_move += turn_info.text_move;
+            move_text += turn_info.text_move;
         }
+
+        alg_move += move_link(move_id, move_text) + " ";
 
         if (only_move) {
             // NAG for "only move", see http://www.markalowery.net/Chess/Notation/NAG.html
-            alg_move += " $7";
+            alg_move += "$7 ";
         }
-
-        alg_move += '</a>';
-
-        alg_move += (opposite_color(GAME_STATE.active_color) === "black" ? "\n" : "");
 
         $$("a.active_move").each(function(m) {
                 m.removeClassName("active_move");
