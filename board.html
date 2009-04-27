@@ -118,7 +118,7 @@ google.load("scriptaculous", "1.8.2");
 
 var GAME_STATE = {
     // Whose turn it is
-    active_color: '',
+    active_color: 'w',
     
     // Castling privileges
     can_castle: {white: {short: true, long: true}, black: {short: true, long: true}},
@@ -126,7 +126,7 @@ var GAME_STATE = {
     ep_target: null,
 
     halfmove_clock: 0,    // Ply since last pawn advance / capture
-    fullmove_number: 0,   // Increment after black moves
+    fullmove_number: 1,   // Increment after black moves
 
     // Not game state, but other globals
     dragging: false,
@@ -1322,22 +1322,12 @@ function opposite_color(color)
 // If historical, do not check for threefold repetition.
 function set_turn(color, historical)
 {
-    var new_color, active_pieces, checked, no_moves, text_move, text_end, repeats;
+    var new_color, active_pieces, checked, no_moves, text_move, text_end, old_color, old_fullmove, repeats;
 
     assert(color === "white" || color === "black" || color === "next", "set_turn(" + color + "): invalid color");
 
-    // BEFORE setting the turn, wrap it up.
-    var new_state = save_fen();
-    if (!historical) {
-        repeats = check_repetition();
-    }
-    if (color === "next") { 
-        var key = GAME_STATE.fullmove_number + GAME_STATE.active_color;
-        GAME_STATE.position_at[key] = new_state;
-    }
+    old_color = GAME_STATE.active_color;
 
-
-    // The most common value. Specific colors only for initial load.
     if (color === "next") {
         new_color = opposite_color(GAME_STATE.active_color);
     } else {
@@ -1347,6 +1337,7 @@ function set_turn(color, historical)
     $("status").innerHTML = ucfirst(new_color) + "'s Turn";
 
     // Move number is incremented after black moves, according to rules.
+    old_fullmove = GAME_STATE.fullmove_number;
     if (GAME_STATE.active_color === "black") {
         GAME_STATE.fullmove_number += 1;
     }
@@ -1383,6 +1374,17 @@ function set_turn(color, historical)
         }
     } else {
         set_check_message("");
+    }
+
+    var new_state = save_fen();
+    if (!historical) {
+        // TODO: this has the wrong move numbers! Since set_turn was already called.
+        repeats = check_repetition();
+    }
+    
+    if (color === "next") { 
+        var key = old_fullmove + old_color;
+        GAME_STATE.position_at[key] = new_state;
     }
 
     return {text_move: text_move, text_end: text_end, repeats: repeats};
