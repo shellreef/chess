@@ -1407,6 +1407,16 @@ function check_repetition(move_id)
     var new_state = save_fen(true);
     var reps;
 
+    // This is weird, but "position 0" is hereby defined to be
+    // the board's initial state, even though the positions are 
+    // usually named as fullmove_number + active_color, and the
+    // initial FEN begins at fullmove_number = 1, even before
+    // anyone has moved.
+    if (move_id.indexOf("white") === -1 &&
+        move_id.indexOf("black") === -1) {
+        move_id = "0";
+    }
+
     // Save new board state for three-move repetition
     if (GAME_STATE.position_moves[new_state] === undefined) {
         GAME_STATE.position_moves[new_state] = [move_id];
