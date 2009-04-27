@@ -23,7 +23,7 @@ span.player_elo { font-size: small; }
 /* PGN */
 span.fullmove_number { font-weight: bold; }
 a.active_move { border-bottom: 1px dashed; }
-a.repeated_move { text-decoration: underline; }     /* goes well with dots and dashes */
+/*a.repeated_move { text-decoration: underline; }*/     /* goes well with dots and dashes */
 /*a.repeated_move { background-color: yellow; }*/   /* highlight */
 
 /* TODO: switch to divs, for flexibility, and use background-image.. or maybe not */
@@ -1612,19 +1612,27 @@ function move_piece_to_square(piece, square, is_hypothetical)
 }
 
 // Visually indicate the moves which after threefold repetition
+// Unfortunately, we highlight the move *after* the board state was repeated. This is
+// because the first clickable link, say 1. Nf3, loads the move after
+// Nf3 was made, not before (the initial board position). But you can
+// repeat the initial board position:
+// 1. Nf3 Nf6 2. Ng1 Ng8 3. Nf3 Nf6 4. Ng1 Ng8
 function mark_repeated_moves(reps)
 {
-    // Highlight the repeated moves so they trust us. Unfortunately,
-    // we highlight the move *after* the board state was repeated. This is
-    // because the first clickable link, say 1. Nf3, loads the move after
-    // Nf3 was made, not before (the initial board position). But you can
-    // repeat the initial board position:
-    // 1. Nf3 Nf6 2. Ng1 Ng8 3. Nf3 Nf6 4. Ng1 Ng8
+    // Generate a random, but pastel, color to visually mark the
+    // group of repeated moves. This is different each time, so that
+    // multiple groups of repeated moves, if that ever occurs, are
+    // differentiated FYI.
+    var color = 'rgb(' + randint(250, 250) + ", " +
+                         randint(250, 250) + ", " +
+                         randint(0, 255) + ")"
+
     for (var i = 0; i < reps.length; ++i) {
         var move_id = reps[i];
 
         $$("a#move_" + move_id).each(function(m) {
-                m.addClassName("repeated_move");
+                //m.addClassName("repeated_move");
+                m.setStyle({backgroundColor: color});
             });
     }
 }
