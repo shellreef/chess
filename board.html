@@ -262,6 +262,70 @@ google.setOnLoadCallback(function() {
 
 // PGN (PORTABLE GAME NOTATION) FUNCTIONS
 
+// Make the PGN content editable (not to be confused with edible).
+var ORIGINAL_UI_HTML;
+function edit_pgn()
+{
+    ORIGINAL_UI_HTML = $("game_ui").innerHTML;
+
+    // TODO: build dynamically using Builder.node, but it gives me a 
+    // builder.js this.NODEMAP undefined error.
+    $("game_ui").innerHTML = "<textarea id='pgn' cols='80' rows='35'>" + save_pgn().escapeHTML() + 
+        "</textarea>" + 
+        "<button type='button' name='ok' accesskey='o' " + 
+        "onclick='javascript:reload_pgn()'>OK</button>" +
+        "<button type='button' name='cancel' onclick='restore_edit()' accesskey='x'>Cancel</button>";
+    // TODO: PGN, too!
+   //load_fen(prompt('Enter game state in FEN notation:', save_fen()));
+}
+
+// Restore the game interface, removing the edit area.
+function restore_edit()
+{
+    $("game_ui").innerHTML = ORIGINAL_UI_HTML;
+}
+
+// Create a PGN tagpair, in PGN format.
+function pgn_tag(key, value)
+{
+    var pgn, quoted_value;
+
+    // TODO: rules for quoting values?
+    quoted_value = '"' + value + '"';
+    pgn = "[" + key + " " + quoted_value + "]\n";
+
+    return pgn;
+}
+
+// Export game as PGN.
+function save_pgn()
+{
+    var pgn = "";
+    var tags = ["White", "WhiteElo", "Black", "BlackElo", "Event", "Round", "Site", "Date", "Time"];
+    
+    for (var i = 0; i < tags.length; ++i) {
+        var tag = tags[i];
+
+        // TODO: unparenthetize, uncommaify, etc. .. or just set attributes
+        // to exactly what we want in load_pgn(), then fetch it.
+        pgn += pgn_tag(tag, $(tag).innerHTML);
+    }
+    pgn += pgn_tag("FEN", save_fen());
+
+    // TODO: save moves
+    pgn += "\n";
+    
+    return pgn;
+}
+
+// Reload PGN after editing it.
+function reload_pgn()
+{
+    restore_edit();
+
+    load_pgn($("game_ui").innerHTML);
+}
+
 // Load a game in Portable Game Notation (PGN) format
 //  TODO: recognize various ECO codes, see http://scid.sourceforge.net/help/ECO.html
 //  and http://scid.sourceforge.net/help/EPD.html
@@ -2436,12 +2500,14 @@ function enable_document_selection(enable) {
  </td><td style="vertical-align: top">
  <noscript><p>JavaScript is disabled, nothing will work!</p></noscript>
 
+ <div id="game_ui">
+
  <!-- Header elements, game metadata. Hidden/shown as needed. -->
   <!-- TODO: click header to edit as PGN, instead of FEN. Overlay header and
     move text with a text field, output PGN, then when saved, load PGN and
     with new header and move text -->
  <p id="header" style="xdisplay: none; text-align: center" 
-  onclick="javascript:load_fen(prompt('Enter game state in FEN notation:', save_fen()))">
+  onclick="javascript:edit_pgn()">
   <span class="players">
    <span id="White" class="player_name" style="display: none">White</span>
    <span id="WhiteElo" class="player_elo" style="display: none">(1500)</span>
@@ -2474,6 +2540,7 @@ function enable_document_selection(enable) {
   <!-- TODO: scrollbar, http://livepipe.net/control/scrollbar -->
   <p id="moves"></p>
   </div>
+</div>
 
  </td>
 </tr>
