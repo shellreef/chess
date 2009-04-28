@@ -275,8 +275,8 @@ function edit_pgn()
         "<button type='button' name='ok' accesskey='o' " + 
         "onclick='javascript:reload_pgn()'>OK</button>" +
         "<button type='button' name='cancel' onclick='restore_edit()' accesskey='x'>Cancel</button>";
-    // TODO: PGN, too!
-   //load_fen(prompt('Enter game state in FEN notation:', save_fen()));
+
+    $("pgn").focus();
 }
 
 // Restore the game interface, removing the edit area.
