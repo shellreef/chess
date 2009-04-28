@@ -285,32 +285,19 @@ function restore_edit()
     $("game_ui").innerHTML = ORIGINAL_UI_HTML;
 }
 
-// Create a PGN tagpair, in PGN format.
-function pgn_tag(key, value)
-{
-    var pgn, quoted_value;
-
-    // TODO: rules for quoting values?
-    quoted_value = '"' + value + '"';
-    pgn = "[" + key + " " + quoted_value + "]\n";
-
-    return pgn;
-}
-
 // Export game as PGN.
 function save_pgn()
 {
-    var pgn = "";
+    var pgn = "", dict;
     var tags = ["White", "WhiteElo", "Black", "BlackElo", "Event", "Round", "Site", "Date", "Time"];
-    
+   
+    dict = {};
     for (var i = 0; i < tags.length; ++i) {
         var tag = tags[i];
 
-        // TODO: unparenthetize, uncommaify, etc. .. or just set attributes
-        // to exactly what we want in load_pgn(), then fetch it.
-        pgn += pgn_tag(tag, $(tag).innerHTML);
+        dict[tag] = $(tag).innerHTML;
     }
-    pgn += pgn_tag("FEN", save_fen());
+    pgn = output_pgn_dict(dict);
 
     // TODO: save moves
     pgn += "\n";
@@ -412,6 +399,26 @@ function parse_pgn(pgn)
 
     return dict;
 }
+
+// Export a PGN tag dictionary to PGN format, opposite of parse_pgn.
+function output_pgn_dict(dict)
+{
+    var pgn, quoted_value;
+
+    pgn = "";
+    for (var key in dict) {
+        var value = dict[key];
+
+        // TODO: unparenthetize, uncommaify, etc. .. or just set attributes
+        // to exactly what we want in load_pgn(), then fetch it.
+        // TODO: rules for quoting values?
+        quoted_value = '"' + value + '"';
+        pgn += "[" + key + " " + quoted_value + "]\n";
+    }
+
+    return pgn;
+}
+
 
 // Load a move by ply. Used to navigate to past moves.
 function load_ply(ply)
