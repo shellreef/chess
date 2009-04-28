@@ -308,9 +308,11 @@ function save_pgn()
 // Reload PGN after editing it.
 function reload_pgn()
 {
+    var pgn = $F("pgn");
+
     restore_edit();
 
-    load_pgn($("game_ui").innerHTML);
+    load_pgn(pgn);
 }
 
 // Load a game in Portable Game Notation (PGN) format
