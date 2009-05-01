@@ -1658,7 +1658,7 @@ function name_squares()
 }
 
 // Acknowledge that a piece was captured. Called by move_piece_to_square(), which
-// does all the DOM manipulation. Returns part of algebraic notation.
+// does all the DOM manipulation. 
 function capture_piece(piece)
 {
     assert(piece, "capture_piece(" + piece + "): piece is false");
@@ -1683,8 +1683,6 @@ function capture_piece(piece)
     }
 
     // TODO: show as captured, somewhere with icons
-    
-    return "x";
 }
 
 // Find precomputed algebraic notation for this move. Called when
@@ -1763,20 +1761,15 @@ function move_piece_to_square(piece, square, is_hypothetical)
         GAME_STATE.ep_target = POSSIBLE_EP_TARGETS[filerank];
         //console.log("NEW EP TARGET",GAME_STATE.ep_target);
     }
+            
+    // TODO: disambiguate, show file (and rank, if needed) came from. 
+    // File: move_text += xy2filerank([from_square.x, from_square.y]).substr(0, 1);
 
     // Capture piece(s) on destination square. Multiple pieces
     // are supported here, but not elsewhere in the code (yet). Might be
     // an interesting variation to have multiple pieces occupy same square.
     while (square.firstChild) {
-
-        // If pawn was capturing, need to show file it came from.
-        /* TODO? 
-        if (piece.type === "pawn") {
-            move_text += xy2filerank([from_square.x, from_square.y]).substr(0, 1);
-        }
-        
-        move_text += capture_piece(square.firstChild);
-        */
+        capture_piece(square.firstChild);
         square.removeChild(square.firstChild);
     }
 
@@ -1785,10 +1778,12 @@ function move_piece_to_square(piece, square, is_hypothetical)
         square.x === GAME_STATE.ep_target[0] && 
         square.y === GAME_STATE.ep_target[1]) {
 
+        console.log("EN PASSANT");
+
         var forward = forwards_vector(GAME_STATE.active_color);
         var dead_pawn_square = sq(square.x, square.y - forward);
 
-        //TODO move_text += capture_piece(pc(dead_pawn_square));
+        capture_piece(pc(dead_pawn_square));
         dead_pawn_square.removeChild(dead_pawn_square.firstChild);
     }
 
