@@ -1250,8 +1250,7 @@ function decode_one_parlett(parlett, xy, color)
 
             return add_flags(ep_moves, flags);
         } else if (ch === "E") {
-            // TODO: save GAME_STATE.ep_target, if actually make this move
-           
+            // This move creates an en passant target square
             flags.mark_en_passant = true;
 
         // Standard Parlett
@@ -1713,7 +1712,7 @@ function algebraic_from_piece_square(piece, square)
 // (castling) so it shouldn't be logged.
 function move_piece_to_square(piece, square, is_hypothetical)
 {
-    var from_square, move_text, castle_move_text;
+    var from_square, move_text, castle_move_text, old_ep_target;
 
     assert(piece, "move_piece_to_square(" + piece + ", " + square + "): piece is false");
     assert(square, "move_piece_to_square(" + piece + ", " + square + "): square is false");
@@ -1755,13 +1754,7 @@ function move_piece_to_square(piece, square, is_hypothetical)
     // Lookup standard algebraic move notation (precomputed)
     move_text = algebraic_from_piece_square(piece, square);
     
-    // If double pawn move, set en passant target square
-    filerank = xy2filerank([square.x, square.y]);
-    if (POSSIBLE_EP_TARGETS[filerank]) {
-        GAME_STATE.ep_target = POSSIBLE_EP_TARGETS[filerank];
-        //console.log("NEW EP TARGET",GAME_STATE.ep_target);
-    }
-            
+           
     // TODO: disambiguate, show file (and rank, if needed) came from. 
     // File: move_text += xy2filerank([from_square.x, from_square.y]).substr(0, 1);
 
@@ -1778,13 +1771,20 @@ function move_piece_to_square(piece, square, is_hypothetical)
         square.x === GAME_STATE.ep_target[0] && 
         square.y === GAME_STATE.ep_target[1]) {
 
-        console.log("EN PASSANT");
-
         var forward = forwards_vector(GAME_STATE.active_color);
         var dead_pawn_square = sq(square.x, square.y - forward);
 
         capture_piece(pc(dead_pawn_square));
         dead_pawn_square.removeChild(dead_pawn_square.firstChild);
+    }
+
+    // If double pawn move, this creates an en passant target square
+    filerank = xy2filerank([square.x, square.y]);
+    if (POSSIBLE_EP_TARGETS[filerank]) {
+        GAME_STATE.ep_target = POSSIBLE_EP_TARGETS[filerank];
+    } else {
+        // En passant possibility disappears immediately after any other move
+        GAME_STATE.ep_target = null;
     }
 
     //TODOmove_text += filerank;
@@ -1862,9 +1862,6 @@ function move_piece_to_square(piece, square, is_hypothetical)
             mark_repeated_moves(turn_info.repeats);
         }
     }
-
-    // En passant possibility disappears immediately after move
-    GAME_STATE.ep_target = null;
 
     // AI - artificial intelligence 
     // Do this after a delay, so that when playing computer vs. computer, you can
