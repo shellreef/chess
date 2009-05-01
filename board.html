@@ -729,12 +729,14 @@ function calculate_moves(color, get_only)
         piece.prior_position = filerank;    // for removal
         moves.each(function(move) {
             var square = sq(move[0], move[1]);
-            var algebraic;
+            var algebraic, capture_indicator;
+
+            capture_indicator = move[2].is_capture ? "x" : "";
            
             if (move[2].algebraic) {
                 algebraic = move[2].algebraic;
             } else {
-                algebraic = algebraic_piece_prefix(piece) + xy2filerank(move[0], move[1]);
+                algebraic = algebraic_piece_prefix(piece) + capture_indicator + xy2filerank(move[0], move[1]);
             }
 
             // Store algebraic notation -> [piece, square] map for understanding the notation
@@ -817,7 +819,8 @@ function filtered_moves(piece, color, is_hypothetical)
     var unfiltered = unfiltered_moves(parlett, xy, color);
 
     filtered = unfiltered.select(function(move) {
-        var piece_under;
+        // Is a capture move if there is a piece under it.
+        move[2].is_capture = !!(pc(move[0], move[1]));
 
         // If castle move, check if castling allowed
         if (move[2].castle) {
@@ -848,16 +851,14 @@ function filtered_moves(piece, color, is_hypothetical)
 
         if (move[2].capture_only) {
             // Destination square must be occupied by enemy piece
-            piece_under = pc(move[0], move[1]);
-            if (!piece_under) {
+            if (!move[2].is_capture) {
                 return false;    // needs something to capture
             }
         }
         
         if (move[2].no_capture) {
             // Can only move if unoccupied, not to capture
-            piece_under = pc(move[0], move[1]);
-            if (piece_under) {
+            if (move[2].is_capture) {
                 return false;    // can't capture, man
             }
         }
