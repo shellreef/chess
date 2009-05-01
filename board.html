@@ -354,6 +354,7 @@ function parse_pgn(pgn)
 {
     var lines = pgn.split("\n");
     var dict = {};
+    var move_text = "";
 
     // Parse header into dictionary
     for (var i = 0; i < lines.length; ++i) {
@@ -379,6 +380,10 @@ function parse_pgn(pgn)
 
                 dict[key] = value;
             }
+        } else if (line.substr(0, 1) === ";" || line.length === 0) {
+            ;
+        } else {
+            move_text += line + " ";
         }
     }
 
@@ -389,6 +394,7 @@ function parse_pgn(pgn)
     }
     
     // TODO: parse move list
+    console.log("<",move_text,">");
     // TODO: parse more than one game per file, return in array
 
     return dict;
