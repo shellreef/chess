@@ -716,14 +716,8 @@ function calculate_moves(color, get_only)
             var square = sq(move[0], move[1]);
             var algebraic;
            
-            if (move[2].castle) {
-                if (move[0] === 7) {
-                    algebraic = "O-O";
-                } else if (move[0] === 3) {
-                    algebraic = "O-O-O";
-                } else {
-                    assert(false, "calculate_moves: move "+xy2filerank(move[0], move[1])+" unknown castle, couldn't convert to algebraic notation");
-                }
+            if (move[2].algebraic) {
+                algebraic = move[2].algebraic;
             } else {
                 algebraic = algebraic_piece_prefix(piece) + xy2filerank(move[0], move[1]);
             }
@@ -898,8 +892,10 @@ function filtered_moves(piece, color, is_hypothetical)
 
             if (move[0] === 7) {
                 castle = "short";
+                move[2].algebraic = "O-O";
             } else if (move[0] === 3) {
                 castle = "long";
+                move[2].algebraic = "O-O-O";
             } else {
                 return false; // not allowed
                 assert(false, "filtered_moves(" + piece + "): unknown name of castling to x="+x+", not long/short. " +
