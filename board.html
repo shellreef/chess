@@ -392,6 +392,26 @@ function parse_pgn(pgn)
         dict.FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
         dict.SetUp = 1;
     }
+
+    var reading_move = false;
+    var move_number_text = "";
+    var move_san = "";
+
+    for (i = 0; i < move_text.length; ++i) {
+        var ch = move_text.substr(i, 1);
+
+        if (reading_move) {
+            move_san += ch;
+        } else if (/[0-9]/.test(ch)) {
+            move_number_text += ch;
+        } else if (ch === ".") {
+            console.log("move_number_text",move_number_text);
+            console.log(move_san);
+            
+            // Read SAN move
+            reading_move = true;
+        }
+    }
     
     // TODO: parse move list
     console.log("<",move_text,">");
