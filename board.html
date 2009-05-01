@@ -322,8 +322,6 @@ function load_pgn(pgn)
 {
     var game = parse_pgn(pgn);
     var tags = ["White", "WhiteElo", "Black", "BlackElo", "Event", "Round", "Site", "Date", "Time"];
-    var parenthetize = {WhiteElo: 1, BlackElo: 1, Round: 1};
-    var show_vs = false;
 
     // Header
     for (var i = 0; i < tags.length; ++i) {
@@ -336,20 +334,14 @@ function load_pgn(pgn)
             var value = game[tag];
 
             $(tag).show();
-            if (parenthetize[tag]) { value = "(" + value + ")"; }
-            if (tag === "Round") { value += ", "; }
-            if (tag === "White") { show_vs = true; }
 
             $(tag).innerHTML = value;
+
+            $$(".show_" + tag).each(function(e) { e.show(); });
         } else {
             $(tag).hide();
+            $$(".show_" + tag).each(function(e) { e.hide(); });
         }
-    }
-
-    if (show_vs) {
-        $("vs").show();
-    } else {
-        $("vs").hide();
     }
 
     // Starting position
@@ -2519,15 +2511,15 @@ function enable_document_selection(enable) {
   onclick="javascript:edit_pgn()">
   <span class="players">
    <span id="White" class="player_name" style="display: none">White</span>
-   <span id="WhiteElo" class="player_elo" style="display: none">(1500)</span>
-    <span id="vs" style="display: none">vs.</span>
+   <span class="player_elo"><span style="display: none" class="show_WhiteElo">(</span><span id="WhiteElo" style="display: none">1500</span><span class="show_WhiteElo" style="display: none">)</span></span>
+    <span id="vs" style="display: none" class="show_WhiteElo">vs.</span>
    <span id="Black" class="player_name" style="display: none">Black</span>
-   <span id="BlackElo" class="player_elo" style="display: none">(1500)</span>
+   <span class="player_elo"><span style="display: none" class="show_BlackElo">(</span><span id="BlackElo" style="display: none">1500</span><span class="show_BlackElo" style="display: none">)</span></span>
   </span>
    <br>
 
-   <span id="Event" style="display: none">Event</span
-   ><span id="Round" style="display: none">(Round)</span>
+   <span id="Event" style="display: none">Event</span>
+   <span style="display: none" class="show_Round">(</span><span id="Round" style="display: none">Round</span><span style="display: none" class="show_Round">)</span>
    <span id="Site" style="display: none">Site</span><br>
 
    <span id="Date" style="display: none">Date</span>
