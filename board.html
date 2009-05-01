@@ -406,12 +406,18 @@ function parse_pgn(pgn)
     // Parse move text
     var tokens = move_text.split(" ");
     var fullmove_number, outcome, moves = [], color = "white";
+    var in_comment = false;
 
     for (i = 0; i < tokens.length; ++i) {
         var token = tokens[i];
 
         if (token === "") {
             ;
+        } else if (in_comment) {
+            if (token.substr(token.length - 1) === "}") {
+                in_comment = false;
+            }
+            // TODO: support annotations
         } else if (token.substring(token.length - 1) === ".") {
             fullmove_number = parseInt(token, 10);
 
@@ -430,10 +436,13 @@ function parse_pgn(pgn)
             outcome = "Draw";
         } else if (token === "*") { 
             outcome = "(In progress)";
+        } else if (token.substr(0, 1) === "{") {
+            in_comment = true;
         } else {
             // Move 
             
             var ply = encode_ply(color, fullmove_number);
+            // TODO: handle #, + for checkmate and check, part of move
             moves[ply] = token;
 
             // white, then black
