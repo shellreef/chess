@@ -736,7 +736,8 @@ function calculate_moves(color, get_only)
                 algebraic = move[2].algebraic;
             } else {
                 var capture_indicator, starting_file;
-                
+
+                // XXX TODO SERIOUS BUG: Why are black captures not recognized?
                 if (move[2].is_capture) {
                     capture_indicator = "x";
 
