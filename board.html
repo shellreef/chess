@@ -347,6 +347,12 @@ function load_pgn(pgn)
     // Starting position
     load_fen(game.FEN, true);
     GAME_STATE.position_after[0] = game.FEN;
+
+    for (i = 1; i < game.moves.length; ++i) {
+        var move = game.moves[i];
+
+        mv(move);
+    }
 }
 
 // Parse PGN into a dictionary
@@ -431,7 +437,7 @@ function parse_pgn(pgn)
     // TODO: parse more than one game per file, return in array, 
     // then show drop-down list to select game from library.
 
-    console.log(dict);
+    //console.log(dict);
     return dict;
 }
 
@@ -2073,10 +2079,10 @@ function piece_letter2name(letter)
 function algebraic_piece_prefix(piece)
 {
     // TODO: option for Figurine Algebraic Notation, FAN
-    if (PIECE_TYPES[piece.type].letter !== undefined) {
-        return PIECE_TYPES[piece.type].letter;
-    } else if (PIECE_TYPES[piece.type].alg_letter !== undefined) {
+    if (PIECE_TYPES[piece.type].alg_letter !== undefined) {
         return PIECE_TYPES[piece.type].alg_letter;
+    } else if (PIECE_TYPES[piece.type].letter !== undefined) {
+        return PIECE_TYPES[piece.type].letter;
     }
 
     assert(false, "algebraic_piece_prefix(" + piece + "): unrecognized piece");
