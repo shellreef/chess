@@ -256,8 +256,11 @@ google.setOnLoadCallback(function() {
 
     // TODO: library of interesting games, see
     // http://www.xs4all.nl/~timkr/records/records.htm and http://www.xs4all.nl/~timkr/ChessTutor/pgnview.htm
-   
-    pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
+
+    // test PGN embedded notes
+    //pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
+    
+    pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
 });
 
 // PGN (PORTABLE GAME NOTATION) FUNCTIONS
@@ -348,10 +351,11 @@ function load_pgn(pgn)
     load_fen(game.FEN, true);
     GAME_STATE.position_after[0] = game.FEN;
 
-    for (i = 1; i < game.moves.length; ++i) {
-        var move = game.moves[i];
+    for (var ply = 1; ply < game.moves.length; ++ply) {
+        var move = game.moves[ply];
 
-        mv(move);
+        console.log(ply, move);
+        //mv(move);
     }
 }
 
@@ -411,6 +415,8 @@ function parse_pgn(pgn)
         } else if (token.substring(token.length - 1) === ".") {
             fullmove_number = parseInt(token, 10);
             color = "white";     // white moves first
+
+            // TODO: support 3.... for black
         } else if (token === "1-0") {
             outcome = "White wins";
         } else if (token === "0-1") {
@@ -708,7 +714,19 @@ function calculate_moves(color, get_only)
         piece.prior_position = filerank;    // for removal
         moves.each(function(move) {
             var square = sq(move[0], move[1]);
-            var algebraic = algebraic_piece_prefix(piece) + xy2filerank(move[0], move[1]);
+            var algebraic;
+           
+            if (move[2].castle) {
+                if (move[0] === 7) {
+                    algebraic = "O-O";
+                } else if (move[0] === 3) {
+                    algebraic = "O-O-O";
+                } else {
+                    assert(false, "calculate_moves: move "+xy2filerank(move[0], move[1])+" unknown castle, couldn't convert to algebraic notation");
+                }
+            } else {
+                algebraic = algebraic_piece_prefix(piece) + xy2filerank(move[0], move[1]);
+            }
 
             // Store algebraic notation -> [piece, square] map for understanding the notation
             // XXX TODO: Need to disambiguate moves! Sometimes the same type of piece can
