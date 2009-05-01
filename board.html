@@ -729,15 +729,30 @@ function calculate_moves(color, get_only)
         piece.prior_position = filerank;    // for removal
         moves.each(function(move) {
             var square = sq(move[0], move[1]);
-            var algebraic, capture_indicator;
+            var algebraic;
 
-            capture_indicator = move[2].is_capture ? "x" : "";
-           
             if (move[2].algebraic) {
+                // Override notation; used for special moves (castling)
                 algebraic = move[2].algebraic;
             } else {
-                algebraic = algebraic_piece_prefix(piece) + capture_indicator + xy2filerank(move[0], move[1]);
+                var capture_indicator, starting_file;
+                
+                if (move[2].is_capture) {
+                    capture_indicator = "x";
+
+                    // Pawn captures begin with file of pawn.
+                    // TODO: full disambiguation!
+                    if (piece.type === "pawn") {
+                        starting_file = filerank.substr(0, 1);
+                    }
+                } else {
+                    capture_indicator = starting_file = "";
+                }
+
+                algebraic = algebraic_piece_prefix(piece) + starting_file + capture_indicator + xy2filerank(move[0], move[1]);
             }
+
+
 
             // Store algebraic notation -> [piece, square] map for understanding the notation
             // XXX TODO: Need to disambiguate moves! Sometimes the same type of piece can
@@ -1755,10 +1770,6 @@ function move_piece_to_square(piece, square, is_hypothetical)
     // Lookup standard algebraic move notation (precomputed)
     move_text = algebraic_from_piece_square(piece, square);
     
-           
-    // TODO: disambiguate, show file (and rank, if needed) came from. 
-    // File: move_text += xy2filerank([from_square.x, from_square.y]).substr(0, 1);
-
     // Capture piece(s) on destination square. Multiple pieces
     // are supported here, but not elsewhere in the code (yet). Might be
     // an interesting variation to have multiple pieces occupy same square.
