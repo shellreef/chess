@@ -697,9 +697,9 @@ function in_check(victim_color, all_moves)
 // After the board changes and it is the next person's turn, calculate 
 // what the next possible allowable moves are, and update the globals with this information.
 //
-// If get_only, do not update globals, and allow "moves" that put in
+// If not_hypothetical, do not update globals, and allow "moves" that put in
 // check (useful for attacks, see is_hypothetical).
-function calculate_moves(color, get_only)
+function calculate_moves(color, not_hypothetical)
 {
     var valid_moves = new Hash();
     var valid_alg_moves = new Hash();
@@ -711,7 +711,7 @@ function calculate_moves(color, get_only)
     $$("img." + color).each(function(piece) { 
         var filerank, square_from, moves;
 
-        moves = filtered_moves(piece, color, get_only);
+        moves = filtered_moves(piece, color, not_hypothetical);
         square_from = sq(piece);
 
         if (!square_from) {
@@ -761,7 +761,7 @@ function calculate_moves(color, get_only)
             valid_alg_moves.set(algebraic, [piece, square]);
 
 
-            if (!get_only) {
+            if (!not_hypothetical) {
                 // For removal
                 ALL_DROP_TARGETS.push(square);
 
@@ -784,7 +784,7 @@ function calculate_moves(color, get_only)
 
 
 
-    if (!get_only) {
+    if (!not_hypothetical) {
         VALID_MOVES = valid_moves;
         VALID_ALGEBRAIC_MOVES = valid_alg_moves;
     }
