@@ -257,7 +257,7 @@ google.setOnLoadCallback(function() {
     // TODO: library of interesting games, see
     // http://www.xs4all.nl/~timkr/records/records.htm and http://www.xs4all.nl/~timkr/ChessTutor/pgnview.htm
    
-    pgn = load_pgn('[Event "10:00 PM"]\n[Site "Shredder for iPhone / iPod touch"]\n[Date "2009.04.23"]\n[Round "?"]\n[White "Player"]\n[Black "Shredder"]\n[WhiteElo "1230"]\n[BlackElo "1236"]\n[Result "1-0"]\n\n1. e4 e5 2. Nf3 d6 3. Bb5 Nc6 4. Bxc6 bxc6 5. d4 Bg4 6. dxe5 dxe5 7. O-O f6\n8. Nc3 Kf7 9. Be3 Qxd1 10. Raxd1 Bxf3 11. gxf3 Bb4 12. Rd7 Ne7 13. Rxc7 Bxc3\n14. bxc3 a6 15. Bc5 Rhe8 16. Bxe7 Rxe7 17. Rxc6 Rb7 18. Rd1 Rb2 19. Rd7 Kg6\n20. Rcc7 Rb1 21. Kg2 Ra1 22. Rxg7 Kh6 23. Rxh7 Kg5 24. Rhg7 Kh4 25. Rg4 Kh5\n26. Rh7 1-0');
+    pgn = load_pgn('[Event "F/S Return Match"]/\n[Site "Belgrade, Serbia JUG"]/\n[Date "1992.11.04"]/\n[Round "29"]/\n[White "Fischer, Robert J."]/\n[Black "Spassky, Boris V."]/\n[Result "1/2-1/2"]/\n /\n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6/\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7/\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5/\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6/\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5/\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5/\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6/\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
 });
 
 // PGN (PORTABLE GAME NOTATION) FUNCTIONS
@@ -393,30 +393,45 @@ function parse_pgn(pgn)
         dict.SetUp = 1;
     }
 
-    var reading_move = false;
-    var move_number_text = "";
-    var move_san = "";
+    // Parse move text
+    var tokens = move_text.split(" ");
+    var fullmove_number, outcome, moves = [], color = "white";
 
-    for (i = 0; i < move_text.length; ++i) {
-        var ch = move_text.substr(i, 1);
+    for (i = 0; i < tokens.length; ++i) {
+        var token = tokens[i];
 
-        if (reading_move) {
-            move_san += ch;
-        } else if (/[0-9]/.test(ch)) {
-            move_number_text += ch;
-        } else if (ch === ".") {
-            console.log("move_number_text",move_number_text);
-            console.log(move_san);
+        if (token === "") {
+            ;
+        } else if (token.substring(token.length - 1) === ".") {
+            fullmove_number = parseInt(token, 10);
+            color = "white";     // white moves first
+        } else if (token === "1-0") {
+            outcome = "White wins";
+        } else if (token === "0-1") {
+            outcome = "Black wins";
+        } else if (token === "1/2-1/2") {
+            outcome = "Draw";
+        } else if (token === "*") { 
+            outcome = "(In progress)";
+        } else {
+            // Move 
             
-            // Read SAN move
-            reading_move = true;
+            var ply = encode_ply(color, fullmove_number);
+            moves[ply] = token;
+
+            // white, then black
+            if (color === "white") {
+                color = opposite_color(color);
+            } 
         }
     }
-    
-    // TODO: parse move list
-    console.log("<",move_text,">");
-    // TODO: parse more than one game per file, return in array
+    dict.outcome = outcome;
+    dict.moves = moves;
+        
+    // TODO: parse more than one game per file, return in array, 
+    // then show drop-down list to select game from library.
 
+    console.log(dict);
     return dict;
 }
 
