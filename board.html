@@ -354,8 +354,9 @@ function load_pgn(pgn)
     for (var ply = 1; ply < game.moves.length; ++ply) {
         var move = game.moves[ply];
 
-        console.log(ply, move);
-        mv(move);
+        //console.log(ply, move);
+        //XYZ mv(move);
+        //XXX
     }
 }
 
@@ -1686,6 +1687,27 @@ function capture_piece(piece)
     return "x";
 }
 
+// Find precomputed algebraic notation for this move. Called when
+// user drags a piece to a square and we don't know what move it is.
+function algebraic_from_piece_square(piece, square)
+{
+    var ret;
+
+    // TODO: better data structure, inverted hash table lookup
+    VALID_ALGEBRAIC_MOVES.each(function(alg_piece_square) {
+            var alg = alg_piece_square[0];
+            var this_piece = alg_piece_square[1][0];
+            var this_square = alg_piece_square[1][1];
+
+            if (this_square === square && this_piece === piece) {
+                ret = alg;
+                throw $break;
+            }
+        });
+
+    return ret;
+}
+
 // Manipulate the DOM nodes to move the piece to its new location,
 // and advance to the next move. Does not do anything graphical
 // with dragging.
@@ -1730,11 +1752,13 @@ function move_piece_to_square(piece, square, is_hypothetical)
         }
     }
 
-    // Generate algebraic move notation
-    filerank = xy2filerank([square.x, square.y]);
-    move_text = algebraic_letter(piece.type);
+
+
+    // Lookup standard algebraic move notation (precomputed)
+    move_text = algebraic_from_piece_square(piece, square);
     
     // If double pawn move, set en passant target square
+    filerank = xy2filerank([square.x, square.y]);
     if (POSSIBLE_EP_TARGETS[filerank]) {
         GAME_STATE.ep_target = POSSIBLE_EP_TARGETS[filerank];
         //console.log("NEW EP TARGET",GAME_STATE.ep_target);
@@ -1746,11 +1770,13 @@ function move_piece_to_square(piece, square, is_hypothetical)
     while (square.firstChild) {
 
         // If pawn was capturing, need to show file it came from.
+        /* TODO? 
         if (piece.type === "pawn") {
             move_text += xy2filerank([from_square.x, from_square.y]).substr(0, 1);
         }
-
+        
         move_text += capture_piece(square.firstChild);
+        */
         square.removeChild(square.firstChild);
     }
 
@@ -1762,11 +1788,11 @@ function move_piece_to_square(piece, square, is_hypothetical)
         var forward = forwards_vector(GAME_STATE.active_color);
         var dead_pawn_square = sq(square.x, square.y - forward);
 
-        move_text += capture_piece(pc(dead_pawn_square));
+        //TODO move_text += capture_piece(pc(dead_pawn_square));
         dead_pawn_square.removeChild(dead_pawn_square.firstChild);
     }
 
-    move_text += filerank;
+    //TODOmove_text += filerank;
 
     // Move to new square
     if (piece.parentNode) {
