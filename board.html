@@ -735,7 +735,7 @@ function calculate_moves(color, is_hypothetical)
                 // Override notation; used for special moves (castling)
                 algebraic = move[2].algebraic;
             } else {
-                var capture_indicator, starting_file;
+                var capture_indicator = "", starting_file = "";
 
                 // XXX TODO SERIOUS BUG: Why are black captures not recognized?
                 if (move[2].is_capture) {
@@ -745,9 +745,7 @@ function calculate_moves(color, is_hypothetical)
                     // TODO: full disambiguation!
                     if (piece.type === "pawn") {
                         starting_file = filerank.substr(0, 1);
-                    }
-                } else {
-                    capture_indicator = starting_file = "";
+                    } 
                 }
 
                 algebraic = algebraic_piece_prefix(piece) + starting_file + capture_indicator + xy2filerank(move[0], move[1]);
