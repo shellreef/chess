@@ -142,6 +142,7 @@ var VALID_SAN_MOVES = null;        // Map Standard Algebraic Notation -> [piece,
 var VALID_LAN_MOVES = null;        // Map Long Algebraic Notation -> [piece, square]
 var VALID_FAN_MOVES = null;        // Map Figurine Algebraic Notation -> [piece, square]
 var VALID_COORD_MOVES = null;      // Map Coordinate Notation -> [piece, square]
+var VALID_SMITH_MOVES = null;      // Map Smith Notation -> [piece, square]
 var ALL_DROP_TARGETS = [];         // Droppables for UI
 var POSSIBLE_EP_TARGETS = null;             // If move to key, set en passant target to value
 
@@ -242,7 +243,7 @@ google.setOnLoadCallback(function() {
 
     name_squares();    
 
-    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
+    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
     //load_fen("rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w KQkq - 0 1"); // pawnless chess
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
@@ -260,9 +261,10 @@ google.setOnLoadCallback(function() {
     //load_fen("4r3/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle out of check
     //load_fen("5r2/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle through check
     //load_fen("rnbqkbnr/ppp2ppp/8/8/8/8/PPP2PPP/RNBQKBNR w KQkq - 0 1"); // to test "only move" 
+    
     //load_fen("8/8/8/8/8/8/3N4/6N1 w - - 0 1"); // disambiguate moves by file (Ngf3, Ndf3)
     //load_fen("8/8/8/6N1/8/8/8/6N1 w - - 0 1"); // disambiguate moves by rank (N5f3, N1f3)
-    load_fen("8/8/8/4N1N1/3N3N/8/3N3N/4N1N1 w - - 0 1"); // disambiguate both (Ne5f3, Nd4f3, Ng5f3, Nh4f3, Nh2f3, Ng1f3, Ne1f3, Nd2f3)
+    //load_fen("8/8/8/4N1N1/3N3N/8/3N3N/4N1N1 w - - 0 1"); // disambiguate both (Ne5f3, Nd4f3, Ng5f3, Nh4f3, Nh2f3, Ng1f3, Ne1f3, Nd2f3)
 
 
     // TODO: library of interesting games, see
@@ -594,6 +596,7 @@ function mv(alg_move)
     if (!piece_square) { piece_square = VALID_LAN_MOVES.get(alg_move); }
     if (!piece_square) { piece_square = VALID_FAN_MOVES.get(alg_move); }
     if (!piece_square) { piece_square = VALID_COORD_MOVES.get(alg_move); }
+    if (!piece_square) { piece_square = VALID_SMITH_MOVES.get(alg_move); }
 
     assert(piece_square, "mv(" + alg_move + "): illegal move");
 
@@ -722,6 +725,7 @@ function calculate_moves(color, is_hypothetical)
     var valid_lan_moves = new Hash();
     var valid_fan_moves = new Hash();
     var valid_coord_moves = new Hash();
+    var valid_smith_moves = new Hash();
 
     assert(color === "black" || color === "white",
             "calculate_moves(" + color + "): bad color or no color given");
@@ -748,7 +752,7 @@ function calculate_moves(color, is_hypothetical)
         piece.prior_position = starting_filerank;    // for removal
         moves.each(function(move) {
             var square = sq(move[0], move[1]);
-            var algebraic, long_algebraic, figurine_algebraic, figurine, coordinate;
+            var algebraic, long_algebraic, figurine_algebraic, figurine, coordinate, smith;
             var dest_filerank = xy2filerank(move[0], move[1]);
 
             if (move[2].algebraic) {
@@ -756,8 +760,9 @@ function calculate_moves(color, is_hypothetical)
                 algebraic = move[2].algebraic;
             } else {
                 var capture_indicator = "", starting_file = ""; // TODO: not just file, intelligent disambiguate
+                var capture_letter = "";
 
-                if (move[2].is_capture) {
+                if (move[2].capture) {
                     capture_indicator = "x";
 
                     // Pawn captures begin with file of pawn.
@@ -778,6 +783,12 @@ function calculate_moves(color, is_hypothetical)
                 long_algebraic = algebraic_piece_prefix(piece) + starting_filerank + 
                     (capture_indicator ? capture_indicator : "-") + dest_filerank;
                 coordinate = starting_filerank.toUpperCase() + "-" + dest_filerank.toUpperCase();
+                // TODO: E = en passant capture, c=short castle, C=long castle
+                // pnbrqk = captured respective piece
+                if (move[2].capture) {
+                    capture_letter = PIECE_TYPES[move[2].capture.type].letter.toLowerCase();
+                } 
+                smith = starting_filerank + dest_filerank + capture_letter;
             }
 
 
@@ -789,6 +800,7 @@ function calculate_moves(color, is_hypothetical)
             valid_lan_moves.set(long_algebraic, [piece, square]);
             valid_fan_moves.set(figurine_algebraic, [piece, square]);
             valid_coord_moves.set(coordinate, [piece, square]);
+            valid_smith_moves.set(smith, [piece, square]);
 
             if (!is_hypothetical) {
                 // For removal
@@ -820,6 +832,7 @@ function calculate_moves(color, is_hypothetical)
         VALID_LAN_MOVES = valid_lan_moves;
         VALID_FAN_MOVES = valid_fan_moves;
         VALID_COORD_MOVES = valid_coord_moves;
+        VALID_SMITH_MOVES = valid_smith_moves;
     }
 
     return valid_moves;
@@ -868,13 +881,8 @@ function filtered_moves(piece, color, is_hypothetical)
     var unfiltered = unfiltered_moves(parlett, xy, color);
 
     filtered = unfiltered.select(function(move) {
-        // If this is a capture, store the letter.
-        var piece_under = pc(move[0], move[1]);
-        if (piece_under) {
-            move[2].capture = PIECE_TYPES[piece_under.type].letter;
-        } else {
-            move[2].capture = null;
-        }
+        // The piece that this move will capture, if any.
+        move[2].capture = pc(move[0], move[1]);
 
         // If castle move, check if castling allowed
         if (move[2].castle) {
@@ -905,14 +913,14 @@ function filtered_moves(piece, color, is_hypothetical)
 
         if (move[2].capture_only) {
             // Destination square must be occupied by enemy piece
-            if (!move[2].is_capture) {
+            if (!move[2].capture) {
                 return false;    // needs something to capture
             }
         }
         
         if (move[2].no_capture) {
             // Can only move if unoccupied, not to capture
-            if (move[2].is_capture) {
+            if (move[2].capture) {
                 return false;    // can't capture, man
             }
         }
