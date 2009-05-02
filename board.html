@@ -243,7 +243,7 @@ google.setOnLoadCallback(function() {
 
     name_squares();    
 
-    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
+    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
     //load_fen("rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w KQkq - 0 1"); // pawnless chess
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
@@ -254,7 +254,7 @@ google.setOnLoadCallback(function() {
     //load_fen("k7/8/K7/8/8/8/8/8 b - - 0 30"); // K against K
     //load_fen("4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5"); // remove check by capture
     //load_fen("k1K5/8/8/8/8/8/p/88888888 b - - 0 5"); // pawn promotion
-    //load_fen("8/8/8/3pP3/8/8/8/8 w - d6 0 5"); // en passant
+    load_fen("8/8/8/3pP3/8/8/8/8 w - d6 0 5"); // en passant
     //load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); 
     //load_fen("k7/8/8/8/8/8/8/5KQ1 w - d6 0 50");  // K + KQ
     //load_fen("k7/8/8/8/8/8/8/5KR1 w - d6 0 50");  // K + KR
@@ -577,9 +577,6 @@ function encode_ply(color, fullmove_number)
 
 //// USER FUNCTIONS
 
-// TODO: support Smith notation, https://www.chessclub.com/chessviewer/smith.html
-// Big TODO: support descriptive notation, to help read older (but good!) chess books
-
 // Convenience function to move given algebraic notation, for use within
 // JavaScript console (Develop -> Show Error Console in Safari) if you want
 // a command-line instead of a GUI. Computer move also uses this function, but it is
@@ -762,7 +759,7 @@ function calculate_moves(color, is_hypothetical)
                 var capture_indicator = "", starting_file = ""; // TODO: not just file, intelligent disambiguate
                 var capture_letter = "";
 
-                if (move[2].capture) {
+                if (move[2].capture || move[2].en_passant_capture) {
                     capture_indicator = "x";
 
                     // Pawn captures begin with file of pawn.
@@ -778,17 +775,24 @@ function calculate_moves(color, is_hypothetical)
                     figurine = algebraic_piece_prefix(piece);
                 }
 
+                // Various chess notations: SAN, FAN, LAN, coordinate, Smith.
                 algebraic = algebraic_piece_prefix(piece) + starting_file + capture_indicator + dest_filerank;
                 figurine_algebraic = figurine + starting_file + capture_indicator + dest_filerank;
                 long_algebraic = algebraic_piece_prefix(piece) + starting_filerank + 
                     (capture_indicator ? capture_indicator : "-") + dest_filerank;
                 coordinate = starting_filerank.toUpperCase() + "-" + dest_filerank.toUpperCase();
-                // TODO: E = en passant capture, c=short castle, C=long castle
-                // pnbrqk = captured respective piece
-                if (move[2].capture) {
+                // Smith notation, reversible, non-ambiguous: https://www.chessclub.com/chessviewer/smith.html
+                // TODO: c=short castle, C=long castle
+                if (move[2].en_passant_capture) { 
+                    // E = en passant capture
+                    capture_letter = "E";
+                } else if (move[2].capture) {
+                    // pnbrqk = captured respective piece
                     capture_letter = PIECE_TYPES[move[2].capture.type].letter.toLowerCase();
                 } 
                 smith = starting_filerank + dest_filerank + capture_letter;
+
+                // Big TODO: support descriptive notation, to help read older (but good!) chess books
             }
 
 
@@ -881,7 +885,9 @@ function filtered_moves(piece, color, is_hypothetical)
     var unfiltered = unfiltered_moves(parlett, xy, color);
 
     filtered = unfiltered.select(function(move) {
-        // The piece that this move will capture, if any.
+        // The piece that this move will capture, if any. 
+        // Only includes pieces that are captured by moving over. For
+        // en passant captures, en_passant_capture will be true, NOT capture!
         move[2].capture = pc(move[0], move[1]);
 
         // If castle move, check if castling allowed
@@ -1306,7 +1312,7 @@ function decode_one_parlett(parlett, xy, color)
                 // We can move to the ep target square.. even though there is no piece there, we'll
                 // capture the pawn in front of it.
                 ep_moves = [[GAME_STATE.ep_target[0], GAME_STATE.ep_target[1]]];
-                flags.en_passant_capture = true; // not needed, but informative
+                flags.en_passant_capture = true;   
             } else {
                 ep_moves = [];
             }
