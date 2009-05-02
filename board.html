@@ -868,7 +868,13 @@ function filtered_moves(piece, color, is_hypothetical)
     var unfiltered = unfiltered_moves(parlett, xy, color);
 
     filtered = unfiltered.select(function(move) {
-        move[2].is_capture = !!pc(move[0], move[1]);
+        // If this is a capture, store the letter.
+        var piece_under = pc(move[0], move[1]);
+        if (piece_under) {
+            move[2].capture = PIECE_TYPES[piece_under.type].letter;
+        } else {
+            move[2].capture = null;
+        }
 
         // If castle move, check if castling allowed
         if (move[2].castle) {
