@@ -706,8 +706,101 @@ function in_check(victim_color, all_moves)
     return attacked;
 }
 
-function calculate_notations()
+// Calculate and save the SAN, LAN, etc. move notations for a move.
+// Note: only do this if not hypothetical.
+function calculate_notations(color, piece, moves, starting_filerank)
 {
+    // Create drop targets for the valid destinations, linking
+    // the draggables to droppables using piece- + source square.
+    piece.addClassName("piece-" + starting_filerank);
+    piece.prior_position = starting_filerank;    // for removal
+
+    moves.each(function(move) {
+        var square = sq(move[0], move[1]);
+
+        var algebraic, long_algebraic, figurine_algebraic, figurine, coordinate, smith;
+        var dest_filerank = xy2filerank(move[0], move[1]);
+
+        // Compute algebraic notation (SAN, LAN, FAN)
+        if (move[2].algebraic) {
+            // Override notation; used for special moves (castling)
+            algebraic = figurine_algebraic = long_algebraic = move[2].algebraic;
+        } else {
+            var capture_indicator = "", starting_file = ""; // TODO: not just file, intelligent disambiguate
+            var capture_letter = "";
+
+            if (move[2].capture || move[2].en_passant_capture) {
+                capture_indicator = "x";
+
+                // Pawn captures begin with file of pawn.
+                // TODO: full disambiguation!
+                if (piece.type === "pawn") {
+                    starting_file = starting_filerank.substr(0, 1);
+                } 
+            }
+
+            if (PIECE_TYPES[piece.type].figurines) {
+                figurine = PIECE_TYPES[piece.type].figurines[color === "white" ? 0 : 1];
+            } else {
+                figurine = algebraic_piece_prefix(piece);
+            }
+
+            algebraic = algebraic_piece_prefix(piece) + starting_file + capture_indicator + dest_filerank;
+            figurine_algebraic = figurine + starting_file + capture_indicator + dest_filerank;
+            long_algebraic = algebraic_piece_prefix(piece) + starting_filerank + 
+                (capture_indicator ? capture_indicator : "-") + dest_filerank;
+        }
+
+        // Coordinate notation
+        coordinate = starting_filerank.toUpperCase() + "-" + dest_filerank.toUpperCase();
+
+        // Smith notation, reversible, non-ambiguous: https://www.chessclub.com/chessviewer/smith.html
+        if (move[2].smith_castle) {
+            // c = short castle, C = long castle
+            capture_letter = move[2].smith_castle;
+        } else if (move[2].en_passant_capture) { 
+            // E = en passant capture
+            capture_letter = "E";
+        } else if (move[2].capture) {
+            // pnbrqk = captured respective piece. This is what makes it reversible.
+            capture_letter = PIECE_TYPES[move[2].capture.type].letter.toLowerCase();
+        } 
+        smith = starting_filerank + dest_filerank + capture_letter;
+        
+        // TODO: support promotation in all notations, make separate moves (a8=Q, a8=N, etc.)
+
+        // Big TODO: support descriptive notation, to help read older (but good!) chess books
+        // Descriptive vs algebraic is like imperial vs. metric units, in some ways. Descriptive
+        // is from each player's perspective, so 1. P-K4 P-K4 is easily recognizable as the same
+        // move from both players, more readily than 1. e4 e5. And 2. PxP PxP more clearly shows
+        // a pawn trade than 10. exd5 cxd5. Smith notation shows the latter, too, but the coordinates
+        // are still not symmetric from each player's perspective. I like descriptive. Problem is
+        // just that it needs to be disambiguated often, algebraic less so.
+        // This paper mentions how a book on openings for black showed all of the diagrams from
+        // white's perspective: http://www.castlelong.com/essay/Essay_HSym_fd47b_Doc_Prn.PDF
+        // -- it discusses symmetric figurines, interesting. Although it says algebraic is superior.
+        // All notations: http://en.wikipedia.org/wiki/Chess_notation
+
+
+        // XXX TODO: Need to disambiguate moves! Sometimes the same type of piece can
+        // move to the same square. Fun. Or use long algebraic notation.
+
+        // Store algebraic notation -> [piece, square] map for understanding the notation
+        VALID_MOVE_NOTATIONS.SAN.set(algebraic, [piece, square]);
+        VALID_MOVE_NOTATIONS.LAN.set(long_algebraic, [piece, square]);
+        VALID_MOVE_NOTATIONS.FAN.set(figurine_algebraic, [piece, square]);
+        VALID_MOVE_NOTATIONS.coord.set(coordinate, [piece, square]);
+        VALID_MOVE_NOTATIONS.smith.set(smith, [piece, square]);
+
+        // For removal
+        ALL_DROP_TARGETS.push(square);
+
+        // You can drop here
+        Droppables.add(square, {
+            accept: "piece-" + starting_filerank,
+            onDrop: move_dropped_piece,
+            hoverclass: 'hover'});
+    });
 }
 
 // After the board changes and it is the next person's turn, calculate 
@@ -743,104 +836,12 @@ function calculate_moves(color, is_hypothetical)
         }
 
         // Convert xy to filerank notation (a string), so it can be easily used
-        // as a hash key (that's the only reason)
+        // as a hash key, class name for droppables, and also for notations.
         starting_filerank = square_from.filerank;
 
         if (!is_hypothetical) {
-            // Create drop targets for the valid destinations, linking
-            // the draggables to droppables using piece- + source square.
-            piece.addClassName("piece-" + starting_filerank);
-            piece.prior_position = starting_filerank;    // for removal
+            calculate_notations(color, piece, moves, starting_filerank)
         }
-        moves.each(function(move) {
-            var square = sq(move[0], move[1]);
-
-            var algebraic, long_algebraic, figurine_algebraic, figurine, coordinate, smith;
-            var dest_filerank = xy2filerank(move[0], move[1]);
-
-            // Compute algebraic notation (SAN, LAN, FAN)
-            if (move[2].algebraic) {
-                // Override notation; used for special moves (castling)
-                algebraic = figurine_algebraic = long_algebraic = move[2].algebraic;
-            } else {
-                var capture_indicator = "", starting_file = ""; // TODO: not just file, intelligent disambiguate
-                var capture_letter = "";
-
-                if (move[2].capture || move[2].en_passant_capture) {
-                    capture_indicator = "x";
-
-                    // Pawn captures begin with file of pawn.
-                    // TODO: full disambiguation!
-                    if (piece.type === "pawn") {
-                        starting_file = starting_filerank.substr(0, 1);
-                    } 
-                }
-
-                if (PIECE_TYPES[piece.type].figurines) {
-                    figurine = PIECE_TYPES[piece.type].figurines[color === "white" ? 0 : 1];
-                } else {
-                    figurine = algebraic_piece_prefix(piece);
-                }
-
-                algebraic = algebraic_piece_prefix(piece) + starting_file + capture_indicator + dest_filerank;
-                figurine_algebraic = figurine + starting_file + capture_indicator + dest_filerank;
-                long_algebraic = algebraic_piece_prefix(piece) + starting_filerank + 
-                    (capture_indicator ? capture_indicator : "-") + dest_filerank;
-            }
-
-            // Coordinate notation
-            coordinate = starting_filerank.toUpperCase() + "-" + dest_filerank.toUpperCase();
-
-            // Smith notation, reversible, non-ambiguous: https://www.chessclub.com/chessviewer/smith.html
-            if (move[2].smith_castle) {
-                // c = short castle, C = long castle
-                capture_letter = move[2].smith_castle;
-            } else if (move[2].en_passant_capture) { 
-                // E = en passant capture
-                capture_letter = "E";
-            } else if (move[2].capture) {
-                // pnbrqk = captured respective piece. This is what makes it reversible.
-                capture_letter = PIECE_TYPES[move[2].capture.type].letter.toLowerCase();
-            } 
-            smith = starting_filerank + dest_filerank + capture_letter;
-            
-            // TODO: support promotation in all notations, make separate moves (a8=Q, a8=N, etc.)
-
-            // Big TODO: support descriptive notation, to help read older (but good!) chess books
-            // Descriptive vs algebraic is like imperial vs. metric units, in some ways. Descriptive
-            // is from each player's perspective, so 1. P-K4 P-K4 is easily recognizable as the same
-            // move from both players, more readily than 1. e4 e5. And 2. PxP PxP more clearly shows
-            // a pawn trade than 10. exd5 cxd5. Smith notation shows the latter, too, but the coordinates
-            // are still not symmetric from each player's perspective. I like descriptive. Problem is
-            // just that it needs to be disambiguated often, algebraic less so.
-            // This paper mentions how a book on openings for black showed all of the diagrams from
-            // white's perspective: http://www.castlelong.com/essay/Essay_HSym_fd47b_Doc_Prn.PDF
-            // -- it discusses symmetric figurines, interesting. Although it says algebraic is superior.
-            // All notations: http://en.wikipedia.org/wiki/Chess_notation
- 
-
-            // XXX TODO: Need to disambiguate moves! Sometimes the same type of piece can
-            // move to the same square. Fun. Or use long algebraic notation.
-
-            if (!is_hypothetical) {
-                // Store algebraic notation -> [piece, square] map for understanding the notation
-                VALID_MOVE_NOTATIONS.SAN.set(algebraic, [piece, square]);
-                VALID_MOVE_NOTATIONS.LAN.set(long_algebraic, [piece, square]);
-                VALID_MOVE_NOTATIONS.FAN.set(figurine_algebraic, [piece, square]);
-                VALID_MOVE_NOTATIONS.coord.set(coordinate, [piece, square]);
-                VALID_MOVE_NOTATIONS.smith.set(smith, [piece, square]);
-
-                // For removal
-                ALL_DROP_TARGETS.push(square);
-
-                // You can drop here
-                Droppables.add(square, {
-                    accept: "piece-" + starting_filerank,
-                    onDrop: move_dropped_piece,
-                    hoverclass: 'hover'});
-
-            }
-        });
 
         // Store valid moves for mouseovers etc.
         if (moves.length !== 0) {
