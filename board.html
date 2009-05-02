@@ -782,8 +782,12 @@ function calculate_notations(color, piece, moves, starting_filerank)
         // All notations: http://en.wikipedia.org/wiki/Chess_notation
 
 
-        // XXX TODO: Need to disambiguate moves! Sometimes the same type of piece can
-        // move to the same square. Fun. Or use long algebraic notation.
+        // XXX TODO: Need to disambiguate moves! Idea to do this: first pass, store
+        // array of moves in all possible formats in each notation. For SAN, that would be
+        // Ng1f3, N1f3, Ngf3, Nf3 for a knight move. Descriptive would have more. Make
+        // a pass through all the notations, and remove duplicates since they are ambiguous.
+        // Then remove all but the shortest notation in each array (make this optional, but
+        // enabled by default; otherwise, can use superfluously-disambiguated moves).
 
         // Store algebraic notation -> [piece, square] map for understanding the notation
         VALID_MOVE_NOTATIONS.SAN.set(algebraic, [piece, square]);
