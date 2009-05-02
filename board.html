@@ -797,6 +797,8 @@ function calculate_moves(color, is_hypothetical)
                 capture_letter = PIECE_TYPES[move[2].capture.type].letter.toLowerCase();
             } 
             smith = starting_filerank + dest_filerank + capture_letter;
+            
+            // TODO: support promotation in all notations, make separate moves (a8=Q, a8=N, etc.)
 
             // Big TODO: support descriptive notation, to help read older (but good!) chess books
             // Descriptive vs algebraic is like imperial vs. metric units, in some ways. Descriptive
@@ -805,6 +807,10 @@ function calculate_moves(color, is_hypothetical)
             // a pawn trade than 10. exd5 cxd5. Smith notation shows the latter, too, but the coordinates
             // are still not symmetric from each player's perspective. I like descriptive. Problem is
             // just that it needs to be disambiguated often, algebraic less so.
+            // This paper mentions how a book on openings for black showed all of the diagrams from
+            // white's perspective: http://www.castlelong.com/essay/Essay_HSym_fd47b_Doc_Prn.PDF
+            // -- it discusses symmetric figurines, interesting. Although it says algebraic is superior.
+            // All notations: http://en.wikipedia.org/wiki/Chess_notation
  
 
 
@@ -1904,8 +1910,9 @@ function move_piece_to_square(piece, square, is_hypothetical)
             alg_move = " ";
         }
 
-        // TODO: also, CRAN (Concise Reversible Algebraic Notation), see 
+        // TODO: also, CRAN (Concise Reversible Algebraic Notation), MAN, RAN, see 
         // http://www.chessville.com/reviews/PlayStrongerChessExaminingChess960.htm
+        //
 
         ply = encode_ply(GAME_STATE.active_color, GAME_STATE.fullmove_number);
 
