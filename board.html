@@ -585,6 +585,10 @@ function mv(alg_move)
     }
 
     piece_square = VALID_SAN_MOVES.get(alg_move);
+    if (!piece_square) {
+        piece_square = VALID_LAN_MOVES.get(alg_move);
+    }
+
     assert(piece_square, "mv(" + alg_move + "): illegal move");
 
     piece = piece_square[0];
@@ -708,13 +712,14 @@ function calculate_moves(color, is_hypothetical)
 {
     var valid_moves = new Hash();
     var valid_san_moves = new Hash();
+    var valid_lan_moves = new Hash();
 
     assert(color === "black" || color === "white",
             "calculate_moves(" + color + "): bad color or no color given");
 
     // Look at all the active pieces
     $$("img." + color).each(function(piece) { 
-        var filerank, square_from, moves;
+        var starting_filerank, square_from, moves;
 
         moves = filtered_moves(piece, color, is_hypothetical);
         square_from = sq(piece);
@@ -726,15 +731,15 @@ function calculate_moves(color, is_hypothetical)
 
         // Convert xy to filerank notation (a string), so it can be easily used
         // as a hash key (that's the only reason)
-        filerank = square_from.filerank;
+        starting_filerank = square_from.filerank;
 
         // Create drop targets for the valid destinations, linking
         // the draggables to droppables using piece- + source square.
-        piece.addClassName("piece-" + filerank);
-        piece.prior_position = filerank;    // for removal
+        piece.addClassName("piece-" + starting_filerank);
+        piece.prior_position = starting_filerank;    // for removal
         moves.each(function(move) {
             var square = sq(move[0], move[1]);
-            var algebraic;
+            var algebraic, long_algebraic;
 
             if (move[2].algebraic) {
                 // Override notation; used for special moves (castling)
@@ -742,18 +747,19 @@ function calculate_moves(color, is_hypothetical)
             } else {
                 var capture_indicator = "", starting_file = "";
 
-                // XXX TODO SERIOUS BUG: Why are black captures not recognized?
                 if (move[2].is_capture) {
                     capture_indicator = "x";
 
                     // Pawn captures begin with file of pawn.
                     // TODO: full disambiguation!
                     if (piece.type === "pawn") {
-                        starting_file = filerank.substr(0, 1);
+                        starting_file = starting_filerank.substr(0, 1);
                     } 
                 }
 
                 algebraic = algebraic_piece_prefix(piece) + starting_file + capture_indicator + xy2filerank(move[0], move[1]);
+                long_algebraic = algebraic_piece_prefix(piece) + starting_filerank + 
+                    (capture_indicator ? capture_indicator : "-") + xy2filerank(move[0], move[1]);
             }
 
 
@@ -762,7 +768,7 @@ function calculate_moves(color, is_hypothetical)
             // XXX TODO: Need to disambiguate moves! Sometimes the same type of piece can
             // move to the same square. Fun. Or use long algebraic notation.
             valid_san_moves.set(algebraic, [piece, square]);
-
+            valid_lan_moves.set(long_algebraic, [piece, square]);
 
             if (!is_hypothetical) {
                 // For removal
@@ -770,7 +776,7 @@ function calculate_moves(color, is_hypothetical)
 
                 // You can drop here
                 Droppables.add(square, {
-                    accept: "piece-" + filerank,
+                    accept: "piece-" + starting_filerank,
                     onDrop: move_dropped_piece,
                     hoverclass: 'hover'});
 
@@ -779,10 +785,10 @@ function calculate_moves(color, is_hypothetical)
 
         // Store valid moves for mouseovers etc.
         if (moves.length !== 0) {
-            valid_moves.set(filerank, moves);
+            valid_moves.set(starting_filerank, moves);
         }
 
-        //console.log(filerank, moves);
+        //console.log(starting_filerank, moves);
     });
 
 
@@ -791,6 +797,7 @@ function calculate_moves(color, is_hypothetical)
         // For reals.
         VALID_MOVES = valid_moves;
         VALID_SAN_MOVES = valid_san_moves;
+        VALID_LAN_MOVES = valid_lan_moves;
     }
 
     return valid_moves;
