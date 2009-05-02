@@ -138,7 +138,7 @@ var GAME_STATE = {
 // Moves that can be made right now, for each active piece.
 var VALID_MOVES = null;            // Keyed by filerank of source, array of [[x,y,flags]] destinations
 var VALID_MOVES_OPP = null;        // Moves opponent could make, if it was their turn (attacking)
-var VALID_ALGEBRAIC_MOVES = null;  // Map algebraic -> [piece, square]
+var VALID_SAN_MOVES = null;  // Map algebraic -> [piece, square]
 var ALL_DROP_TARGETS = [];         // Droppables for UI
 var POSSIBLE_EP_TARGETS = null;             // If move to key, set en passant target to value
 
@@ -580,10 +580,10 @@ function mv(alg_move)
     var piece_square, piece, square;
 
     if (!alg_move) {
-        return VALID_ALGEBRAIC_MOVES.keys();
+        return VALID_SAN_MOVES.keys();
     }
 
-    piece_square = VALID_ALGEBRAIC_MOVES.get(alg_move);
+    piece_square = VALID_SAN_MOVES.get(alg_move);
     assert(piece_square, "mv(" + alg_move + "): illegal move");
 
     piece = piece_square[0];
@@ -789,7 +789,7 @@ function calculate_moves(color, is_hypothetical)
     if (!is_hypothetical) {
         // For reals.
         VALID_MOVES = valid_moves;
-        VALID_ALGEBRAIC_MOVES = valid_alg_moves;
+        VALID_SAN_MOVES = valid_alg_moves;
     }
 
     return valid_moves;
@@ -808,10 +808,10 @@ function computer_move_if_applicable()
     // TODO: weak AI, take most valuable piece, checkmate if can, check if can,
     //     fork if can.. something to entertain a beginner. Or better yet,
     // plugin to a remote network server.
-    var keys = VALID_ALGEBRAIC_MOVES.keys();
+    var keys = VALID_SAN_MOVES.keys();
     var alg_move = keys[randint(0, keys.length - 1)];
 
-    var piece_square = VALID_ALGEBRAIC_MOVES.get(alg_move);
+    var piece_square = VALID_SAN_MOVES.get(alg_move);
 
     // TODO: do some animation when moving, Effect.Move, to slow it down so we can see it.
     mv(alg_move);
@@ -1712,7 +1712,7 @@ function algebraic_from_piece_square(piece, square)
     var ret;
 
     // TODO: better data structure, inverted hash table lookup
-    VALID_ALGEBRAIC_MOVES.each(function(alg_piece_square) {
+    VALID_SAN_MOVES.each(function(alg_piece_square) {
             var alg = alg_piece_square[0];
             var this_piece = alg_piece_square[1][0];
             var this_square = alg_piece_square[1][1];
