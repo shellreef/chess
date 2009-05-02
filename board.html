@@ -138,6 +138,7 @@ var GAME_STATE = {
 // Moves that can be made right now, for each active piece.
 var VALID_MOVES = null;            // Keyed by filerank of source, array of [[x,y,flags]] destinations
 var VALID_MOVES_OPP = null;        // Moves opponent could make, if it was their turn (attacking)
+//XXX var VALID_MOVE_NOTATIONS = null;   // Map SAN, LAN, FAN, coordinate, Smith etc. -> [piece, square]
 var VALID_SAN_MOVES = null;        // Map Standard Algebraic Notation -> [piece, square]
 var VALID_LAN_MOVES = null;        // Map Long Algebraic Notation -> [piece, square]
 var VALID_FAN_MOVES = null;        // Map Figurine Algebraic Notation -> [piece, square]
@@ -1916,7 +1917,7 @@ function move_piece_to_square(piece, square, is_hypothetical)
 
         ply = encode_ply(GAME_STATE.active_color, GAME_STATE.fullmove_number);
 
-        only_move = VALID_MOVES.keys().length === 1;
+        only_move = VALID_SAN_MOVES.keys().length === 1;
 
         turn_info = set_turn("next");
         if (turn_info.text_move) {
