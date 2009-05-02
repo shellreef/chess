@@ -140,6 +140,7 @@ var VALID_MOVES = null;            // Keyed by filerank of source, array of [[x,
 var VALID_MOVES_OPP = null;        // Moves opponent could make, if it was their turn (attacking)
 var VALID_SAN_MOVES = null;        // Map Standard Algebraic Notation -> [piece, square]
 var VALID_LAN_MOVES = null;        // Map Long Algebraic Notation -> [piece, square]
+var VALID_FAN_MOVES = null;        // Map Figurine Algebraic Notation -> [piece, square]
 var ALL_DROP_TARGETS = [];         // Droppables for UI
 var POSSIBLE_EP_TARGETS = null;             // If move to key, set en passant target to value
 
@@ -157,20 +158,24 @@ var PIECE_TYPES = {
     // parlett: movement of piece in extended Parlett notation
     // letter: uppercase character representing the piece in FEN
     // alg_letter: uppercase character for algebraic notation [defaults to FEN letter]
-    // TODO: html
-    // TODO: royal: if true, if checked, must make move that unthreatens, otherwise checkmate
+    // royal: if true, if checked, must make move that unthreatens, otherwise checkmate
+    // castles_with: piece to move in conjunction with this piece if castling
+    // castle: if true, this piece can be moved during castling
+    // promote: array of piece names that this piece can promote to, in order of preference
+    // figurines: [white, black] Unicode strings for Figurine Algebraic Notation
 
     // Standard international chess pieces
-    king: {parlett: "1*, imR2=e", letter: "K", royal: true, castles_with: "rook"},    // or: ~1/1, ~1/0
-    queen: {parlett: "n*", letter: "Q"},
-    bishop: {parlett: "nX", letter: "B"},
-    rook: {parlett: "n+", letter: "R", castle: true},
+    king: {parlett: "1*, imR2=e", letter: "K", royal: true, castles_with: "rook", figurines: ["\u2654", "\u265a"]},    // or: ~1/1, ~1/0
+    queen: {parlett: "n*", letter: "Q", figurines: ["\u2655", "\u265b"]},
+    bishop: {parlett: "nX", letter: "B", figurines: ["\u2657", "\u265d"]},
+    rook: {parlett: "n+", letter: "R", castle: true, figurines: ["\u2656", "\u265c"]},
     // P allows for moving to GAME_STATE.ep_target square (must be before other capture move)
     // oi2> is another way to write the one/two-forward move, but it is really two possible moves:
     // - oi2>eE: exactly two forward, store piece behind in ep_target (notated by "E")
     // - oi1>e: exactly one forward
-    pawn: {parlett: "o1>, P, c1X>, oi2>eE, oi1>e", letter: "P", alg_letter: "", promote: ["queen", "knight", "rook", "bishop"]},
-    knight: {parlett: "~1/2", letter: "N"},
+    pawn: {parlett: "o1>, P, c1X>, oi2>eE, oi1>e", letter: "P", alg_letter: "", promote: ["queen", "knight", "rook", "bishop"],
+        figurines: ["\u2659", "\u265f"]},
+    knight: {parlett: "~1/2", letter: "N", figurines: ["\u2658", "\u265e"]},
 
     // Other hippogonals, good for testing
     zero: {parlett: "~0/0", letter: "O"},
@@ -585,9 +590,8 @@ function mv(alg_move)
     }
 
     piece_square = VALID_SAN_MOVES.get(alg_move);
-    if (!piece_square) {
-        piece_square = VALID_LAN_MOVES.get(alg_move);
-    }
+    if (!piece_square) { piece_square = VALID_LAN_MOVES.get(alg_move); }
+    if (!piece_square) { piece_square = VALID_FAN_MOVES.get(alg_move); }
 
     assert(piece_square, "mv(" + alg_move + "): illegal move");
 
@@ -711,8 +715,10 @@ function in_check(victim_color, all_moves)
 function calculate_moves(color, is_hypothetical)
 {
     var valid_moves = new Hash();
+    /* TODO: don't calculate notation unless !is_hypothetical */
     var valid_san_moves = new Hash();
     var valid_lan_moves = new Hash();
+    var valid_fan_moves = new Hash();
 
     assert(color === "black" || color === "white",
             "calculate_moves(" + color + "): bad color or no color given");
@@ -739,13 +745,13 @@ function calculate_moves(color, is_hypothetical)
         piece.prior_position = starting_filerank;    // for removal
         moves.each(function(move) {
             var square = sq(move[0], move[1]);
-            var algebraic, long_algebraic;
+            var algebraic, long_algebraic, figurine_algebraic, figurine;
 
             if (move[2].algebraic) {
                 // Override notation; used for special moves (castling)
                 algebraic = move[2].algebraic;
             } else {
-                var capture_indicator = "", starting_file = "";
+                var capture_indicator = "", starting_file = ""; // TODO: not just file, intelligent disambiguate
 
                 if (move[2].is_capture) {
                     capture_indicator = "x";
@@ -757,7 +763,14 @@ function calculate_moves(color, is_hypothetical)
                     } 
                 }
 
+                if (PIECE_TYPES[piece.type].figurines) {
+                    figurine = PIECE_TYPES[piece.type].figurines[color === "white" ? 0 : 1];
+                } else {
+                    figurine = algebraic_piece_prefix(piece);
+                }
+
                 algebraic = algebraic_piece_prefix(piece) + starting_file + capture_indicator + xy2filerank(move[0], move[1]);
+                figurine_algebraic = figurine + starting_file + capture_indicator + xy2filerank(move[0], move[1]);
                 long_algebraic = algebraic_piece_prefix(piece) + starting_filerank + 
                     (capture_indicator ? capture_indicator : "-") + xy2filerank(move[0], move[1]);
             }
@@ -769,6 +782,7 @@ function calculate_moves(color, is_hypothetical)
             // move to the same square. Fun. Or use long algebraic notation.
             valid_san_moves.set(algebraic, [piece, square]);
             valid_lan_moves.set(long_algebraic, [piece, square]);
+            valid_fan_moves.set(figurine_algebraic, [piece, square]);
 
             if (!is_hypothetical) {
                 // For removal
@@ -798,6 +812,7 @@ function calculate_moves(color, is_hypothetical)
         VALID_MOVES = valid_moves;
         VALID_SAN_MOVES = valid_san_moves;
         VALID_LAN_MOVES = valid_lan_moves;
+        VALID_FAN_MOVES = valid_fan_moves;
     }
 
     return valid_moves;
