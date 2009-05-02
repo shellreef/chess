@@ -138,7 +138,8 @@ var GAME_STATE = {
 // Moves that can be made right now, for each active piece.
 var VALID_MOVES = null;            // Keyed by filerank of source, array of [[x,y,flags]] destinations
 var VALID_MOVES_OPP = null;        // Moves opponent could make, if it was their turn (attacking)
-var VALID_SAN_MOVES = null;  // Map algebraic -> [piece, square]
+var VALID_SAN_MOVES = null;        // Map Standard Algebraic Notation -> [piece, square]
+var VALID_LAN_MOVES = null;        // Map Long Algebraic Notation -> [piece, square]
 var ALL_DROP_TARGETS = [];         // Droppables for UI
 var POSSIBLE_EP_TARGETS = null;             // If move to key, set en passant target to value
 
@@ -706,7 +707,7 @@ function in_check(victim_color, all_moves)
 function calculate_moves(color, is_hypothetical)
 {
     var valid_moves = new Hash();
-    var valid_alg_moves = new Hash();
+    var valid_san_moves = new Hash();
 
     assert(color === "black" || color === "white",
             "calculate_moves(" + color + "): bad color or no color given");
@@ -760,7 +761,7 @@ function calculate_moves(color, is_hypothetical)
             // Store algebraic notation -> [piece, square] map for understanding the notation
             // XXX TODO: Need to disambiguate moves! Sometimes the same type of piece can
             // move to the same square. Fun. Or use long algebraic notation.
-            valid_alg_moves.set(algebraic, [piece, square]);
+            valid_san_moves.set(algebraic, [piece, square]);
 
 
             if (!is_hypothetical) {
@@ -789,7 +790,7 @@ function calculate_moves(color, is_hypothetical)
     if (!is_hypothetical) {
         // For reals.
         VALID_MOVES = valid_moves;
-        VALID_SAN_MOVES = valid_alg_moves;
+        VALID_SAN_MOVES = valid_san_moves;
     }
 
     return valid_moves;
