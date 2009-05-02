@@ -755,7 +755,7 @@ function calculate_moves(color, is_hypothetical)
             // Compute algebraic notation (SAN, LAN, FAN)
             if (move[2].algebraic) {
                 // Override notation; used for special moves (castling)
-                algebraic = move[2].algebraic;
+                algebraic = figurine_algebraic = long_algebraic = move[2].algebraic;
             } else {
                 var capture_indicator = "", starting_file = ""; // TODO: not just file, intelligent disambiguate
                 var capture_letter = "";
