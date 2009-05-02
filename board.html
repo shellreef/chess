@@ -254,12 +254,12 @@ google.setOnLoadCallback(function() {
     //load_fen("k7/8/K7/8/8/8/8/8 b - - 0 30"); // K against K
     //load_fen("4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5"); // remove check by capture
     //load_fen("k1K5/8/8/8/8/8/p/88888888 b - - 0 5"); // pawn promotion
-    load_fen("8/8/8/3pP3/8/8/8/8 w - d6 0 5"); // en passant
+    //load_fen("8/8/8/3pP3/8/8/8/8 w - d6 0 5"); // en passant
     //load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); 
     //load_fen("k7/8/8/8/8/8/8/5KQ1 w - d6 0 50");  // K + KQ
     //load_fen("k7/8/8/8/8/8/8/5KR1 w - d6 0 50");  // K + KR
     //load_fen("4r3/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle out of check
-    //load_fen("5r2/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle through check
+    load_fen("5r2/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle through check
     //load_fen("rnbqkbnr/ppp2ppp/8/8/8/8/PPP2PPP/RNBQKBNR w KQkq - 0 1"); // to test "only move" 
     
     //load_fen("8/8/8/8/8/8/3N4/6N1 w - - 0 1"); // disambiguate moves by file (Ngf3, Ndf3)
@@ -752,6 +752,7 @@ function calculate_moves(color, is_hypothetical)
             var algebraic, long_algebraic, figurine_algebraic, figurine, coordinate, smith;
             var dest_filerank = xy2filerank(move[0], move[1]);
 
+            // Compute algebraic notation (SAN, LAN, FAN)
             if (move[2].algebraic) {
                 // Override notation; used for special moves (castling)
                 algebraic = move[2].algebraic;
@@ -775,26 +776,36 @@ function calculate_moves(color, is_hypothetical)
                     figurine = algebraic_piece_prefix(piece);
                 }
 
-                // Various chess notations: SAN, FAN, LAN, coordinate, Smith.
                 algebraic = algebraic_piece_prefix(piece) + starting_file + capture_indicator + dest_filerank;
                 figurine_algebraic = figurine + starting_file + capture_indicator + dest_filerank;
                 long_algebraic = algebraic_piece_prefix(piece) + starting_filerank + 
                     (capture_indicator ? capture_indicator : "-") + dest_filerank;
-                coordinate = starting_filerank.toUpperCase() + "-" + dest_filerank.toUpperCase();
-                // Smith notation, reversible, non-ambiguous: https://www.chessclub.com/chessviewer/smith.html
-                // TODO: c=short castle, C=long castle
-                if (move[2].en_passant_capture) { 
-                    // E = en passant capture
-                    capture_letter = "E";
-                } else if (move[2].capture) {
-                    // pnbrqk = captured respective piece
-                    capture_letter = PIECE_TYPES[move[2].capture.type].letter.toLowerCase();
-                } 
-                smith = starting_filerank + dest_filerank + capture_letter;
-
-                // Big TODO: support descriptive notation, to help read older (but good!) chess books
             }
 
+            // Coordinate notation
+            coordinate = starting_filerank.toUpperCase() + "-" + dest_filerank.toUpperCase();
+
+            // Smith notation, reversible, non-ambiguous: https://www.chessclub.com/chessviewer/smith.html
+            if (move[2].smith_castle) {
+                // c = short castle, C = long castle
+                capture_letter = move[2].smith_castle;
+            } else if (move[2].en_passant_capture) { 
+                // E = en passant capture
+                capture_letter = "E";
+            } else if (move[2].capture) {
+                // pnbrqk = captured respective piece. This is what makes it reversible.
+                capture_letter = PIECE_TYPES[move[2].capture.type].letter.toLowerCase();
+            } 
+            smith = starting_filerank + dest_filerank + capture_letter;
+
+            // Big TODO: support descriptive notation, to help read older (but good!) chess books
+            // Descriptive vs algebraic is like imperial vs. metric units, in some ways. Descriptive
+            // is from each player's perspective, so 1. P-K4 P-K4 is easily recognizable as the same
+            // move from both players, more readily than 1. e4 e5. And 2. PxP PxP more clearly shows
+            // a pawn trade than 10. exd5 cxd5. Smith notation shows the latter, too, but the coordinates
+            // are still not symmetric from each player's perspective. I like descriptive. Problem is
+            // just that it needs to be disambiguated often, algebraic less so.
+ 
 
 
             // Store algebraic notation -> [piece, square] map for understanding the notation
@@ -977,9 +988,11 @@ function filtered_moves(piece, color, is_hypothetical)
             if (move[0] === 7) {
                 castle = "short";
                 move[2].algebraic = "O-O";
+                move[2].smith_castle = "c";
             } else if (move[0] === 3) {
                 castle = "long";
                 move[2].algebraic = "O-O-O";
+                move[2].smith_castle = "C";
             } else {
                 return false; // not allowed
                 assert(false, "filtered_moves(" + piece + "): unknown name of castling to x="+x+", not long/short. " +
