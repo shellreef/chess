@@ -739,7 +739,7 @@ function calculate_moves(color, is_hypothetical)
 
                 // XXX TODO SERIOUS BUG: Why are black captures not recognized?
                 if (move[2].is_capture) {
-                    capture_indicator = "x";
+                    capture_indicator = "x" + "(" + move[2].is_capture + ")";
 
                     // Pawn captures begin with file of pawn.
                     // TODO: full disambiguation!
@@ -834,8 +834,16 @@ function filtered_moves(piece, color, is_hypothetical)
     var unfiltered = unfiltered_moves(parlett, xy, color);
 
     filtered = unfiltered.select(function(move) {
-        // Is a capture move if there is a piece under it.
-        move[2].is_capture = !!(pc(move[0], move[1]));
+        var piece_under = pc(move[0], move[1]);
+
+        if (piece_under) {
+            move[2].is_capture = piece_under.classNames();
+        } else {
+            move[2].is_capture = false;
+        }
+        if (move[2].is_capture) {
+            console.log("There is a piece at "+xy2filerank([move[0], move[1]]) + ": " + pc(move[0], move[1]).classNames());
+        }
 
         // If castle move, check if castling allowed
         if (move[2].castle) {
@@ -972,7 +980,7 @@ function filtered_moves(piece, color, is_hypothetical)
                 }
             }
         }
-            
+
         return true;
     });
 
