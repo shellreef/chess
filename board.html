@@ -239,7 +239,7 @@ google.setOnLoadCallback(function() {
 
     name_squares();    
 
-    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
+    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
     //load_fen("rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w KQkq - 0 1"); // pawnless chess
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
@@ -255,7 +255,7 @@ google.setOnLoadCallback(function() {
     //load_fen("k7/8/8/8/8/8/8/5KQ1 w - d6 0 50");  // K + KQ
     //load_fen("k7/8/8/8/8/8/8/5KR1 w - d6 0 50");  // K + KR
     //load_fen("4r3/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle out of check
-    load_fen("5r2/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle through check
+    //load_fen("5r2/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle through check
     //load_fen("rnbqkbnr/ppp2ppp/8/8/8/8/PPP2PPP/RNBQKBNR w KQkq - 0 1"); // to test "only move" 
     
     //load_fen("8/8/8/8/8/8/3N4/6N1 w - - 0 1"); // disambiguate moves by file (Ngf3, Ndf3)
@@ -706,6 +706,10 @@ function in_check(victim_color, all_moves)
     return attacked;
 }
 
+function calculate_notations()
+{
+}
+
 // After the board changes and it is the next person's turn, calculate 
 // what the next possible allowable moves are, and update the globals with this information.
 //
@@ -742,12 +746,15 @@ function calculate_moves(color, is_hypothetical)
         // as a hash key (that's the only reason)
         starting_filerank = square_from.filerank;
 
-        // Create drop targets for the valid destinations, linking
-        // the draggables to droppables using piece- + source square.
-        piece.addClassName("piece-" + starting_filerank);
-        piece.prior_position = starting_filerank;    // for removal
+        if (!is_hypothetical) {
+            // Create drop targets for the valid destinations, linking
+            // the draggables to droppables using piece- + source square.
+            piece.addClassName("piece-" + starting_filerank);
+            piece.prior_position = starting_filerank;    // for removal
+        }
         moves.each(function(move) {
             var square = sq(move[0], move[1]);
+
             var algebraic, long_algebraic, figurine_algebraic, figurine, coordinate, smith;
             var dest_filerank = xy2filerank(move[0], move[1]);
 
