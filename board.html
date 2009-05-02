@@ -138,12 +138,7 @@ var GAME_STATE = {
 // Moves that can be made right now, for each active piece.
 var VALID_MOVES = null;            // Keyed by filerank of source, array of [[x,y,flags]] destinations
 var VALID_MOVES_OPP = null;        // Moves opponent could make, if it was their turn (attacking)
-//XXX var VALID_MOVE_NOTATIONS = null;   // Map SAN, LAN, FAN, coordinate, Smith etc. -> [piece, square]
-var VALID_SAN_MOVES = null;        // Map Standard Algebraic Notation -> [piece, square]
-var VALID_LAN_MOVES = null;        // Map Long Algebraic Notation -> [piece, square]
-var VALID_FAN_MOVES = null;        // Map Figurine Algebraic Notation -> [piece, square]
-var VALID_COORD_MOVES = null;      // Map Coordinate Notation -> [piece, square]
-var VALID_SMITH_MOVES = null;      // Map Smith Notation -> [piece, square]
+var VALID_MOVE_NOTATIONS = null;   // Map SAN, LAN, FAN, coordinate, Smith etc. -> [piece, square]
 var ALL_DROP_TARGETS = [];         // Droppables for UI
 var POSSIBLE_EP_TARGETS = null;             // If move to key, set en passant target to value
 
@@ -587,14 +582,15 @@ function mv(alg_move)
     var piece_square, piece, square;
 
     if (!alg_move) {
-        return VALID_SAN_MOVES.keys();
+        assert(VALID_MOVE_NOTATIONS, "mv(" + alg_move + "): called with VALID_MOVE_NOTATINS false");
+        return VALID_MOVE_NOTATIONS.SAN.keys();
     }
 
-    piece_square = VALID_SAN_MOVES.get(alg_move);
-    if (!piece_square) { piece_square = VALID_LAN_MOVES.get(alg_move); }
-    if (!piece_square) { piece_square = VALID_FAN_MOVES.get(alg_move); }
-    if (!piece_square) { piece_square = VALID_COORD_MOVES.get(alg_move); }
-    if (!piece_square) { piece_square = VALID_SMITH_MOVES.get(alg_move); }
+                         piece_square = VALID_MOVE_NOTATIONS.SAN.get(alg_move);
+    if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.LAN.get(alg_move); }
+    if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.FAN.get(alg_move); }
+    if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.coord.get(alg_move); }
+    if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.smith.get(alg_move); }
 
     assert(piece_square, "mv(" + alg_move + "): illegal move");
 
@@ -718,12 +714,14 @@ function in_check(victim_color, all_moves)
 function calculate_moves(color, is_hypothetical)
 {
     var valid_moves = new Hash();
-    /* TODO: don't calculate notation unless !is_hypothetical */
-    var valid_san_moves = new Hash();
-    var valid_lan_moves = new Hash();
-    var valid_fan_moves = new Hash();
-    var valid_coord_moves = new Hash();
-    var valid_smith_moves = new Hash();
+    if (!is_hypothetical) {
+        VALID_MOVE_NOTATIONS = {};
+        VALID_MOVE_NOTATIONS.SAN = new Hash();
+        VALID_MOVE_NOTATIONS.LAN = new Hash();
+        VALID_MOVE_NOTATIONS.FAN = new Hash();
+        VALID_MOVE_NOTATIONS.coord = new Hash();
+        VALID_MOVE_NOTATIONS.smith = new Hash();
+    }
 
     assert(color === "black" || color === "white",
             "calculate_moves(" + color + "): bad color or no color given");
@@ -814,17 +812,17 @@ function calculate_moves(color, is_hypothetical)
             // All notations: http://en.wikipedia.org/wiki/Chess_notation
  
 
-
-            // Store algebraic notation -> [piece, square] map for understanding the notation
             // XXX TODO: Need to disambiguate moves! Sometimes the same type of piece can
             // move to the same square. Fun. Or use long algebraic notation.
-            valid_san_moves.set(algebraic, [piece, square]);
-            valid_lan_moves.set(long_algebraic, [piece, square]);
-            valid_fan_moves.set(figurine_algebraic, [piece, square]);
-            valid_coord_moves.set(coordinate, [piece, square]);
-            valid_smith_moves.set(smith, [piece, square]);
 
             if (!is_hypothetical) {
+                // Store algebraic notation -> [piece, square] map for understanding the notation
+                VALID_MOVE_NOTATIONS.SAN.set(algebraic, [piece, square]);
+                VALID_MOVE_NOTATIONS.LAN.set(long_algebraic, [piece, square]);
+                VALID_MOVE_NOTATIONS.FAN.set(figurine_algebraic, [piece, square]);
+                VALID_MOVE_NOTATIONS.coord.set(coordinate, [piece, square]);
+                VALID_MOVE_NOTATIONS.smith.set(smith, [piece, square]);
+
                 // For removal
                 ALL_DROP_TARGETS.push(square);
 
@@ -850,11 +848,6 @@ function calculate_moves(color, is_hypothetical)
     if (!is_hypothetical) {
         // For reals.
         VALID_MOVES = valid_moves;
-        VALID_SAN_MOVES = valid_san_moves;
-        VALID_LAN_MOVES = valid_lan_moves;
-        VALID_FAN_MOVES = valid_fan_moves;
-        VALID_COORD_MOVES = valid_coord_moves;
-        VALID_SMITH_MOVES = valid_smith_moves;
     }
 
     return valid_moves;
@@ -873,10 +866,10 @@ function computer_move_if_applicable()
     // TODO: weak AI, take most valuable piece, checkmate if can, check if can,
     //     fork if can.. something to entertain a beginner. Or better yet,
     // plugin to a remote network server.
-    var keys = VALID_SAN_MOVES.keys();
+    var keys = VALID_MOVE_NOTATIONS.SAN.keys();
     var alg_move = keys[randint(0, keys.length - 1)];
 
-    var piece_square = VALID_SAN_MOVES.get(alg_move);
+    var piece_square = VALID_MOVE_NOTATIONS.SAN.get(alg_move);
 
     // TODO: do some animation when moving, Effect.Move, to slow it down so we can see it.
     mv(alg_move);
@@ -1777,12 +1770,14 @@ function capture_piece(piece)
 
 // Find precomputed algebraic notation for this move. Called when
 // user drags a piece to a square and we don't know what move it is.
+// TODO: User-customizable notation for converting _to_ (since
+// mv(), user input, accepts anything). This uses SAN right now.
 function algebraic_from_piece_square(piece, square)
 {
     var ret;
 
     // TODO: better data structure, inverted hash table lookup
-    VALID_SAN_MOVES.each(function(alg_piece_square) {
+    VALID_MOVE_NOTATIONS.SAN.each(function(alg_piece_square) {
             var alg = alg_piece_square[0];
             var this_piece = alg_piece_square[1][0];
             var this_square = alg_piece_square[1][1];
@@ -1917,7 +1912,7 @@ function move_piece_to_square(piece, square, is_hypothetical)
 
         ply = encode_ply(GAME_STATE.active_color, GAME_STATE.fullmove_number);
 
-        only_move = VALID_SAN_MOVES.keys().length === 1;
+        only_move = VALID_MOVE_NOTATIONS.SAN.keys().length === 1;
 
         turn_info = set_turn("next");
         if (turn_info.text_move) {
