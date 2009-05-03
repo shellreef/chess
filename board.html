@@ -586,11 +586,17 @@ function mv(alg_move)
         return VALID_MOVE_NOTATIONS.SAN.keys();
     }
 
+    // Prefer these move notations, in this order.
                          piece_square = VALID_MOVE_NOTATIONS.SAN.get(alg_move);
     if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.LAN.get(alg_move); }
     if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.FAN.get(alg_move); }
     if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.coord.get(alg_move); }
     if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.smith.get(alg_move); }
+
+    // TODO: Non-ambiguous notations can be parsed directly, without needing to
+    // calculate the valid moves. Maybe useful for loading in-progress games? And
+    // would have to convert from SAN to non-ambiguous formats. Or just make 
+    // calculate_moves() faster.
 
     assert(piece_square, "mv(" + alg_move + "): illegal move");
 
@@ -708,7 +714,7 @@ function in_check(victim_color, all_moves)
 
 // Calculate and save the SAN, LAN, etc. move notations for a move.
 // Note: only do this if not hypothetical.
-function calculate_notations(color, piece, moves, starting_filerank)
+function calculate_notations(color, piece, moves, starting_filerank, possible_notations)
 {
     // Create drop targets for the valid destinations, linking
     // the draggables to droppables using piece- + source square.
@@ -797,6 +803,14 @@ function calculate_notations(color, piece, moves, starting_filerank)
         VALID_MOVE_NOTATIONS.coord.set(coordinate, [piece, square]);
         VALID_MOVE_NOTATIONS.smith.set(smith, [piece, square]);
 
+        // TODO: multiple possible notations for same move; algebraics
+        possible_notations.SAN.push([[piece, square], [algebraic]]);
+        possible_notations.LAN.push([[piece, square], [long_algebraic]]);
+        possible_notations.FAN.push([[piece, square], [figurine_algebraic]]);
+        possible_notations.coord.push([[piece, square], [coordinate]]);
+        possible_notations.smith.push([[piece, square], [smith]]);
+
+
         // For removal
         ALL_DROP_TARGETS.push(square);
 
@@ -823,6 +837,7 @@ function disambiguate_notations()
 function calculate_moves(color, is_hypothetical)
 {
     var valid_moves = new Hash();
+    var possible_notations;
 
     assert(color === "black" || color === "white",
             "calculate_moves(" + color + "): bad color or no color given");
@@ -835,6 +850,19 @@ function calculate_moves(color, is_hypothetical)
         VALID_MOVE_NOTATIONS.FAN = new Hash();
         VALID_MOVE_NOTATIONS.coord = new Hash();
         VALID_MOVE_NOTATIONS.smith = new Hash();
+
+        // Values are [ [ [piece, square ], [possible move names] ], ... ]
+        // Instead of a hash or assocative array, because I couldn't use
+        // [piece, square] as a key, even with Prototype's Hash. Could use
+        // http://www.tutorials4html.com/2009/02/06/true-javascript-hash-table/
+        // but instead, using an array with linear lookup.
+        possible_notations = {
+            SAN: [],
+            LAN: [],
+            FAN: [],
+            coord: [],
+            smith: []
+            };
     }
 
     // Look at all the active pieces
@@ -854,7 +882,8 @@ function calculate_moves(color, is_hypothetical)
         starting_filerank = square_from.filerank;
 
         if (!is_hypothetical) {
-            calculate_notations(color, piece, moves, starting_filerank)
+            // Fills in possible_notations with possibly-ambiguous move notations in each system
+            calculate_notations(color, piece, moves, starting_filerank, possible_notations);
         }
 
         // Store valid moves for mouseovers etc.
@@ -865,7 +894,7 @@ function calculate_moves(color, is_hypothetical)
         //console.log(starting_filerank, moves);
     });
 
-
+    PN=possible_notations;
 
     if (!is_hypothetical) {
         // For reals.
@@ -2229,7 +2258,6 @@ function piece_letter2name(letter)
 // string (for pawns, for example).
 function algebraic_piece_prefix(piece)
 {
-    // TODO: option for Figurine Algebraic Notation, FAN
     if (PIECE_TYPES[piece.type].alg_letter !== undefined) {
         return PIECE_TYPES[piece.type].alg_letter;
     } else if (PIECE_TYPES[piece.type].letter !== undefined) {
