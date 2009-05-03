@@ -239,7 +239,7 @@ google.setOnLoadCallback(function() {
 
     name_squares();    
 
-    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
+    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
     //load_fen("rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w KQkq - 0 1"); // pawnless chess
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
@@ -260,7 +260,7 @@ google.setOnLoadCallback(function() {
     
     //load_fen("8/8/8/8/8/8/3N4/6N1 w - - 0 1"); // disambiguate moves by file (Ngf3, Ndf3)
     //load_fen("8/8/8/6N1/8/8/8/6N1 w - - 0 1"); // disambiguate moves by rank (N5f3, N1f3)
-    //load_fen("8/8/8/4N1N1/3N3N/8/3N3N/4N1N1 w - - 0 1"); // disambiguate both (Ne5f3, Nd4f3, Ng5f3, Nh4f3, Nh2f3, Ng1f3, Ne1f3, Nd2f3)
+    load_fen("8/8/8/4N1N1/3N3N/8/3N3N/4N1N1 w - - 0 1"); // disambiguate both (Ne5f3, Nd4f3, Ng5f3, Nh4f3, Nh2f3, Ng1f3, Ne1f3, Nd2f3)
 
 
     // TODO: library of interesting games, see
@@ -724,26 +724,23 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
     moves.each(function(move) {
         var square = sq(move[0], move[1]);
 
-        var algebraic, long_algebraic, figurine_algebraic, figurine, coordinate, smith;
+        var algebraics, long_algebraics, figurine_algebraics, figurine, coordinate, smith;
         var dest_filerank = xy2filerank(move[0], move[1]);
 
         // Compute algebraic notation (SAN, LAN, FAN)
         if (move[2].algebraic) {
             // Override notation; used for special moves (castling)
-            algebraic = figurine_algebraic = long_algebraic = move[2].algebraic;
+            algebraics = figurine_algebraics = long_algebraics = [move[2].algebraic];
         } else {
-            var capture_indicator = "", starting_file = ""; // TODO: not just file, intelligent disambiguate
-            var capture_letter = "";
+            var capture_indicator = "", capture_letter = "";
+            var starting_file = "", starting_rank = ""; 
 
             if (move[2].capture || move[2].en_passant_capture) {
                 capture_indicator = "x";
-
-                // Pawn captures begin with file of pawn.
-                // TODO: full disambiguation!
-                if (piece.type === "pawn") {
-                    starting_file = starting_filerank.substr(0, 1);
-                } 
             }
+
+            starting_file = starting_filerank.substr(0, 1);
+            starting_rank = starting_filerank.substr(1, 1);
 
             if (PIECE_TYPES[piece.type].figurines) {
                 figurine = PIECE_TYPES[piece.type].figurines[color === "white" ? 0 : 1];
@@ -751,8 +748,26 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
                 figurine = algebraic_piece_prefix(piece);
             }
 
-            algebraic = algebraic_piece_prefix(piece) + starting_file + capture_indicator + dest_filerank;
-            figurine_algebraic = figurine + starting_file + capture_indicator + dest_filerank;
+            if (capture_indicator === "x" && piece.type === "pawn") {
+                // Pawn captures begin with file of pawn.
+                algebraics = [algebraic_piece_prefix(piece) + starting_file + capture_indicator + dest_filerank]; // exd5
+                figurine_algebraics = [figurine + starting_file + capture_indicator + dest_filerank]; // ♙exd5
+            } else {
+                algebraics = [
+                    algebraic_piece_prefix(piece) + capture_indicator + dest_filerank,                    // Nf3
+                    algebraic_piece_prefix(piece) + starting_file + capture_indicator + dest_filerank,    // Ngf3
+                    algebraic_piece_prefix(piece) + starting_rank + capture_indicator + dest_filerank,    // N1f3
+                    algebraic_piece_prefix(piece) + starting_filerank + capture_indicator + dest_filerank // Ng1f3
+                ];
+                figurine_algebraics = [
+                    figurine + capture_indicator + dest_filerank,                    // ♘f3
+                    figurine + starting_file + capture_indicator + dest_filerank,    // ♘gf3
+                    figurine + starting_rank + capture_indicator + dest_filerank,    // ♘1f3
+                    figurine + starting_filerank + capture_indicator + dest_filerank // ♘g1f3
+                ];
+
+            }
+
             long_algebraic = algebraic_piece_prefix(piece) + starting_filerank + 
                 (capture_indicator ? capture_indicator : "-") + dest_filerank;
         }
@@ -796,17 +811,18 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
         // enabled by default; otherwise, can use superfluously-disambiguated moves).
 
         // Store algebraic notation -> [piece, square] map for understanding the notation
-        // TODO: key by starting_filerank, array of arrays
-        VALID_MOVE_NOTATIONS.SAN.set(algebraic, [piece, square]);
+        // TODO: obsolete
+        VALID_MOVE_NOTATIONS.SAN.set(algebraics[0], [piece, square]);
         VALID_MOVE_NOTATIONS.LAN.set(long_algebraic, [piece, square]);
-        VALID_MOVE_NOTATIONS.FAN.set(figurine_algebraic, [piece, square]);
+        VALID_MOVE_NOTATIONS.FAN.set(figurine_algebraics[0], [piece, square]);
         VALID_MOVE_NOTATIONS.coord.set(coordinate, [piece, square]);
         VALID_MOVE_NOTATIONS.smith.set(smith, [piece, square]);
 
-        // TODO: multiple possible notations for same move; algebraics
-        possible_notations.SAN.push([[piece, square], [algebraic]]);
+        // Store moves, along with notations. The notations are stored as
+        // an array to accomodate ambiguous notations.
+        possible_notations.SAN.push([[piece, square], algebraics]);
         possible_notations.LAN.push([[piece, square], [long_algebraic]]);
-        possible_notations.FAN.push([[piece, square], [figurine_algebraic]]);
+        possible_notations.FAN.push([[piece, square], figurine_algebraics]);
         possible_notations.coord.push([[piece, square], [coordinate]]);
         possible_notations.smith.push([[piece, square], [smith]]);
 
@@ -1779,6 +1795,8 @@ function check_repetition(ply)
 // don't have to manually type <td x=0 y=0 filerank=a8> etc. in all the cells.
 function name_squares()
 {
+    // TODO: descriptive notation name, too
+    
     for (var x = 1; x <= FILE_MAX; ++x){
         for (var y = 1; y <= RANK_MAX; ++y) {
             var square = sq(x, y);
