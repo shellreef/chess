@@ -589,6 +589,8 @@ function mv(alg_move)
     if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.coord.get(alg_move); }
     if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.smith.get(alg_move); }
 
+    // TODO: allow synonymous moves, not part of VALID_MOVE_NOTATIONS, since are redundant.
+
     // TODO: Non-ambiguous notations can be parsed directly, without needing to
     // calculate the valid moves. Maybe useful for loading in-progress games? And
     // would have to convert from SAN to non-ambiguous formats. Or just make 
@@ -708,7 +710,7 @@ function in_check(victim_color, all_moves)
     return attacked;
 }
 
-// Calculate and save the SAN, LAN, etc. move notations for a move.
+// Calculate and save the move notations for a move.
 // Note: only do this if not hypothetical.
 function calculate_notations(color, piece, moves, starting_filerank, possible_notations)
 {
@@ -720,20 +722,29 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
     moves.each(function(move) {
         var square = sq(move[0], move[1]);
 
-        var algebraics, long_algebraics, figurine_algebraics, figurine, coordinate, smith;
+        var algebraics, long_algebraics, figurine_algebraics, figurine, coordinate, smith, descriptives;
         var dest_filerank = xy2filerank(move[0], move[1]);
+            
+        var capture_indicator, captured_piece_letter = "";
+        var capture_or_dash;
+
+        if (move[2].capture || move[2].en_passant_capture) {
+            capture_indicator = "x";
+            capture_or_dash = "x";
+            captured_piece_letter = PIECE_TYPES[move[2].capture.type].letter;
+        } else {
+            capture_or_dash = "-";
+            capture_indicator = "";
+            captured_piece_letter = null;
+        }
+
 
         // Compute algebraic notation (SAN, LAN, FAN)
         if (move[2].algebraic) {
             // Override notation; used for special moves (castling)
-            algebraics = figurine_algebraics = long_algebraics = [move[2].algebraic];
+            algebraics = figurine_algebraics = long_algebraics = descriptives = [move[2].algebraic];
         } else {
-            var capture_indicator = "", capture_letter = "";
             var starting_file = "", starting_rank = ""; 
-
-            if (move[2].capture || move[2].en_passant_capture) {
-                capture_indicator = "x";
-            }
 
             starting_file = starting_filerank.substr(0, 1);
             starting_rank = starting_filerank.substr(1, 1);
@@ -765,13 +776,28 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
             }
 
             long_algebraic = algebraic_piece_prefix(piece) + starting_filerank + 
-                (capture_indicator ? capture_indicator : "-") + dest_filerank;
+                capture_or_dash + dest_filerank;
+
+            // English descriptive notation
+            // TODO:
+            // KP-K4 (need to find descriptive piece name, capture_or_dash, xy2descriptive)
+            // P-K4
+            // KPxQP
+            // PxQP
+            // KPxP
+            // PxP
+            // also, QB/KB for queen's/king's bishop, just B
+            // KP(K2)-K4 most specified
+            // KP(2)-K4
+            // KP(K)-K4
+            //descriptives = [
         }
 
         // Coordinate notation
         coordinate = starting_filerank.toUpperCase() + "-" + dest_filerank.toUpperCase();
 
         // Smith notation, reversible, non-ambiguous: https://www.chessclub.com/chessviewer/smith.html
+        var capture_letter;
         if (move[2].smith_castle) {
             // c = short castle, C = long castle
             capture_letter = move[2].smith_castle;
@@ -780,8 +806,10 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
             capture_letter = "E";
         } else if (move[2].capture) {
             // pnbrqk = captured respective piece. This is what makes it reversible.
-            capture_letter = PIECE_TYPES[move[2].capture.type].letter.toLowerCase();
-        } 
+            capture_letter = captured_piece_letter.toLowerCase();
+        } else {
+            capture_letter = "";
+        }
         smith = starting_filerank + dest_filerank + capture_letter;
         
         // TODO: support promotation in all notations, make separate moves (a8=Q, a8=N, etc.)
@@ -2593,9 +2621,10 @@ function xy2filerank(x, y)
 // Return name of square from color's perspective in English descriptive notation
 function xy2descriptive(color, x, y)
 {
-    var files = [null, "QR", "QN", "QB", "Q", "K", "KB", "KN", "KR"];
+    assert(x >= 1 && x <= FILE_MAX, "xy2filerank(" + x + ", " + y + "): bad x: " + x);
+    assert(y >= 1 && y <= RANK_MAX, "xy2filerank(" + x + ", " + y + "): bad y: " + y);
 
-    return files[x] + (color === "white" ? y : 9 - y);
+    return [null, "QR", "QN", "QB", "Q", "K", "KB", "KN", "KR"][x] + (color === "white" ? y : 9 - y);
 }
 
 // Get a square cell, given location in either
