@@ -820,11 +820,11 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
 
         // Store moves, along with notations. The notations are stored as
         // an array to accomodate ambiguous notations.
-        possible_notations.SAN.push([[piece, square], algebraics]);
-        possible_notations.LAN.push([[piece, square], [long_algebraic]]);
-        possible_notations.FAN.push([[piece, square], figurine_algebraics]);
-        possible_notations.coord.push([[piece, square], [coordinate]]);
-        possible_notations.smith.push([[piece, square], [smith]]);
+        possible_notations.SAN.push([piece, square, algebraics]);
+        possible_notations.LAN.push([piece, square, [long_algebraic]]);
+        possible_notations.FAN.push([piece, square, figurine_algebraics]);
+        possible_notations.coord.push([piece, square, [coordinate]]);
+        possible_notations.smith.push([piece, square, [smith]]);
 
 
         // For removal
@@ -841,8 +841,74 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
 // Given a list of all valid move notations, remove the ambiguous 
 // (Nf3 and Nf3, remove both) overly-disambiguated (Ng1f3 if Ngf3
 // or N1f3 is not ambiguous).
-function disambiguate_notations()
+function disambiguate_notations(notations)
 {
+    var freq_count = new Hash();
+    var canonical_notations = new Hash();
+    var synonymous_notations = new Hash();
+
+    for (var i = 0; i < notations.length; ++i) {
+        var piece, square, moves;
+
+        piece = notations[i][0];
+        square = notations[i][1];
+        moves = notations[i][2];
+
+        for (var j = 0; j < moves.length; ++j) {
+            var move = moves[j];
+
+            if (!freq_count.get(move)) {
+                // Store index so can delete if is a dupe
+                freq_count.set(move, [[i, j]]);
+            } else {
+                freq_count.get(move).push([i, j]);
+            }
+        }
+    }
+
+    // Delete ambiguous moves (or actually, replace with 'undefined')
+    freq_count.each(function(pair) {
+        var notation = pair[0];
+        var locations = pair[1];
+
+        if (locations.length > 1) {
+            for (var k = 0; k < locations.length; ++k) { 
+                var i = locations[k][0], j = locations[k][1];
+                delete notations[i][2][j];
+            }
+        }
+    });
+
+    for (i = 0; i < notations.length; ++i) {
+        var piece = notations[i][0];
+        var square = notations[i][1];
+        var same_moves = notations[i][2];
+        var shortest, synonyms;
+
+        // Remove undefined elements
+        same_moves = same_moves.compact();
+       
+        // Choose shortest (now unambiguous) notation
+        // Could also do: min_length = same_moves.pluck("length").min();, then partition
+        // Rather, sort by length, ascending.
+        same_moves.sort(function(x, y) { return x.length - y.length });
+
+        // The shortest, non-ambiguous move is canonical. But also keep the
+        // synonymous moves around.
+        shortest = same_moves.shift();
+        synonyms = same_moves;
+
+        canonical_notations.set(shortest, [piece, square]);
+
+        for (j = 0; j < synonyms.length; ++j) {
+            synonymous_notations.set(synonyms[j], [piece, square]);
+        }
+    }
+
+    // TODO: also return synonymous_notations, so overly-disambiguated move
+    // notations can be used, too, but return them separately so they won't be
+    // listed as unique, canonical moves.
+    return canonical_notations;
 }
 
 // After the board changes and it is the next person's turn, calculate 
@@ -910,9 +976,12 @@ function calculate_moves(color, is_hypothetical)
         //console.log(starting_filerank, moves);
     });
 
-    PN=possible_notations;
 
     if (!is_hypothetical) {
+        notations = possible_notations;
+        notations.SAN = disambiguate_notations(notations.SAN);
+        notations.FAN = disambiguate_notations(notations.FAN);
+
         // For reals.
         VALID_MOVES = valid_moves;
     }
