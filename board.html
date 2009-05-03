@@ -239,7 +239,7 @@ google.setOnLoadCallback(function() {
 
     name_squares();    
 
-    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
+    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
     //load_fen("rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w KQkq - 0 1"); // pawnless chess
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
@@ -250,7 +250,7 @@ google.setOnLoadCallback(function() {
     //load_fen("k7/8/K7/8/8/8/8/8 b - - 0 30"); // K against K
     //load_fen("4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5"); // remove check by capture
     //load_fen("k1K5/8/8/8/8/8/p/88888888 b - - 0 5"); // pawn promotion
-    load_fen("8/8/8/3pP3/8/8/8/8 w - d6 0 5"); // en passant
+    //load_fen("8/8/8/3pP3/8/8/8/8 w - d6 0 5"); // en passant
     //load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); 
     //load_fen("k7/8/8/8/8/8/8/5KQ1 w - d6 0 50");  // K + KQ
     //load_fen("k7/8/8/8/8/8/8/5KR1 w - d6 0 50");  // K + KR
@@ -722,7 +722,7 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
     moves.each(function(move) {
         var square = sq(move[0], move[1]);
 
-        var algebraics, long_algebraics, figurine_algebraics, figurine, coordinate, smith, descriptives;
+        var standard_algebraics, long_algebraics, figurine_algebraics, figurine, coordinate, smith, descriptives;
         var dest_filerank = xy2filerank(move[0], move[1]);
             
         var capture_indicator, captured_piece_letter = "";
@@ -749,9 +749,10 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
         // Compute algebraic notation (SAN, LAN, FAN)
         if (move[2].algebraic) {
             // Override notation; used for special moves (castling)
-            algebraics = figurine_algebraics = long_algebraics = descriptives = [move[2].algebraic];
+            standard_algebraics = figurine_algebraics = long_algebraics = descriptives = [move[2].algebraic];
         } else {
-            var starting_file = "", starting_rank = ""; 
+            var starting_file, starting_rank;
+            var algs;
 
             starting_file = starting_filerank.substr(0, 1);
             starting_rank = starting_filerank.substr(1, 1);
@@ -764,23 +765,19 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
 
             if (capture_indicator === "x" && piece.type === "pawn") {
                 // Pawn captures begin with file of pawn.
-                algebraics = [algebraic_piece_prefix(piece) + starting_file + capture_indicator + dest_filerank]; // exd5
-                figurine_algebraics = [figurine + starting_file + capture_indicator + dest_filerank]; // ♙exd5
+                algs = [starting_file + capture_indicator + dest_filerank]; // ?xd5
             } else {
-                algebraics = [
-                    algebraic_piece_prefix(piece) + capture_indicator + dest_filerank,                    // Nf3
-                    algebraic_piece_prefix(piece) + starting_file + capture_indicator + dest_filerank,    // Ngf3
-                    algebraic_piece_prefix(piece) + starting_rank + capture_indicator + dest_filerank,    // N1f3
-                    algebraic_piece_prefix(piece) + starting_filerank + capture_indicator + dest_filerank // Ng1f3
-                ];
-                figurine_algebraics = [
-                    figurine + capture_indicator + dest_filerank,                    // ♘f3
-                    figurine + starting_file + capture_indicator + dest_filerank,    // ♘gf3
-                    figurine + starting_rank + capture_indicator + dest_filerank,    // ♘1f3
-                    figurine + starting_filerank + capture_indicator + dest_filerank // ♘g1f3
+                algs = [
+                    capture_indicator + dest_filerank,                    // ?f3
+                    starting_file + capture_indicator + dest_filerank,    // ?gf3
+                    starting_rank + capture_indicator + dest_filerank,    // ?1f3
+                    starting_filerank + capture_indicator + dest_filerank // ?g1f3
                 ];
 
             }
+
+            standard_algebraics = algs.map(function(a) { return algebraic_piece_prefix(piece) + a; }); // N??
+            figurine_algebraics = algs.map(function(a) { return figurine + a; });             // ♘??
 
             long_algebraic = algebraic_piece_prefix(piece) + starting_filerank + 
                 capture_or_dash + dest_filerank;
@@ -836,7 +833,7 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
 
         // Store moves, along with notations. The notations are stored as
         // an array to accomodate ambiguous notations.
-        possible_notations.SAN.push([piece, square, algebraics]);
+        possible_notations.SAN.push([piece, square, standard_algebraics]);
         possible_notations.LAN.push([piece, square, [long_algebraic]]);
         possible_notations.FAN.push([piece, square, figurine_algebraics]);
         possible_notations.coord.push([piece, square, [coordinate]]);
