@@ -722,7 +722,7 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
     moves.each(function(move) {
         var square = sq(move[0], move[1]);
 
-        var standard_algebraics, long_algebraics, figurine_algebraics, figurine, coordinate, smith, descriptives;
+        var standard_algebraics, long_algebraics, figurine_algebraics, coordinate, smith, descriptives;
         var dest_filerank = xy2filerank(move[0], move[1]);
             
         var capture_indicator, captured_piece_letter = "";
@@ -752,16 +752,10 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
             standard_algebraics = figurine_algebraics = long_algebraics = descriptives = [move[2].algebraic];
         } else {
             var starting_file, starting_rank;
-            var algs;
+            var algs, figurine_prefix, algebraic_prefix;
 
             starting_file = starting_filerank.substr(0, 1);
             starting_rank = starting_filerank.substr(1, 1);
-
-            if (PIECE_TYPES[piece.type].figurines) {
-                figurine = PIECE_TYPES[piece.type].figurines[color === "white" ? 0 : 1];
-            } else {
-                figurine = algebraic_piece_prefix(piece);
-            }
 
             if (capture_indicator === "x" && piece.type === "pawn") {
                 // Pawn captures begin with file of pawn.
@@ -776,8 +770,11 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
 
             }
 
-            standard_algebraics = algs.map(function(a) { return algebraic_piece_prefix(piece) + a; }); // N??
-            figurine_algebraics = algs.map(function(a) { return figurine + a; });             // ♘??
+            algebraic_prefix = algebraic_piece_prefix(piece);
+            figurine_prefix = figurine_piece_prefix(color, piece);
+
+            standard_algebraics = algs.map(function(a) { return algebraic_prefix + a; });  // N??
+            figurine_algebraics = algs.map(function(a) { return figurine_prefix + a; });   // ♘??
 
             long_algebraic = algebraic_piece_prefix(piece) + starting_filerank + 
                 capture_or_dash + dest_filerank;
@@ -2365,6 +2362,16 @@ function algebraic_piece_prefix(piece)
     assert(false, "algebraic_piece_prefix(" + piece + "): unrecognized piece");
 }
 
+// Get the Unicode figurine for a piece of a given color, or fall back on 
+// algebraic_piece_prefix if there isn't one.
+function figurine_piece_prefix(color, piece)
+{
+    if (PIECE_TYPES[piece.type].figurines) {
+        return PIECE_TYPES[piece.type].figurines[color === "white" ? 0 : 1];
+    } else {
+        return algebraic_piece_prefix(piece);
+    }
+}
 
 
 // Return an existing piece somewhere (or a false value), given:
@@ -2373,25 +2380,25 @@ function algebraic_piece_prefix(piece)
 // - a square, from sq()
 function pc(x, y)
 {
-    var square;
+var square;
 
-    // Get square
-    if (x.hasClassName && x.hasClassName("square")) {
-        square = x;
-    } else {
-        square = sq(x, y);
-    }
+// Get square
+if (x.hasClassName && x.hasClassName("square")) {
+    square = x;
+} else {
+    square = sq(x, y);
+}
 
-    // A virtual, off-board "hypothetical" piece, or lack of (null, empty square).
-    if (HYPOTHETICAL_TO && square.x === HYPOTHETICAL_TO[0] && square.y === HYPOTHETICAL_TO[1]) {
-        // As if it moved here
-        return HYPOTHETICAL_PIECE;
-    } else if (HYPOTHETICAL_FROM && square.x === HYPOTHETICAL_FROM[0] && square.y === HYPOTHETICAL_FROM[1]) {
-        // As if it moved off of here, so empty
-        return null;
-    }
+// A virtual, off-board "hypothetical" piece, or lack of (null, empty square).
+if (HYPOTHETICAL_TO && square.x === HYPOTHETICAL_TO[0] && square.y === HYPOTHETICAL_TO[1]) {
+    // As if it moved here
+    return HYPOTHETICAL_PIECE;
+} else if (HYPOTHETICAL_FROM && square.x === HYPOTHETICAL_FROM[0] && square.y === HYPOTHETICAL_FROM[1]) {
+    // As if it moved off of here, so empty
+    return null;
+}
 
-    return square.childNodes[0];
+return square.childNodes[0];
 }
 
 // Get (x,y) of piece. For filerank notation, use xy2filerank on this.
