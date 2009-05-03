@@ -258,9 +258,9 @@ google.setOnLoadCallback(function() {
     //load_fen("5r2/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle through check
     //load_fen("rnbqkbnr/ppp2ppp/8/8/8/8/PPP2PPP/RNBQKBNR w KQkq - 0 1"); // to test "only move" 
     
-    //load_fen("8/8/8/8/8/8/3N4/6N1 w - - 0 1"); // disambiguate moves by file (Ngf3, Ndf3)
-    //load_fen("8/8/8/6N1/8/8/8/6N1 w - - 0 1"); // disambiguate moves by rank (N5f3, N1f3)
-    load_fen("8/8/8/4N1N1/3N3N/8/3N3N/4N1N1 w - - 0 1"); // disambiguate both (Ne5f3, Nd4f3, Ng5f3, Nh4f3, Nh2f3, Ng1f3, Ne1f3, Nd2f3)
+    //load_fen("k7/8/8/8/8/8/3N4/6N1 w - - 0 1"); // disambiguate moves by file (Ngf3, Ndf3)
+    //load_fen("k7/8/8/6N1/8/8/8/6N1 w - - 0 1"); // disambiguate moves by rank (N5f3, N1f3)
+    load_fen("k7/8/8/4N1N1/3N3N/8/3N3N/4N1N1 w - - 0 1"); // disambiguate both (Ne5f3, Nd4f3, Ng5f3, Nh4f3, Nh2f3, Ng1f3, Ne1f3, Nd2f3)
 
 
     // TODO: library of interesting games, see
@@ -803,21 +803,6 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
         // All notations: http://en.wikipedia.org/wiki/Chess_notation
 
 
-        // XXX TODO: Need to disambiguate moves! Idea to do this: first pass, store
-        // array of moves in all possible formats in each notation. For SAN, that would be
-        // Ng1f3, N1f3, Ngf3, Nf3 for a knight move. Descriptive would have more. Make
-        // a pass through all the notations, and remove duplicates since they are ambiguous.
-        // Then remove all but the shortest notation in each array (make this optional, but
-        // enabled by default; otherwise, can use superfluously-disambiguated moves).
-
-        // Store algebraic notation -> [piece, square] map for understanding the notation
-        // TODO: obsolete
-        VALID_MOVE_NOTATIONS.SAN.set(algebraics[0], [piece, square]);
-        VALID_MOVE_NOTATIONS.LAN.set(long_algebraic, [piece, square]);
-        VALID_MOVE_NOTATIONS.FAN.set(figurine_algebraics[0], [piece, square]);
-        VALID_MOVE_NOTATIONS.coord.set(coordinate, [piece, square]);
-        VALID_MOVE_NOTATIONS.smith.set(smith, [piece, square]);
-
         // Store moves, along with notations. The notations are stored as
         // an array to accomodate ambiguous notations.
         possible_notations.SAN.push([piece, square, algebraics]);
@@ -925,14 +910,6 @@ function calculate_moves(color, is_hypothetical)
             "calculate_moves(" + color + "): bad color or no color given");
 
     if (!is_hypothetical) { 
-        VALID_MOVE_NOTATIONS = {};
-
-        VALID_MOVE_NOTATIONS.SAN = new Hash();
-        VALID_MOVE_NOTATIONS.LAN = new Hash();
-        VALID_MOVE_NOTATIONS.FAN = new Hash();
-        VALID_MOVE_NOTATIONS.coord = new Hash();
-        VALID_MOVE_NOTATIONS.smith = new Hash();
-
         // Values are [ [ [piece, square ], [possible move names] ], ... ]
         // Instead of a hash or assocative array, because I couldn't use
         // [piece, square] as a key, even with Prototype's Hash. Could use
@@ -979,8 +956,12 @@ function calculate_moves(color, is_hypothetical)
 
     if (!is_hypothetical) {
         notations = possible_notations;
-        notations.SAN = disambiguate_notations(notations.SAN);
-        notations.FAN = disambiguate_notations(notations.FAN);
+        VALID_MOVE_NOTATIONS = {};
+        VALID_MOVE_NOTATIONS.SAN = disambiguate_notations(notations.SAN);
+        VALID_MOVE_NOTATIONS.LAN = disambiguate_notations(notations.LAN);
+        VALID_MOVE_NOTATIONS.FAN = disambiguate_notations(notations.FAN);
+        VALID_MOVE_NOTATIONS.coord = disambiguate_notations(notations.coord);
+        VALID_MOVE_NOTATIONS.smith = disambiguate_notations(notations.smith);
 
         // For reals.
         VALID_MOVES = valid_moves;
