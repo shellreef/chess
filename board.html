@@ -790,6 +790,7 @@ function calculate_notations(color, piece, moves, starting_filerank)
         // enabled by default; otherwise, can use superfluously-disambiguated moves).
 
         // Store algebraic notation -> [piece, square] map for understanding the notation
+        // TODO: key by starting_filerank, array of arrays
         VALID_MOVE_NOTATIONS.SAN.set(algebraic, [piece, square]);
         VALID_MOVE_NOTATIONS.LAN.set(long_algebraic, [piece, square]);
         VALID_MOVE_NOTATIONS.FAN.set(figurine_algebraic, [piece, square]);
@@ -807,6 +808,13 @@ function calculate_notations(color, piece, moves, starting_filerank)
     });
 }
 
+// Given a list of all valid move notations, remove the ambiguous 
+// (Nf3 and Nf3, remove both) overly-disambiguated (Ng1f3 if Ngf3
+// or N1f3 is not ambiguous).
+function disambiguate_notations()
+{
+}
+
 // After the board changes and it is the next person's turn, calculate 
 // what the next possible allowable moves are, and update the globals with this information.
 //
@@ -815,17 +823,19 @@ function calculate_notations(color, piece, moves, starting_filerank)
 function calculate_moves(color, is_hypothetical)
 {
     var valid_moves = new Hash();
-    if (!is_hypothetical) {
+
+    assert(color === "black" || color === "white",
+            "calculate_moves(" + color + "): bad color or no color given");
+
+    if (!is_hypothetical) { 
         VALID_MOVE_NOTATIONS = {};
+
         VALID_MOVE_NOTATIONS.SAN = new Hash();
         VALID_MOVE_NOTATIONS.LAN = new Hash();
         VALID_MOVE_NOTATIONS.FAN = new Hash();
         VALID_MOVE_NOTATIONS.coord = new Hash();
         VALID_MOVE_NOTATIONS.smith = new Hash();
     }
-
-    assert(color === "black" || color === "white",
-            "calculate_moves(" + color + "): bad color or no color given");
 
     // Look at all the active pieces
     $$("img." + color).each(function(piece) { 
