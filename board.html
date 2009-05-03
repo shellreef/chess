@@ -1841,8 +1841,6 @@ function check_repetition(ply)
 // don't have to manually type <td x=0 y=0 filerank=a8> etc. in all the cells.
 function name_squares()
 {
-    // TODO: descriptive notation name, too
-    
     for (var x = 1; x <= FILE_MAX; ++x){
         for (var y = 1; y <= RANK_MAX; ++y) {
             var square = sq(x, y);
@@ -1850,6 +1848,10 @@ function name_squares()
             square.x = x;
             square.y = y;
             square.filerank = xy2filerank(x, y);
+
+            square.descriptive = {};
+            square.descriptive.white = xy2descriptive("white", x, y);
+            square.descriptive.black = xy2descriptive("black", x, y);
             //console.log(square);
         }
     }
@@ -2586,6 +2588,14 @@ function xy2filerank(x, y)
     filerank += String.fromCharCode(y + "1".charCodeAt(0) - 1);
 
     return filerank;
+}
+
+// Return name of square from color's perspective in English descriptive notation
+function xy2descriptive(color, x, y)
+{
+    var files = [null, "QR", "QN", "QB", "Q", "K", "KB", "KN", "KR"];
+
+    return files[x] + (color === "white" ? y : 9 - y);
 }
 
 // Get a square cell, given location in either
