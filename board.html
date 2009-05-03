@@ -138,7 +138,7 @@ var GAME_STATE = {
 // Moves that can be made right now, for each active piece.
 var VALID_MOVES = null;            // Keyed by filerank of source, array of [[x,y,flags]] destinations
 var VALID_MOVES_OPP = null;        // Moves opponent could make, if it was their turn (attacking)
-var VALID_MOVE_NOTATIONS = null;   // Map SAN, LAN, RAN, FAN, coordinate, Smith etc. -> [piece, square]
+var VALID_MOVE_NOTATIONS = null;   // Map SAN, LAN, RAN, CRAN, FAN, coordinate, Smith etc. -> [piece, square]
 var ALL_DROP_TARGETS = [];         // Droppables for UI
 var POSSIBLE_EP_TARGETS = null;             // If move to key, set en passant target to value
 
@@ -198,7 +198,7 @@ var PIECE_TYPES = {
 
     // More complex fairy / non-intl chess pieces
     // See http://en.wikipedia.org/wiki/Fairy_chess_piece#Notable_examples
-    
+   
     // TODO: support two-letter expanded FEN codes (my invention), since A-Z leaves
     // only 26 possibilities, X indicates another letter follows, so XA-XZ are available,
     // and XXA-XXZ, XXXA-XXXZ, to infinity, if needed. Straightforward FEN extension.
@@ -215,6 +215,12 @@ var PIECE_TYPES = {
     squid: {parlett: "o~n/m ~0/0", letter: "J"}, // any square but can't capture, much less powerful
     universal_leaper: {parlett: "~n/m"},// like kraken, but can't go to square it is on (like a zero)
     octopus: {parlett: "o~n/m", letter: "U"},
+
+    // Pieces from chess-3
+    // http://www.chessbase.com/newsdetail.asp?newsid=4553
+    tower: {parlett: "n+, onX", castle: true},  // rook + can move (not capture) like bishop
+    jous: {parlett: "~1/2, o1+"},       // knight + can move (not capture) like wazir
+    vicar: {parlett: "nX, o2+"},       // bishop + can move (not capture) 1 or 2 squares orthogonally
 
     // Pieces that probably won't be supported without significant coding
     leo: {parlett: "on*, c^&", letter:"XO"},        // no & support, whatever that is
@@ -586,6 +592,7 @@ function mv(alg_move)
                          piece_square = VALID_MOVE_NOTATIONS.SAN.get(alg_move);
     if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.LAN.get(alg_move); }
     if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.RAN.get(alg_move); }
+    if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.CRAN.get(alg_move); }
     if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.FAN.get(alg_move); }
     if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.coord.get(alg_move); }
     if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.smith.get(alg_move); }
@@ -724,7 +731,7 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
         var square = sq(move[0], move[1]);
 
         var standard_algebraics, long_algebraics, figurine_algebraics, coordinate, smith;
-        var reverse_algebraics, descriptives;
+        var reverse_algebraics, crans, descriptives;
         var dest_filerank = xy2filerank(move[0], move[1]);
             
         var capture_indicator, captured_piece_letter = "";
@@ -748,7 +755,7 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
         }
 
 
-        // Compute algebraic notation (SAN, LAN, RAN, FAN)
+        // Compute algebraic notation (SAN, LAN, RAN, CRAN, FAN)
         if (move[2].algebraic) {
             // Override notation; used for special moves (castling)
             standard_algebraics = figurine_algebraics = long_algebraics = 
@@ -2062,7 +2069,7 @@ function move_piece_to_square(piece, square, is_hypothetical)
 
         // TODO: also, CRAN (Concise Reversible Algebraic Notation), MAN, RAN, see 
         // http://www.chessville.com/reviews/PlayStrongerChessExaminingChess960.htm
-        //
+        // http://playchess960.com/pdfs/PSCbyEC960.pdf - part of the Chess960 book
 
         ply = encode_ply(GAME_STATE.active_color, GAME_STATE.fullmove_number);
 
