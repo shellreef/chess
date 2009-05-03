@@ -138,7 +138,7 @@ var GAME_STATE = {
 // Moves that can be made right now, for each active piece.
 var VALID_MOVES = null;            // Keyed by filerank of source, array of [[x,y,flags]] destinations
 var VALID_MOVES_OPP = null;        // Moves opponent could make, if it was their turn (attacking)
-var VALID_MOVE_NOTATIONS = null;   // Map SAN, LAN, FAN, coordinate, Smith etc. -> [piece, square]
+var VALID_MOVE_NOTATIONS = null;   // Map SAN, LAN, RAN, FAN, coordinate, Smith etc. -> [piece, square]
 var ALL_DROP_TARGETS = [];         // Droppables for UI
 var POSSIBLE_EP_TARGETS = null;             // If move to key, set en passant target to value
 
@@ -585,6 +585,7 @@ function mv(alg_move)
     // Prefer these move notations, in this order.
                          piece_square = VALID_MOVE_NOTATIONS.SAN.get(alg_move);
     if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.LAN.get(alg_move); }
+    if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.RAN.get(alg_move); }
     if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.FAN.get(alg_move); }
     if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.coord.get(alg_move); }
     if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.smith.get(alg_move); }
@@ -722,7 +723,8 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
     moves.each(function(move) {
         var square = sq(move[0], move[1]);
 
-        var standard_algebraics, long_algebraics, figurine_algebraics, coordinate, smith, descriptives;
+        var standard_algebraics, long_algebraics, figurine_algebraics, coordinate, smith;
+        var reverse_algebraics, descriptives;
         var dest_filerank = xy2filerank(move[0], move[1]);
             
         var capture_indicator, captured_piece_letter = "";
@@ -742,14 +744,15 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
         } else {
             capture_or_dash = "-";
             capture_indicator = "";
-            captured_piece_letter = null;
+            captured_piece_letter = "";
         }
 
 
-        // Compute algebraic notation (SAN, LAN, FAN)
+        // Compute algebraic notation (SAN, LAN, RAN, FAN)
         if (move[2].algebraic) {
             // Override notation; used for special moves (castling)
-            standard_algebraics = figurine_algebraics = long_algebraics = descriptives = [move[2].algebraic];
+            standard_algebraics = figurine_algebraics = long_algebraics = 
+                reversible_algebraics = descriptives = [move[2].algebraic];
         } else {
             var starting_file, starting_rank;
             var algs, figurine_prefix, algebraic_prefix;
@@ -776,8 +779,10 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
             standard_algebraics = algs.map(function(a) { return algebraic_prefix + a; });  // N??
             figurine_algebraics = algs.map(function(a) { return figurine_prefix + a; });   // ♘??
 
-            long_algebraic = algebraic_piece_prefix(piece) + starting_filerank + 
-                capture_or_dash + dest_filerank;
+            long_algebraic = algebraic_prefix + starting_filerank + capture_or_dash + dest_filerank;
+
+            reversible_algebraic = algebraic_prefix + starting_filerank + capture_or_dash + 
+                captured_piece_letter + dest_filerank;
 
             // English descriptive notation
             // TODO:
@@ -832,6 +837,7 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
         // an array to accomodate ambiguous notations.
         possible_notations.SAN.push([piece, square, standard_algebraics]);
         possible_notations.LAN.push([piece, square, [long_algebraic]]);
+        possible_notations.RAN.push([piece, square, [reversible_algebraic]]);
         possible_notations.FAN.push([piece, square, figurine_algebraics]);
         possible_notations.coord.push([piece, square, [coordinate]]);
         possible_notations.smith.push([piece, square, [smith]]);
@@ -943,6 +949,7 @@ function calculate_moves(color, is_hypothetical)
         possible_notations = {
             SAN: [],
             LAN: [],
+            RAN: [],
             FAN: [],
             coord: [],
             smith: []
@@ -984,6 +991,7 @@ function calculate_moves(color, is_hypothetical)
         VALID_MOVE_NOTATIONS = {};
         VALID_MOVE_NOTATIONS.SAN = disambiguate_notations(notations.SAN);
         VALID_MOVE_NOTATIONS.LAN = disambiguate_notations(notations.LAN);
+        VALID_MOVE_NOTATIONS.RAN = disambiguate_notations(notations.RAN);
         VALID_MOVE_NOTATIONS.FAN = disambiguate_notations(notations.FAN);
         VALID_MOVE_NOTATIONS.coord = disambiguate_notations(notations.coord);
         VALID_MOVE_NOTATIONS.smith = disambiguate_notations(notations.smith);
