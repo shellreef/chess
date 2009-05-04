@@ -182,17 +182,17 @@ var PIECE_TYPES = {
     alibaba: {parlett: "~2/0, ~2X", letter: "L"},
     squirrel: {parlett: "~0/2, ~1/2, ~2/2", letter: "S"},
     kangaroo: {parlett: "~3/0", letter: "H"},    // aka threeleaper
-    tripper: {parlett: "~3/3", letter: "T"},
+    tripper: {parlett: "~3/3", letter: "XT"},
     camel: {parlett: "~1/3", letter: "W"},
     zebra: {parlett:"~2/3", letter: "Z"},
     man: {parlett: "1*", letter: "M"},    // same as king, but not royale
     frog: {parlett: "~1/1, ~0/3", letter: "F"},   // amphibian
-    giraffe: {parlett: "~1/4", letter: "G"},
+    giraffe: {parlett: "~1/4", letter: "XG"},
 
     // Combined pieces of International Chess
     archbishop: {parlett: "nX, ~1/2", letter: "A"}, // B+N, aka cardinal, princess, janus (Capablanca, X-FEN standard)
     chancellor: {parlett: "n+, ~1/2", letter: "C"}, // R+N, aka empress, marshal (Capablanca, X-FEN standard)
-    amazon: {parlett: "n*, ~1/2", letter: "V"},     // Q+N, aka superqueen
+    amazon: {parlett: "n*, ~1/2", letter: "XV"},     // Q+N, aka superqueen
     maharajah: {parlett: "n*, ~1/2", letter: "XJ", royal: true},   // Q+N+K, Maharajah chess
     royal_knight: {parlett: "~1/2", letter: "XR", royal: true},  // Knightmate chess (for king, use a man)
 
@@ -212,15 +212,15 @@ var PIECE_TYPES = {
     fers: {parlett: "1X", letter: "XF"},
     wazir: {parlett: "1+", letter: "I"},
     kraken: {parlett: "~n/m ~0/0"},     // any square, not realistic since always checkmates!
-    squid: {parlett: "o~n/m ~0/0", letter: "J"}, // any square but can't capture, much less powerful
+    squid: {parlett: "o~n/m ~0/0", letter: "XD"}, // any square but can't capture, much less powerful
     universal_leaper: {parlett: "~n/m"},// like kraken, but can't go to square it is on (like a zero)
     octopus: {parlett: "o~n/m", letter: "U"},
 
     // Pieces from chess-3
     // http://www.chessbase.com/newsdetail.asp?newsid=4553
-    tower: {parlett: "n+, onX", castle: true},  // rook + can move (not capture) like bishop
-    jous: {parlett: "~1/2, o1+"},       // knight + can move (not capture) like wazir
-    vicar: {parlett: "nX, o2+"},       // bishop + can move (not capture) 1 or 2 squares orthogonally
+    tower: {parlett: "n+, onX", castle: true, letter: "T"},  // rook + can move (not capture) like bishop
+    jous: {parlett: "~1/2, o1+", letter: "J"},       // knight + can move (not capture) like wazir
+    vicar: {parlett: "nX, o2+", letter: "V"},  // bishop + can move (not capture) 1 or 2 squares orthogonally
 
     // Pieces that probably won't be supported without significant coding
     leo: {parlett: "on*, c^&", letter:"XO"},        // no & support, whatever that is
@@ -734,24 +734,28 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
         var reverse_algebraics, crans, descriptives;
         var dest_filerank = xy2filerank(move[0], move[1]);
             
-        var capture_indicator, captured_piece_letter = "";
-        var capture_or_dash;
+        var capture_x;                  // x/blank
+        var capture_or_dash;            // x/-
+        var captured_letter = "";       // capital letter of piece, P for pawn, etc. or blank
+        var captured_colon_letter = ""; // colon if captured, then piece letter if not pawn
 
         if (move[2].capture || move[2].en_passant_capture) {
-            capture_indicator = "x";
+            capture_x = "x";
             capture_or_dash = "x";
             // TODO: set capture, even if en_passant_capture is true;
             // then this conditional won't be needed.
             if (move[2].capture) { 
-                captured_piece_letter = PIECE_TYPES[move[2].capture.type].letter;
+                captured_letter = PIECE_TYPES[move[2].capture.type].letter;
             } else {
                 // en passant captures pawn
-                captured_piece_letter = "P";
+                captured_letter = "P";
             }
+            captured_colon_letter = ":" + (captured_letter === "P" ? "": captured_letter);
         } else {
             capture_or_dash = "-";
-            capture_indicator = "";
-            captured_piece_letter = "";
+            capture_x = "";
+            captured_letter = "";
+            captured_colon_letter = "";
         }
 
 
@@ -766,16 +770,18 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
 
             starting_file = starting_filerank.substr(0, 1);
             starting_rank = starting_filerank.substr(1, 1);
+            dest_file = dest_filerank.substr(0, 1);
+            dest_rank = dest_filerank.substr(1, 1);
 
-            if (capture_indicator === "x" && piece.type === "pawn") {
+            if (capture_x === "x" && piece.type === "pawn") {
                 // Pawn captures begin with file of pawn.
-                algs = [starting_file + capture_indicator + dest_filerank]; // ?xd5
+                algs = [starting_file + capture_x + dest_filerank]; // ?xd5
             } else {
                 algs = [
-                    capture_indicator + dest_filerank,                    // ?f3
-                    starting_file + capture_indicator + dest_filerank,    // ?gf3
-                    starting_rank + capture_indicator + dest_filerank,    // ?1f3
-                    starting_filerank + capture_indicator + dest_filerank // ?g1f3
+                    capture_x + dest_filerank,                    // ?f3
+                    starting_file + capture_x + dest_filerank,    // ?gf3
+                    starting_rank + capture_x + dest_filerank,    // ?1f3
+                    starting_filerank + capture_x + dest_filerank // ?g1f3
                 ];
 
             }
@@ -789,7 +795,19 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
             long_algebraic = algebraic_prefix + starting_filerank + capture_or_dash + dest_filerank;
 
             reversible_algebraic = algebraic_prefix + starting_filerank + capture_or_dash + 
-                captured_piece_letter + dest_filerank;
+                captured_letter + dest_filerank;
+
+            // Best online documentation I could find on CRAN: 
+            //  http://main.uschess.org/forums/viewtopic.php?f=2&t=1428&start=30
+            // Always gives origin square filerank, then only non-redundant file/rank of dest square
+            // Uses ':' for capture instead of 'x', and piece letter isn't given if pawn
+            // Full description will have to wait until I receive the book
+            //  http://www.amazon.com/Play-Stronger-Chess-Examining-Chess960/dp/0977452107
+            crans = [
+                algebraic_prefix + starting_filerank + captured_colon_letter + dest_filerank,  // Rd3:d7
+                algebraic_prefix + starting_filerank + captured_colon_letter + dest_file,      // Rd3:7
+                algebraic_prefix + starting_filerank + captured_colon_letter + dest_rank       // Rd3:e
+                ]
 
             // English descriptive notation
             // TODO:
@@ -819,7 +837,7 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
             capture_letter = "E";
         } else if (move[2].capture) {
             // pnbrqk = captured respective piece. This is what makes it reversible.
-            capture_letter = captured_piece_letter.toLowerCase();
+            capture_letter = captured_letter.toLowerCase();
         } else {
             capture_letter = "";
         }
@@ -845,6 +863,7 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
         possible_notations.SAN.push([piece, square, standard_algebraics]);
         possible_notations.LAN.push([piece, square, [long_algebraic]]);
         possible_notations.RAN.push([piece, square, [reversible_algebraic]]);
+        possible_notations.CRAN.push([piece, square, crans]);
         possible_notations.FAN.push([piece, square, figurine_algebraics]);
         possible_notations.coord.push([piece, square, [coordinate]]);
         possible_notations.smith.push([piece, square, [smith]]);
@@ -957,6 +976,7 @@ function calculate_moves(color, is_hypothetical)
             SAN: [],
             LAN: [],
             RAN: [],
+            CRAN: [],
             FAN: [],
             coord: [],
             smith: []
@@ -999,6 +1019,7 @@ function calculate_moves(color, is_hypothetical)
         VALID_MOVE_NOTATIONS.SAN = disambiguate_notations(notations.SAN);
         VALID_MOVE_NOTATIONS.LAN = disambiguate_notations(notations.LAN);
         VALID_MOVE_NOTATIONS.RAN = disambiguate_notations(notations.RAN);
+        VALID_MOVE_NOTATIONS.CRAN = disambiguate_notations(notations.CRAN);
         VALID_MOVE_NOTATIONS.FAN = disambiguate_notations(notations.FAN);
         VALID_MOVE_NOTATIONS.coord = disambiguate_notations(notations.coord);
         VALID_MOVE_NOTATIONS.smith = disambiguate_notations(notations.smith);
@@ -2066,10 +2087,6 @@ function move_piece_to_square(piece, square, is_hypothetical)
         } else {
             alg_move = " ";
         }
-
-        // TODO: also, CRAN (Concise Reversible Algebraic Notation), MAN, RAN, see 
-        // http://www.chessville.com/reviews/PlayStrongerChessExaminingChess960.htm
-        // http://playchess960.com/pdfs/PSCbyEC960.pdf - part of the Chess960 book
 
         ply = encode_ply(GAME_STATE.active_color, GAME_STATE.fullmove_number);
 
