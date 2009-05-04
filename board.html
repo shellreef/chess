@@ -366,9 +366,6 @@ function load_pgn(pgn)
     load_fen(game.FEN, true);
     GAME_STATE.position_after[0] = game.FEN;
 
-    // TODO: only if chess1
-    name_pieces();
-
     for (var ply = 1; ply < game.moves.length; ++ply) {
         var move = game.moves[ply];
 
@@ -758,6 +755,8 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
         var captured_letter = "";       // capital letter of piece, P for pawn, etc. or blank
         var captured_colon_letter = ""; // colon if captured, then piece letter if not pawn
 
+        var captured_piece = pc(dest_filerank);
+
         if (move[2].capture || move[2].en_passant_capture) {
             capture_x = "x";
             capture_or_dash = "x";
@@ -827,34 +826,38 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
 
             // English descriptive notation
             // TODO: 
-            // - piece_name (KP, QP, etc. for king and queen pawn), captured_name
             // - alt_letter (Kt for knight instead of N) and
-            // - alt_descriptive_dest (QKt1 for b1 instead of QN1) - currently, Kt is preprocessed to N in mv()
+            //   alt_descriptive_dest (QKt1 for b1 instead of QN1) - currently, Kt is preprocessed to N in mv()
             //   would be nice to have an option to prefer Kt over N, for using old books (though N/Kt would be synonyms)
-            short_descriptive_dest = short_descriptive(descriptive_dest_file) + descriptive_dest_rank;
+            // - short piece name, NP instead of QNP or KNP
+           
+            var piece_name = piece.descriptive_name;
+            var short_descriptive_dest = short_descriptive(descriptive_dest_file) + descriptive_dest_rank;
             if (capture_or_dash === "-") { 
                 // non-capturing move
                 descriptives = [
-                    //piece_name + capture_or_dash + descriptive_dest,              // P-K4
-                    piece_letter + capture_or_dash + descriptive_dest,              // KP-K4
-                    //piece_name + capture_or_dash + short_descriptive_dest,        // QB-B4
+                    piece_name + capture_or_dash + descriptive_dest,              // P-K4
+                    piece_letter + capture_or_dash + descriptive_dest,            // KP-K4
+                    piece_name + capture_or_dash + short_descriptive_dest,        // QB-B4
                     piece_letter + capture_or_dash + short_descriptive_dest,      // B-B4
                     // TODO: also allow slashes, as synonyms
-                    piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + descriptive_dest, // P(K2)-K4
-                    piece_letter + "(" + descriptive_origin_rank + ")" + capture_or_dash + descriptive_dest,      // P(2)-K4
-                    piece_letter + "(" + descriptive_origin_file + ")" + capture_or_dash + descriptive_dest    // P(K)-K4
+                    piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + descriptive_dest,      // P(K2)-K4
+                    piece_letter + "(" + descriptive_origin_rank + ")" + capture_or_dash + descriptive_dest, // P(2)-K4
+                    piece_letter + "(" + descriptive_origin_file + ")" + capture_or_dash + descriptive_dest  // P(K)-K4
                 ]
             } else {
+                var captured_name = captured_piece.descriptive_name;
+
                 // capture
                 descriptives = [
-                    piece_letter + capture_or_dash + captured_letter,       // PxP
-                    //piece_name + capture_or_dash + captured_letter,       // KPxP
-                    //piece_letter + capture_or_dash + captured_name,       // PxQP
-                    //piece_name + capture_or_dash + captured_name,         // KPxQP
-                    //piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + captured_name,  // P(K4)xQP
-                    //piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + captured_letter,// P(K4)xP
-                    piece_letter + capture_or_dash + captured_letter + "(" + descriptive_dest + ")"     // PxP(Q4)
-                    //piece_name + capture_or_dash + captured_letter + "(" + descriptive_dest + ")",    // KPxP(Q4)
+                    piece_letter + capture_or_dash + captured_letter,     // PxP
+                    piece_name + capture_or_dash + captured_letter,       // KPxP
+                    piece_letter + capture_or_dash + captured_name,       // PxQP
+                    piece_name + capture_or_dash + captured_name,         // KPxQP
+                    piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + captured_name,    // P(K4)xQP
+                    piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + captured_letter,  // P(K4)xP
+                    piece_letter + capture_or_dash + captured_letter + "(" + descriptive_dest + ")",    // PxP(Q4)
+                    piece_name + capture_or_dash + captured_letter + "(" + descriptive_dest + ")"       // KPxP(Q4)
                 ]
             }
         }
@@ -2379,6 +2382,9 @@ function load_starting_position(fen)
             assert("load_starting_position(" + fen + "): unknown code: " + code);
         }
     }
+
+    // TODO: only if chess1
+    name_pieces();
 }
 
 //// PIECE FUNCTIONS
