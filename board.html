@@ -2380,6 +2380,20 @@ function load_starting_position(fen)
 
 //// PIECE FUNCTIONS
 
+function name_pieces()
+{
+    // TODO: broken, fix.XYZ
+    for (var file_number = 1; file_number <= FILE_MAX; ++file_number) {
+        var file = xy2descriptive("white", file_number);
+
+        for (var rank = 1; rank <= 2; ++rank) {
+            pc(file_number, rank).descriptive_name = descriptive_piece_name_starting_on(file + rank);
+            pc(file_number, rank).descriptive_name = descriptive_piece_name_starting_on(file + rank);
+        }
+
+    }
+}
+
 /// TODO: a "piece lab", where can dynamically create new pieces,
 // browse existing pieces. Show piece on board by itself, highlighting 
 // valid moves, update when change Parlett movement types, allow to operate
@@ -2702,12 +2716,20 @@ function xy2filerank(x, y)
 
 
 // Return name of square from color's perspective in English descriptive notation
+// Accepts an array of two numbers, for file and rank, or just a file
+// Only works for chess1, not any variants where the pieces are arranged differently.
 function xy2descriptive(color, xy)
 {
-    var x = xy[0], y = xy[1];
+    var x, y;
+    if (Object.isArray(xy)) {
+        x = xy[0], y = xy[1];
+    } else {
+        x = xy;
+        y = "";
+    }
 
     assert(x >= 1 && x <= FILE_MAX, "xy2filerank(" + x + ", " + y + "): bad x: " + x);
-    assert(y >= 1 && y <= RANK_MAX, "xy2filerank(" + x + ", " + y + "): bad y: " + y);
+    assert(y === "" || (y >= 1 && y <= RANK_MAX), "xy2filerank(" + x + ", " + y + "): bad y: " + y);
 
     return [null, "QR", "QN", "QB", "Q", "K", "KB", "KN", "KR"][x] + (color === "white" ? y : 9 - y);
 }
@@ -2717,6 +2739,25 @@ function xy2descriptive(color, xy)
 function short_descriptive(descriptive_file)
 {
     return {QR:"R", QN:"N", QB:"B", KB:"B", KN:"N", KR:"R"}[descriptive_file];
+}
+
+// Get the descriptive name of a piece starting on the given square, in descriptive notation
+// (from xy2descriptive).
+function descriptive_piece_name_starting_on(descriptive_location)
+{
+    var descriptive_file, descriptive_rank;
+
+    descriptive_rank = parseInt(descriptive_location.substr(descriptive_location.length - 1), 10);
+    descriptive_file = descriptive_location.substr(0, descriptive_location.length - 1);
+
+    if (descriptive_rank === 2) {
+        return descriptive_file + "P";
+    } else if (descriptive_rank === 1) {
+        return descriptive_file;
+    } else {
+        assert(false, "descriptive_piece_name_starting_on(" + descriptive_file + ", " + descriptive_rank + "): not on rank 1 or 2, " + 
+                "rank=" + descriptive_rank + ", file=" + descriptive_file);
+    }
 }
 
 // Get a square cell, given location in either
