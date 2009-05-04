@@ -596,7 +596,7 @@ function mv(alg_move)
     if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.FAN.get(alg_move); }
     if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.coord.get(alg_move); }
     if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.smith.get(alg_move); }
-    if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.descr.get(alg_move); }
+    if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.descr.get(alg_move.replace(/Kt/g, "N")); }
 
     // TODO: allow synonymous moves, not part of VALID_MOVE_NOTATIONS, since are redundant.
 
@@ -819,7 +819,7 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
             // - piece_name (KP, QP, etc. for king and queen pawn), captured_name
             // - short_descriptive_dest (instead of QB4, just B4, etc.)
             // - alt_letter (Kt for knight instead of N)
-            // - alt_descriptive_dest (QKt1 for b1 instead of QN1) - or maybe just replace Kt with N before?? easier!
+            // - alt_descriptive_dest (QKt1 for b1 instead of QN1) - currently, Kt is preprocessed to N in mv()
             // TODO: also allow 
             if (capture_or_dash === "-") { 
                 // non-capturing move
