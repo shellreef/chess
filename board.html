@@ -741,9 +741,11 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
         // starting_filerank (passed in as parameter)           // e2
         var starting_file = starting_filerank.substr(0, 1);     // e
         var starting_rank = starting_filerank.substr(1, 1);     // 2
-        var descriptive_origin = xy2descriptive(color, filerank2xy(starting_filerank)); // K2
-        var descriptive_dest = xy2descriptive(color, move);                             // K4
-        var descriptive_file = descriptive_dest.substr(0, descriptive_dest.length - 1); // K
+        var descriptive_origin = xy2descriptive(color, filerank2xy(starting_filerank));             // K2
+        var descriptive_dest = xy2descriptive(color, move);                                         // K4
+        var descriptive_dest_file = descriptive_dest.substr(0, descriptive_dest.length - 1);        // K
+        var descriptive_origin_file = descriptive_origin.substr(0, descriptive_origin.length - 1);  // K
+        // TODO: rank from black's perspective
         var capture_x;                  // x/blank
         var capture_or_dash;            // x/-
         var captured_letter = "";       // capital letter of piece, P for pawn, etc. or blank
@@ -817,21 +819,21 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
             // English descriptive notation
             // TODO: 
             // - piece_name (KP, QP, etc. for king and queen pawn), captured_name
-            // - short_descriptive_dest (instead of QB4, just B4, etc.)
-            // - alt_letter (Kt for knight instead of N)
+            // - alt_letter (Kt for knight instead of N) and
             // - alt_descriptive_dest (QKt1 for b1 instead of QN1) - currently, Kt is preprocessed to N in mv()
-            // TODO: also allow 
+            //   would be nice to have an option to prefer Kt over N, for using old books (though N/Kt would be synonyms)
+            short_descriptive_dest = short_descriptive(descriptive_dest_file) + dest_rank;
             if (capture_or_dash === "-") { 
                 // non-capturing move
                 descriptives = [
                     //piece_name + capture_or_dash + descriptive_dest,              // P-K4
                     piece_letter + capture_or_dash + descriptive_dest,              // KP-K4
                     //piece_name + capture_or_dash + short_descriptive_dest,        // QB-B4
-                    //piece_letter + capture_or_dash + short_descriptive_dest,      // B-B4
+                    piece_letter + capture_or_dash + short_descriptive_dest,      // B-B4
                     // TODO: also allow slashes, as synonyms
                     piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + descriptive_dest, // P(K2)-K4
                     piece_letter + "(" + starting_rank + ")" + capture_or_dash + descriptive_dest,      // P(2)-K4
-                    piece_letter + "(" + descriptive_file + ")" + capture_or_dash + descriptive_dest    // P(K)-K4
+                    piece_letter + "(" + descriptive_origin_file + ")" + capture_or_dash + descriptive_dest    // P(K)-K4
                 ]
             } else {
                 // capture
@@ -2688,6 +2690,7 @@ function xy2filerank(x, y)
     return filerank;
 }
 
+
 // Return name of square from color's perspective in English descriptive notation
 function xy2descriptive(color, xy)
 {
@@ -2697,6 +2700,13 @@ function xy2descriptive(color, xy)
     assert(y >= 1 && y <= RANK_MAX, "xy2filerank(" + x + ", " + y + "): bad y: " + y);
 
     return [null, "QR", "QN", "QB", "Q", "K", "KB", "KN", "KR"][x] + (color === "white" ? y : 9 - y);
+}
+
+// Shorten a file name, in descriptive notation, to a possibly-ambiguous name.
+// QR for queen's rook file is shortened to R, and so is KR for king's rook. 
+function short_descriptive(descriptive_file)
+{
+    return {QR:"R", QN:"N", QB:"B", KB:"B", KN:"N", KR:"R"}[descriptive_file];
 }
 
 // Get a square cell, given location in either
