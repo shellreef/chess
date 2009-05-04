@@ -596,6 +596,7 @@ function mv(alg_move)
     if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.FAN.get(alg_move); }
     if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.coord.get(alg_move); }
     if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.smith.get(alg_move); }
+    if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.descr.get(alg_move); }
 
     // TODO: allow synonymous moves, not part of VALID_MOVE_NOTATIONS, since are redundant.
 
@@ -732,8 +733,17 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
 
         var standard_algebraics, long_algebraics, figurine_algebraics, coordinate, smith;
         var reverse_algebraics, crans, descriptives;
-        var dest_filerank = xy2filerank(move[0], move[1]);
-            
+
+        // Building blocks
+        var dest_filerank = xy2filerank(move[0], move[1]);      // e4
+        var dest_file = dest_filerank.substr(0, 1);             // e
+        var dest_rank = dest_filerank.substr(1, 1);             // 4
+        // starting_filerank (passed in as parameter)           // e2
+        var starting_file = starting_filerank.substr(0, 1);     // e
+        var starting_rank = starting_filerank.substr(1, 1);     // 2
+        var descriptive_origin = xy2descriptive(color, filerank2xy(starting_filerank)); // K2
+        var descriptive_dest = xy2descriptive(color, move);                             // K4
+        var descriptive_file = descriptive_dest.substr(0, descriptive_dest.length - 1); // K
         var capture_x;                  // x/blank
         var capture_or_dash;            // x/-
         var captured_letter = "";       // capital letter of piece, P for pawn, etc. or blank
@@ -765,13 +775,7 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
             standard_algebraics = figurine_algebraics = long_algebraics = 
                 reversible_algebraics = descriptives = [move[2].algebraic];
         } else {
-            var starting_file, starting_rank;
-            var algs, figurine_prefix, algebraic_prefix;
-
-            starting_file = starting_filerank.substr(0, 1);
-            starting_rank = starting_filerank.substr(1, 1);
-            dest_file = dest_filerank.substr(0, 1);
-            dest_rank = dest_filerank.substr(1, 1);
+            var algs, figurine_prefix, algebraic_prefix, piece_letter;
 
             if (capture_x === "x" && piece.type === "pawn") {
                 // Pawn captures begin with file of pawn.
@@ -786,8 +790,9 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
 
             }
 
-            algebraic_prefix = algebraic_piece_prefix(piece);
-            figurine_prefix = figurine_piece_prefix(color, piece);
+            piece_letter = algebraic_piece_prefix(piece, true);    // P, N, etc.
+            algebraic_prefix = algebraic_piece_prefix(piece);      // blank, N, etc.
+            figurine_prefix = figurine_piece_prefix(color, piece); // ♟, ♞, ♙, ♘, etc.
 
             standard_algebraics = algs.map(function(a) { return algebraic_prefix + a; });  // N??
             figurine_algebraics = algs.map(function(a) { return figurine_prefix + a; });   // ♘??
@@ -810,18 +815,37 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
                 ]
 
             // English descriptive notation
-            // TODO:
-            // KP-K4 (need to find descriptive piece name, capture_or_dash, xy2descriptive)
-            // P-K4
-            // KPxQP
-            // PxQP
-            // KPxP
-            // PxP
-            // also, QB/KB for queen's/king's bishop, just B
-            // KP(K2)-K4 most specified
-            // KP(2)-K4
-            // KP(K)-K4
-            //descriptives = [
+            // TODO: 
+            // - piece_name (KP, QP, etc. for king and queen pawn), captured_name
+            // - short_descriptive_dest (instead of QB4, just B4, etc.)
+            // - alt_letter (Kt for knight instead of N)
+            // - alt_descriptive_dest (QKt1 for b1 instead of QN1) - or maybe just replace Kt with N before?? easier!
+            // TODO: also allow 
+            if (capture_or_dash === "-") { 
+                // non-capturing move
+                descriptives = [
+                    //piece_name + capture_or_dash + descriptive_dest,              // P-K4
+                    piece_letter + capture_or_dash + descriptive_dest,              // KP-K4
+                    //piece_name + capture_or_dash + short_descriptive_dest,        // QB-B4
+                    //piece_letter + capture_or_dash + short_descriptive_dest,      // B-B4
+                    // TODO: also allow slashes, as synonyms
+                    piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + descriptive_dest, // P(K2)-K4
+                    piece_letter + "(" + starting_rank + ")" + capture_or_dash + descriptive_dest,      // P(2)-K4
+                    piece_letter + "(" + descriptive_file + ")" + capture_or_dash + descriptive_dest    // P(K)-K4
+                ]
+            } else {
+                // capture
+                descriptives = [
+                    piece_letter + capture_or_dash + captured_letter,       // PxP
+                    //piece_name + capture_or_dash + captured_letter,       // KPxP
+                    //piece_letter + capture_or_dash + captured_name,       // PxQP
+                    //piece_name + capture_or_dash + captured_name,         // KPxQP
+                    //piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + captured_name,  // P(K4)xQP
+                    //piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + captured_letter,// P(K4)xP
+                    piece_letter + capture_or_dash + captured_letter + "(" + descriptive_dest + ")"     // PxP(Q4)
+                    //piece_name + capture_or_dash + captured_letter + "(" + descriptive_dest + ")",    // KPxP(Q4)
+                ]
+            }
         }
 
         // Coordinate notation
@@ -867,6 +891,7 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
         possible_notations.FAN.push([piece, square, figurine_algebraics]);
         possible_notations.coord.push([piece, square, [coordinate]]);
         possible_notations.smith.push([piece, square, [smith]]);
+        possible_notations.descr.push([piece, square, descriptives]);
 
 
         // For removal
@@ -979,7 +1004,8 @@ function calculate_moves(color, is_hypothetical)
             CRAN: [],
             FAN: [],
             coord: [],
-            smith: []
+            smith: [],
+            descr: []
             };
     }
 
@@ -1023,6 +1049,7 @@ function calculate_moves(color, is_hypothetical)
         VALID_MOVE_NOTATIONS.FAN = disambiguate_notations(notations.FAN);
         VALID_MOVE_NOTATIONS.coord = disambiguate_notations(notations.coord);
         VALID_MOVE_NOTATIONS.smith = disambiguate_notations(notations.smith);
+        VALID_MOVE_NOTATIONS.descr = disambiguate_notations(notations.descr);
 
         // For reals.
         VALID_MOVES = valid_moves;
@@ -1915,8 +1942,8 @@ function name_squares()
             square.filerank = xy2filerank(x, y);
 
             square.descriptive = {};
-            square.descriptive.white = xy2descriptive("white", x, y);
-            square.descriptive.black = xy2descriptive("black", x, y);
+            square.descriptive.white = xy2descriptive("white", [x, y]);
+            square.descriptive.black = xy2descriptive("black", [x, y]);
             //console.log(square);
         }
     }
@@ -2382,10 +2409,10 @@ function piece_letter2name(letter)
 }
 
 // Return algebraic prefix for a piece. May return an empty 
-// string (for pawns, for example).
-function algebraic_piece_prefix(piece)
+// string (for pawns, for example), unless want_pawn_letter.
+function algebraic_piece_prefix(piece, want_pawn_letter)
 {
-    if (PIECE_TYPES[piece.type].alg_letter !== undefined) {
+    if (!want_pawn_letter && PIECE_TYPES[piece.type].alg_letter !== undefined) {
         return PIECE_TYPES[piece.type].alg_letter;
     } else if (PIECE_TYPES[piece.type].letter !== undefined) {
         return PIECE_TYPES[piece.type].letter;
@@ -2662,8 +2689,10 @@ function xy2filerank(x, y)
 }
 
 // Return name of square from color's perspective in English descriptive notation
-function xy2descriptive(color, x, y)
+function xy2descriptive(color, xy)
 {
+    var x = xy[0], y = xy[1];
+
     assert(x >= 1 && x <= FILE_MAX, "xy2filerank(" + x + ", " + y + "): bad x: " + x);
     assert(y >= 1 && y <= RANK_MAX, "xy2filerank(" + x + ", " + y + "): bad y: " + y);
 
