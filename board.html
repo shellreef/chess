@@ -116,6 +116,13 @@ if (!window.google) {
 google.load("prototype", "1.6.0.3");
 google.load("scriptaculous", "1.8.2");
 
+// Preferences, not game state.
+var PREFS = {
+    // TODO: UI element drop-down to change
+    OUTPUT_NOTATION: "descr"
+}
+
+// Info about the game
 var GAME_STATE = {
     // Whose turn it is
     active_color: '',
@@ -848,7 +855,12 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
                     piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + descriptive_dest,      // P(K2)-K4
                     piece_letter + "(" + descriptive_origin_rank + ")" + capture_or_dash + descriptive_dest, // P(2)-K4
                     piece_letter + "(" + descriptive_origin_file + ")" + capture_or_dash + descriptive_dest  // P(K)-K4
-                ]
+
+                // Must uniq() the array, since some of the notations actually appear twice
+                // in the list above, and disambiguate_moves() will delete both since it'll think they
+                // are ambiguous. This would have occurred when piece_name === short_piece_name, that is,
+                // for KP, QP, K, and Q. 
+                ].uniq()
             } else {
                 var captured_name = captured_piece.descriptive_name;
                 var short_captured_name = short_descriptive(captured_name);
@@ -870,7 +882,7 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
                     piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + captured_letter,  // P(K4)xP
                     piece_letter + capture_or_dash + captured_letter + "(" + descriptive_dest + ")",    // PxP(Q4)
                     piece_name + capture_or_dash + captured_letter + "(" + descriptive_dest + ")"       // KPxP(Q4)
-                ]
+                ].uniq()
             }
         }
 
@@ -2009,14 +2021,12 @@ function capture_piece(piece)
 
 // Find precomputed algebraic notation for this move. Called when
 // user drags a piece to a square and we don't know what move it is.
-// TODO: User-customizable notation for converting _to_ (since
-// mv(), user input, accepts anything). This uses SAN right now.
 function algebraic_from_piece_square(piece, square)
 {
     var ret;
 
     // TODO: better data structure, inverted hash table lookup
-    VALID_MOVE_NOTATIONS.SAN.each(function(alg_piece_square) {
+    VALID_MOVE_NOTATIONS[PREFS.OUTPUT_NOTATION].each(function(alg_piece_square) {
             var alg = alg_piece_square[0];
             var this_piece = alg_piece_square[1][0];
             var this_square = alg_piece_square[1][1];
