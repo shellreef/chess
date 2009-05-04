@@ -201,7 +201,7 @@ var PIECE_TYPES = {
    
     // TODO: support two-letter expanded FEN codes (my invention), since A-Z leaves
     // only 26 possibilities, X indicates another letter follows, so XA-XZ are available,
-    // and XXA-XXZ, XXXA-XXXZ, to infinity, if needed. Straightforward FEN extension.
+    // and XXA-XXZ, X++ to infinity, if needed. Straightforward FEN extension.
     colonel: {parlett: "n>, n=, 2/1>, 1*", letter: "XC"}, 
     murray_lion: {parlett: "~0/2, ~2/2, c1*", letter: "XM"},
     lion: {parlett: "~n*", letter: "XL"},
@@ -772,11 +772,13 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
         }
 
 
-        // Compute algebraic notation (SAN, LAN, RAN, CRAN, FAN)
+        // Compute notations: SAN, FAN,  LAN, RAN, CRAN and also descriptive.
+        // But first check if the move text was overridden in decode_one_parlett(), for the
+        // notations where it can be overridden.
         if (move[2].algebraic) {
             // Override notation; used for special moves (castling)
             standard_algebraics = figurine_algebraics = long_algebraics = 
-                reversible_algebraics = descriptives = [move[2].algebraic];
+                reversible_algebraics = crans = descriptives = [move[2].algebraic];
         } else {
             var algs, figurine_prefix, algebraic_prefix, piece_letter;
 
@@ -923,6 +925,10 @@ function disambiguate_notations(notations)
         piece = notations[i][0];
         square = notations[i][1];
         moves = notations[i][2];
+
+        if (!moves) {
+            console.log(notations[i]);
+        }
 
         for (var j = 0; j < moves.length; ++j) {
             var move = moves[j];
