@@ -838,12 +838,13 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
             if (capture_or_dash === "-") { 
                 // non-capturing move
                 descriptives = [
-                    piece_name + capture_or_dash + descriptive_dest,              // P-K4
-                    short_piece_name + capture_or_dash + descriptive_dest,        // BP-QB4
-                    piece_letter + capture_or_dash + descriptive_dest,            // KP-K4
-                    piece_name + capture_or_dash + short_descriptive_dest,        // QB-B4
-                    short_piece_name + capture_or_dash + short_descriptive_dest,  // BP-B4
-                    piece_letter + capture_or_dash + short_descriptive_dest,      // B-B4
+                    piece_letter + capture_or_dash + short_descriptive_dest,        // P-B4
+                    piece_name + capture_or_dash + short_descriptive_dest,          // QBP-B4
+                    short_piece_name + capture_or_dash + short_descriptive_dest,    // BP-B4
+                    piece_letter + capture_or_dash + descriptive_dest,              // P-QB4
+                    short_piece_name + capture_or_dash + descriptive_dest,          // BP-QB4
+                    piece_name + capture_or_dash + descriptive_dest,                // QBP-QB4
+
                     piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + descriptive_dest,      // P(K2)-K4
                     piece_letter + "(" + descriptive_origin_rank + ")" + capture_or_dash + descriptive_dest, // P(2)-K4
                     piece_letter + "(" + descriptive_origin_file + ")" + capture_or_dash + descriptive_dest  // P(K)-K4
@@ -854,15 +855,17 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
 
                 // capture
                 descriptives = [
+                    // Note: a permutation function would be handy here
                     piece_letter + capture_or_dash + captured_letter,           // PxP
-                    piece_name + capture_or_dash + captured_letter,             // KPxP
-                    short_piece_name + capture_or_dash + captured_letter,       // BPxP
-                    piece_letter + capture_or_dash + captured_name,             // PxQBP
                     piece_letter + capture_or_dash + short_captured_name,       // PxBP
-                    piece_name + capture_or_dash + captured_name,               // QNPxQBP
-                    piece_name + capture_or_dash + short_captured_name,         // QNPxBP
-                    short_piece_name + capture_or_dash + captured_name,         // NPxQBP
+                    piece_letter + capture_or_dash + captured_name,             // PxQBP
+                    short_piece_name + capture_or_dash + captured_letter,       // NPxP
                     short_piece_name + capture_or_dash + short_captured_name,   // NPxBP
+                    short_piece_name + capture_or_dash + captured_name,         // NPxQBP
+                    piece_name + capture_or_dash + captured_letter,             // QNPxP
+                    piece_name + capture_or_dash + short_captured_name,         // QNPxBP
+                    piece_name + capture_or_dash + captured_name,               // QNPxQBP
+
                     piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + captured_name,    // P(K4)xQP
                     piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + captured_letter,  // P(K4)xP
                     piece_letter + capture_or_dash + captured_letter + "(" + descriptive_dest + ")",    // PxP(Q4)
