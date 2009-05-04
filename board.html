@@ -588,6 +588,9 @@ function mv(alg_move)
         return VALID_MOVE_NOTATIONS.SAN.keys();
     }
 
+    // Accept digits, but prefer the letter oh.
+    alg_move = alg_move.replace("0-0-0", "O-O-O").replace("0-0", "O-O");
+
     // Prefer these move notations, in this order.
                          piece_square = VALID_MOVE_NOTATIONS.SAN.get(alg_move);
     if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.LAN.get(alg_move); }
