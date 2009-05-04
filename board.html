@@ -744,8 +744,9 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
         var descriptive_origin = xy2descriptive(color, filerank2xy(starting_filerank));             // K2
         var descriptive_dest = xy2descriptive(color, move);                                         // K4
         var descriptive_dest_file = descriptive_dest.substr(0, descriptive_dest.length - 1);        // K
+        var descriptive_dest_rank = descriptive_dest.substr(descriptive_dest.length - 1);           //  4
         var descriptive_origin_file = descriptive_origin.substr(0, descriptive_origin.length - 1);  // K
-        // TODO: rank from black's perspective
+        var descriptive_origin_rank = descriptive_dest.substr(descriptive_dest.length - 1);         //  4
         var capture_x;                  // x/blank
         var capture_or_dash;            // x/-
         var captured_letter = "";       // capital letter of piece, P for pawn, etc. or blank
@@ -822,7 +823,7 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
             // - alt_letter (Kt for knight instead of N) and
             // - alt_descriptive_dest (QKt1 for b1 instead of QN1) - currently, Kt is preprocessed to N in mv()
             //   would be nice to have an option to prefer Kt over N, for using old books (though N/Kt would be synonyms)
-            short_descriptive_dest = short_descriptive(descriptive_dest_file) + dest_rank;
+            short_descriptive_dest = short_descriptive(descriptive_dest_file) + descriptive_dest_rank;
             if (capture_or_dash === "-") { 
                 // non-capturing move
                 descriptives = [
@@ -832,7 +833,7 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
                     piece_letter + capture_or_dash + short_descriptive_dest,      // B-B4
                     // TODO: also allow slashes, as synonyms
                     piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + descriptive_dest, // P(K2)-K4
-                    piece_letter + "(" + starting_rank + ")" + capture_or_dash + descriptive_dest,      // P(2)-K4
+                    piece_letter + "(" + descriptive_origin_rank + ")" + capture_or_dash + descriptive_dest,      // P(2)-K4
                     piece_letter + "(" + descriptive_origin_file + ")" + capture_or_dash + descriptive_dest    // P(K)-K4
                 ]
             } else {
