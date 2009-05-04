@@ -829,31 +829,40 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
             // - alt_letter (Kt for knight instead of N) and
             //   alt_descriptive_dest (QKt1 for b1 instead of QN1) - currently, Kt is preprocessed to N in mv()
             //   would be nice to have an option to prefer Kt over N, for using old books (though N/Kt would be synonyms)
+            // - allow slashes in addition to parenthesises, or maybe not, since would be shorter and therefore preferred
             // - short piece name, NP instead of QNP or KNP
            
             var piece_name = piece.descriptive_name;
+            var short_piece_name = short_descriptive(piece_name);
             var short_descriptive_dest = short_descriptive(descriptive_dest_file) + descriptive_dest_rank;
             if (capture_or_dash === "-") { 
                 // non-capturing move
                 descriptives = [
                     piece_name + capture_or_dash + descriptive_dest,              // P-K4
+                    short_piece_name + capture_or_dash + descriptive_dest,        // BP-QB4
                     piece_letter + capture_or_dash + descriptive_dest,            // KP-K4
                     piece_name + capture_or_dash + short_descriptive_dest,        // QB-B4
+                    short_piece_name + capture_or_dash + short_descriptive_dest,  // BP-B4
                     piece_letter + capture_or_dash + short_descriptive_dest,      // B-B4
-                    // TODO: also allow slashes, as synonyms
                     piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + descriptive_dest,      // P(K2)-K4
                     piece_letter + "(" + descriptive_origin_rank + ")" + capture_or_dash + descriptive_dest, // P(2)-K4
                     piece_letter + "(" + descriptive_origin_file + ")" + capture_or_dash + descriptive_dest  // P(K)-K4
                 ]
             } else {
                 var captured_name = captured_piece.descriptive_name;
+                var short_captured_name = short_descriptive(captured_name);
 
                 // capture
                 descriptives = [
-                    piece_letter + capture_or_dash + captured_letter,     // PxP
-                    piece_name + capture_or_dash + captured_letter,       // KPxP
-                    piece_letter + capture_or_dash + captured_name,       // PxQP
-                    piece_name + capture_or_dash + captured_name,         // KPxQP
+                    piece_letter + capture_or_dash + captured_letter,           // PxP
+                    piece_name + capture_or_dash + captured_letter,             // KPxP
+                    short_piece_name + capture_or_dash + captured_letter,       // BPxP
+                    piece_letter + capture_or_dash + captured_name,             // PxQBP
+                    piece_letter + capture_or_dash + short_captured_name,       // PxBP
+                    piece_name + capture_or_dash + captured_name,               // QNPxQBP
+                    piece_name + capture_or_dash + short_captured_name,         // QNPxBP
+                    short_piece_name + capture_or_dash + captured_name,         // NPxQBP
+                    short_piece_name + capture_or_dash + short_captured_name,   // NPxBP
                     piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + captured_name,    // P(K4)xQP
                     piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + captured_letter,  // P(K4)xP
                     piece_letter + capture_or_dash + captured_letter + "(" + descriptive_dest + ")",    // PxP(Q4)
@@ -2749,7 +2758,10 @@ function xy2descriptive(color, xy)
 // QR for queen's rook file is shortened to R, and so is KR for king's rook. 
 function short_descriptive(descriptive_file)
 {
-    return {QR:"R", QN:"N", QB:"B", KB:"B", KN:"N", KR:"R"}[descriptive_file];
+    return {
+        QR:"R", QN:"N", QB:"B", KB:"B", KN:"N", KR:"R", K:"K", Q:"Q",
+        QRP:"RP", QNP:"NP", QBP:"BP", KBP:"BP", KNP:"NP", KRP:"RP", KP:"KP", QP:"QP" 
+    }[descriptive_file];
 }
 
 // Get a square cell, given location in either
