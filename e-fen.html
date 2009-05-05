@@ -351,6 +351,113 @@ with ~0/0 for ~n/m, ~0/0.
 
 <p>"P", by itself, is a move to the en passant target square, as long as the pawn can diagonally move forwards towards it. See the pawn Parlett notation for an example. The pawn in front of the target square will be captured.
 
+<h1>Algebraic Descriptive Notation</h1>
+<p><em>English descriptive notation</em> has several advantages over algebraic notation. Unfortunately, it labels pieces and squares based on chess1 pieces.
+The pieces, from left to right, are named: QR (queen's rook, etc.), QN, QB, Q, K, KB (king's bishop, etc.), KN, and KR. The pawns in front of their respective
+pieces are named as QRP (queen's rook's pawn, etc.), QNP, QBP, QP, KP, KBP, KNP, and KRP. If it is not ambiguous whether the piece or pawn is from the queen's
+or rook's side, it can be abbreviated to just NP, BP, or RP. The pieces and pawn names can further be abbreviated to P, R, N, or B if those are also not 
+ambiguous. The naming of the pieces is a desirable feature of English descriptive notation, but this method makes the notation unsuitable for chess variants
+with different pieces or with pieces in a different order (Chess960, etc). Additionally, descriptive notation names squares by rank (by the perspective of the
+active color) and the starting piece name on that file, with a similar disambiguation strategy.
+
+<h2>Naming the pieces</h2>
+<p><em>Algebraic descriptive notation</em> is similar to descriptive notation but names pieces as follows: origin + capital letter describing piece type. The
+origin may either be a file, rank, or file+rank, or nothing: whatever is shortest and not ambiguous. Hence, the pieces in a standard chess1 setup are named:
+<blockquote>
+aR, bN, cB, Q, K, fB, gN, hR
+</blockquote>
+
+<p>The queen and king may technically be named dQ and eK, but if there is only one if each, they never need be named this way. Pieces can also be identified
+by only a letter, if it is non-ambiguous, just as in English descriptive notation.
+
+<p>The pawns, similarly, are named aP through hP. If multiple pawns (or pieces) are on the same file, they will have names based on the rank, or both file
+and rank. A crazy screen chess setup might have pawns a3P, a4P, and others. Note that naming the pieces in this way is a feature that none of the algebraic
+chess notations allow for. To SAN, LAN, CRAN, a pawn is a pawn, a rook is a rook, no matter where it came from, since pieces are only identified by a single
+letter (and possibly their origin file and/or rank, before the move, but not the starting position). Algebraic notations emphasize position over pieces,
+algebraic descriptive notation is just the opposite.
+
+<h2>Naming the squares</h2>
+<p>Algebraic descriptive notation names squares using file + rank. The file is identical to algebraic notation, and the rank identical to as in descriptive
+notation. That is, the rank is from the <em>active player's</em> perspective. This is an important quality of algebraic descriptive notation: symmetry. Chess1
+is heavily biased towards white. Losing as white is seen as "wasting a white" and black often will consider a draw a victory. Several chess variants attempt to
+reduce the white bias, by 
+<a href="http://www.chessvariants.com/d.betza/chessvar/fair1st.html">various means</a> (see also 
+        <a href="http://www.amazon.com/Play-Stronger-Chess-Examining-Chess960/dp/0977452107">Gene Milener</a>'s "fair first move" rule). Symmetric rank
+numbering also has the benefit of making it easy to understand symmetric moves. Thus the Épine Dorsale opening, 1. e4 e5 in SAN, or 1. P-K4 P-K4 in 
+descriptive, becomes 1. P-e4 P-e4 in algebraic descriptive. 
+
+<h2>Special moves and notation</h2>
+<p>Castling shall be notated by O-O or O-O-O, capital letters, not zero digits.
+
+<p>Checkmate is denoted by "#", as in algebraic, not by "mate". Check is indicated with "+", not "ch.". 
+
+<p>Double check is denoted as "++", not "dbl ch". Double check is not indicated in algebraic notation, even though it is an important part of the game.
+
+<p>En passant moves may be denoted by "ep", but it is not required.
+
+<h2>Canonical moves</h2>
+<p>To find out the moves in algebraic descriptive notation, first compute all the valid moves for the position. For each move, build a list of moves
+of the following forms:
+
+<p>
+<table border="1">
+ <tr>
+  <th>Building blocks</th>
+  <th>Example</th>
+ </tr><tr>
+  <td colspan="2" align="center"><i>Non-capturing move</i></td>
+ </tr><tr>
+  <td>piece_letter + "-" + adescriptive_dest</td>
+  <td>P-c4</td>
+ </tr><tr>
+  <td>piece_aname + "-" + adescriptive_dest</td>
+  <td>cP-c4</td>
+ </tr><tr>
+  <td>piece_letter + "(" + adescriptive_origin + ")" + "-" + adescriptive_dest</td>
+  <td>P(c2)-c4</td>
+ </tr><tr>
+  <td>piece_letter + "(" + adescriptive_origin_rank + ")" + "-" + adescriptive_dest</td>
+  <td>P(2)-c4</td>
+ </tr><tr>
+  <td>piece_letter + "(" + adescriptive_origin_file + ")" + "-" + adescriptive_dest</td>
+  <td>P(c)-c4</td>
+ </tr><tr>
+  <td colspan="2" align="center"><i>Capturing move</i></td>
+ </tr><tr>
+  <td>piece_letter + capture_or_dash + captured_letter</td>
+  <td>PxP</td>
+ </tr><tr>
+  <td>piece_letter + capture_or_dash + captured_aname</td>
+  <td>PxcP</td>
+ </tr><tr>
+  <td>piece_aname + capture_or_dash + captured_letter</td>
+  <td>bPxP</td>
+ </tr><tr>
+  <td>piece_aname + capture_or_dash + captured_aname</td>
+  <td>bPxcP</td>
+ </tr><tr>
+  <td>piece_letter + "(" + adescriptive_origin + ")" + capture_or_dash + captured_aname</td>
+  <td>P(b4)xcP</td>
+ </tr><tr>
+  <td>piece_letter + "(" + adescriptive_origin + ")" + capture_or_dash + captured_letter</td>
+  <td>P(b4)xP</td>
+ </tr><tr>
+  <td>piece_letter + capture_or_dash + captured_letter + "(" + adescriptive_dest + ")"</td>
+  <td>PxP(c5)</td>
+ </tr><tr>
+  <td>piece_aname + capture_or_dash + captured_letter + "(" + adescriptive_dest + ")"</td>
+  <td>bPxP(c5)</td>
+ </tr><tr>
 </table>
+
+<p>After each move has been listed in each of the above notations, remove any notations that appear for more than one move.
+This removes ambiguous notations. Next, choose the shortest remaining notation for each move. This is the
+<em>canonical</em> move, the text which uniquely describes the move. All the remaining notations are
+<em>synonyms</em> that should also be accepted as input, but not used as output.
+
+<p>E-FEN piece letters may be accepted.
+
+<h3>Contact info</h3>
+<p>Copyright &copy; 2009 Jeff Connelly &mdash; efen-chess [AT] xyzzy.cjb dot net</p>
 </body>
 </html>
