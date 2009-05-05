@@ -252,7 +252,7 @@ google.setOnLoadCallback(function() {
 
     name_squares();    
 
-    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
+    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
     //load_fen("rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w KQkq - 0 1"); // pawnless chess
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
@@ -263,7 +263,7 @@ google.setOnLoadCallback(function() {
     //load_fen("k7/8/K7/8/8/8/8/8 b - - 0 30"); // K against K
     //load_fen("4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5"); // remove check by capture
     //load_fen("k1K5/8/8/8/8/8/p/88888888 b - - 0 5"); // pawn promotion
-    load_fen("8/8/8/3pP3/8/8/8/8 w - d6 0 5"); // en passant
+    //load_fen("8/8/8/3pP3/8/8/8/8 w - d6 0 5"); // en passant
     //load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); 
     //load_fen("k7/8/8/8/8/8/8/5KQ1 w - d6 0 50");  // K + KQ
     //load_fen("k7/8/8/8/8/8/8/5KR1 w - d6 0 50");  // K + KR
@@ -777,6 +777,7 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
             capture_x = "x";
             capture_slash = "/";
             capture_or_dash = "x";
+            captured_letter = PIECE_TYPES[captured_piece.type].letter;
             captured_colon_letter = ":" + (captured_letter === "P" ? "": captured_letter);
         } else {
             capture_or_dash = "-";
@@ -1927,6 +1928,7 @@ function set_turn(color, historical)
     if (checked && !no_moves) {
         set_check_message("Check!");
         text_move = "+";
+        // TODO: detect double-check, allow ++ for descriptive/algebraic descriptive, but not algebraic
     } else if (!checked && no_moves) {
         set_check_message("Draw (stalemate)");
         text_end = "1/2-1/2";
