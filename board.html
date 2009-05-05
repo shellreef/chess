@@ -753,7 +753,7 @@ function in_check(victim_color, all_moves)
 
 // Calculate and save the move notations for a move.
 // Note: only do this if not hypothetical.
-function calculate_notations(color, piece, moves, starting_filerank, possible_notations)
+function calculate_notations(color, piece, moves, starting_filerank, ps)
 {
     // Create drop targets for the valid destinations, linking
     // the draggables to droppables using piece- + source square.
@@ -762,9 +762,6 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
 
     moves.each(function(move) {
         var square = sq(move[0], move[1]);
-
-        var standard_algebraics, long_algebraics, figurine_algebraics, coordinates, smiths;
-        var reverse_algebraics, crans, descriptives, alg_descs;
 
         // Building blocks
         var dest_filerank = xy2filerank(move[0], move[1]);      // e4
@@ -814,8 +811,13 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
         // notations where it can be overridden.
         if (move[2].algebraic) {
             // Override notation; used for special moves (castling)
-            standard_algebraics = figurine_algebraics = long_algebraics = 
-                reversible_algebraics = crans = descriptives = [move[2].algebraic];
+            // Note: not all notations have special notation for castling.
+            ps.SAN.push([piece, square, [move[2].algebraics]]);
+            ps.LAN.push([piece, square, [move[2].algebraics]]);
+            ps.RAN.push([piece, square, [move[2].algebraics]]);
+            ps.CRAN.push([piece, square, [move[2].algebraics]]);
+            ps.descr.push([piece, square, [move[2].algebraics]]);
+            ps.adescr.push([piece, square, [move[2].algebraics]]);
         } else {
             var algs, figurine_prefix, algebraic_prefix, piece_letter;
 
@@ -836,13 +838,13 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
             algebraic_prefix = algebraic_piece_prefix(piece);      // blank, N, etc.
             figurine_prefix = figurine_piece_prefix(color, piece); // ♟, ♞, ♙, ♘, etc.
 
-            standard_algebraics = algs.map(function(a) { return algebraic_prefix + a; });  // N??
-            figurine_algebraics = algs.map(function(a) { return figurine_prefix + a; });   // ♘??
+            ps.SAN.push([piece, square, algs.map(function(a) { return algebraic_prefix + a; })]);  // N??
+            ps.FAN.push([piece, square, algs.map(function(a) { return figurine_prefix + a; })]);   // ♘??
 
-            long_algebraics = [algebraic_prefix + starting_filerank + capture_or_dash + dest_filerank];
+            ps.LAN.push([piece, square, [algebraic_prefix + starting_filerank + capture_or_dash + dest_filerank]]);
 
-            reversible_algebraics = [algebraic_prefix + starting_filerank + capture_or_dash + 
-                captured_letter + dest_filerank];
+            ps.RAN.push([piece, square, [algebraic_prefix + starting_filerank + capture_or_dash + 
+                captured_letter + dest_filerank]]);
 
             // Best online documentation I could find on CRAN: 
             //  http://main.uschess.org/forums/viewtopic.php?f=2&t=1428&start=30
@@ -850,11 +852,11 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
             // Uses ':' for capture instead of 'x', and piece letter isn't given if pawn
             // Full description will have to wait until I receive the book
             //  http://www.amazon.com/Play-Stronger-Chess-Examining-Chess960/dp/0977452107
-            crans = [
+            ps.CRAN.push([piece, square, [
                 algebraic_prefix + starting_filerank + captured_colon_letter + dest_filerank,  // Rd3:d7
                 algebraic_prefix + starting_filerank + captured_colon_letter + dest_file,      // Rd3:7
                 algebraic_prefix + starting_filerank + captured_colon_letter + dest_rank       // Rd3:e
-                ]
+                ]]);
 
             // English descriptive notation
             // TODO: 
@@ -882,7 +884,7 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
 
             if (capture_or_dash === "-") { 
                 // non-capturing move
-                descriptives = [
+                ps.descr.push([piece, square, [
                     piece_letter + capture_or_dash + short_descriptive_dest,        // P-B4
                     piece_name + capture_or_dash + short_descriptive_dest,          // QBP-B4
                     short_piece_name + capture_or_dash + short_descriptive_dest,    // BP-B4
@@ -898,16 +900,16 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
                 // in the list above, and disambiguate_moves() will delete both since it'll think they
                 // are ambiguous. This would have occurred when piece_name === short_piece_name, that is,
                 // for KP, QP, K, and Q. 
-                ].uniq()
+                ].uniq()])
 
 
-                adescs = [
+                ps.adesc.push([piece, square, [
                     piece_letter + capture_or_dash + adescriptive_dest,             // P-c4
                     piece_aname + capture_or_dash + adescriptive_dest,              // cP-c4
                     piece_letter + "(" + adescriptive_origin + ")" + capture_or_dash + adescriptive_dest,       // P(c2)-c4
                     piece_letter + "(" + adescriptive_origin_rank + ")" + capture_or_dash + adescriptive_dest,  // P(2)-c4
                     piece_letter + "(" + adescriptive_origin_file + ")" + capture_or_dash + adescriptive_dest   // P(c)-c4
-                ].uniq();
+                ].uniq()])
             } else if (capture_or_dash === "x") {
                 var captured_name = captured_piece.descriptive_name;
                 var short_captured_name = short_descriptive(captured_name);
@@ -915,7 +917,7 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
                 var captured_aname = captured_piece.adescriptive_name;
 
                 // capture
-                descriptives = [
+                ps.descr.push([piece, square, [
                     // Note: a permutation function would be handy here
                     piece_letter + capture_or_dash + captured_letter,           // PxP
                     piece_letter + capture_or_dash + short_captured_name,       // PxBP
@@ -931,8 +933,9 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
                     piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + captured_letter,  // P(K4)xP
                     piece_letter + capture_or_dash + captured_letter + "(" + descriptive_dest + ")",    // PxP(Q4)
                     piece_name + capture_or_dash + captured_letter + "(" + descriptive_dest + ")"       // KPxP(Q4)
-                ].uniq()
-                adescs = [
+                ].uniq()])
+
+                ps.adesc.push([piece, square, [
                     piece_letter + capture_or_dash + captured_letter,           // PxP
                     piece_letter + capture_or_dash + captured_aname,            // PxcP
                     piece_aname + capture_or_dash + captured_letter,            // bPxP
@@ -942,14 +945,14 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
                     piece_letter + "(" + adescriptive_origin + ")" + capture_or_dash + captured_letter, // P(b4)xP
                     piece_letter + capture_or_dash + captured_letter + "(" + adescriptive_dest + ")",   // PxP(c5)
                     piece_aname + capture_or_dash + captured_letter + "(" + adescriptive_dest + ")"     // bPxP(c5)
-                ].uniq();
+                ].uniq()])
             } else {
                 assert(false, "calculate_notations: " + capture_or_dash + " is not - or x");
             }
         }
 
-        // Coordinate notation. Sorry about the plural, but an array is required even though its singular.
-        coordinates = [starting_filerank.toUpperCase() + "-" + dest_filerank.toUpperCase()];
+        // Coordinate notation - least descriptive notation possible
+        ps.coord.push([piece, square, [starting_filerank.toUpperCase() + "-" + dest_filerank.toUpperCase()]]);
 
         // Smith notation, reversible, non-ambiguous: https://www.chessclub.com/chessviewer/smith.html
         var smith_capture_letter;
@@ -965,22 +968,9 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
         } else {
             smith_capture_letter = "";
         }
-        smiths = [starting_filerank + dest_filerank + smith_capture_letter];
+        ps.smith.push([piece, square, [starting_filerank + dest_filerank + smith_capture_letter]]);
         
         // TODO: support promotation in all notations, make separate moves (a8=Q, a8=N, etc.)
-
-
-        // Store moves, along with notations. The notations are stored as
-        // an array to accomodate ambiguous notations.
-        possible_notations.SAN.push([piece, square, standard_algebraics]);
-        possible_notations.LAN.push([piece, square, long_algebraics]);
-        possible_notations.RAN.push([piece, square, reversible_algebraics]);
-        possible_notations.CRAN.push([piece, square, crans]);
-        possible_notations.FAN.push([piece, square, figurine_algebraics]);
-        possible_notations.coord.push([piece, square, coordinates]);
-        possible_notations.smith.push([piece, square, smiths]);
-        possible_notations.descr.push([piece, square, descriptives]);
-        possible_notations.adesc.push([piece, square, adescs]);
 
 
         // For removal
@@ -1132,6 +1122,7 @@ function calculate_moves(color, is_hypothetical)
     });
 
 
+    // Gather all the notations, disambiguate and apply
     if (!is_hypothetical) {
         notations = possible_notations;
         VALID_MOVE_NOTATIONS = {};
