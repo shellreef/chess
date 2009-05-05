@@ -130,6 +130,7 @@ var AVAILABLE_NOTATIONS = [
     "RAN",  // Reversible Algebraic Notation            Bb5xNc6     e7-e5
     "CRAN", // Concise Reversible Algebraic Notation    Bb5:Nc6     e75
     "FAN",  // Figurine Algebraic Notation              ♗xc6        ♟e5
+    "ICCF", // ICCF Numeric Notation                    2536        5755
     "coord",// Coordinate                               B5-C6       E7-E5
     "smith",// Smith                                    b5c6n       e7e5
     "descr",// English Descriptive Notation             BxN         P-K4
@@ -953,6 +954,12 @@ function calculate_notations(color, piece, moves, starting_filerank, ps)
 
         // Coordinate notation - least descriptive notation possible
         ps.coord.push([piece, square, [starting_filerank.toUpperCase() + "-" + dest_filerank.toUpperCase()]]);
+
+        // ICCF numeric notation
+        // TODO: promotion number, 1234 = QRBN
+        var starting_xy = filerank2xy(starting_filerank);
+        var starting_x = starting_xy[0], starting_y = starting_xy[1];
+        ps.ICCF.push([piece, square, [starting_x + "" + starting_y + "" + move[0] + "" + move[1]]]);
 
         // Smith notation, reversible, non-ambiguous: https://www.chessclub.com/chessviewer/smith.html
         var smith_capture_letter;
