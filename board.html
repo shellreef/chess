@@ -608,7 +608,7 @@ function mv(alg_move)
 
     if (!alg_move) {
         assert(VALID_MOVE_NOTATIONS, "mv(" + alg_move + "): called with VALID_MOVE_NOTATINS false");
-        return VALID_MOVE_NOTATIONS.SAN.keys();
+        return VALID_MOVE_NOTATIONS[AVAILABLE_NOTATIONS[0]].keys();
     }
 
     // Accept digits, but prefer the letter oh.
