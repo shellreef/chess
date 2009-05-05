@@ -753,12 +753,20 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
         var starting_file = starting_filerank.substr(0, 1);     // e
         var starting_rank = starting_filerank.substr(1, 1);     // 2
         var descriptive_origin = xy2descriptive(color, filerank2xy(starting_filerank));             // K2
+        var adescriptive_origin = xy2adescriptive(color, filerank2xy(starting_filerank));           // e2
         var descriptive_dest = xy2descriptive(color, move);                                         // K4
+        var adescriptive_dest = xy2adescriptive(color, move);                                       // e4
         var descriptive_dest_file = descriptive_dest.substr(0, descriptive_dest.length - 1);        // K
         var descriptive_dest_rank = descriptive_dest.substr(descriptive_dest.length - 1);           //  4
         var descriptive_origin_file = descriptive_origin.substr(0, descriptive_origin.length - 1);  // K
         var descriptive_origin_rank = descriptive_dest.substr(descriptive_dest.length - 1);         //  4
+        var adescriptive_dest_file = adescriptive_dest.substr(0, 1);                                // e
+        var adescriptive_dest_rank = adescriptive_dest.substr(1, 1);                                //  4
+        var adescriptive_origin_file = adescriptive_origin.substr(0, 1);                            // e
+        var adescriptive_origin_rank = adescriptive_dest.substr(1, 1);                              //  4
+
         var capture_x;                  // x/blank
+        var capture_slash;              // slash/blank
         var capture_or_dash;            // x/-
         var captured_letter = "";       // capital letter of piece, P for pawn, etc. or blank
         var captured_colon_letter = ""; // colon if captured, then piece letter if not pawn
@@ -767,6 +775,7 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
 
         if (move[2].capture || move[2].en_passant_capture) {
             capture_x = "x";
+            capture_slash = "/";
             capture_or_dash = "x";
             // TODO: set capture, even if en_passant_capture is true;
             // then this conditional won't be needed.
@@ -780,6 +789,7 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
         } else {
             capture_or_dash = "-";
             capture_x = "";
+            capture_slash = "";
             captured_letter = "";
             captured_colon_letter = "";
         }
@@ -855,6 +865,9 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
             var piece_name = piece.descriptive_name;
             var short_piece_name = short_descriptive(piece_name);
             var short_descriptive_dest = short_descriptive(descriptive_dest_file) + descriptive_dest_rank;
+
+            var piece_aname = piece.adescriptive_name;
+
             if (capture_or_dash === "-") { 
                 // non-capturing move
                 descriptives = [
@@ -876,11 +889,18 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
                 ].uniq()
 
 
-                // TODO: adescs XXX
-                adescs = []
+                adescs = [
+                    piece_letter + capture_or_dash + adescriptive_dest,             // P-c4
+                    piece_aname + capture_or_dash + adescriptive_dest,              // cP-c4
+                    piece_letter + "(" + adescriptive_origin + ")" + capture_or_dash + adescriptive_dest,       // P(c2)-c4
+                    piece_letter + "(" + adescriptive_origin_rank + ")" + capture_or_dash + adescriptive_dest,  // P(2)-c4
+                    piece_letter + "(" + adescriptive_origin_file + ")" + capture_or_dash + adescriptive_dest   // P(c)-c4
+                ].uniq();
             } else {
                 var captured_name = captured_piece.descriptive_name;
                 var short_captured_name = short_descriptive(captured_name);
+                
+                var captured_aname = captured_piece.adescriptive_name;
 
                 // capture
                 descriptives = [
@@ -900,8 +920,17 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
                     piece_letter + capture_or_dash + captured_letter + "(" + descriptive_dest + ")",    // PxP(Q4)
                     piece_name + capture_or_dash + captured_letter + "(" + descriptive_dest + ")"       // KPxP(Q4)
                 ].uniq()
-                // TODO: adescs XXX
-                adescs = []
+                adescs = [
+                    piece_letter + capture_or_dash + captured_letter,           // PxP
+                    piece_letter + capture_or_dash + captured_aname,            // PxcP
+                    piece_aname + capture_or_dash + captured_letter,            // bPxP
+                    piece_aname + capture_or_dash + captured_aname,             // bPxcP
+
+                    piece_letter + "(" + adescriptive_origin + ")" + capture_or_dash + captured_aname,  // P(b4)xcP
+                    piece_letter + "(" + adescriptive_origin + ")" + capture_or_dash + captured_letter, // P(b4)xP
+                    piece_letter + capture_or_dash + captured_letter + "(" + adescriptive_dest + ")",   // PxP(c5)
+                    piece_aname + capture_or_dash + captured_letter + "(" + adescriptive_dest + ")"     // bPxP(c5)
+                ].uniq();
             }
         }
 
@@ -1101,6 +1130,7 @@ function calculate_moves(color, is_hypothetical)
         VALID_MOVE_NOTATIONS.coord = disambiguate_notations(notations.coord);
         VALID_MOVE_NOTATIONS.smith = disambiguate_notations(notations.smith);
         VALID_MOVE_NOTATIONS.descr = disambiguate_notations(notations.descr);
+        VALID_MOVE_NOTATIONS.adesc = disambiguate_notations(notations.adesc);
 
         // For reals.
         VALID_MOVES = valid_moves;
@@ -2414,7 +2444,6 @@ function load_starting_position(fen)
         }
     }
 
-    // TODO: only if chess1
     name_pieces();
 }
 
@@ -2424,6 +2453,7 @@ function load_starting_position(fen)
 function name_pieces()
 {
     for (var file_number = 1; file_number <= FILE_MAX; ++file_number) {
+        // English descriptive notation (only really applicable to chess1)
         var file = xy2descriptive("white", file_number);
 
         // White's pieces and pawns
@@ -2433,6 +2463,31 @@ function name_pieces()
         // Black's pieces and pawns
         pc(file_number, 8).descriptive_name = file;
         pc(file_number, 7).descriptive_name = file + "P";
+
+
+        // Algebraic descriptive notation
+        var afile = xy2filerank(file_number, "");
+        for (var white_rank = 1; white_rank <= RANK_MAX; ++white_rank) {
+            var black_rank = 9 - white_rank;
+            var piece = pc(file_number, white_rank);
+            var rank, piece_letter;
+
+            if (!piece) {
+                continue;
+            }
+
+            if (piece.hasClassName("white")) {
+                rank = white_rank;
+            } else {
+                rank = black_rank;
+            }
+
+            piece_letter = PIECE_TYPES[piece.type].letter;
+            // aP, bP, etc.. TODO: use rank, if needed to disambiguate (two
+            // pieces of same type on same file). Use file, rank, or filerank
+            // like disambiguating moves.
+            piece.adescriptive_name = afile + piece_letter;
+        }
     }
 }
 
@@ -2737,6 +2792,7 @@ function filerank2xy(code)
 // Convert from x,y coordinates to filerank notation for human consumption. Can either pass
 // xy2filerank(1, 8) === "a8"
 // xy2filerank([1, 8]) === "a8"
+// xy2filerank(1, "") === "a"
 function xy2filerank(x, y)
 {
     var filerank;
@@ -2748,10 +2804,12 @@ function xy2filerank(x, y)
     }
 
     assert(x >= 1 && x <= FILE_MAX, "xy2filerank(" + x + ", " + y + "): bad x: " + x);
-    assert(y >= 1 && y <= RANK_MAX, "xy2filerank(" + x + ", " + y + "): bad y: " + y);
+    assert(y === "" || (y >= 1 && y <= RANK_MAX), "xy2filerank(" + x + ", " + y + "): bad y: " + y);
 
     filerank = String.fromCharCode(x + "a".charCodeAt(0) - 1);
-    filerank += String.fromCharCode(y + "1".charCodeAt(0) - 1);
+    if (y !== "") {
+        filerank += String.fromCharCode(y + "1".charCodeAt(0) - 1);
+    }
 
     return filerank;
 }
@@ -2770,10 +2828,24 @@ function xy2descriptive(color, xy)
         y = "";
     }
 
-    assert(x >= 1 && x <= FILE_MAX, "xy2filerank(" + x + ", " + y + "): bad x: " + x);
-    assert(y === "" || (y >= 1 && y <= RANK_MAX), "xy2filerank(" + x + ", " + y + "): bad y: " + y);
+    assert(x >= 1 && x <= FILE_MAX, "xy2descriptive(" + x + ", " + y + "): bad x: " + x);
+    assert(y === "" || (y >= 1 && y <= RANK_MAX), "xy2descriptive(" + x + ", " + y + "): bad y: " + y);
 
     return [null, "QR", "QN", "QB", "Q", "K", "KB", "KN", "KR"][x] + (color === "white" ? y : 9 - y);
+}
+
+// Return name of square from color's perspective in "algebraic descriptive notation".
+// Same file as xy2algebraic, but rank is from symmetric, not always white's perspective.
+function xy2adescriptive(color, xy)
+{
+    var x, y, file;
+    
+    x = xy[0], y = xy[1];
+
+    assert(x >= 1 && x <= FILE_MAX, "xy2adescriptive(" + x + ", " + y + "): bad x: " + x);
+    assert(y >= 1 && y <= RANK_MAX, "xy2adescriptive(" + x + ", " + y + "): bad y: " + y);
+
+    return xy2filerank(x, "") + (color === "white" ? y : 9 - y);
 }
 
 // Shorten a file name, in descriptive notation, to a possibly-ambiguous name.
