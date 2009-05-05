@@ -119,7 +119,7 @@ google.load("scriptaculous", "1.8.2");
 // Preferences, not game state.
 var PREFS = {
     // TODO: UI element drop-down to change
-    OUTPUT_NOTATION: "descr"
+    OUTPUT_NOTATION: "SAN"
 }
 
 // Chess movement notations, in descending precedence. 
@@ -135,7 +135,6 @@ var AVAILABLE_NOTATIONS = [
     "smith",// Smith                                    b5c6n       e7e5
     "descr",// English Descriptive Notation             BxN         P-K4
     "adesc" // Algebraic Descriptive Notation           BxN         P-e4
-    // TODO: iccf
     ];
 
 
@@ -269,8 +268,34 @@ google.setOnLoadCallback(function() {
 
     name_squares();    
 
-    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
-    //load_fen("rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w KQkq - 0 1"); // pawnless chess
+    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
+    //load_fen("bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1");    // Church Chess
+    //load_fen("rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq - 0 1"); // Advance Chess
+    //load_fen("4rbqk/4rb1q/4r1bb/5rrr/RRR5/BB1R4/Q1BR4/KQBR4 w - - 0 1");    // Corner Chess
+    //load_fen("kbp2pbq/nrp2prn/pp4pp/8/8/PP4PP/NRP2PRN/QBP2PBK w - - 0 1");  // Corner Chess II
+    //load_fen("r6r/1nbqkbn1/pppppppp/8/8/PPPPPPPP/1NBQKBN1/R6R w - - 0 1"); // Corner Rooks Skirmish
+    //load_fen("1nrqkrn1/2b2b2/1pppppp1/8/8/1PPPPPP1/2B2B2/1NRQKRN1 w - - 0 1"); // Corridor Chess
+    //load_fen("kkkkkkkk/pppppppp/8/8/8/8/PPPPPPPP/KKKKKKKK w - - 0 1");  // Eight Kings Chess
+    //load_fen("bnrqkrnb/pppppppp/8/8/8/8/PPPPPPPP/BNRQKRNB w KQkq - 0 1"); // Fianchetto Chess
+    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R1BQKBNR w KQkq - 0 1"); // Knight Odds Chess
+    //load_fen("RNBQKBNR/pppppppp/8/8/8/8/PPPPP1PP/rnbqkbnr w KQkq - 0 1"); // Pawn Odds Chess
+    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNB1KBNR w KQkq - 0 1"); // Queen Odds Chess
+    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/1NBQKBNR w KQkq - 0 1"); // Rook Odds Chess
+    //load_fen("rbbqknnr/pppppppp/8/8/8/8/PPPPPPPP/RBBQKNNR w - - 0 1"); // Mongredian Chess
+    //load_fen("RNBQKBNR/pppppppp/8/8/8/8/PPPPPPPP/rnbqkbnr w KQkq - 0 1"); // Pawn Massacre Chess
+    //load_fen("rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w KQkq - 0 1"); // Pawnless Chess
+    //load_fen("1nn1k1n1/4p3/8/8/8/8/PPPPPPPP/4K3 w - - 0 1"); // Peasant Revolt Chess
+    //load_fen("qqqqkqqq/pppppppp/8/8/8/8/PPPPPPPP/QQQQKQQQ w - - 0 1"); // Power Chess
+    //load_fen("rrbqkbrr/bbnnnnbb/pppppppp/8/8/PPPPPPPP/BBNNNNBB/RRBQKBRR w - - 0 1");    // Power Chess II
+    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBKQBNR w KQkq - 0 1"); // Reverso Chess
+    //load_fen("nnnnknnn/pppppppp/8/8/8/8/PPPPPPPP/NNNNKNNN w - - 0 1"); // Royal Stables Chess
+    //load_fen("nnnnknnn/pppppppp/2p2p2/1pppppp1/8/8/PPPPPPPP/RNBQKBNR w - - 0 1");// Seven Knights Chess
+    //load_fen("rbqkkqbr/pppppppp/n6n/8/8/N6N/PPPPPPPP/RBQKKQBR w - - 0 1"); // Twin Chess
+    //load_fen("nkbqqbkn/r2pp2r/pppppppp/8/8/PPPPPPPP/R2PP2R/NKBQQBKN w - - 0 1"); // Twin Chess B
+    //load_fen("RNBQKBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbqkbnr w KQkq - 0 1"); // Upside-Down Chess
+    //load_fen("4k3/5ppp/8/8/8/8/PPP5/3K4 w - - 0 1"); // Wild Chess 7 
+    load_fen("rnbqkbnr/8/8/pppppppp/PPPPPPPP/8/8/RNBQKBNR w KQkq - 0 1"); // Wild Chess 8
+    
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
     //load_fen("rnbqkb1r/pp1ppppp/5n2/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 3");
