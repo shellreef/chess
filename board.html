@@ -122,6 +122,22 @@ var PREFS = {
     OUTPUT_NOTATION: "adesc"
 }
 
+// Chess movement notations, in descending precedence. 
+// For more info see http://en.wikipedia.org/wiki/Chess_notation
+var AVAILABLE_NOTATIONS = [
+    "SAN",  // Standard Algebraic Notation              Bxc6        e5
+    "LAN",  // Long Algebraic Notation                  Bb5xc6      e7-e5
+    "RAN",  // Reversible Algebraic Notation            Bb5xNc6     e7-e5
+    "CRAN", // Concise Reversible Algebraic Notation    Bb5:Nc6     e75
+    "FAN",  // Figurine Algebraic Notation              ♗xc6        ♟e5
+    "coord",// Coordinate                               B5-C6       E7-E5
+    "smith",// Smith                                    b5c6n       e7e5
+    "descr",// English Descriptive Notation             BxN         P-K4
+    "adesc" // Algebraic Descriptive Notation           BxN         P-e4
+    // TODO: iccf
+    ];
+
+
 // Info about the game
 var GAME_STATE = {
     // Whose turn it is
@@ -599,15 +615,20 @@ function mv(alg_move)
     alg_move = alg_move.replace("0-0-0", "O-O-O").replace("0-0", "O-O");
 
     // Prefer these move notations, in this order.
-                         piece_square = VALID_MOVE_NOTATIONS.SAN.get(alg_move);
-    if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.LAN.get(alg_move); }
-    if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.RAN.get(alg_move); }
-    if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.CRAN.get(alg_move); }
-    if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.FAN.get(alg_move); }
-    if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.coord.get(alg_move); }
-    if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.smith.get(alg_move); }
-    if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.descr.get(alg_move.replace(/Kt/g, "N")); }
-    if (!piece_square) { piece_square = VALID_MOVE_NOTATIONS.adesc.get(alg_move.replace(/Kt/g, "N")); }
+    for (var i = 0; i < AVAILABLE_NOTATIONS.length; ++i) {
+        var notation = AVAILABLE_NOTATIONS[i];
+
+        if (notation === "descr" || notation === "adesc") {
+            alg_move = alg_move.replace(/Kt/g, "N");
+        }
+
+        piece_square = VALID_MOVE_NOTATIONS[notation].get(alg_move);
+
+        if (piece_square) {
+            // Found one.
+            break;
+        }
+    }
 
     // TODO: allow synonymous moves, not part of VALID_MOVE_NOTATIONS, since are redundant.
 
@@ -852,8 +873,6 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
             // This paper mentions how a book on openings for black showed all of the diagrams from
             // white's perspective: http://www.castlelong.com/essay/Essay_HSym_fd47b_Doc_Prn.PDF
             // -- it discusses symmetric figurines, interesting. Although it says algebraic is superior.
-            // All notations: http://en.wikipedia.org/wiki/Chess_notation
-
           
             var piece_name = piece.descriptive_name;
             var short_piece_name = short_descriptive(piece_name);
@@ -973,6 +992,10 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
             onDrop: move_dropped_piece,
             hoverclass: 'hover'});
     });
+
+    // TODO: check for cross-notation ambiguities. Inputs are tested in the order of
+    // AVAILABLE_NOTATIONS, but a notation that matches two different moves in
+    // two different notations, if it exists, is sure to cause trouble!
 }
 
 // Given a list of all valid move notations, remove the ambiguous 
