@@ -1094,17 +1094,12 @@ function calculate_moves(color, is_hypothetical)
         // [piece, square] as a key, even with Prototype's Hash. Could use
         // http://www.tutorials4html.com/2009/02/06/true-javascript-hash-table/
         // but instead, using an array with linear lookup.
-        possible_notations = {
-            SAN: [],
-            LAN: [],
-            RAN: [],
-            CRAN: [],
-            FAN: [],
-            coord: [],
-            smith: [],
-            descr: [],
-            adesc: []
-            };
+        possible_notations = {};
+        for (var i = 0; i < AVAILABLE_NOTATIONS.length; ++i) {
+            var notation = AVAILABLE_NOTATIONS[i];
+
+            possible_notations[notation] = [];
+        }
     }
 
     // Look at all the active pieces
@@ -1140,15 +1135,11 @@ function calculate_moves(color, is_hypothetical)
     if (!is_hypothetical) {
         notations = possible_notations;
         VALID_MOVE_NOTATIONS = {};
-        VALID_MOVE_NOTATIONS.SAN = disambiguate_notations(notations.SAN);
-        VALID_MOVE_NOTATIONS.LAN = disambiguate_notations(notations.LAN);
-        VALID_MOVE_NOTATIONS.RAN = disambiguate_notations(notations.RAN);
-        VALID_MOVE_NOTATIONS.CRAN = disambiguate_notations(notations.CRAN);
-        VALID_MOVE_NOTATIONS.FAN = disambiguate_notations(notations.FAN);
-        VALID_MOVE_NOTATIONS.coord = disambiguate_notations(notations.coord);
-        VALID_MOVE_NOTATIONS.smith = disambiguate_notations(notations.smith);
-        VALID_MOVE_NOTATIONS.descr = disambiguate_notations(notations.descr);
-        VALID_MOVE_NOTATIONS.adesc = disambiguate_notations(notations.adesc);
+        for (i = 0; i < AVAILABLE_NOTATIONS.length; ++i) {
+            var notation = AVAILABLE_NOTATIONS[i];
+
+            VALID_MOVE_NOTATIONS[notation] = disambiguate_notations(notations[notation]);
+        }
 
         // For reals.
         VALID_MOVES = valid_moves;
