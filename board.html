@@ -263,7 +263,7 @@ google.setOnLoadCallback(function() {
     //load_fen("k7/8/K7/8/8/8/8/8 b - - 0 30"); // K against K
     //load_fen("4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5"); // remove check by capture
     //load_fen("k1K5/8/8/8/8/8/p/88888888 b - - 0 5"); // pawn promotion
-    //load_fen("8/8/8/3pP3/8/8/8/8 w - d6 0 5"); // en passant
+    load_fen("8/8/8/3pP3/8/8/8/8 w - d6 0 5"); // en passant
     //load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); 
     //load_fen("k7/8/8/8/8/8/8/5KQ1 w - d6 0 50");  // K + KQ
     //load_fen("k7/8/8/8/8/8/8/5KR1 w - d6 0 50");  // K + KR
@@ -280,7 +280,7 @@ google.setOnLoadCallback(function() {
     // http://www.xs4all.nl/~timkr/records/records.htm and http://www.xs4all.nl/~timkr/ChessTutor/pgnview.htm
 
     // test PGN embedded notes
-    pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
+    //pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
     
     //pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
 });
@@ -771,20 +771,12 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
         var captured_letter = "";       // capital letter of piece, P for pawn, etc. or blank
         var captured_colon_letter = ""; // colon if captured, then piece letter if not pawn
 
-        var captured_piece = pc(dest_filerank);
+        var captured_piece = move[2].capture; 
 
-        if (move[2].capture || move[2].en_passant_capture) {
+        if (captured_piece) {
             capture_x = "x";
             capture_slash = "/";
             capture_or_dash = "x";
-            // TODO: set capture, even if en_passant_capture is true;
-            // then this conditional won't be needed.
-            if (move[2].capture) { 
-                captured_letter = PIECE_TYPES[move[2].capture.type].letter;
-            } else {
-                // en passant captures pawn
-                captured_letter = "P";
-            }
             captured_colon_letter = ":" + (captured_letter === "P" ? "": captured_letter);
         } else {
             capture_or_dash = "-";
@@ -896,7 +888,7 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
                     piece_letter + "(" + adescriptive_origin_rank + ")" + capture_or_dash + adescriptive_dest,  // P(2)-c4
                     piece_letter + "(" + adescriptive_origin_file + ")" + capture_or_dash + adescriptive_dest   // P(c)-c4
                 ].uniq();
-            } else {
+            } else if (capture_or_dash === "x") {
                 var captured_name = captured_piece.descriptive_name;
                 var short_captured_name = short_descriptive(captured_name);
                 
@@ -931,6 +923,8 @@ function calculate_notations(color, piece, moves, starting_filerank, possible_no
                     piece_letter + capture_or_dash + captured_letter + "(" + adescriptive_dest + ")",   // PxP(c5)
                     piece_aname + capture_or_dash + captured_letter + "(" + adescriptive_dest + ")"     // bPxP(c5)
                 ].uniq();
+            } else {
+                assert(false, "calculate_notations: " + capture_or_dash + " is not - or x");
             }
         }
 
@@ -1184,8 +1178,10 @@ function filtered_moves(piece, color, is_hypothetical)
     filtered = unfiltered.select(function(move) {
         // The piece that this move will capture, if any. 
         // Only includes pieces that are captured by moving over. For
-        // en passant captures, en_passant_capture will be true, NOT capture!
-        move[2].capture = pc(move[0], move[1]);
+        // en passant captures, capture is set in decode_one_parlett.
+        if (!move[2].capture) {
+            move[2].capture = pc(move[0], move[1]);
+        }
 
         // If castle move, check if castling allowed
         if (move[2].castle) {
@@ -1604,7 +1600,7 @@ function decode_one_parlett(parlett, xy, color)
             // 3 = opponent's pawn that will be captured 
             // 2, 4 = squares where you can capture from, we must be on
          
-            // Are we on the capture-from squares, (2) or (3) in the diagram above?
+            // Are we on the capture-from squares, (2) or (4) in the diagram above?
             if (GAME_STATE.ep_target && xy[1] === GAME_STATE.ep_target[1] + forward &&
                 (GAME_STATE.ep_target[0] === xy[0] + 1 || GAME_STATE.ep_target[0] === xy[0] - 1)) {
 
@@ -1612,6 +1608,9 @@ function decode_one_parlett(parlett, xy, color)
                 // capture the pawn in front of it.
                 ep_moves = [[GAME_STATE.ep_target[0], GAME_STATE.ep_target[1]]];
                 flags.en_passant_capture = true;   
+                
+                // (3), opponent's piece to capture
+                flags.capture = pc(GAME_STATE.ep_target[0], GAME_STATE.ep_target[1] + forward);
             } else {
                 ep_moves = [];
             }
@@ -2455,14 +2454,15 @@ function name_pieces()
     for (var file_number = 1; file_number <= FILE_MAX; ++file_number) {
         // English descriptive notation (only really applicable to chess1)
         var file = xy2descriptive("white", file_number);
+        var piece;
 
         // White's pieces and pawns
-        pc(file_number, 1).descriptive_name = file;
-        pc(file_number, 2).descriptive_name = file + "P";
+        piece = pc(file_number, 1); if (piece) { piece.descriptive_name = file; }
+        piece = pc(file_number, 2); if (piece) { descriptive_name = file + "P"; }
 
         // Black's pieces and pawns
-        pc(file_number, 8).descriptive_name = file;
-        pc(file_number, 7).descriptive_name = file + "P";
+        piece = pc(file_number, 8); if (piece) { descriptive_name = file; }
+        piece = pc(file_number, 7); if (piece) { descriptive_name = file + "P"; }
 
 
         // Algebraic descriptive notation
