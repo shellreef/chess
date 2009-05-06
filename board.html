@@ -119,7 +119,10 @@ google.load("scriptaculous", "1.8.2");
 // Preferences, not game state.
 var PREFS = {
     // TODO: UI element drop-down to change
-    OUTPUT_NOTATION: "SAN"
+    OUTPUT_NOTATION: "SAN",
+
+    // What piece images to use                     
+    IMAGE_SET: "alfaerie"
 }
 
 // Chess movement notations, in descending precedence. 
@@ -2704,7 +2707,7 @@ function image_path_for(type, color)
     // TODO: use web fonts! Supported on Firefox 3.1+, Opera 10+, Safari 3.1+, IE4+
     // See http://fonts.philip.html5.org/
     
-    return "images/alfaerie/" + {white:"w", black:"b"}[color] + base + ".gif";
+    return "images/" + PREFS.IMAGE_SET + "/" + {white:"w", black:"b"}[color] + base + ".gif";
 }
 
 // Create a new piece or pawn, given the name in
