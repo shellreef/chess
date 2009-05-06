@@ -200,6 +200,7 @@ var PIECE_TYPES = {
 
     // Other hippogonals, good for testing
     zero: {parlett: "~0/0", letter: "O"},
+    man: {parlett: "1*", letter: "M"},    // same as king, but not royale
     dababba: {parlett: "~2/0", letter: "D"},  // or ~2+
     alfil: {parlett: "~2/2", letter: "Y"},    // or ~2X
     alibaba: {parlett: "~2/0, ~2X", letter: "L"},
@@ -208,9 +209,15 @@ var PIECE_TYPES = {
     tripper: {parlett: "~3/3", letter: "XT"},
     camel: {parlett: "~1/3", letter: "W"},
     zebra: {parlett:"~2/3", letter: "Z"},
-    man: {parlett: "1*", letter: "M"},    // same as king, but not royale
-    frog: {parlett: "~1/1, ~0/3", letter: "F"},   // amphibian
     giraffe: {parlett: "~1/4", letter: "XG"},
+    antelope: {parlett: "~3/4"},    // TODO: letter
+    flamingo: {parlett: "~1/6"},    // TODO: letter
+
+    // Amphibians (combined leapers)
+    frog: {parlett: "~1/1, ~0/3", letter: "F"},
+    bison: {parlett: "~1/3, ~2/3"}, // TODO: letter
+    gnus: {parlett: "~1/2, ~1/3"},  // TODO: letter
+    root_fifty_leaper: {parlett: "~5/5, ~7/1"},
 
     // Combined pieces of International Chess
     archbishop: {parlett: "nX, ~1/2", letter: "A"}, // B+N, aka cardinal, princess, janus (Capablanca, X-FEN standard)
@@ -269,7 +276,7 @@ google.setOnLoadCallback(function() {
     name_squares();    
 
     //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
-    //load_fen("bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1");    // Church Chess
+    load_fen("bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1");    // Church Chess
     //load_fen("rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq - 0 1"); // Advance Chess
     //load_fen("4rbqk/4rb1q/4r1bb/5rrr/RRR5/BB1R4/Q1BR4/KQBR4 w - - 0 1");    // Corner Chess
     //load_fen("kbp2pbq/nrp2prn/pp4pp/8/8/PP4PP/NRP2PRN/QBP2PBK w - - 0 1");  // Corner Chess II
@@ -294,7 +301,7 @@ google.setOnLoadCallback(function() {
     //load_fen("nkbqqbkn/r2pp2r/pppppppp/8/8/PPPPPPPP/R2PP2R/NKBQQBKN w - - 0 1"); // Twin Chess B
     //load_fen("RNBQKBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbqkbnr w KQkq - 0 1"); // Upside-Down Chess
     //load_fen("4k3/5ppp/8/8/8/8/PPP5/3K4 w - - 0 1"); // Wild Chess 7 
-    load_fen("rnbqkbnr/8/8/pppppppp/PPPPPPPP/8/8/RNBQKBNR w KQkq - 0 1"); // Wild Chess 8
+    //load_fen("rnbqkbnr/8/8/pppppppp/PPPPPPPP/8/8/RNBQKBNR w KQkq - 0 1"); // Wild Chess 8
     
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
     //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
