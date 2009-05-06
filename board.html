@@ -2681,20 +2681,14 @@ function piece_location(piece)
 // Return the path to an image for the piece of that color
 function image_path_for(type, color)
 {
-    var letter = PIECE_TYPES[type].letter;
-
-    if (!letter) {
-        // TODO: store image path in piece info, eliminate this function
-        assert(false, "image_path_for(" + type + ", " + color + "): letter not found");
-    }
-
     // TODO: pngs
     // TODO: even better, use Unicode characters in a span!! How cool would that be? Infinite resolution.
     // See for example http://en.wikipedia.org/wiki/Knight_(chess)
     // Unfortunately, MSIE doesn't seem to support it, though it should..different font?
     // TODO: use web fonts! Supported on Firefox 3.1+, Opera 10+, Safari 3.1+, IE4+
     // See http://fonts.philip.html5.org/
-    return "images/" + {white:"w", black:"b"}[color] + letter.toLowerCase() + ".gif";
+    
+    return "images/alfaerie/" + {white:"w", black:"b"}[color] + type + ".gif";
 }
 
 // Create a new piece or pawn, given the name in
