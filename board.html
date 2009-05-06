@@ -221,9 +221,16 @@ var PIECE_TYPES = {
     buffalo: {parlett: "~1/2, ~1/3, ~2/3"},
 
     // Combined pieces of International Chess
-    archbishop: {parlett: "nX, ~1/2", letter: "A"}, // B+N, aka cardinal, princess, janus (Capablanca, X-FEN standard)
-    chancellor: {parlett: "n+, ~1/2", letter: "C"}, // R+N, aka empress, marshal (Capablanca, X-FEN standard)
-    amazon: {parlett: "n*, ~1/2", letter: "XV"},     // Q+N, aka superqueen
+   
+    // B+N, aka cardinal, princess, janus (Capablanca, X-FEN standard)
+    archbishop: {parlett: "nX, ~1/2", letter: "A", image: "cardinal"}, 
+
+    // R+N, aka empress, marshal (Capablanca, X-FEN standard)
+    chancellor: {parlett: "n+, ~1/2", letter: "C"}, 
+
+    // Q+N, aka superqueen
+    amazon: {parlett: "n*, ~1/2", letter: "XV"},     
+
     maharajah: {parlett: "n*, ~1/2", letter: "XJ", royal: true},   // Q+N+K, Maharajah chess
     royal_knight: {parlett: "~1/2", letter: "XR", royal: true},  // Knightmate chess (for king, use a man)
     royal_queen: {parlet: "n*", royal: true},               // queen but can't be captured
@@ -296,8 +303,8 @@ google.setOnLoadCallback(function() {
 
     name_squares();    
 
-    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
-    load_fen("bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1");    // Church Chess
+    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
+    //load_fen("bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1");    // Church Chess
     //load_fen("rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq - 0 1"); // Advance Chess
     //load_fen("4rbqk/4rb1q/4r1bb/5rrr/RRR5/BB1R4/Q1BR4/KQBR4 w - - 0 1");    // Corner Chess
     //load_fen("kbp2pbq/nrp2prn/pp4pp/8/8/PP4PP/NRP2PRN/QBP2PBK w - - 0 1");  // Corner Chess II
@@ -2681,6 +2688,15 @@ function piece_location(piece)
 // Return the path to an image for the piece of that color
 function image_path_for(type, color)
 {
+    var base;
+
+    // Override image name
+    if (PIECE_TYPES[type].image) {
+        base = PIECE_TYPES[type].image;
+    } else {
+        base = type;
+    }
+
     // TODO: pngs
     // TODO: even better, use Unicode characters in a span!! How cool would that be? Infinite resolution.
     // See for example http://en.wikipedia.org/wiki/Knight_(chess)
@@ -2688,7 +2704,7 @@ function image_path_for(type, color)
     // TODO: use web fonts! Supported on Firefox 3.1+, Opera 10+, Safari 3.1+, IE4+
     // See http://fonts.philip.html5.org/
     
-    return "images/alfaerie/" + {white:"w", black:"b"}[color] + type + ".gif";
+    return "images/alfaerie/" + {white:"w", black:"b"}[color] + base + ".gif";
 }
 
 // Create a new piece or pawn, given the name in
