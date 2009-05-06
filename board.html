@@ -747,11 +747,11 @@ function promote(piece)
     // ... except when changing images. Safari has CSS animations.
     // new Effect.Puff(piece);
     // or try CSS transitions, see CSS at the top of this document.
-    //piece.style.background = image_path_for(PIECE_TYPES[promotes_to].letter, piece.hasClassName("white") ? "white" : "black");
+    //piece.style.background = image_path_for(promotes_to, piece.hasClassName("white") ? "white" : "black");
     // or TODO: create another img, same place same time, change opacity to reveal it
     // but this leaves the old image behind..
     
-    piece.src = image_path_for(PIECE_TYPES[promotes_to].letter, piece.hasClassName("white") ? "white" : "black");
+    piece.src = image_path_for(promotes_to, piece.hasClassName("white") ? "white" : "black");
 
 
     piece.type = promotes_to;
@@ -2679,8 +2679,15 @@ function piece_location(piece)
 }
 
 // Return the path to an image for the piece of that color
-function image_path_for(letter, color)
+function image_path_for(type, color)
 {
+    var letter = PIECE_TYPES[type].letter;
+
+    if (!letter) {
+        // TODO: store image path in piece info, eliminate this function
+        assert(false, "image_path_for(" + type + ", " + color + "): letter not found");
+    }
+
     // TODO: pngs
     // TODO: even better, use Unicode characters in a span!! How cool would that be? Infinite resolution.
     // See for example http://en.wikipedia.org/wiki/Knight_(chess)
@@ -2711,7 +2718,7 @@ function create_piece(name)
 
     // TODO: catch invalid letters, lookup PIECE_TYPES
 
-    filename = image_path_for(letter, color);
+    filename = image_path_for(piece_letter2name(letter), color);
 
     // Color is the most important class. Type is added
     // mostly for debugging purposes.
