@@ -2608,7 +2608,8 @@ function algebraic_piece_prefix(piece, want_pawn_letter)
         return PIECE_TYPES[piece.type].letter;
     }
 
-    assert(false, "algebraic_piece_prefix(" + piece + "): unrecognized piece");
+    return "X(" + piece.type + ")";
+    //assert(false, "algebraic_piece_prefix(" + piece + "): unrecognized piece");
 }
 
 // Get the Unicode figurine for a piece of a given color, or fall back on 
