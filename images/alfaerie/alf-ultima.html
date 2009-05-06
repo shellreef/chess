@@ -1,0 +1,132 @@
+<html>
+<body bgcolor="#fffff0">
+<h1 align=center>Ultima</h1>
+
+<a href="#board">Board</a> | <a href="#pieces">Pieces</a> | <a href="#description">Description</a> | <a href="#history">History</a> | <a href="#strategy">Strategy</a> | <a href="alf-index.html">Back to Index</a> 
+
+<a name=board> </a>
+<h2>Board</h2>
+
+<img hspace=32 src="ultima.gif">
+
+<a name=pieces> </a>
+<h2>Pieces</h2>
+
+<table width=600 cellpadding=8>
+<tr><td valign=top><img src="bking.gif"></td><td valign=top>A King can move to any adjacent square, but never to a 
+	      square where it can be captured.  The King can capture an enemy piece
+		  on the square its moving to, just as in regular chess.  There is no
+		  castling.
+<p>The object of the game is to capture the enemy King.</td></tr>
+
+<tr><td colspan=2><hr></td></tr>
+
+<tr><td valign=top><img src="bcoordinator.gif"></td><td valign=top>The Coordinator can slide any number of squares in any
+	     direction.  When it finishes a move, it captures any enemy piece on an intersection
+		 of the orthogonal lines that pass through the Coordinator and through the friendly
+		 King.  Imagine the rectangle formed on the chess board by the Coordinator and the
+		 King of the same side; the captured pieces are on the rectangle's other two
+		 corners.  Note that the capture only occurs when the Coordinator moves, not when 
+		 the King moves.  When the Coordinator moves to the same rank or file as the King,
+		 nothing is captured.</td></tr>
+
+<tr><td colspan=2><hr></td></tr>
+
+<tr><td valign=top><img src="bchameleon.gif"></td><td valign=top>The Chameleon can slide any number of squares in any
+	     direction.  It captures using the capture method of the piece it is
+		 capturing!  For example, it can capture an enemy Withdrawer by
+		 moving directly away from it and then end its move beside an enemy
+		 Pawn, which it captures by interception.  Note that when capturing
+		 a Pawn, the Chameleon must be moving orthogonally, because Pawns
+		 can't move diagonally.  Similarly, it can only capture the enemy
+		 King when adjacent and then making a single step.  When a Chameleon
+		 is next to an enemy Immobilizer, the Chameleon immobilizes it, though
+		 it can't immobilize any other pieces.  A Chameleon can't capture
+		 an enemy Chameleon.</td></tr>
+
+<tr><td colspan=2><hr></td></tr>
+
+<tr><td valign=top><img src="bimmobilizer.gif"></td><td valign=top>The Immobilizer can slide any number of squares in any
+	     direction.  It doesn't capture, but rather immobilizes any enemy pieces that
+		 are adjacent to it.  These pieces can't move as long as the Immobilizer is
+		 there.  An Immobilizer doesn't affect pieces that are simply moving past it,
+		 though if the piece ends its movement beside an Immobilizer it will immediately
+		 be frozen.  Enemy adjacent Immobilizers will immobilize each other until
+		 one of them is captured.
+		 <p>An Immobilized piece (except a King) has the option of committing suicide,
+		 capturing itself as a move.  This is occasionally useful to clear the way
+		 for an attack on the Immobilizer.  To make this move, simply click on an
+		 Immobilized piece.</td></tr>
+
+<tr><td colspan=2><hr></td></tr>
+
+<tr><td valign=top><img src="bwithdrawer.gif"></td><td valign=top>The Withdrawer can slide any number of squares in any
+	     direction.  If the Withdrawer begins adjacent to an enemy piece and then moves
+		 in a straight line directly away from it, the enemy piece is captured.</td></tr>
+
+<tr><td colspan=2><hr></td></tr>
+
+<tr><td valign=top><img src="blongleaper.gif"></td><td valign=top>The Long-Leaper can slide any number of squares in any
+	     direction.  If it runs into an enemy piece, the Long-Leaper captures by
+		 leaping over the enemy piece to the vacant square directly behind.  If
+		 the square behind it is occupied then the piece may not be jumped.  After
+		 jumping the Long-Leaper may continue to slide in the same direction and
+		 may in fact jump over subsequent enemy pieces it encounters.</td></tr>
+
+<tr><td colspan=2><hr></td></tr>
+
+<tr><td valign=top><img src="bpincerpawn.gif"></td><td valign=top>The Pawn moves any number of squares horizontally or
+	     vertically.  If the Pawn moves orthogonally next to an enemy
+		 piece and there is another friendly piece of any type directly beyond
+		 that, the enemy piece is squeezed between the two pieces and captured.
+		 The Pawn may capture several pieces like this on a single move.
+		 Ultima Pawns are very much like the pieces in Tafl.
+</td></tr>
+
+</table>
+
+<pre>
+
+</pre>
+
+<table width=600><tr><td>
+<a name=description> </a>
+<h2>Description</h2>
+
+Ultima is a complex game, more complex than Chess.
+      While the movement is fairly uniform, each type of piece
+	  captures differently.  Having many capturing forms is the
+	  main element that sets Ultima apart from other games and was
+	  the reason for the game's creation.
+<p>The object of the game
+	  is to capture the opponent's King.  Right-click on a piece
+	  to read about how it moves.
+
+<a name=history> </a>
+<h2>History</h2>
+
+Ultima was invented by Robert Abbott and first appeared,
+      without a name, in the December 1962 issue of 'Recreational
+      Mathematics Magazine' (forerunner of the 'Journal of Recreational
+      Mathematics').  The game was later published, as Ultima, in
+      'Abbott's New Card Games.'  Abbott revised the rules for the paperback
+      edition of the book, adding a rule limiting movement depending on
+      what rank a piece begins on, but that rule was not widely accepted,
+      and this implementation uses Abbott's original rules.
+
+<a name=strategy> </a>
+<h2>Strategy</h2> 
+
+Try to avoid getting your King immobilized as this is
+      a very dangerous situation.  To avoid captures by an enemy
+	  Coordinator, be watchful of all your pieces that are on the
+	  same rank or file as the enemy King.
+
+<p>More information on Ultima can be found at 
+<a href="http://www.chessvariants.com/other.dir/ultima.html">http://www.chessvariants.com/other.dir/ultima.html</a>.
+
+</td></tr></table>
+
+</body>
+
+</html>
