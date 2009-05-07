@@ -1637,6 +1637,12 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
             continue;
         }
 
+        var dest_square = sq(x, y);
+
+        if (pc(move[0], move[1]) && pc(move[0], move[1]).hasClassName(color)) {
+                return false;
+        }
+ 
         moves.push([x, y, flags]);
 
     }
@@ -2870,25 +2876,25 @@ function figurine_piece_prefix(color, piece)
 // - a square, from sq()
 function pc(x, y)
 {
-var square;
+    var square;
 
-// Get square
-if (x.hasClassName && x.hasClassName("square")) {
-    square = x;
-} else {
-    square = sq(x, y);
-}
+    // Get square
+    if (x.hasClassName && x.hasClassName("square")) {
+        square = x;
+    } else {
+        square = sq(x, y);
+    }
 
-// A virtual, off-board "hypothetical" piece, or lack of (null, empty square).
-if (HYPOTHETICAL_TO && square.x === HYPOTHETICAL_TO[0] && square.y === HYPOTHETICAL_TO[1]) {
-    // As if it moved here
-    return HYPOTHETICAL_PIECE;
-} else if (HYPOTHETICAL_FROM && square.x === HYPOTHETICAL_FROM[0] && square.y === HYPOTHETICAL_FROM[1]) {
-    // As if it moved off of here, so empty
-    return null;
-}
+    // A virtual, off-board "hypothetical" piece, or lack of (null, empty square).
+    if (HYPOTHETICAL_TO && square.x === HYPOTHETICAL_TO[0] && square.y === HYPOTHETICAL_TO[1]) {
+        // As if it moved here
+        return HYPOTHETICAL_PIECE;
+    } else if (HYPOTHETICAL_FROM && square.x === HYPOTHETICAL_FROM[0] && square.y === HYPOTHETICAL_FROM[1]) {
+        // As if it moved off of here, so empty
+        return null;
+    }
 
-return square.childNodes[0];
+    return square.childNodes[0];
 }
 
 // Get (x,y) of piece. For filerank notation, use xy2filerank on this.
