@@ -1638,18 +1638,30 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
         }
 
         var dest_square = sq(x, y);
-        var dest_piece = pc(x, y);
+        var capture_piece = pc(x, y);
 
         // Can't move to self-occupied square
-        if (dest_piece && dest_piece.hasClassName(color)) {
+        if (capture_piece && capture_piece.hasClassName(color)) {
             continue;
         }
+
+        // Must be a capture
+        if (flags.capture_only && !capture_piece) {
+            continue;
+        }
+
+        // Must not be
+        if (flags.no_capture && capture_piece) {
+            continue;
+        }
+
+        // TODO: initial only
  
         moves.push([x, y, flags]);
 
     }
 
-    console.log(moves);
+    return moves;
 }
 
 // Return an array of [direction vectors, ch2 consumed]. The vectors
