@@ -1661,7 +1661,8 @@ function relative_decode_direction(ch, ch2)
 // from the perspective of the active color. Has no knowledge of board state.
 function relative_decode_parlett(parlett)
 {
-    var distances, directions, flags, movement;
+    var distances, directions, flags, movement, rel_moves;
+    var hippogonal = false;
 
     flags = {};
     distances = [];
@@ -1695,7 +1696,6 @@ function relative_decode_parlett(parlett)
             distances.push(Infinity);
         } else if (ch === "/") {
             hippogonal = true;
-
         } else if (ch == " ") {
             assert(false, "relative_parlett(" + parlett + "): whitespace encountered, did you forget a comma?");
         } else {
@@ -1712,8 +1712,58 @@ function relative_decode_parlett(parlett)
         }
     }
 
-    console.log("movement=",movement);
-    console.log("directions=",directions);
+    if (hippogonal) {
+        assert(distances.length === 2, "relative_parlett(" + parlett + "): for hippogonal, expected exactly two distances");
+        var a = distances[0], b = distances[1];
+
+        // TODO: remove expand_hippogonal, include_reversed, times_each, add_flags. They just generate this.
+        // But keep without_dupes. It is useful.
+        rel_moves = without_dupes([
+            [+a, +b, flags],
+            [+b, +a, flags],
+            [+a, -b, flags],
+            [-b, +a, flags],
+            [-a, +b, flags],
+            [+a, -b, flags],
+            [-a, -b, flags],
+            [-b, -a, flags]]);
+    } else {
+        rel_moves = [];
+        for (i = 0; i < directions.length; ++i) {
+            var dir = directions[i];
+            var limit, rel_x, rel_y, prev_rel_x, prev_rel_y;
+
+            // Optional limit on number of steps to take of direction vector
+            if (distances.length !== 0) {
+                limit = distances[0];
+
+                assert(distances.length === 1, "relative_parlett(" + parlett + "): multiple distances given for rider, expected one or none");
+            } else {
+                limit = Math.max(RANK_MAX, FILE_MAX);
+            }
+            limit = Math.min(limit, Math.max(RANK_MAX, FILE_MAX));
+
+            rel_x = rel_y = 0;
+            prev_rel_x = null, prev_rel_y = null;
+            for (var j = 0; j < limit; ++j) {
+                var flags = {};
+
+                // Riders get blocked
+                if (prev_rel_x !== null && prev_rel_y !== null && movement === "rider") { 
+                    flags.unblocked = [prev_rel_x, prev_rel_y];
+                }
+
+                rel_x += dir[0];
+                rel_y += dir[1];
+
+                rel_moves.push([rel_x, rel_y, flags]);
+
+                prev_rel_x = rel_x;
+                prev_rel_y = rel_y;
+            }
+        }
+    }
+    console.log("rel_moves",rel_moves);
 }
 
 // Decode a single group in extended Parlett notation into unfiltered absolute moves
