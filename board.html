@@ -1659,13 +1659,14 @@ function relative_decode_direction(ch, ch2)
 // x and y are destinations relative to the piece origin, and flags describes
 // under what conditions the move can be made. + is forward, - is backwards,
 // from the perspective of the active color. Has no knowledge of board state.
-function relative_parlett(parlett)
+function relative_decode_parlett(parlett)
 {
-    var distances, directions, flags, maybe_directions, extremities;
+    var distances, directions, flags, movement;
 
     flags = {};
     distances = [];
 
+    movement = "rider";
     for (var i = 0; i < parlett.length; ++i) {
         var ch = parlett.substr(i, 1);
 
@@ -1690,7 +1691,7 @@ function relative_parlett(parlett)
         // Standard Parlett
         } else if (/[0-9]/.test(ch)) {
             distances.push(parseInt(ch, 10));
-        } else if (ch === "n") {
+        } else if (ch === "n" || ch === "m") {
             distances.push(Infinity);
         } else if (ch === "/") {
             hippogonal = true;
@@ -1698,63 +1699,21 @@ function relative_parlett(parlett)
         } else if (ch == " ") {
             assert(false, "relative_parlett(" + parlett + "): whitespace encountered, did you forget a comma?");
         } else {
-            maybe_directions = decode_direction(ch, parlett.substr(i + 1, 1), color);
+            var maybe_directions = relative_decode_direction(ch, parlett.substr(i + 1, 1));
+
             if (maybe_directions) {
                 directions = maybe_directions[0];
                 if (maybe_directions[1]) {
                     i += 1; // two-character direction
                 }
             } else {
-                assert(false, "decode_one_parlett(" + parlett + "): unsupported: '" + ch + "'");
+                assert(false, "relative_parlett(" + parlett + "): unsupported: '" + ch + "'");
             }
         }
     }
-    if (!movement) {
-        // Move unlimited distance in one direction, as long as its not blocked
-        // rook = (1,0)rider, bishop = (1,1)rider, queen (1,1)+(1,0)rider
-        movement = "rider";
-    }
 
-    //console.log("movement=",movement);
-    //console.log("directions=",directions);
-
-    if (hippogonal) {
-        assert(movement === "leaper", "decode_one_parlett(" + parlett + 
-            "): only hippogonals that are leapers are currently supported");
-
-        // First get valid destinations, then convert to absolute coordinates.
-        // Relatively easy, since with leapers, can disregard pieces on the path
-        var rel_moves = add_flags(expand_hippogonal(distances), flags);
-
-        moves = move_rel2abs(xy, rel_moves).reject(function(xy) {
-            var piece = pc(xy[0], xy[1]);
-            if (!piece) {
-                return false;    // unoccupied, good
-            }
-
-            // skip squares that are occupied by friendly pieces
-            return piece.hasClassName(color);
-        });
-
-    } else if (movement === "leaper") {
-        assert(false, "decode_one_parlett(" + parlett + 
-            "): only leapers that are hippogonals are currently supported");
-    } else if (movement === "rider") {
-        var limit;
-
-        assert(distances.length === 1, "decode_one_parlett(" + parlett + 
-            "): for non-hippogonal parletts, must have exactly one distance, not: " +
-            distances);
-
-        // The distance is the move limit (1 for king, "infinity" for Q, B, R).
-        limit = distances[0];
-
-        moves = add_flags(expand_rider(limit, directions, xy, extremities, color), flags);
-    } else {
-        assert(false, "decode_one_parlett(" + parlett + "): unsupported movement");
-    }
-
- 
+    console.log("movement=",movement);
+    console.log("directions=",directions);
 }
 
 // Decode a single group in extended Parlett notation into unfiltered absolute moves
