@@ -1638,9 +1638,11 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
         }
 
         var dest_square = sq(x, y);
+        var dest_piece = pc(x, y);
 
-        if (pc(move[0], move[1]) && pc(move[0], move[1]).hasClassName(color)) {
-                return false;
+        // Can't move to self-occupied square
+        if (dest_piece && dest_piece.hasClassName(color)) {
+            continue;
         }
  
         moves.push([x, y, flags]);
