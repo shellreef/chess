@@ -325,9 +325,9 @@ google.setOnLoadCallback(function() {
     name_squares();    
 
 
-    load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // mythical pieces
+    //load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // test fairy pieces
 
-    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
+    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
     //load_fen("bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1");    // Church Chess
     //load_fen("rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq - 0 1"); // Advance Chess
     //load_fen("4rbqk/4rb1q/4r1bb/5rrr/RRR5/BB1R4/Q1BR4/KQBR4 w - - 0 1");    // Corner Chess
@@ -1604,6 +1604,157 @@ function decode_direction(ch, ch2, color)
     } else {
         return null;
     }
+}
+
+// Return an array of [direction vectors, ch2 consumed]. The vectors
+// are positive for forward, negative for backwards.
+// TODO: use
+function relative_decode_direction(ch, ch2)
+{
+    if (ch === "+") { 
+        // orthogonally four possible directions
+        return [include_reversed(times_each([1, 0], [1, -1])), false];
+    } else if (ch === "=") {
+        // orthogonally sideways
+        return [[[1, 0], [-1, 0]], false];
+    } else if (ch === ">") {
+        if (ch2 === "=") {
+            // >= orthogonally forwards or sideways
+            return [relative_decode_direction(">", undefined)[0].concat(relative_decode_direction("=", undefined)[0]), true];
+        } else {
+            // = orthogonally forward
+            return [[[0, 1]], false];
+        }
+    } else if (ch === "<") {
+        if (ch2 === ">") {
+            // <> orthogonally forwards and backwards
+            return [[[0, 1], [0, -1]], true];
+        } else if (ch2 === "=") {
+            // <= orthogonally backwards or sideways
+            return [relative_decode_direction("<", undefined)[0].concat(relative_decode_direction("=", undefined)[0]), true];
+        } else {
+            // < orthogonally backwards
+            return [[[0, -1]], false];
+        }
+    } else if (ch === "X") { 
+        if (ch2 === ">") {
+            // X> diagonally forwards
+            return [[[1, 1], [-1, 1]], true];
+        } else if (ch2 === "<") {
+            // X< diagonally backwards
+            return [[[1, -1], [-1, -1]], true];
+        } else {
+            // X diagonally four possible directions
+            return [include_reversed(times_each([1, 1], [1, -1])), false];
+        }
+    } else if (ch === "*") {    
+        // orthogonally or diagonally (eight possible directions)
+        return [relative_decode_direction("+", undefined)[0].concat(relative_decode_direction("X", undefined)[0]), false];
+    } else {
+        assert(false, "relative_decode_direction(" + ch + ", " + ch2 + "): invalid direction");
+    }
+}
+
+// TODO: decode a Parlett notation into a list of [x,y,flags], where
+// x and y are destinations relative to the piece origin, and flags describes
+// under what conditions the move can be made. + is forward, - is backwards,
+// from the perspective of the active color. Has no knowledge of board state.
+function relative_parlett(parlett)
+{
+    var distances, directions, flags, maybe_directions, extremities;
+
+    flags = {};
+    distances = [];
+
+    for (var i = 0; i < parlett.length; ++i) {
+        var ch = parlett.substr(i, 1);
+
+        if (ch === "~") {
+            movement = "leaper";
+
+        // Flags, documented on http://en.wikipedia.org/wiki/Fairy_chess_piece#Additions_to_Parlett.27s
+        } else if (ch === "i") { 
+            // Initial move: Can only if the piece is in its original position
+            // (pawn's 2 move forward)
+            flags.initial_only = true;
+        } else if (ch === "c") {
+            // Capture only: may only be used if destination is occupied by enemy piece
+            // (pawn's diagnal capture)
+            flags.capture_only = true;
+        } else if (ch === "o") {
+            // Can not capture: destination square must be unoccupied; since by default, piece
+            // can move to enemy square in order to capture it
+            // (pawn's forward move)
+            flags.no_capture = true;
+
+        // Standard Parlett
+        } else if (/[0-9]/.test(ch)) {
+            distances.push(parseInt(ch, 10));
+        } else if (ch === "n") {
+            distances.push(Infinity);
+        } else if (ch === "/") {
+            hippogonal = true;
+
+        } else if (ch == " ") {
+            assert(false, "relative_parlett(" + parlett + "): whitespace encountered, did you forget a comma?");
+        } else {
+            maybe_directions = decode_direction(ch, parlett.substr(i + 1, 1), color);
+            if (maybe_directions) {
+                directions = maybe_directions[0];
+                if (maybe_directions[1]) {
+                    i += 1; // two-character direction
+                }
+            } else {
+                assert(false, "decode_one_parlett(" + parlett + "): unsupported: '" + ch + "'");
+            }
+        }
+    }
+    if (!movement) {
+        // Move unlimited distance in one direction, as long as its not blocked
+        // rook = (1,0)rider, bishop = (1,1)rider, queen (1,1)+(1,0)rider
+        movement = "rider";
+    }
+
+    //console.log("movement=",movement);
+    //console.log("directions=",directions);
+
+    if (hippogonal) {
+        assert(movement === "leaper", "decode_one_parlett(" + parlett + 
+            "): only hippogonals that are leapers are currently supported");
+
+        // First get valid destinations, then convert to absolute coordinates.
+        // Relatively easy, since with leapers, can disregard pieces on the path
+        var rel_moves = add_flags(expand_hippogonal(distances), flags);
+
+        moves = move_rel2abs(xy, rel_moves).reject(function(xy) {
+            var piece = pc(xy[0], xy[1]);
+            if (!piece) {
+                return false;    // unoccupied, good
+            }
+
+            // skip squares that are occupied by friendly pieces
+            return piece.hasClassName(color);
+        });
+
+    } else if (movement === "leaper") {
+        assert(false, "decode_one_parlett(" + parlett + 
+            "): only leapers that are hippogonals are currently supported");
+    } else if (movement === "rider") {
+        var limit;
+
+        assert(distances.length === 1, "decode_one_parlett(" + parlett + 
+            "): for non-hippogonal parletts, must have exactly one distance, not: " +
+            distances);
+
+        // The distance is the move limit (1 for king, "infinity" for Q, B, R).
+        limit = distances[0];
+
+        moves = add_flags(expand_rider(limit, directions, xy, extremities, color), flags);
+    } else {
+        assert(false, "decode_one_parlett(" + parlett + "): unsupported movement");
+    }
+
+ 
 }
 
 // Decode a single group in extended Parlett notation into unfiltered absolute moves
