@@ -327,7 +327,7 @@ google.setOnLoadCallback(function() {
 
     //load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // test fairy pieces
 
-    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
+    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
     //load_fen("bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1");    // Church Chess
     //load_fen("rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq - 0 1"); // Advance Chess
     //load_fen("4rbqk/4rb1q/4r1bb/5rrr/RRR5/BB1R4/Q1BR4/KQBR4 w - - 0 1");    // Corner Chess
@@ -367,7 +367,7 @@ google.setOnLoadCallback(function() {
     //load_fen("8/8/8/3pP3/8/8/8/8 w - d6 0 5"); // en passant
     //load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); 
     //load_fen("k7/8/8/8/8/8/8/5KQ1 w - d6 0 50");  // K + KQ
-    //load_fen("k7/8/8/8/8/8/8/5KR1 w - d6 0 50");  // K + KR
+    load_fen("k7/8/8/8/8/8/8/5KR1 w - d6 0 50");  // K + KR
     //load_fen("4r3/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle out of check
     //load_fen("5r2/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle through check
     //load_fen("rnbqkbnr/ppp2ppp/8/8/8/8/PPP2PPP/RNBQKBNR w KQkq - 0 1"); // to test "only move" 
@@ -1606,9 +1606,47 @@ function decode_direction(ch, ch2, color)
     }
 }
 
+// TODO: new move filtering
+function NEW_filtered_moves(piece, color, is_hypothetical)
+{
+    var choice_groups, parlett, rel_moves, moves, start_xy;
+
+    start_xy = piece_location(piece);
+    parlett = PIECE_TYPES[piece.type].parlett;
+
+    // Get all the unfiltered moves for the mutually exclusive choices
+    choice_groups = parlett.split(", ");
+
+    rel_moves = []
+    for (var i = 0; i < choice_groups.length; ++i) {
+            // For each group, gather the move options. 
+            // (Would be nice if JavaScript arrays had a Python-like .extend)
+            rel_moves = rel_moves.concat(relative_decode_parlett(choice_groups[i]));
+    }   
+    rel_moves = without_dupes(rel_moves);
+
+    // Absolutize and find what is allowed
+    moves = [];
+    for (var i = 0; i < rel_moves.length; ++i) {
+        var xy = [rel_moves[i][0] + start_xy[0], rel_moves[i][1] + start_xy[1]];
+        var x = xy[0], y = xy[1];
+        var flags = rel_moves[i][2];
+
+        if (x < 1 || y < 1 || x > FILE_MAX || y > RANK_MAX) {
+            // Out of bounds
+            continue;
+        }
+
+        moves.push([x, y, flags]);
+
+    }
+
+    console.log(moves);
+}
+
 // Return an array of [direction vectors, ch2 consumed]. The vectors
 // are positive for forward, negative for backwards.
-// TODO: use
+// NEW
 function relative_decode_direction(ch, ch2)
 {
     if (ch === "+") { 
@@ -1651,18 +1689,21 @@ function relative_decode_direction(ch, ch2)
         // orthogonally or diagonally (eight possible directions)
         return [relative_decode_direction("+", undefined)[0].concat(relative_decode_direction("X", undefined)[0]), false];
     } else {
-        assert(false, "relative_decode_direction(" + ch + ", " + ch2 + "): invalid direction");
+        assert(false, "relative_decode_direction('" + ch + "', '" + ch2 + "'): invalid direction");
     }
 }
 
-// TODO: decode a Parlett notation into a list of [x,y,flags], where
+// Decode a Parlett notation into a list of [x,y,flags], where
 // x and y are destinations relative to the piece origin, and flags describes
 // under what conditions the move can be made. + is forward, - is backwards,
 // from the perspective of the active color. Has no knowledge of board state.
+// The moves must be filtered to determine their validity.
+// NEW
 function relative_decode_parlett(parlett)
 {
     var distances, directions, flags, movement, rel_moves;
     var hippogonal = false;
+    var end_only = false;
 
     flags = {};
     distances = [];
@@ -1688,6 +1729,13 @@ function relative_decode_parlett(parlett)
             // can move to enemy square in order to capture it
             // (pawn's forward move)
             flags.no_capture = true;
+
+        // Extended Parlett flags
+        } else if (ch === "e") {
+            assert(false, "TODO: replace with [-2,0] etc, extended notation to directly enter a move");
+
+        // TODO: add [dx,dy,flags] to Extended Parlett, to directly enter a relative move
+        // with optional flags. Arbitrary move support. Use for castling, instead of =2e.
 
         // Standard Parlett
         } else if (/[0-9]/.test(ch)) {
@@ -1745,12 +1793,12 @@ function relative_decode_parlett(parlett)
 
             rel_x = rel_y = 0;
             prev_rel_x = null, prev_rel_y = null;
-            for (var j = 0; j < limit; ++j) {
-                var flags = {};
-
+            for (var j = 0; j <= limit; ++j) {
                 // Riders get blocked
                 if (prev_rel_x !== null && prev_rel_y !== null && movement === "rider") { 
                     flags.unblocked = [prev_rel_x, prev_rel_y];
+                } else {
+                    delete flags.unblocked;
                 }
 
                 rel_x += dir[0];
@@ -1763,7 +1811,8 @@ function relative_decode_parlett(parlett)
             }
         }
     }
-    console.log("rel_moves",rel_moves);
+
+    return rel_moves;
 }
 
 // Decode a single group in extended Parlett notation into unfiltered absolute moves
