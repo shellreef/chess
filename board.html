@@ -223,6 +223,7 @@ var PIECE_TYPES = {
     bison: {parlett: "~1/3, ~2/3"},                 // TODO: image
     gnus: {parlett: "~1/2, ~1/3"},                  // TODO: image
     root_fifty_leaper: {parlett: "~5/5, ~7/1"},     // TODO: image
+    // TODO: root-65 leaper, bat, see http://members.shaw.ca/quadibloc/chess/ch03.htm
     buffalo: {parlett: "~1/2, ~1/3, ~2/3"},         // TODO: image
 
     // Combined pieces of International Chess
@@ -242,6 +243,9 @@ var PIECE_TYPES = {
     dragon: {parlett: "o1>, P, c1X>, oi2>eE, oi1>e, ~1/2"}, // pawn + knight
 
     // More combined pieces
+    // From piecelopedia or http://members.shaw.ca/quadibloc/chess/ch03.htm or 
+    walker: {parlett: "o1+, c1X"},          // wazir move, fers capture
+    tiger: {parlett: "onX, c~1/2"},         // bishop move, knight capture
     bd: {parlett: "~2/0, nX"},              // dabbaba + bishop
     caliph: {parlett: "~1/3, nX"},          // camel + bishop
     canvasser: {parlett: "~1/3, n+"},       // camel + rook
@@ -301,6 +305,9 @@ var PIECE_TYPES = {
     checker_kinged: {parlett: "cn(^2X), o1x", letter:"XZ"},
     spy: {parlett: "2>, 2=, (1/1)>", letter:"XS"}  // no grouping
     // pieces with no notation. WinChloe supports 1400 pieces.
+    //
+    // TODO: pieces from http://members.shaw.ca/quadibloc/chess/ch04.htm
+    // TODO: compound pieces from http://www.chessvariants.com/graphics.dir/alfaerie/
 };
 
 // Hypothetical board squares. Pieces or lack thereof, for check filtering.
