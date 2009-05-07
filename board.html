@@ -206,24 +206,24 @@ var PIECE_TYPES = {
     // Other hippogonals, good for testing
     zero: {parlett: "~0/0", letter: "O"},
     man: {parlett: "1*", letter: "M"},    // same as king, but not royale (also known as commoner)
-    dababba: {parlett: "~2/0", letter: "D"},  // or ~2+
-    alfil: {parlett: "~2/2", letter: "Y"},    // or ~2X
-    alibaba: {parlett: "~2/0, ~2X", letter: "L"},
+    dababba: {parlett: "~2/0", letter: "D", image: "warmachine"},  // or ~2+
+    alfil: {parlett: "~2/2", letter: "Y"},    // or ~2X // TODO: image
+    alibaba: {parlett: "~2/0, ~2X", letter: "L"},   // TODO: image
     squirrel: {parlett: "~0/2, ~1/2, ~2/2", letter: "S"},
     threeleaper: {parlett: "~3/0", letter: "H"}, 
     tripper: {parlett: "~3/3", letter: "XT"},
     camel: {parlett: "~1/3", letter: "W"},
     zebra: {parlett:"~2/3", letter: "Z"},
     giraffe: {parlett: "~1/4", letter: "XG"},
-    antelope: {parlett: "~3/4"},    // TODO: letter
-    flamingo: {parlett: "~1/6"},    // TODO: letter
+    antelope: {parlett: "~3/4"}, 
+    flamingo: {parlett: "~1/6"}, 
 
     // Amphibians (combined leapers)
-    frog: {parlett: "~1/1, ~0/3", letter: "F"},
-    bison: {parlett: "~1/3, ~2/3"}, // TODO: letter
-    gnus: {parlett: "~1/2, ~1/3"},  // TODO: letter
-    root_fifty_leaper: {parlett: "~5/5, ~7/1"},
-    buffalo: {parlett: "~1/2, ~1/3, ~2/3"},
+    frog: {parlett: "~1/1, ~0/3", letter: "F"},     // TODO: image
+    bison: {parlett: "~1/3, ~2/3"},                 // TODO: image
+    gnus: {parlett: "~1/2, ~1/3"},                  // TODO: image
+    root_fifty_leaper: {parlett: "~5/5, ~7/1"},     // TODO: image
+    buffalo: {parlett: "~1/2, ~1/3, ~2/3"},         // TODO: image
 
     // Combined pieces of International Chess
    
@@ -242,7 +242,7 @@ var PIECE_TYPES = {
     dragon: {parlett: "o1>, P, c1X>, oi2>eE, oi1>e, ~1/2"}, // pawn + knight
 
     // More combined pieces
-    bd: {parlett: "~2/0, nX"},              // dabbabah + bishop
+    bd: {parlett: "~2/0, nX"},              // dabbaba + bishop
     caliph: {parlett: "~1/3, nX"},          // camel + bishop
     canvasser: {parlett: "~1/3, n+"},       // camel + rook
     carpenter: {parlett: "~1/2, ~2/0"},     // knight + dabbaba
@@ -252,7 +252,7 @@ var PIECE_TYPES = {
     dragon_king: {parlett: "n+, 1X", royal: true},  // rook + king
     fad: {parlett: "1X, ~2/2, ~2/0"},       // ferz + alfil + dababa
     general: {parlett: "1X", royal: true},  // royal ferz
-    kangaroo: {parlett: "~1/2, ~2/2"},      // knight + alfil
+    kangaroo: {parlett: "~1/2, ~2/2"},      // knight + alfil       TODO: image:
     waffle: {parlett: "1+, ~2/2"},          // wazir + alfil wazir + alfil
     wizard: {parlett: "~1/3, 1X"},          // camel + fers
 
@@ -277,13 +277,22 @@ var PIECE_TYPES = {
     kraken: {parlett: "~n/m ~0/0"},     // any square, not realistic since always checkmates!
     squid: {parlett: "o~n/m ~0/0", letter: "XD"}, // any square but can't capture, much less powerful
     universal_leaper: {parlett: "~n/m"},// like kraken, but can't go to square it is on (like a zero)
-    octopus: {parlett: "o~n/m", letter: "U"},
+    octopus: {parlett: "o~n/m", letter: "U"},   // TODO: image
 
     // Pieces from chess-3
     // http://www.chessbase.com/newsdetail.asp?newsid=4553
-    tower: {parlett: "n+, onX", castle: true, letter: "T"},  // rook + can move (not capture) like bishop
-    jous: {parlett: "~1/2, o1+", letter: "J"},       // knight + can move (not capture) like wazir
-    vicar: {parlett: "nX, o2+", letter: "V"},  // bishop + can move (not capture) 1 or 2 squares orthogonally
+    // TODO: instead of using composite pieces, which aren't totally accurate because the
+    // extra moves are non-capturing (jous is not strictly knight + wazir, since the wazir moves can't capture!)
+    // frookbbishop, knightwazir?
+    
+    // rook + can move (not capture) like bishop
+    tower: {parlett: "n+, onX", castle: true, letter: "T", image: "rookinv"},  
+
+    // knight + can move (not capture!) like wazir
+    jous: {parlett: "~1/2, o1+", letter: "J", image: "knightwazir"}, 
+
+    // bishop + can move (not capture) 1 or 2 squares orthogonally
+    vicar: {parlett: "nX, o2+", letter: "V", image: "bishopinv"},  
 
     // Pieces that probably won't be supported without significant coding
     leo: {parlett: "on*, c^&", letter:"XO"},        // no & support, whatever that is
@@ -308,7 +317,10 @@ google.setOnLoadCallback(function() {
 
     name_squares();    
 
-    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
+
+    load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // mythical pieces
+
+    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
     //load_fen("bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1");    // Church Chess
     //load_fen("rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq - 0 1"); // Advance Chess
     //load_fen("4rbqk/4rb1q/4r1bb/5rrr/RRR5/BB1R4/Q1BR4/KQBR4 w - - 0 1");    // Corner Chess
