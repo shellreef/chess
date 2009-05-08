@@ -1655,6 +1655,11 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
         var rel_x = rel_moves[i][0], rel_y = rel_moves[i][1]; 
         var flags = rel_moves[i][2];
 
+        // Positive is forwards, so mirror for black.
+        if (color === "black") {
+            rel_y = -rel_y;
+        }
+
         var x = rel_x + start_x;
         var y = rel_y + start_y;
 
