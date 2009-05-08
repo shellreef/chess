@@ -1766,6 +1766,45 @@ function relative_decode_direction(ch, ch2)
     }
 }
 
+// Decodes an explicit relative move that was in square brackets: [0,2;initial_only]
+function decode_relative_text_move(text_move)
+{
+    var xy_text_opts, xy_text, opts, xy, x, y, flags;
+    
+    xy_text_opts = text_move.split(";");
+    xy_text = xy_text_opts.shift();
+    opts = xy_text_opts;
+
+    xy = xy_text.split(",");
+    x = xy[0];
+    y = xy[1];
+   
+    // Semicolon-separated flags
+    flags = {};
+    for (var i = 0; i < opts.length; ++i) {
+        var opt = opts[i];
+        var key, value;
+       
+        // Allow if_unblocked=0,1, etc.
+        if (/=/.test(opt)) {
+            var ary = opt.split("=");
+            var left = ary[0], right = ary[1];
+            value = right.split(",");
+            key = left;
+            console.log("VALUE",value);
+        } else {
+            key = opt;
+            value = true;
+        }
+        flags[key] = value;
+    }
+
+    console.log(x);
+    console.log(y);
+    console.log(flags);
+    return [x, y, flags];
+}
+
 // Decode a Parlett notation into a list of [x,y,flags], where
 // x and y are destinations relative to the piece origin, and flags describes
 // under what conditions the move can be made. + is forward, - is backwards,
@@ -1807,15 +1846,18 @@ function relative_decode_parlett(parlett)
         // Extended Parlett flags
         } else if (ch === "[") {
             var text_move = "";
+            var nest = 1;
             while(i < parlett.length)
             {
                 i += 1;
                 var ch = parlett.substr(i, 1);
-                if (ch === "]") { 
-                    break; 
-                }
+                if (ch === "]") { nest -= 1; }
+                if (ch === "[") { nest += 1; }
+                if (nest === 0) { break; } 
+
                 text_move += ch;
             }
+            moves.push(decode_relative_text_move(text_move));
         } else if (ch === "e") {
             assert(false, "TODO: replace with [-2,0] etc, extended notation to directly enter a move");
 
