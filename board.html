@@ -328,7 +328,7 @@ google.setOnLoadCallback(function() {
     name_squares();    
 
 
-    load_fen("8/8/3a/2G w KQkq - 0 1");
+    load_fen("8/8/3xv/2G w KQkq - 0 1");
     //load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // test fairy pieces
 
     //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
@@ -2807,7 +2807,26 @@ function load_starting_position(fen)
     y = 8;
     for (i = 0; i < fen.length; ++i) {
         code = fen.charAt(i);
-        if (/[a-zA-Z]/.test(code)) {
+        if (code === "X" || code === "x") {
+            i += 1;
+            code += fen.charAt(i);
+
+            if (code === "X(" || code === "x(") {
+                // Read until closing paren
+                var ch;
+                i += 1;
+                while(i < fen.length) {
+                    ch = fen.charAt(i);
+                    code += ch;
+                    if (ch === ")") { break; }
+                    i += 1;
+                }
+            }
+            // TODO: extended extended codes, multiple x's? or just use names?
+
+            sq(x, y).appendChild(create_piece(code));
+            ++x;
+        } else if (/[a-zA-Z]/.test(code)) {
             sq(x, y).appendChild(create_piece(code));
             ++x;
         } else if (code === "/") {
@@ -2891,6 +2910,11 @@ function algebraic_letter(type)
 var cache_letter2name;
 function piece_letter2name(letter)
 {
+    // If given a name, return what we were given.
+    if (PIECE_TYPES[letter]) {
+        return letter;
+    }
+
     letter = letter.toUpperCase();
 
     if (!cache_letter2name) {
@@ -2901,7 +2925,7 @@ function piece_letter2name(letter)
 
             if (info.letter !== undefined) {
                 cache_letter2name.set(info.letter, name);
-            } if (info.alg_letter !== undefined) {
+            } else if (info.alg_letter !== undefined) {
                 cache_letter2name.set(info.alg_letter, name);
             }
         }
@@ -2995,6 +3019,8 @@ function image_path_for(type, color)
 {
     var base;
 
+    assert(PIECE_TYPES[type], "image_path_for(" + type + ", " + color + "): no such piece type");
+
     // Override image name
     if (PIECE_TYPES[type].image) {
         base = PIECE_TYPES[type].image;
@@ -3029,11 +3055,17 @@ function create_piece(name)
         assert("create_piece(" + name + "): not a letter");
     }
     letter = name.toLowerCase();
-    type = piece_letter2name(letter);
 
-    // TODO: catch invalid letters, lookup PIECE_TYPES
+    // x(name) or X(name) is explicit name, otherwise, is a letter
+    if (/\(/.test(letter)) {
+        var ary = /^[xX]\(([^)]+)/.exec(letter);
+        type = ary[1];
+    } else {
+        type = piece_letter2name(letter);
+    }
+    assert(type, "create_piece(" + name + "): unrecognized piece type: " + type);
 
-    filename = image_path_for(piece_letter2name(letter), color);
+    filename = image_path_for(type, color);
 
     // Color is the most important class. Type is added
     // mostly for debugging purposes.
