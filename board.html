@@ -119,7 +119,7 @@ google.load("scriptaculous", "1.8.2");
 // Preferences, not game state.
 var PREFS = {
     // TODO: UI element drop-down to change
-    OUTPUT_NOTATION: "descr",
+    OUTPUT_NOTATION: "adesc",
 
     // What piece images to use                     
     IMAGE_SET: "alfaerie"   // http://www.chessvariants.org/graphics.dir/alfaerie/index.html
@@ -883,7 +883,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps)
             capture_x = "x";
             capture_slash = "/";
             capture_or_dash = "x";
-            captured_letter = algebraic_piece_prefix(captured_piece, true);
+            captured_letter = full_piece_prefix(captured_piece);
             captured_colon_letter = ":" + (captured_letter === "P" ? "": captured_letter);
         } else {
             capture_or_dash = "-";
@@ -922,7 +922,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps)
 
             }
 
-            piece_letter = algebraic_piece_prefix(piece, true);    // P, N, etc.
+            piece_letter = full_piece_prefix(piece);               // P, N, etc.
             algebraic_prefix = algebraic_piece_prefix(piece);      // blank, N, etc.
             figurine_prefix = figurine_piece_prefix(color, piece); // ♟, ♞, ♙, ♘, etc.
 
@@ -1476,8 +1476,13 @@ function would_check(piece, move, color)
 // TODO: store initial rank in piece information
 function piece_moved(piece)
 {
+    // Bit of a hack, but castling privileges take care of this.
+    if (piece.type === "king") {
+        return false;
+    }
+
     assert(piece.type === "pawn" || piece.type === "test", 
-            "piece_moved(" + piece + "): can only tell if pawns moved");
+            "piece_moved(" + piece + "): can only tell if pawns moved, not " + piece.type);
 
     if (piece.hasClassName("white")) {
         return sq(piece).y !== 2;    // 2nd rank
@@ -2700,7 +2705,7 @@ function save_fen(strip_moves)
                     fen += blanks.toString();
                     blanks = 0;
                 }
-                letter = algebraic_piece_prefix(piece, true);
+                letter = full_piece_prefix(piece);
 
                 // Uppercase = white, lowercase = black
                 if (piece.hasClassName("black")) {
@@ -2886,7 +2891,7 @@ function name_pieces()
                 rank = black_rank;
             }
 
-            piece_letter = algebraic_piece_prefix(piece, true);
+            piece_letter = full_piece_prefix(piece);
             // aP, bP, etc.. TODO: use rank, if needed to disambiguate (two
             // pieces of same type on same file). Use file, rank, or filerank
             // like disambiguating moves.
@@ -2954,17 +2959,15 @@ function full_piece_prefix(piece)
 }
 
 // Return algebraic prefix for a piece. May return an empty 
-// string (for pawns, for example), unless want_pawn_letter.
-function algebraic_piece_prefix(piece, want_pawn_letter)
+// string (for pawns, for example): prefers alg_letter over letter.
+// To always get a non-empty string, use full_piece_prefix() instead.
+function algebraic_piece_prefix(piece)
 {
-    if (!want_pawn_letter && PIECE_TYPES[piece.type].alg_letter !== undefined) {
+    if (PIECE_TYPES[piece.type].alg_letter !== undefined) {
         return PIECE_TYPES[piece.type].alg_letter;
-    } else if (PIECE_TYPES[piece.type].letter !== undefined) {
-        return PIECE_TYPES[piece.type].letter;
+    } else {
+        return full_piece_prefix(piece);
     }
-
-    return "X(" + piece.type + ")";
-    //assert(false, "algebraic_piece_prefix(" + piece + "): unrecognized piece");
 }
 
 // Get the Unicode figurine for a piece of a given color, or fall back on 
