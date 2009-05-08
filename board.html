@@ -204,7 +204,7 @@ var PIECE_TYPES = {
     knight: {parlett: "~1/2", letter: "N", figurines: ["\u2658", "\u265e"]},
 
     //XYZ
-    test: {parlett: "o1>, c1X>", letter:"G", image: "pawn"},
+    test: {parlett: "o1>, c1X>", image: "pawn"},
 
     // Other hippogonals, good for testing
     zero: {parlett: "~0/0", letter: "O"},
@@ -328,7 +328,7 @@ google.setOnLoadCallback(function() {
     name_squares();    
 
 
-    load_fen("8/8/3xv/2G w KQkq - 0 1");
+    load_fen("8/8/3x(test)/2X(test) w KQkq - 0 1");
     //load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // test fairy pieces
 
     //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
@@ -2694,7 +2694,7 @@ function save_fen(strip_moves)
                     fen += blanks.toString();
                     blanks = 0;
                 }
-                letter = PIECE_TYPES[piece.type].letter;
+                letter = algebraic_piece_prefix(piece, true);
 
                 // Uppercase = white, lowercase = black
                 if (piece.hasClassName("black")) {
@@ -2880,7 +2880,7 @@ function name_pieces()
                 rank = black_rank;
             }
 
-            piece_letter = PIECE_TYPES[piece.type].letter;
+            piece_letter = algebraic_piece_prefix(piece, true);
             // aP, bP, etc.. TODO: use rank, if needed to disambiguate (two
             // pieces of same type on same file). Use file, rank, or filerank
             // like disambiguating moves.
