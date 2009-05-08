@@ -2940,6 +2940,19 @@ function piece_letter2name(letter)
     return cache_letter2name.get(letter.toUpperCase());
 }
 
+// Return the full piece prefix, succiently indicating the piece type.
+// Will not return an empty string but may return E-FEN piece codes. 
+function full_piece_prefix(piece)
+{
+    var letter = PIECE_TYPES[piece.type].letter;
+
+    if (letter !== undefined) {
+        return letter;
+    } else {
+        return (piece.hasClassName("white") ? "X" : "x") + "(" + piece.type + ")";
+    }
+}
+
 // Return algebraic prefix for a piece. May return an empty 
 // string (for pawns, for example), unless want_pawn_letter.
 function algebraic_piece_prefix(piece, want_pawn_letter)
