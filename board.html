@@ -325,7 +325,7 @@ google.setOnLoadCallback(function() {
     name_squares();    
 
 
-    load_fen("8/8/4N/8/4m w KQkq - 0 1");
+    load_fen("8/8/8/4R/8/4m w KQkq - 0 1");
     //load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // test fairy pieces
 
     //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
@@ -1635,18 +1635,25 @@ function NEW_unfiltered_moves(parlett)
 function NEW_filtered_moves(piece, color, is_hypothetical)
 {
     var parlett, rel_moves, moves, start_xy;
+    var blocked, start_x, start_y;
 
     start_xy = piece_location(piece);
+    start_x = start_xy[0];
+    start_y = start_xy[1];
+
     parlett = PIECE_TYPES[piece.type].parlett;
 
     rel_moves = NEW_unfiltered_moves(parlett);
 
     // Absolutize and find what is allowed
     moves = [];
+    blocked = {};
     for (var i = 0; i < rel_moves.length; ++i) {
-        var xy = [rel_moves[i][0] + start_xy[0], rel_moves[i][1] + start_xy[1]];
-        var x = xy[0], y = xy[1];
+        var rel_x = rel_moves[i][0], rel_y = rel_moves[i][1]; 
         var flags = rel_moves[i][2];
+
+        var x = rel_x + start_x;
+        var y = rel_y + start_y;
 
         if (x < 1 || y < 1 || x > FILE_MAX || y > RANK_MAX) {
             // Out of bounds
@@ -1655,6 +1662,13 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
 
         var dest_square = sq(x, y);
         var capture_piece = pc(x, y);
+
+        // If there is any piece there, it may block other moves
+        if (capture_piece) {
+            var key = rel_moves[i][0] + "," + rel_moves[i][1];
+            blocked[key] = true;
+        }
+
 
         // Can't move to self-occupied square
         if (capture_piece && capture_piece.hasClassName(color)) {
@@ -1666,9 +1680,18 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
             continue;
         }
 
-        // Must not be
+        // Must not be capture
         if (flags.no_capture && capture_piece) {
             continue;
+        }
+
+        // Blocked by an obstruction
+        if (flags.if_unblocked) {
+            var key = flags.if_unblocked[0] + "," + flags.if_unblocked[1];
+            if (blocked[key]) {
+                blocked[rel_moves[i][0] + "," + rel_moves[i][1]] = true;
+                continue;
+            }
         }
 
         // TODO: initial only
@@ -1834,15 +1857,15 @@ function relative_decode_parlett(parlett)
             for (var j = 0; j <= limit; ++j) {
                 // Riders get blocked
                 if (prev_rel_x !== null && prev_rel_y !== null && movement === "rider") { 
-                    flags.unblocked = [prev_rel_x, prev_rel_y];
+                    flags.if_unblocked = [prev_rel_x, prev_rel_y];
                 } else {
-                    delete flags.unblocked;
+                    delete flags.if_unblocked;
                 }
 
                 rel_x += dir[0];
                 rel_y += dir[1];
 
-                rel_moves.push([rel_x, rel_y, flags]);
+                rel_moves.push([rel_x, rel_y, Object.clone(flags)]);
 
                 prev_rel_x = rel_x;
                 prev_rel_y = rel_y;
