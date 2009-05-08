@@ -325,6 +325,7 @@ google.setOnLoadCallback(function() {
     name_squares();    
 
 
+    load_fen("8/8/4N/8/4m w KQkq - 0 1");
     //load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // test fairy pieces
 
     //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
@@ -367,7 +368,7 @@ google.setOnLoadCallback(function() {
     //load_fen("8/8/8/3pP3/8/8/8/8 w - d6 0 5"); // en passant
     //load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); 
     //load_fen("k7/8/8/8/8/8/8/5KQ1 w - d6 0 50");  // K + KQ
-    load_fen("k7/8/8/8/8/8/8/5KR1 w - d6 0 50");  // K + KR
+    //load_fen("k7/8/8/8/8/8/8/5KR1 w - d6 0 50");  // K + KR
     //load_fen("4r3/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle out of check
     //load_fen("5r2/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle through check
     //load_fen("rnbqkbnr/ppp2ppp/8/8/8/8/PPP2PPP/RNBQKBNR w KQkq - 0 1"); // to test "only move" 
@@ -1260,6 +1261,9 @@ function computer_move_if_applicable()
 // unless is_hypothetical is true (for checking for attacks, see comment).
 function filtered_moves(piece, color, is_hypothetical)
 {
+    //XYZ ABC test
+    return NEW_filtered_moves(piece, color, is_hypothetical);
+
     var xy = piece_location(piece);    // TODO: OO
     if (!xy) {
         // Piece was taken, so no moves for it
@@ -1606,13 +1610,12 @@ function decode_direction(ch, ch2, color)
     }
 }
 
-// TODO: new move filtering
-function NEW_filtered_moves(piece, color, is_hypothetical)
+// Get the unfiltered, relative moves for a Parlett string.
+function NEW_unfiltered_moves(parlett)
 {
-    var choice_groups, parlett, rel_moves, moves, start_xy;
+    var choice_groups;
 
-    start_xy = piece_location(piece);
-    parlett = PIECE_TYPES[piece.type].parlett;
+    // TODO: cache! This is constant per parlett. Performance improvement?
 
     // Get all the unfiltered moves for the mutually exclusive choices
     choice_groups = parlett.split(", ");
@@ -1624,6 +1627,19 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
             rel_moves = rel_moves.concat(relative_decode_parlett(choice_groups[i]));
     }   
     rel_moves = without_dupes(rel_moves);
+
+    return rel_moves;
+}
+
+// TODO: new move filtering
+function NEW_filtered_moves(piece, color, is_hypothetical)
+{
+    var parlett, rel_moves, moves, start_xy;
+
+    start_xy = piece_location(piece);
+    parlett = PIECE_TYPES[piece.type].parlett;
+
+    rel_moves = NEW_unfiltered_moves(parlett);
 
     // Absolutize and find what is allowed
     moves = [];
@@ -1787,14 +1803,16 @@ function relative_decode_parlett(parlett)
         // TODO: remove expand_hippogonal, include_reversed, times_each, add_flags. They just generate this.
         // But keep without_dupes. It is useful.
         rel_moves = without_dupes([
-            [+a, +b, flags],
-            [+b, +a, flags],
-            [+a, -b, flags],
-            [-b, +a, flags],
+            [-a, -b, flags],
             [-a, +b, flags],
             [+a, -b, flags],
-            [-a, -b, flags],
-            [-b, -a, flags]]);
+            [+a, +b, flags],
+
+            [-b, -a, flags],
+            [-b, +a, flags],
+            [+b, -a, flags],
+            [+b, +a, flags],
+            ]);
     } else {
         rel_moves = [];
         for (i = 0; i < directions.length; ++i) {
