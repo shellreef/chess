@@ -204,7 +204,7 @@ var PIECE_TYPES = {
     knight: {parlett: "~1/2", letter: "N", figurines: ["\u2658", "\u265e"]},
 
     //XYZ
-    test: {parlett: "o1>, c1X>", image: "pawn"},
+    test: {parlett: "o1>, c1X>, oi2>", image: "pawn"},
 
     // Other hippogonals, good for testing
     zero: {parlett: "~0/0", letter: "O"},
@@ -328,7 +328,7 @@ google.setOnLoadCallback(function() {
     name_squares();    
 
 
-    load_fen("8/8/3x(test)/2X(test) w KQkq - 0 1");
+    load_fen("8/8/8/8/8/3x(test)/2X(test) w KQkq - 0 1");
     //load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // test fairy pieces
 
     //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
@@ -483,7 +483,6 @@ function load_pgn(pgn)
 
         //console.log(ply, move);
         //XYZ mv(move);
-        //XXX
     }
 }
 
@@ -1304,14 +1303,9 @@ function filtered_moves(piece, color, is_hypothetical)
 
         if (move[2].initial_only) {
             // Can only move if have not moved this piece yet
-            if (piece.type === "pawn" && pawn_moved(piece)) {
+            if (piece_moved(piece)) {
                 return false;
             } 
-
-            assert(piece.type === "pawn" || piece.type === "king", 
-                "filtered_moves(" + piece + "): parlett " + parlett + " said this move " +
-                    move + " was valid only on initial moves, but couldn't find out if piece " + 
-                    piece.type + " moved, not a king or pawn");
         }
 
         if (move[2].capture_only) {
@@ -1480,14 +1474,17 @@ function would_check(piece, move, color)
 // are recognized as in fact having moved. Other games with pawns in ranks other
 // than 2nd and 7th (Chinese Chess, etc.) will need to have this modified.
 // TODO: store initial rank in piece information
-function pawn_moved(piece)
+function piece_moved(piece)
 {
+    assert(piece.type === "pawn" || piece.type === "test", 
+            "piece_moved(" + piece + "): can only tell if pawns moved");
+
     if (piece.hasClassName("white")) {
         return sq(piece).y !== 2;    // 2nd rank
     } else if (piece.hasClassName("black")) {
         return sq(piece).y !== 7;    // 7th rank
     } else {
-        assert("pawn_moved(" + piece + "): neither white nor black");
+        assert("piece_moved(" + piece + "): neither white nor black");
     }
 }
 
@@ -1690,6 +1687,10 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
 
         // Must not be capture
         if (flags.no_capture && capture_piece) {
+            continue;
+        }
+
+        if (flags.initial_only && piece_moved(piece)) {
             continue;
         }
 
