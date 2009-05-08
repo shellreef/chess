@@ -328,10 +328,10 @@ google.setOnLoadCallback(function() {
     name_squares();    
 
 
-    //load_fen("8/8/8/8/8/3x(test)/2X(test) w KQkq - 0 1");
+    load_fen("8/8/8/8/8/3x(test)/2X(test)aBcDe w KQkq - 0 1");
     //load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // test fairy pieces
 
-    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
+    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
     //load_fen("bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1");    // Church Chess
     //load_fen("rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq - 0 1"); // Advance Chess
     //load_fen("4rbqk/4rb1q/4r1bb/5rrr/RRR5/BB1R4/Q1BR4/KQBR4 w - - 0 1");    // Corner Chess
@@ -1264,7 +1264,7 @@ function computer_move_if_applicable()
 function filtered_moves(piece, color, is_hypothetical)
 {
     //XYZ ABC test
-    //return NEW_filtered_moves(piece, color, is_hypothetical);
+    return NEW_filtered_moves(piece, color, is_hypothetical);
 
     var xy = piece_location(piece);    // TODO: OO
     if (!xy) {
@@ -1780,6 +1780,7 @@ function relative_decode_parlett(parlett)
 
     flags = {};
     distances = [];
+    rel_moves = [];
 
     movement = "rider";
     for (var i = 0; i < parlett.length; ++i) {
@@ -1804,6 +1805,17 @@ function relative_decode_parlett(parlett)
             flags.no_capture = true;
 
         // Extended Parlett flags
+        } else if (ch === "[") {
+            var text_move = "";
+            while(i < parlett.length)
+            {
+                i += 1;
+                var ch = parlett.substr(i, 1);
+                if (ch === "]") { 
+                    break; 
+                }
+                text_move += ch;
+            }
         } else if (ch === "e") {
             assert(false, "TODO: replace with [-2,0] etc, extended notation to directly enter a move");
 
@@ -1844,7 +1856,7 @@ function relative_decode_parlett(parlett)
 
         // TODO: remove expand_hippogonal, include_reversed, times_each, add_flags. They just generate this.
         // But keep without_dupes. It is useful.
-        rel_moves = without_dupes([
+        rel_moves = rel_moves.concat(without_dupes([
             [-a, -b, flags],
             [-a, +b, flags],
             [+a, -b, flags],
@@ -1854,9 +1866,8 @@ function relative_decode_parlett(parlett)
             [-b, +a, flags],
             [+b, -a, flags],
             [+b, +a, flags],
-            ]);
+            ]));
     } else {
-        rel_moves = [];
         for (i = 0; i < directions.length; ++i) {
             var dir = directions[i];
             var limit, rel_x, rel_y, prev_rel_x, prev_rel_y;
