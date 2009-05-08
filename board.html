@@ -203,11 +203,14 @@ var PIECE_TYPES = {
         figurines: ["\u2659", "\u265f"]},
     knight: {parlett: "~1/2", letter: "N", figurines: ["\u2658", "\u265e"]},
 
+    //XYZ
+    test: {parlett: "o1>, c1X>", letter:"G", image: "pawn"},
+
     // Other hippogonals, good for testing
     zero: {parlett: "~0/0", letter: "O"},
     man: {parlett: "1*", letter: "M"},    // same as king, but not royale (also known as commoner)
-    dabbaba: {parlett: "~2/0", letter: "D", image: "warmachine"},  // or ~2+
-    alfil: {parlett: "~2/2", letter: "Y"},    // or ~2X // TODO: image
+    dabbaba: {parlett: "~2/0", letter: "D", image: "warmachine"},  // actually NOT ~2+
+    alfil: {parlett: "~2/2", letter: "Y"},    // TODO: image        (note: this is NOT ~2X)
     alibaba: {parlett: "~2/0, ~2X", letter: "L"},   // TODO: image
     squirrel: {parlett: "~0/2, ~1/2, ~2/2", letter: "S"},
     threeleaper: {parlett: "~3/0", letter: "H"}, 
@@ -325,7 +328,7 @@ google.setOnLoadCallback(function() {
     name_squares();    
 
 
-    load_fen("8/8/8/M/abcde w KQkq - 0 1");
+    load_fen("8/8/3a/2G w KQkq - 0 1");
     //load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // test fairy pieces
 
     //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
@@ -1860,7 +1863,10 @@ function relative_decode_parlett(parlett)
             rel_x = rel_y = 0;
             prev_rel_x = null, prev_rel_y = null;
             for (var j = 0; j < limit; ++j) {
-                // Riders get blocked
+                // Riders get blocked. Note that you can have a non-hippogonal leaper.
+                // ~2+ for example, would move one or two orthogonally, leaping if needed,
+                // whereas 2+ would move orthogonally one or two, but be blocked by any
+                // pieces in between.
                 if (prev_rel_x !== null && prev_rel_y !== null && movement === "rider") { 
                     flags.if_unblocked = [prev_rel_x, prev_rel_y];
                 } else {
