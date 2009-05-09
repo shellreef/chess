@@ -204,13 +204,16 @@ var PIECE_TYPES = {
     knight: {parlett: "~1/2", letter: "N", figurines: ["\u2658", "\u265e"]},
 
     //XYZ
-    test: {parlett: "o1>, c1X>, oi2>", image: "pawn"},
+    test: {parlett: "o1>, c1X>, oi2>", image: "pawn",
+        promote: ["queen", "knight", "rook", "bishop"],
+        figurines: ["\u2659", "\u265f"]
+    },
 
     // Other hippogonals, good for testing
     zero: {parlett: "~0/0", letter: "O"},
     man: {parlett: "1*", letter: "M"},    // same as king, but not royale (also known as commoner)
-    dabbaba: {parlett: "~2/0", letter: "D", image: "warmachine"},  // actually NOT ~2+
-    alfil: {parlett: "~2/2", letter: "Y"},    // TODO: image        (note: this is NOT ~2X)
+    dabbaba: {parlett: "~2+", letter: "D", image: "warmachine"},  // or ~2/0
+    alfil: {parlett: "~2X", letter: "Y"},    // TODO: image          or ~2/2
     alibaba: {parlett: "~2/0, ~2X", letter: "L"},   // TODO: image
     squirrel: {parlett: "~0/2, ~1/2, ~2/2", letter: "S"},
     threeleaper: {parlett: "~3/0", letter: "H"}, 
@@ -277,7 +280,7 @@ var PIECE_TYPES = {
     lion: {parlett: "~n*", letter: "XL"},
     berolina_pawn: {parlett: "o1X>, c1>, io2X>", letter: "XB"},
     superpawn: {parlett: "on>, cnX>", letter: "XP"},
-    elephant: {parlett: "2X", letter: "E"},
+    elephant: {parlett: "2X", letter: "E"}, // TODO: not a leaper, needs to be blocked
     khohn: {parlett: "1X, 1>", letter: "XK"},
     fers: {parlett: "1X", letter: "XF"},
     wazir: {parlett: "1+", letter: "I"},
@@ -328,7 +331,7 @@ google.setOnLoadCallback(function() {
     name_squares();    
 
 
-    load_fen("8/8/8/8/8/3x(test)/2X(test)aBcDe w KQkq - 0 1");
+    load_fen("8/4x(test)X(test)/x(test)4X(test)/8/4YDE/3x(test)x(test)X(test)/1X(test)X(test) w KQkq - 0 1");
     //load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // test fairy pieces
 
     //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
@@ -1912,25 +1915,24 @@ function relative_decode_parlett(parlett)
     } else {
         for (i = 0; i < directions.length; ++i) {
             var dir = directions[i];
-            var limit, rel_x, rel_y, prev_rel_x, prev_rel_y;
+            var rel_x, rel_y, prev_rel_x, prev_rel_y, distance;
 
             // Optional limit on number of steps to take of direction vector
             if (distances.length !== 0) {
-                limit = distances[0];
+                distance = distances[0];
 
                 assert(distances.length === 1, "relative_parlett(" + parlett + "): multiple distances given for rider, expected one or none");
             } else {
-                limit = Math.max(RANK_MAX, FILE_MAX);
+                distance = null;
             }
-            limit = Math.min(limit, Math.max(RANK_MAX, FILE_MAX));
 
             rel_x = rel_y = 0;
             prev_rel_x = null, prev_rel_y = null;
-            for (var j = 0; j < limit; ++j) {
+            for (var j = 1; j < Math.max(RANK_MAX, FILE_MAX); ++j) {
                 // Riders get blocked. Note that you can have a non-hippogonal leaper.
-                // ~2+ for example, would move one or two orthogonally, leaping if needed,
-                // whereas 2+ would move orthogonally one or two, but be blocked by any
-                // pieces in between.
+                // ~n* (lion) for example, is like a queen, but not blocked by intervening pieces.
+                //
+                // TODO: 2X (elephant) should be a non-leaper blocked by intervening pieces. Why isn't it?
                 if (prev_rel_x !== null && prev_rel_y !== null && movement === "rider") { 
                     flags.if_unblocked = [prev_rel_x, prev_rel_y];
                 } else {
@@ -1940,7 +1942,13 @@ function relative_decode_parlett(parlett)
                 rel_x += dir[0];
                 rel_y += dir[1];
 
-                rel_moves.push([rel_x, rel_y, Object.clone(flags)]);
+                if (distance === null || j === distance) {
+                    rel_moves.push([rel_x, rel_y, Object.clone(flags)]);
+
+                    if (j === distance) { 
+                        break;
+                    }
+                }
 
                 prev_rel_x = rel_x;
                 prev_rel_y = rel_y;
