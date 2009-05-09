@@ -204,9 +204,13 @@ var PIECE_TYPES = {
     knight: {parlett: "~1/2", letter: "N", figurines: ["\u2658", "\u265e"]},
 
     //XYZ
-    test: {parlett: "o1>, c1X>, i[0,2;if_unblocked=0,1;mark_ep_target=0,1], " +
-        // TODO
-        "[-1,1;if_ep_target;capture_at=-1,0], [1,1;if_ep_target;capture_at=-1.0]", 
+    test: {parlett: 
+        // En passant capture
+        "[-1,1;if_ep_target;capture_at=-1,0], [1,1;if_ep_target;capture_at=-1.0], " + 
+        // Initial two-move, creates ep target square
+        "i[0,2;if_unblocked=0,1;mark_ep_target=0,1], " +
+        // Normal one forward and diagonal capture moves
+        "o1>, c1X>",
 
         image: "pawn",
         promote: ["queen", "knight", "rook", "bishop"],
@@ -334,7 +338,8 @@ google.setOnLoadCallback(function() {
 
     name_squares();    
 
-    load_fen("8/4x(test)X(test)/x(test)4X(test)/8/2x(test)1DDE/2x(test)x(test)X(test)/1X(test)X(test) w KQkq - 0 1");
+    load_fen("8/8/8/3x(test)X(test)3/8/8/8/8 w - d6 0 5"); 
+    //load_fen("8/4x(test)X(test)/x(test)4X(test)/8/2x(test)1DDE/2x(test)x(test)X(test)/1X(test)X(test) w KQkq - 0 1");
     //load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // test fairy pieces
 
     //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
@@ -1729,10 +1734,8 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
         }
 
         // Only valid if this move is to an ep target.
-        // TODO: Get this working.
-        if (flags.if_ep_target) {
-            console.log("EP TARGET");
-            if (GAME_STATE.ep_target[0] !== x &&
+        if (GAME_STATE.ep_target && flags.if_ep_target) {
+            if (GAME_STATE.ep_target[0] !== x ||
                 GAME_STATE.ep_target[1] !== y)  {
                 continue;
             }
@@ -1794,7 +1797,7 @@ function relative_decode_direction(ch, ch2)
 }
 
 // Decodes an explicit relative move that was in square brackets: [0,2;initial_only]
-function decode_relative_text_move(text_move, flags)
+function decode_relative_raw_move(text_move, flags)
 {
     var xy_text_opts, xy_text, opts, xy, x, y;
     
@@ -1882,7 +1885,7 @@ function relative_decode_parlett(parlett)
 
                 text_move += ch;
             }
-            rel_moves.push(decode_relative_text_move(text_move, flags));
+            rel_moves.push(decode_relative_raw_move(text_move, flags));
 
         // Standard Parlett
         } else if (/[0-9]/.test(ch)) {
