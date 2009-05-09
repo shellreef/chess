@@ -204,7 +204,7 @@ var PIECE_TYPES = {
     knight: {parlett: "~1/2", letter: "N", figurines: ["\u2658", "\u265e"]},
 
     //XYZ
-    test: {parlett: "i[0,2]", Xparlett: "o1>, c1X>, oi2>", image: "pawn",
+    test: {parlett: "i[0,2;if_unblocked=0,1]", Xparlett: "o1>, c1X>, oi2>", image: "pawn",
         promote: ["queen", "knight", "rook", "bishop"],
         figurines: ["\u2659", "\u265f"]
     },
@@ -1796,8 +1796,8 @@ function decode_relative_text_move(text_move, flags)
             var ary = opt.split("=");
             var left = ary[0], right = ary[1];
             value = right.split(",");
+            value = value.map(function(x) { return parseInt(x, 10); });
             key = left;
-            console.log("VALUE",value);
         } else {
             key = opt;
             value = true;
