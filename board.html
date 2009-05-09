@@ -1705,7 +1705,11 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
         // Blocked by an obstruction
         if (flags.if_unblocked) {
             var key = flags.if_unblocked[0] + "," + flags.if_unblocked[1];
-            if (blocked[key]) {
+            // If was either blocked by a previous move (faster), or there is a
+            // piece there but it wasn't a valid move. For example, elephant (2X)
+            // can be blocked, since it is not a leaper (sticking the elephant's eye),
+            // non-hippogonal rider.
+            if (blocked[key] || pc(flags.if_unblocked[0] + start_x, flags.if_unblocked[1] + start_y)) {
                 blocked[rel_moves[i][0] + "," + rel_moves[i][1]] = true;
                 continue;
             }
