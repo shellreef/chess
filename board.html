@@ -205,16 +205,14 @@ var PIECE_TYPES = {
 
     //XYZ
     test: {parlett: 
-        // En passant capture
-        "[-1,1;if_ep_target;capture_at=-1,0], [1,1;if_ep_target;capture_at=-1.0], " + 
-        // Initial two-move, creates ep target square
-        "i[0,2;if_unblocked=0,1;mark_ep_target=0,1], " +
-        // Normal one forward and diagonal capture moves
-        "o1>, c1X>",
+        "o1>, c1X>, " + 
+        "i[0,2;if_unblocked=0,1;mark_ep_target=0,1], ", // +
+        //"[-1,1;if_ep_target;capture_at=-1,0], [1,1;if_ep_target;capture_at=-1.0]",
 
         image: "pawn",
         promote: ["queen", "knight", "rook", "bishop"],
-        figurines: ["\u2659", "\u265f"]
+        figurines: ["\u2659", "\u265f"],
+        letter: "G"
     },
 
     // Other hippogonals, good for testing
@@ -338,9 +336,10 @@ google.setOnLoadCallback(function() {
 
     name_squares();    
 
-    load_fen("8/8/8/3x(test)X(test)3/8/8/8/8 w - d6 0 5"); 
+    //load_fen("8/8/8/3x(test)X(test)3/8/8/8/8 w - d6 0 5"); 
     //load_fen("8/4x(test)X(test)/x(test)4X(test)/8/2x(test)1DDE/2x(test)x(test)X(test)/1X(test)X(test) w KQkq - 0 1");
     //load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // test fairy pieces
+    load_fen("rnbqmbnr/gggggggg/8/8/8/8/GGGGGGGG/RNBQMBNR w KQkq - 0 1");   // no royal pieces
 
     //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
     //load_fen("bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1");    // Church Chess
@@ -1916,7 +1915,7 @@ function relative_decode_parlett(parlett)
 
         // TODO: remove expand_hippogonal, include_reversed, times_each, add_flags. They just generate this.
         // But keep without_dupes. It is useful.
-        rel_movess.push.apply(rel_moves, without_dupes([
+        rel_moves.push.apply(rel_moves, without_dupes([
             [-a, -b, flags],
             [-a, +b, flags],
             [+a, -b, flags],
@@ -2318,6 +2317,7 @@ function include_reversed(a)
 // http://laurens.vd.oever.nl/weblog/items2005/setsinjavascript/ , even
 // modified to use Prototype's Hash, won't do because the keys will be 
 // converted to strings. But at least the ugliness is confined to this function.
+// Note: flags also differentiate a move.
 function without_dupes(a)
 {
     var hash = new Hash();
@@ -2325,14 +2325,14 @@ function without_dupes(a)
 
     for (var i = 0; i < a.length; ++i) {
         // Add if not a dupe
-        if (!hash.get(a[i])) {
+        if (!hash.get(Object.toJSON(a[i]))) {
             result.push(a[i]);
         }
 
         // Record that this element was added. Converts to a string,
         // unfortunately, so can't just use hash.keys() after filling 
         // in the hash.
-        hash.set(a[i], true);
+        hash.set(Object.toJSON(a[i]), true);
     }
 
     return result;
