@@ -206,7 +206,7 @@ var PIECE_TYPES = {
     //XYZ
     test: {parlett: "o1>, c1X>, i[0,2;if_unblocked=0,1;mark_ep_target=0,1], " +
         // TODO
-        "[-1,1;capture_at=-1,0;if_ep_target], [1,1;capture_at=-1.0;if_ep_target]", 
+        "[-1,1;if_ep_target;capture_at=-1,0], [1,1;if_ep_target;capture_at=-1.0]", 
 
         image: "pawn",
         promote: ["queen", "knight", "rook", "bishop"],
@@ -1720,17 +1720,25 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
             }
         }
 
+        // Map pawn moves to what the en passant target will be if
+        // the pawn moves there.
         if (!is_hypothetical && flags.mark_ep_target) {
-            // Map pawn moves to what the en passant target will be if
-            // the pawn moves there.
             POSSIBLE_EP_TARGETS[xy2filerank([x, y])] = 
                 [flags.mark_ep_target[0] + start_x,
                  flags.mark_ep_target[1] + start_y];
         }
 
+        // Only valid if this move is to an ep target.
+        // TODO: Get this working.
+        if (flags.if_ep_target) {
+            console.log("EP TARGET");
+            if (GAME_STATE.ep_target[0] !== x &&
+                GAME_STATE.ep_target[1] !== y)  {
+                continue;
+            }
+        }
+
         moves.push([x, y, flags]);
-
-
     }
 
     return moves;
