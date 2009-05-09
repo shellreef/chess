@@ -204,7 +204,7 @@ var PIECE_TYPES = {
     knight: {parlett: "~1/2", letter: "N", figurines: ["\u2658", "\u265e"]},
 
     //XYZ
-    test: {parlett: "i[0,2;if_unblocked=0,1]", Xparlett: "o1>, c1X>, oi2>", image: "pawn",
+    test: {parlett: "i[0,2;if_unblocked=0,1;mark_ep_target=0,1]", Xparlett: "o1>, c1X>, oi2>", image: "pawn",
         promote: ["queen", "knight", "rook", "bishop"],
         figurines: ["\u2659", "\u265f"]
     },
@@ -1349,7 +1349,7 @@ function filtered_moves(piece, color, is_hypothetical)
             //console.log("would_check",color,piece,xy2filerank([move[0], move[1]]));
         }
 
-        if (!is_hypothetical && move[2].mark_en_passant) {
+        if (!is_hypothetical && move[2].creates_en_passant) {
             var backward = -forwards_vector(color);
             var ep_target = [move[0], move[1] + backward];
             var pawn_dest = xy2filerank([move[0], move[1]]);
@@ -1846,7 +1846,9 @@ function relative_decode_parlett(parlett)
             // (pawn's forward move)
             flags.no_capture = true;
 
-        // Extended Parlett flags
+        // Extended Parlett
+        
+        // Direct move text: [rel_x,rel_y;flag1;flag2;...] 
         } else if (ch === "[") {
             var text_move = "";
             var nest = 1;
@@ -1861,16 +1863,6 @@ function relative_decode_parlett(parlett)
                 text_move += ch;
             }
             rel_moves.push(decode_relative_text_move(text_move, flags));
-        } else if (ch === "e") {
-            assert(false, "TODO: replace with [-2,0] etc, extended notation to directly enter a move");
-
-        // TODO: add [dx,dy,flags] to Extended Parlett, to directly enter a relative move
-        // with optional flags. Arbitrary move support. Use for castling, instead of =2e.
-        
-        } else if (ch === "E") {
-            // This move creates an en passant target square
-            flags.mark_en_passant = true;
-
 
         // Standard Parlett
         } else if (/[0-9]/.test(ch)) {
@@ -2068,7 +2060,7 @@ function decode_one_parlett(parlett, xy, color)
             return add_flags(ep_moves, flags);
         } else if (ch === "E") {
             // This move creates an en passant target square
-            flags.mark_en_passant = true;
+            flags.creates_en_passant = true;
 
         // Standard Parlett
         } else if (/[0-9]/.test(ch)) {
