@@ -360,13 +360,13 @@ with ~0/0 for ~n/m, ~0/0.
 
 <p>"P", by itself, is a move to the en passant target square, as long as the pawn can diagonally move forwards towards it. See the pawn Parlett notation for an example. The pawn in front of the target square will be captured.
 
-<p>The Extended Parlett notation is converted to a list of relative moves, an array of relative x and y coordinates
+<p>The Extended Parlett notation is converted to a list of "raw moves", an array of relative x and y coordinates
 (with (0,0) where the piece begins), along with various flags that describe under which conditions the move
 is allowed. A relative move can be specified directly by using square brackets (which nest): [0,2] means 
 that the piece can move exactly two squares forward. Positive indicates the forward direction, from the 
 perspective of the active color.
 
-<p>Flags can be entered in brackets after a semicolon, with additional flags after another semicolon. A flag alone
+<p>Flags for raw moves can be entered in brackets after a semicolon, with additional flags after another semicolon. A flag alone
 specifies a true value: [0,2;initial_only] is the same as using the "o" flag. Flags can also accept relative moves
 as values: [0,2;initial_only;if_unblocked=0,1].
 
