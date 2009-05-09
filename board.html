@@ -204,7 +204,7 @@ var PIECE_TYPES = {
     knight: {parlett: "~1/2", letter: "N", figurines: ["\u2658", "\u265e"]},
 
     //XYZ
-    test: {parlett: "[0,2]", Xparlett: "o1>, c1X>, oi2>", image: "pawn",
+    test: {parlett: "i[0,2]", Xparlett: "o1>, c1X>, oi2>", image: "pawn",
         promote: ["queen", "knight", "rook", "bishop"],
         figurines: ["\u2659", "\u265f"]
     },
@@ -1774,9 +1774,9 @@ function relative_decode_direction(ch, ch2)
 }
 
 // Decodes an explicit relative move that was in square brackets: [0,2;initial_only]
-function decode_relative_text_move(text_move)
+function decode_relative_text_move(text_move, flags)
 {
-    var xy_text_opts, xy_text, opts, xy, x, y, flags;
+    var xy_text_opts, xy_text, opts, xy, x, y;
     
     xy_text_opts = text_move.split(";");
     xy_text = xy_text_opts.shift();
@@ -1787,7 +1787,6 @@ function decode_relative_text_move(text_move)
     y = parseInt(xy[1], 10);
    
     // Semicolon-separated flags
-    flags = {};
     for (var i = 0; i < opts.length; ++i) {
         var opt = opts[i];
         var key, value;
@@ -1861,7 +1860,7 @@ function relative_decode_parlett(parlett)
 
                 text_move += ch;
             }
-            rel_moves.push(decode_relative_text_move(text_move));
+            rel_moves.push(decode_relative_text_move(text_move, flags));
         } else if (ch === "e") {
             assert(false, "TODO: replace with [-2,0] etc, extended notation to directly enter a move");
 
