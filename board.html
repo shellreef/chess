@@ -195,16 +195,10 @@ var PIECE_TYPES = {
     queen: {parlett: "n*", letter: "Q", figurines: ["\u2655", "\u265b"]},
     bishop: {parlett: "nX", letter: "B", figurines: ["\u2657", "\u265d"]},
     rook: {parlett: "n+", letter: "R", castle: true, figurines: ["\u2656", "\u265c"]},
-    // P allows for moving to GAME_STATE.ep_target square (must be before other capture move)
-    // oi2> is another way to write the one/two-forward move, but it is really two possible moves:
-    // - oi2>eE: exactly two forward, store piece behind in ep_target (notated by "E")
-    // - oi1>e: exactly one forward
-    pawn: {parlett: "o1>, P, c1X>, oi2>eE, oi1>e", letter: "P", alg_letter: "", promote: ["queen", "knight", "rook", "bishop"],
-        figurines: ["\u2659", "\u265f"]},
-    knight: {parlett: "~1/2", letter: "N", figurines: ["\u2658", "\u265e"]},
 
-    //XYZ
-    test: {parlett: 
+
+    // Pawn in new notation
+    pawn: {parlett: 
         "o1>, c1X>, " + 
         "i[0,2;if_unblocked=0,1;mark_ep_target=0,1], " +
         "[-1,1;if_ep_target;capture_at=-1,0], [1,1;if_ep_target;capture_at=-1.0]",
@@ -212,8 +206,17 @@ var PIECE_TYPES = {
         image: "pawn",
         promote: ["queen", "knight", "rook", "bishop"],
         figurines: ["\u2659", "\u265f"],
-        letter: "G"
+        letter: "P",
+        alg_letter: ""
     },
+
+    // OLD NOTATION
+    // P allows for moving to GAME_STATE.ep_target square (must be before other capture move)
+    // oi2> is another way to write the one/two-forward move, but it is really two possible moves:
+    // - oi2>eE: exactly two forward, store piece behind in ep_target (notated by "E")
+    // - oi1>e: exactly one forward
+    //pawn: {parlett: "o1>, P, c1X>, oi2>eE, oi1>e", letter: "P", alg_letter: "", promote: ["queen", "knight", "rook", "bishop"], figurines: ["\u2659", "\u265f"]},
+    knight: {parlett: "~1/2", letter: "N", figurines: ["\u2658", "\u265e"]},
 
     // Other hippogonals, good for testing
     zero: {parlett: "~0/0", letter: "O"},
@@ -339,7 +342,7 @@ google.setOnLoadCallback(function() {
     //load_fen("8/8/8/3x(test)X(test)3/8/8/8/8 w - d6 0 5"); 
     //load_fen("8/4x(test)X(test)/x(test)4X(test)/8/2x(test)1DDE/2x(test)x(test)X(test)/1X(test)X(test) w KQkq - 0 1");
     //load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // test fairy pieces
-    load_fen("rnbqmbnr/gggggggg/8/8/8/8/GGGGGGGG/RNBQMBNR w KQkq - 0 1");   // no royal pieces
+    load_fen("rnbqmbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQMBNR w KQkq - 0 1");   // no royal pieces
 
     //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
     //load_fen("bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1");    // Church Chess
@@ -1493,8 +1496,7 @@ function piece_moved(piece)
         return false;
     }
 
-    assert(piece.type === "pawn" || piece.type === "test", 
-            "piece_moved(" + piece + "): can only tell if pawns moved, not " + piece.type);
+    assert(piece.type === "pawn", "piece_moved(" + piece + "): can only tell if pawns moved, not " + piece.type);
 
     if (piece.hasClassName("white")) {
         return sq(piece).y !== 2;    // 2nd rank
@@ -1672,6 +1674,10 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
         // Positive is forwards, so mirror for black.
         if (color === "black") {
             rel_y = -rel_y;
+            // Reverse any embedded relative coordinates.
+            if (flags.if_unblocked) { flags.if_unblocked[1] = -flags.if_unblocked[1]; }
+            if (flags.capture_at) { flags.capture_at[1] = -flags.capture_at[1]; }
+            if (flags.mark_ep_target) { flags.mark_ep_target[1] = -flags.mark_ep_target[1]; }
         }
 
         var x = rel_x + start_x;
@@ -2075,6 +2081,8 @@ function decode_one_parlett(parlett, xy, color)
                 
                 // (3), opponent's piece to capture
                 flags.capture = pc(GAME_STATE.ep_target[0], GAME_STATE.ep_target[1] + forward);
+                // TODO: implement capture_at. It is coded in pawn but not used, instead the
+                // relative positions are hardcoded above. 
             } else {
                 ep_moves = [];
             }
