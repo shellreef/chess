@@ -204,7 +204,7 @@ var PIECE_TYPES = {
     knight: {parlett: "~1/2", letter: "N", figurines: ["\u2658", "\u265e"]},
 
     //XYZ
-    test: {parlett: "o1>, c1X>, oi2>", image: "pawn",
+    test: {parlett: "[0,2]", Xparlett: "o1>, c1X>, oi2>", image: "pawn",
         promote: ["queen", "knight", "rook", "bishop"],
         figurines: ["\u2659", "\u265f"]
     },
@@ -331,7 +331,7 @@ google.setOnLoadCallback(function() {
     name_squares();    
 
 
-    load_fen("8/4x(test)X(test)/x(test)4X(test)/8/4YDE/3x(test)x(test)X(test)/1X(test)X(test) w KQkq - 0 1");
+    load_fen("8/4x(test)X(test)/x(test)4X(test)/8/4YDE/2x(test)x(test)X(test)/1X(test)X(test) w KQkq - 0 1");
     //load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // test fairy pieces
 
     //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
@@ -1783,8 +1783,8 @@ function decode_relative_text_move(text_move)
     opts = xy_text_opts;
 
     xy = xy_text.split(",");
-    x = xy[0];
-    y = xy[1];
+    x = parseInt(xy[0], 10);
+    y = parseInt(xy[1], 10);
    
     // Semicolon-separated flags
     flags = {};
@@ -1806,9 +1806,6 @@ function decode_relative_text_move(text_move)
         flags[key] = value;
     }
 
-    console.log(x);
-    console.log(y);
-    console.log(flags);
     return [x, y, flags];
 }
 
@@ -1864,7 +1861,7 @@ function relative_decode_parlett(parlett)
 
                 text_move += ch;
             }
-            moves.push(decode_relative_text_move(text_move));
+            rel_moves.push(decode_relative_text_move(text_move));
         } else if (ch === "e") {
             assert(false, "TODO: replace with [-2,0] etc, extended notation to directly enter a move");
 
@@ -1916,7 +1913,7 @@ function relative_decode_parlett(parlett)
             [+b, -a, flags],
             [+b, +a, flags],
             ]));
-    } else {
+    } else if (directions) {
         for (i = 0; i < directions.length; ++i) {
             var dir = directions[i];
             var rel_x, rel_y, prev_rel_x, prev_rel_y, distance;
