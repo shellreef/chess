@@ -204,7 +204,11 @@ var PIECE_TYPES = {
     knight: {parlett: "~1/2", letter: "N", figurines: ["\u2658", "\u265e"]},
 
     //XYZ
-    test: {parlett: "i[0,2;if_unblocked=0,1;mark_ep_target=0,1]", Xparlett: "o1>, c1X>, oi2>", image: "pawn",
+    test: {parlett: "o1>, c1X>, i[0,2;if_unblocked=0,1;mark_ep_target=0,1], " +
+        // TODO
+        "[-1,1;capture_at=-1,0;if_ep_target], [1,1;capture_at=-1.0;if_ep_target]", 
+
+        image: "pawn",
         promote: ["queen", "knight", "rook", "bishop"],
         figurines: ["\u2659", "\u265f"]
     },
@@ -330,8 +334,7 @@ google.setOnLoadCallback(function() {
 
     name_squares();    
 
-
-    load_fen("8/4x(test)X(test)/x(test)4X(test)/8/4YDE/2x(test)x(test)X(test)/1X(test)X(test) w KQkq - 0 1");
+    load_fen("8/4x(test)X(test)/x(test)4X(test)/8/2x(test)1DDE/2x(test)x(test)X(test)/1X(test)X(test) w KQkq - 0 1");
     //load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // test fairy pieces
 
     //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
@@ -451,6 +454,8 @@ function reload_pgn()
 // Load a game in Portable Game Notation (PGN) format
 //  TODO: recognize various ECO codes, see http://scid.sourceforge.net/help/ECO.html
 //  and http://scid.sourceforge.net/help/EPD.html
+// TODO: support any base 10 number, and asterisks for filling remainder of rank with empty
+// spaces, and {} for labels, see http://play.chessvariants.org/pbm/devguide.html
 function load_pgn(pgn)
 {
     var game = parse_pgn(pgn);
@@ -1715,9 +1720,16 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
             }
         }
 
-        // TODO: initial only
- 
+        if (!is_hypothetical && flags.mark_ep_target) {
+            // Map pawn moves to what the en passant target will be if
+            // the pawn moves there.
+            POSSIBLE_EP_TARGETS[xy2filerank([x, y])] = 
+                [flags.mark_ep_target[0] + start_x,
+                 flags.mark_ep_target[1] + start_y];
+        }
+
         moves.push([x, y, flags]);
+
 
     }
 
@@ -2470,6 +2482,19 @@ function name_squares()
             //console.log(square);
         }
     }
+
+    // Konami code
+    KEYS_PRESSED = [];
+    document.onkeydown = 
+            function(event) {
+            KEYS_PRESSED.push(event.keyCode);
+            if (KEYS_PRESSED.length > 11) {
+                KEYS_PRESSED.shift();
+            }
+            if (KEYS_PRESSED.join('') === '3838404037393739666513') {
+                alert("TODO: easter egg");
+            }
+    };
 }
 
 // Acknowledge that a piece was captured. Called by move_piece_to_square(), which
