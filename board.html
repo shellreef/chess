@@ -206,8 +206,8 @@ var PIECE_TYPES = {
     //XYZ
     test: {parlett: 
         "o1>, c1X>, " + 
-        "i[0,2;if_unblocked=0,1;mark_ep_target=0,1], ", // +
-        //"[-1,1;if_ep_target;capture_at=-1,0], [1,1;if_ep_target;capture_at=-1.0]",
+        "i[0,2;if_unblocked=0,1;mark_ep_target=0,1], " +
+        "[-1,1;if_ep_target;capture_at=-1,0], [1,1;if_ep_target;capture_at=-1.0]",
 
         image: "pawn",
         promote: ["queen", "knight", "rook", "bishop"],
@@ -1733,8 +1733,8 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
         }
 
         // Only valid if this move is to an ep target.
-        if (GAME_STATE.ep_target && flags.if_ep_target) {
-            if (GAME_STATE.ep_target[0] !== x ||
+        if (flags.if_ep_target) {
+            if (!GAME_STATE.ep_target || GAME_STATE.ep_target[0] !== x ||
                 GAME_STATE.ep_target[1] !== y)  {
                 continue;
             }
