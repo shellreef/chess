@@ -1541,7 +1541,7 @@ function unfiltered_moves(parlett, xy, color)
     for (var i = 0; i < choice_groups.length; ++i) {
             // For each group, gather the move options. 
             // (Would be nice if JavaScript arrays had a Python-like .extend)
-            moves = moves.concat(decode_one_parlett(choice_groups[i], xy, color));
+            moves.push.apply(moves, decode_one_parlett(choice_groups[i], xy, color));
     }    
 
     // Last step: remove duplicates. Maybe the caller should do this.
@@ -1632,7 +1632,7 @@ function NEW_unfiltered_moves(parlett)
     for (var i = 0; i < choice_groups.length; ++i) {
             // For each group, gather the move options. 
             // (Would be nice if JavaScript arrays had a Python-like .extend)
-            rel_moves = rel_moves.concat(relative_decode_parlett(choice_groups[i]));
+            rel_moves.push.apply(rel_moves, relative_decode_parlett(choice_groups[i]));
     }   
     rel_moves = without_dupes(rel_moves);
 
@@ -1902,7 +1902,7 @@ function relative_decode_parlett(parlett)
 
         // TODO: remove expand_hippogonal, include_reversed, times_each, add_flags. They just generate this.
         // But keep without_dupes. It is useful.
-        rel_moves = rel_moves.concat(without_dupes([
+        rel_movess.push.apply(rel_moves, without_dupes([
             [-a, -b, flags],
             [-a, +b, flags],
             [+a, -b, flags],
@@ -2154,7 +2154,7 @@ function expand_rider(limit, directions, xy, extremities, color)
     //console.log("expand_rider",limit, directions, xy);
 
     directions.each(function(direction) {
-        moves = moves.concat(expand_direction(limit, direction, xy, extremities, color));
+        moves.push.apply(moves, expand_direction(limit, direction, xy, extremities, color));
     });
 
     return without_dupes(moves);
