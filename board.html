@@ -190,8 +190,16 @@ var PIECE_TYPES = {
     // promote: array of piece names that this piece can promote to, in order of preference
     // figurines: [white, black] Unicode strings for Figurine Algebraic Notation
 
-    // Standard international chess pieces
-    king: {parlett: "1*, imR2=e", letter: "K", royal: true, castles_with: "rook", figurines: ["\u2654", "\u265a"]},    // or: ~1/1, ~1/0
+    // Standard international chess piece
+    
+    //king: {parlett: "1*, imR2=e", letter: "K", royal: true, castles_with: "rook", figurines: ["\u2654", "\u265a"]},    // or: ~1/1, ~1/0
+
+    // TODO: @ for absolute, @3,0 and @4,0 short, then @7,0 for @6,0, in order to allow
+    // Chess960 orthodox castling when rooks & kings are not at known positions.
+    //king: {parlett: "1*", /*[@3,0;move_a_castle_to=@4,0], [@7,0;move_h_castle_to=@6,0]",*/
+    // TODO: actually pay attention to move_{a,h}_castle_to commands.
+    king: {parlett: "1*, [-2,0;move_a_castle_to=3,0], [2,0;move_h_castle_to=-2,0]",
+          royal: true, letter: "K", figurines: ["\u2654", "\u265a"]},
     queen: {parlett: "n*", letter: "Q", figurines: ["\u2655", "\u265b"]},
     bishop: {parlett: "nX", letter: "B", figurines: ["\u2657", "\u265d"]},
     rook: {parlett: "n+", letter: "R", castle: true, figurines: ["\u2656", "\u265c"]},
@@ -342,9 +350,9 @@ google.setOnLoadCallback(function() {
     //load_fen("8/8/8/3x(test)X(test)3/8/8/8/8 w - d6 0 5"); 
     //load_fen("8/4x(test)X(test)/x(test)4X(test)/8/2x(test)1DDE/2x(test)x(test)X(test)/1X(test)X(test) w KQkq - 0 1");
     //load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // test fairy pieces
-    load_fen("rnbqmbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQMBNR w KQkq - 0 1");   // no royal pieces
+    //load_fen("rnbqmbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQMBNR w KQkq - 0 1");   // no royal pieces
 
-    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
+    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
     //load_fen("bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1");    // Church Chess
     //load_fen("rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq - 0 1"); // Advance Chess
     //load_fen("4rbqk/4rb1q/4r1bb/5rrr/RRR5/BB1R4/Q1BR4/KQBR4 w - - 0 1");    // Corner Chess
@@ -1979,7 +1987,7 @@ function relative_decode_parlett(parlett)
 
                 assert(distances.length === 1, "relative_parlett(" + parlett + "): multiple distances given for rider, expected one or none");
             } else {
-                distance = null;
+                distance = Infinity;
             }
 
             rel_x = rel_y = 0;
@@ -1987,8 +1995,7 @@ function relative_decode_parlett(parlett)
             for (var j = 1; j < Math.max(RANK_MAX, FILE_MAX); ++j) {
                 // Riders get blocked. Note that you can have a non-hippogonal leaper.
                 // ~n* (lion) for example, is like a queen, but not blocked by intervening pieces.
-                //
-                // TODO: 2X (elephant) should be a non-leaper blocked by intervening pieces. Why isn't it?
+                
                 if (prev_rel_x !== null && prev_rel_y !== null && movement === "rider") { 
                     flags.if_unblocked = [prev_rel_x, prev_rel_y];
                 } else {
@@ -1998,7 +2005,7 @@ function relative_decode_parlett(parlett)
                 rel_x += dir[0];
                 rel_y += dir[1];
 
-                if (distance === null || j === distance) {
+                if (distance === Infinity || j === distance) {
                     rel_moves.push([rel_x, rel_y, Object.clone(flags)]);
 
                     if (j === distance) { 
