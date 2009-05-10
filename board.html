@@ -197,9 +197,9 @@ var PIECE_TYPES = {
     // TODO: @ for absolute, @3,0 and @4,0 short, then @7,0 for @6,0, in order to allow
     // Chess960 orthodox castling when rooks & kings are not at known positions.
     //king: {parlett: "1*", /*[@3,0;move_a_castle_to=@4,0], [@7,0;move_h_castle_to=@6,0]",*/
-    // TODO: actually pay attention to move_{a,h}_castle_to commands, instead of having the logic in piece moved.
-    king: {parlett: "1*, {2<<;if_can_castle_long;move_a_castle_to=3,0}, " +
-              "{2>>;if_can_castle_short;move_h_castle_to=-2,0]",
+    // TODO: actually pay attention to move_{a,h}_castle_to commands, instead of having the logic in piece moved,
+    king: {parlett: "1*, [-2,0;if_can_castle_long;move_a_castle_to=3,0], " +
+              "[2,0;if_can_castle_short;if_unblocked=1,0;if_unblocked2=2,0;move_h_castle_to=-2,0]",
           royal: true, letter: "K", figurines: ["\u2654", "\u265a"]},
     queen: {parlett: "n*", letter: "Q", figurines: ["\u2655", "\u265b"]},
     bishop: {parlett: "nX", letter: "B", figurines: ["\u2657", "\u265d"]},
@@ -396,7 +396,7 @@ google.setOnLoadCallback(function() {
     //load_fen("k7/8/8/8/8/8/8/5KR1 w - d6 0 50");  // K + KR
     //load_fen("4r3/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle out of check
     //load_fen("5r2/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle through check
-    load_fen("5k2/8/8/8/8/8/8/R3KB1R w KQkq - 0 1"); // can't castle with intervening pieces
+    load_fen("1k/8/8/8/8/8/8/R3KQ1R w KQkq - 0 1"); // can't castle with intervening pieces
     //load_fen("rnbqkbnr/ppp2ppp/8/8/8/8/PPP2PPP/RNBQKBNR w KQkq - 0 1"); // to test "only move" 
     
     //load_fen("k7/8/8/8/8/8/3N4/6N1 w - - 0 1"); // disambiguate moves by file (Ngf3, Ndf3)
