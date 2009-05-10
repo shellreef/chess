@@ -119,7 +119,7 @@ google.load("scriptaculous", "1.8.2");
 // Preferences, not game state.
 var PREFS = {
     // TODO: UI element drop-down to change
-    OUTPUT_NOTATION: "adesc",
+    OUTPUT_NOTATION: "descr",
 
     // What piece images to use                     
     IMAGE_SET: "alfaerie"   // http://www.chessvariants.org/graphics.dir/alfaerie/index.html
@@ -347,13 +347,15 @@ google.setOnLoadCallback(function() {
 
     name_squares();    
 
+    //load_fen("r/8/8/1N3b2/3PP3/1P1BBN/8/8 w Q - 0 17"); // test riders being blocked
+    load_fen("8/8/8/5b2/3PP3/1P2B/8/8 w Q - 0 17"); // bug: bishop can't leap
     //load_fen("rnbqkbnr/pppppppp/9/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"); // 1. P-K4
     //load_fen("8/8/8/3x(test)X(test)3/8/8/8/8 w - d6 0 5"); 
     //load_fen("8/4x(test)X(test)/x(test)4X(test)/8/2x(test)1DDE/2x(test)x(test)X(test)/1X(test)X(test) w KQkq - 0 1");
     //load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // test fairy pieces
     //load_fen("rnbqmbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQMBNR w KQkq - 0 1");   // no royal pieces
 
-    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
+    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
     //load_fen("bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1");    // Church Chess
     //load_fen("rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq - 0 1"); // Advance Chess
     //load_fen("4rbqk/4rb1q/4r1bb/5rrr/RRR5/BB1R4/Q1BR4/KQBR4 w - - 0 1");    // Corner Chess
@@ -1460,13 +1462,13 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
         // If there is any piece there, it may block other moves
         if (capture_piece) {
             blocked[rel_x + "," + rel_y] = true;
+
+            // Can't move to self-occupied square
+            if (capture_piece.hasClassName(color)) {
+                continue;
+            }
         }
 
-
-        // Can't move to self-occupied square
-        if (capture_piece && capture_piece.hasClassName(color)) {
-            continue;
-        }
 
         // Must be a capture
         if (flags.capture_only && !capture_piece) {
@@ -1482,7 +1484,8 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
             continue;
         }
 
-        // Blocked by an obstruction. Can check for up to three spaces.
+        // Blocked by an obstruction. Can check for up to three spaces. To check
+        // more, chain the moves. TODO: fix bug where riders aren't blocked sometimes!
         if (flags.if_unblocked) {
             var key = flags.if_unblocked[0] + "," + flags.if_unblocked[1];
             // If was either blocked by a previous move (faster), or there is a
