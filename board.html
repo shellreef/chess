@@ -347,13 +347,13 @@ google.setOnLoadCallback(function() {
 
     name_squares();    
 
-    load_fen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"); // standard
+    //load_fen("rnbqkbnr/pppppppp/9/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"); // 1. P-K4
     //load_fen("8/8/8/3x(test)X(test)3/8/8/8/8 w - d6 0 5"); 
     //load_fen("8/4x(test)X(test)/x(test)4X(test)/8/2x(test)1DDE/2x(test)x(test)X(test)/1X(test)X(test) w KQkq - 0 1");
     //load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // test fairy pieces
     //load_fen("rnbqmbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQMBNR w KQkq - 0 1");   // no royal pieces
 
-    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
+    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
     //load_fen("bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1");    // Church Chess
     //load_fen("rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq - 0 1"); // Advance Chess
     //load_fen("4rbqk/4rb1q/4r1bb/5rrr/RRR5/BB1R4/Q1BR4/KQBR4 w - - 0 1");    // Corner Chess
@@ -1272,7 +1272,8 @@ function computer_move_if_applicable()
     //     fork if can.. something to entertain a beginner. Or better yet,
     // plugin to a remote network server.
     var keys = VALID_MOVE_NOTATIONS.SAN.keys();
-    var alg_move = keys[randint(0, keys.length - 1)];
+    //var alg_move = keys[randint(0, keys.length - 1)];
+    var alg_move = keys[0];
 
     var piece_square = VALID_MOVE_NOTATIONS.SAN.get(alg_move);
 
@@ -1376,11 +1377,15 @@ function move_rel2abs(xy_location, moves)
 //// PARLETT NOTATION FUNCTIONS
 
 // Get the unfiltered, relative moves for a Parlett string.
+var PARLETT_CACHE = {};
 function NEW_unfiltered_moves(parlett)
 {
     var choice_groups;
 
     // TODO: cache! This is constant per parlett. Performance improvement?
+    if (PARLETT_CACHE[parlett]) {
+        return PARLETT_CACHE[parlett];
+    }
 
     // Get all the unfiltered moves for the mutually exclusive choices
     choice_groups = parlett.split(", ");
@@ -1392,6 +1397,8 @@ function NEW_unfiltered_moves(parlett)
             rel_moves.push.apply(rel_moves, relative_decode_parlett(choice_groups[i]));
     }   
     rel_moves = without_dupes(rel_moves);
+
+    PARLETT_CACHE[parlett] = rel_moves;
 
     return rel_moves;
 }
