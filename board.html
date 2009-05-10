@@ -396,6 +396,7 @@ google.setOnLoadCallback(function() {
     //load_fen("k7/8/8/8/8/8/8/5KR1 w - d6 0 50");  // K + KR
     //load_fen("4r3/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle out of check
     //load_fen("5r2/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle through check
+    load_fen("5k2/8/8/8/8/8/8/R3KB1R w KQkq - 0 1"); // can't castle with intervening pieces
     //load_fen("rnbqkbnr/ppp2ppp/8/8/8/8/PPP2PPP/RNBQKBNR w KQkq - 0 1"); // to test "only move" 
     
     //load_fen("k7/8/8/8/8/8/3N4/6N1 w - - 0 1"); // disambiguate moves by file (Ngf3, Ndf3)
@@ -1429,6 +1430,7 @@ function filtered_moves(piece, color, is_hypothetical)
             } else if (castle === "long") {
                 // Square must not be occupied, but it can be attacked. See
                 // http://www.flickr.com/photos/theyoungthousands/3456432277
+                // IMPORTANT NOTE: In Chess960, the rook can't castle through check either. But not chess1.
                 if (pc(2, first_rank)) {
                     return false;
                 }
@@ -1813,6 +1815,9 @@ function relative_decode_direction(ch, ch2)
         if (ch2 === "=") {
             // >= orthogonally forwards or sideways
             return [relative_decode_direction(">", undefined)[0].concat(relative_decode_direction("=", undefined)[0]), true];
+        } else if (ch2 === ">") {
+            // >> right (Extended Parlett)
+            return [[1, 0], true];
         } else {
             // = orthogonally forward
             return [[[0, 1]], false];
@@ -1824,6 +1829,9 @@ function relative_decode_direction(ch, ch2)
         } else if (ch2 === "=") {
             // <= orthogonally backwards or sideways
             return [relative_decode_direction("<", undefined)[0].concat(relative_decode_direction("=", undefined)[0]), true];
+        } else if (ch2 === "<") {
+            // << left (Extended Parlett)
+            return [[-1, 0], true];
         } else {
             // < orthogonally backwards
             return [[[0, -1]], false];
