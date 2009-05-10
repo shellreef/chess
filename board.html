@@ -341,8 +341,6 @@ var HYPOTHETICAL_PIECE = null;
 var HYPOTHETICAL_TO = null;
 var HYPOTHETICAL_CAPTURED = null;
 
-var CACHE_HIPPOGONAL = {};
-
 google.setOnLoadCallback(function() {
     /* Safari & IE7: Disable text selection to stop interfering with dragging */
     enable_document_selection(false);    
@@ -1405,6 +1403,10 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
     var blocked, start_x, start_y;
 
     start_xy = piece_location(piece);
+    if (!start_xy) {
+        return [];
+    }
+
     start_x = start_xy[0];
     start_y = start_xy[1];
 
@@ -1416,8 +1418,11 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
     moves = [];
     blocked = {};
     for (var i = 0; i < rel_moves.length; ++i) {
-        var rel_x = rel_moves[i][0], rel_y = rel_moves[i][1]; 
-        var flags = rel_moves[i][2];
+        var rel_x, rel_y, flags, move, x, y;
+        
+        rel_x = rel_moves[i][0], rel_y = rel_moves[i][1]; 
+        flags = rel_moves[i][2];
+ 
 
         // Positive is forwards, so mirror for black.
         if (color === "black") {
@@ -1430,8 +1435,8 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
             if (flags.mark_ep_target) { flags.mark_ep_target[1] = -flags.mark_ep_target[1]; }
         }
 
-        var x = rel_x + start_x;
-        var y = rel_y + start_y;
+        x = rel_x + start_x;
+        y = rel_y + start_y;
 
         if (x < 1 || y < 1 || x > FILE_MAX || y > RANK_MAX) {
             // Out of bounds
@@ -1554,7 +1559,13 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
            }
         }*/
 
-        moves.push([x, y, flags]);
+        move = [x, y, flags];
+
+        if (!is_hypothetical && would_check(piece, move, color)) { 
+            continue; 
+        }
+ 
+        moves.push(move);
     }
 
     // TODO: check if puts in check! See oldmvgenboard.html.
