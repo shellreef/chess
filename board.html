@@ -450,6 +450,10 @@ function save_pgn()
 
         dict[tag] = $(tag).innerHTML;
     }
+
+    // Non-standard. The standard tags are FEN and SetUp, for starting position only.
+    dict["CurrentFEN"] = save_fen();
+
     pgn = output_pgn_dict(dict);
 
     // TODO: save moves
@@ -1272,8 +1276,8 @@ function computer_move_if_applicable()
     //     fork if can.. something to entertain a beginner. Or better yet,
     // plugin to a remote network server.
     var keys = VALID_MOVE_NOTATIONS.SAN.keys();
-    //var alg_move = keys[randint(0, keys.length - 1)];
-    var alg_move = keys[0];
+    var alg_move = keys[randint(0, keys.length - 1)];
+    //var alg_move = keys[0];
 
     var piece_square = VALID_MOVE_NOTATIONS.SAN.get(alg_move);
 
@@ -2370,7 +2374,7 @@ function move_piece_to_square(piece, square, is_hypothetical)
     // see the move, since they are not animated (Effect.Move) yet.
     setTimeout(function() { 
             computer_move_if_applicable()
-            }, 100);
+            }, 1);
 }
 
 // Visually indicate the moves which after threefold repetition
