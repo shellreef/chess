@@ -1,0 +1,3805 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+<title>Chess by Jeff</title>
+<!-- Copyright (C) 2009 Jeff Connelly -->
+<!-- Created:20090411 -->
+<style type="text/css">
+body {
+    font: medium 'Gill Sans', sans-serif;
+    line-height: 1.3;
+    word-spacing: 0.1em;
+}
+
+a { text-decoration: none; }
+a:hover { border-bottom: 1px dotted; }
+
+/* Header */
+span.players { font-size: large; }
+span.player_name { font-weight: bold; }
+span.player_elo { font-size: small; }
+
+/* PGN */
+span.fullmove_number { font-weight: bold; }
+a.active_move { border-bottom: 1px dashed; }
+/*a.repeated_move { text-decoration: underline; }*/     /* goes well with dots and dashes */
+/*a.repeated_move { background-color: yellow; }*/   /* highlight */
+
+/* TODO: switch to divs, for flexibility, and use background-image.. or maybe not */
+img.piece
+{ 
+ border: none;
+ margin: 0px;
+
+ /* TODO: Transition when promote, would be nice to be
+  * able to do with a CSS transition, but img src is not
+  * a CSS property, but a tag attribute. And even if tried to animate
+  * background-image, it wouldn't work until 6806248 is fixed.
+  *
+ /* Or could have two images and change their opacity, see
+  * http://www.the-art-of-web.com/css/timing-function/ section 4, but
+  * that is even worse. */
+ /*-webkit-transition: background 1s linear;*/
+}
+
+img.black {}
+img.white {}
+
+table.board
+{
+ /*border: 2px solid black;*/
+
+/* This is like cellspacing=0 cellpadding=0 */
+ border-collapse: collapse;
+
+/* Firefox: disable text selection when dragging */
+ -moz-user-select: none;
+}
+
+td.square
+{
+ border-style: none;
+ /* border: 1px solid black; */
+ padding: 0em;
+ margin: 0em;
+ width: 55px;
+ height: 55px;
+ text-align: center;
+}
+
+td.label { text-align: center; }
+td.file { border-bottom: 2px solid black; }
+td.rank { border-right: 2px solid black; padding-right: 5px; }
+td.right-edge { border-right: 2px solid black; }
+td.bottom-edge { border-bottom: 2px solid black; }
+
+td.hover 
+{ 
+ /* border: 1px solid black; */
+ background-color: blue !important;
+}
+
+
+/* Colors based on http://en.wikipedia.org/wiki/Chessboard
+ * Useful site: http://www.cssdrive.com/imagepalette/index.php
+ * Colors palette generator, get colors of an arbitrary image.
+ *
+ * Other colors to consider: http://chessos.com/, higher contrast
+ *  http://chessteacher.110mb.com/, much lighter
+ * But I like these, gives it a nice wooden feel. Could also
+ * use green for a tournament-style board.
+ */
+td.white { background-color: #ffce9e; }
+td.black { background-color: #d18b47; }
+
+/* TODO: check out what colors Chess with Friends uses */
+td.legal-move-white { background-color: #cf9e6e; }
+td.legal-move-black { background-color: #a15b17; }
+
+
+/* Would be cool to use CSS3 expressions to make the pattern, but they're not in
+ * Firefox 3.0.8, maybe in Firefox 3.1. Safari has them though! 
+ * If do this, would need to remember to shift nth-child per ranks. 
+/*td:nth-child(2n) { background-color: green } */
+
+</style>
+<script src="http://www.google.com/jsapi" type="text/javascript"></script>
+<script type="text/javascript">
+if (!window.google) {
+    alert("Google was not found. Nothing will work.");
+}
+
+/* TODO: why aren't these miniifed? http://code.google.com/apis/ajaxlibs/documentation/index.html#prototype has
+ * direct paths but neither prototype nor scriptaculous are minified.. others are though. */
+/* TODO: http://compressorrater.thruhere.net/ */
+google.load("prototype", "1.6.0.3");
+google.load("scriptaculous", "1.8.2");
+
+// Preferences, not game state.
+var PREFS = {
+    // TODO: UI element drop-down to change
+    OUTPUT_NOTATION: "adesc",
+
+    // What piece images to use                     
+    IMAGE_SET: "alfaerie"   // http://www.chessvariants.org/graphics.dir/alfaerie/index.html
+    //IMAGE_SET: "ariel"    // based on Ariel Unicode MS
+    //IMAGE_SET: "chessos"
+}
+
+// Chess movement notations, in descending precedence. 
+// For more info see http://en.wikipedia.org/wiki/Chess_notation
+var AVAILABLE_NOTATIONS = [
+    "SAN",  // Standard Algebraic Notation              Bxc6        e5
+    "LAN",  // Long Algebraic Notation                  Bb5xc6      e7-e5
+    "RAN",  // Reversible Algebraic Notation            Bb5xNc6     e7-e5
+    "CRAN", // Concise Reversible Algebraic Notation    Bb5:Nc6     e75
+    "FAN",  // Figurine Algebraic Notation              ♗xc6        ♟e5
+    "ICCF", // ICCF Numeric Notation                    2536        5755
+    "coord",// Coordinate                               B5-C6       E7-E5
+    "smith",// Smith                                    b5c6n       e7e5
+    "descr",// English Descriptive Notation             BxN         P-K4
+    "adesc" // Algebraic Descriptive Notation           BxN         P-e4
+    ];
+
+
+// Info about the game
+var GAME_STATE = {
+    // Whose turn it is
+    active_color: '',
+    
+    // Castling privileges
+    can_castle: {white: {short: true, long: true}, black: {short: true, long: true}},
+
+    ep_target: null,
+
+    halfmove_clock: 0,    // Ply since last pawn advance / capture
+    fullmove_number: 0,   // Increment after black moves
+
+    // Not game state, but other globals
+    dragging: false,
+    position_moves: {},        // Board position -> move IDs, for 3n move repetition
+    position_after: {},           // Board positions at each move, for playback
+    active_in_check: false
+};    
+
+// Moves that can be made right now, for each active piece.
+var VALID_MOVES = null;            // Keyed by filerank of source, array of [[x,y,flags]] destinations
+var VALID_MOVES_OPP = null;        // Moves opponent could make, if it was their turn (attacking)
+var VALID_MOVE_NOTATIONS = null;   // Map SAN, LAN, RAN, CRAN, FAN, coordinate, Smith etc. -> [piece, square]
+var ALL_DROP_TARGETS = [];         // Droppables for UI
+var POSSIBLE_EP_TARGETS = null;             // If move to key, set en passant target to value
+
+// Board size
+var RANK_MAX = 8;
+var FILE_MAX = 8;
+
+// Movement of pieces in extended Parlett notation
+var PIECE_TYPES = {
+// TODO: make this into a proper class/hash, where pieces have not only movements
+// but HTML code to represent black and white (img, or Unicode character) pieces,
+// and codes for FEN notation of initial board positions, also black and white
+
+    // Keys:
+    // parlett: movement of piece in extended Parlett notation
+    // letter: uppercase character representing the piece in FEN
+    // alg_letter: uppercase character for algebraic notation [defaults to FEN letter]
+    // royal: if true, if checked, must make move that unthreatens, otherwise checkmate
+    // castles_with: piece to move in conjunction with this piece if castling
+    // castle: if true, this piece can be moved during castling
+    // promote: array of piece names that this piece can promote to, in order of preference
+    // figurines: [white, black] Unicode strings for Figurine Algebraic Notation
+
+    // Standard international chess piece
+    
+    king: {parlett: "1*, imR2=e", letter: "K", royal: true, castles_with: "rook", figurines: ["\u2654", "\u265a"]},    // or: ~1/1, ~1/0
+
+    // TODO: @ for absolute, @3,0 and @4,0 short, then @7,0 for @6,0, in order to allow
+    // Chess960 orthodox castling when rooks & kings are not at known positions.
+    //king: {parlett: "1*", /*[@3,0;move_a_castle_to=@4,0], [@7,0;move_h_castle_to=@6,0]",*/
+    // TODO: actually pay attention to move_{a,h}_castle_to commands, instead of having the logic in piece moved,
+    /*king: {parlett: "1*, [-2,0;if_can_castle_long;if_unblocked=-1,0;if_unblocked2=-2,0;if_unblocked3=-3,0;move_a_castle_to=3,0], " +
+              "[2,0;if_can_castle_short;if_unblocked=1,0;if_unblocked2=2,0;move_h_castle_to=-2,0]",
+          royal: true, letter: "K", figurines: ["\u2654", "\u265a"],
+          castles_with: "rook"},*/
+    queen: {parlett: "n*", letter: "Q", figurines: ["\u2655", "\u265b"]},
+    bishop: {parlett: "nX", letter: "B", figurines: ["\u2657", "\u265d"]},
+    rook: {parlett: "n+", letter: "R", castle: true, figurines: ["\u2656", "\u265c"]},
+
+
+    // Pawn in new notation
+    /*pawn: {parlett: 
+        "o1>, c1X>, " + 
+        "oi[0,2;if_unblocked=0,1;mark_ep_target=0,1], " +
+        "[-1,1;if_ep_target;capture_at=-1,0], [1,1;if_ep_target;capture_at=-1,0]",
+
+        image: "pawn",
+        promote: ["queen", "knight", "rook", "bishop"],
+        figurines: ["\u2659", "\u265f"],
+        letter: "P",
+        alg_letter: ""
+    },*/
+
+    // OLD NOTATION
+    // P allows for moving to GAME_STATE.ep_target square (must be before other capture move)
+    // oi2> is another way to write the one/two-forward move, but it is really two possible moves:
+    // - oi2>eE: exactly two forward, store piece behind in ep_target (notated by "E")
+    // - oi1>e: exactly one forward
+    pawn: {parlett: "o1>, P, c1X>, oi2>eE, oi1>e", letter: "P", alg_letter: "", promote: ["queen", "knight", "rook", "bishop"], figurines: ["\u2659", "\u265f"]},
+    knight: {parlett: "~1/2", letter: "N", figurines: ["\u2658", "\u265e"]},
+
+    // Other hippogonals, good for testing
+    zero: {parlett: "~0/0", letter: "O"},
+    man: {parlett: "1*", letter: "M"},    // same as king, but not royale (also known as commoner)
+    dabbaba: {parlett: "~2+", letter: "D", image: "warmachine"},  // or ~2/0
+    alfil: {parlett: "~2X", letter: "Y"},    // TODO: image          or ~2/2
+    alibaba: {parlett: "~2/0, ~2X", letter: "L"},   // TODO: image
+    squirrel: {parlett: "~0/2, ~1/2, ~2/2", letter: "S"},
+    threeleaper: {parlett: "~3/0", letter: "H"}, 
+    tripper: {parlett: "~3/3", letter: "XT"},
+    camel: {parlett: "~1/3", letter: "W"},
+    zebra: {parlett:"~2/3", letter: "Z"},
+    giraffe: {parlett: "~1/4", letter: "XG"},
+    antelope: {parlett: "~3/4"}, 
+    flamingo: {parlett: "~1/6"}, 
+
+    // Amphibians (combined leapers)
+    frog: {parlett: "~1/1, ~0/3", letter: "F"},     // TODO: image
+    bison: {parlett: "~1/3, ~2/3"},                 // TODO: image
+    gnus: {parlett: "~1/2, ~1/3"},                  // TODO: image
+    root_fifty_leaper: {parlett: "~5/5, ~7/1"},     // TODO: image
+    // TODO: root-65 leaper, bat, see http://members.shaw.ca/quadibloc/chess/ch03.htm
+    buffalo: {parlett: "~1/2, ~1/3, ~2/3"},         // TODO: image
+
+    // Combined pieces of International Chess
+   
+    // B+N, aka cardinal, princess, janus (Capablanca, X-FEN standard)
+    archbishop: {parlett: "nX, ~1/2", letter: "A", image: "cardinal"}, 
+
+    // R+N, aka empress, marshal (Capablanca, X-FEN standard)
+    chancellor: {parlett: "n+, ~1/2", letter: "C"}, 
+
+    // Q+N, aka superqueen
+    amazon: {parlett: "n*, ~1/2", letter: "XV"},     
+
+    maharajah: {parlett: "n*, ~1/2", letter: "XJ", royal: true},   // Q+N+K, Maharajah chess
+    royal_knight: {parlett: "~1/2", letter: "XR", royal: true},  // Knightmate chess (for king, use a man)
+    royal_queen: {parlet: "n*", royal: true},               // queen but can't be captured
+    dragon: {parlett: "o1>, P, c1X>, oi2>eE, oi1>e, ~1/2"}, // pawn + knight
+
+    // More combined pieces
+    // From piecelopedia or http://members.shaw.ca/quadibloc/chess/ch03.htm or 
+    walker: {parlett: "o1+, c1X"},          // wazir move, fers capture
+    tiger: {parlett: "onX, c~1/2"},         // bishop move, knight capture
+    bd: {parlett: "~2/0, nX"},              // dabbaba + bishop
+    caliph: {parlett: "~1/3, nX"},          // camel + bishop
+    canvasser: {parlett: "~1/3, n+"},       // camel + rook
+    carpenter: {parlett: "~1/2, ~2/0"},     // knight + dabbaba
+    centaur: {parlett: "~1/2, 1*"},         // knight + man (aka crowned knight)
+    champion: {parlett: "1+, ~2/2, ~2/0"},  // wazir + alfil + dabbaba
+    crowned_rook: {parlett: "n+, 1X"},      // rook + ferz / rook + man
+    dragon_king: {parlett: "n+, 1X", royal: true},  // rook + king
+    fad: {parlett: "1X, ~2/2, ~2/0"},       // ferz + alfil + dababa
+    general: {parlett: "1X", royal: true},  // royal ferz
+    kangaroo: {parlett: "~1/2, ~2/2"},      // knight + alfil       TODO: image:
+    waffle: {parlett: "1+, ~2/2"},          // wazir + alfil wazir + alfil
+    wizard: {parlett: "~1/3, 1X"},          // camel + fers
+
+    // TODO: support two-letter expanded FEN codes (my invention), since A-Z leaves
+    // only 26 possibilities, X indicates another letter follows, so XA-XZ are available,
+    // and XXA-XXZ, X++ to infinity, if needed. Straightforward FEN extension.
+ 
+    // More complex fairy / non-intl chess pieces
+    // See http://en.wikipedia.org/wiki/Fairy_chess_piece#Notable_examples
+    // and even better, Piecelopedia
+    // http://www.chessvariants.org/index/mainquery.php?type=Piececlopedia&orderby=LinkText&displayauthor=1&displayinventor=1&usethisheading=Piececlopedia
+   
+    colonel: {parlett: "n>, n=, 2/1>, 1*", letter: "XC"}, 
+    murray_lion: {parlett: "~0/2, ~2/2, c1*", letter: "XM"},
+    lion: {parlett: "~n*", letter: "XL"},
+    berolina_pawn: {parlett: "o1X>, c1>, io2X>", letter: "XB"},
+    superpawn: {parlett: "on>, cnX>", letter: "XP"},
+    elephant: {parlett: "2X", letter: "E"}, // TODO: not a leaper, needs to be blocked
+    khohn: {parlett: "1X, 1>", letter: "XK"},
+    fers: {parlett: "1X", letter: "XF"},
+    wazir: {parlett: "1+", letter: "I"},
+    kraken: {parlett: "~n/m ~0/0"},     // any square, not realistic since always checkmates!
+    squid: {parlett: "o~n/m ~0/0", letter: "XD"}, // any square but can't capture, much less powerful
+    universal_leaper: {parlett: "~n/m"},// like kraken, but can't go to square it is on (like a zero)
+    octopus: {parlett: "o~n/m", letter: "U"},   // TODO: image
+
+    // Pieces from chess-3
+    // http://www.chessbase.com/newsdetail.asp?newsid=4553
+    // TODO: instead of using composite pieces, which aren't totally accurate because the
+    // extra moves are non-capturing (jous is not strictly knight + wazir, since the wazir moves can't capture!)
+    // frookbbishop, knightwazir?
+    
+    // rook + can move (not capture) like bishop
+    tower: {parlett: "n+, onX", castle: true, letter: "T", image: "rookinv"},  
+
+    // knight + can move (not capture!) like wazir
+    jous: {parlett: "~1/2, o1+", letter: "J", image: "knightwazir"}, 
+
+    // bishop + can move (not capture) 1 or 2 squares orthogonally
+    vicar: {parlett: "nX, o2+", letter: "V", image: "bishopinv"},  
+
+    // Pieces that probably won't be supported without significant coding
+    leo: {parlett: "on*, c^&", letter:"XO"},        // no & support, whatever that is
+    knightrider: {parlett: "n(1/2)", letter:"XN"},  // no grouping support, sadly
+    checker: {parlett: "cn(^2X>), o1X>", promote: "checker_kinged", letter:"XY"},  // no grouping
+    checker_kinged: {parlett: "cn(^2X), o1x", letter:"XZ"},
+    spy: {parlett: "2>, 2=, (1/1)>", letter:"XS"}  // no grouping
+    // pieces with no notation. WinChloe supports 1400 pieces.
+    //
+    // TODO: pieces from http://members.shaw.ca/quadibloc/chess/ch04.htm
+    // TODO: compound pieces from http://www.chessvariants.com/graphics.dir/alfaerie/
+};
+
+// Hypothetical board squares. Pieces or lack thereof, for check filtering.
+var HYPOTHETICAL_FROM = null;
+var HYPOTHETICAL_PIECE = null;
+var HYPOTHETICAL_TO = null;
+var HYPOTHETICAL_CAPTURED = null;
+
+var CACHE_HIPPOGONAL = {};
+
+google.setOnLoadCallback(function() {
+    /* Safari & IE7: Disable text selection to stop interfering with dragging */
+    enable_document_selection(false);    
+
+    name_squares();    
+
+    //load_fen("8/8/8/3x(test)X(test)3/8/8/8/8 w - d6 0 5"); 
+    //load_fen("8/4x(test)X(test)/x(test)4X(test)/8/2x(test)1DDE/2x(test)x(test)X(test)/1X(test)X(test) w KQkq - 0 1");
+    //load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // test fairy pieces
+    //load_fen("rnbqmbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQMBNR w KQkq - 0 1");   // no royal pieces
+
+    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
+    //load_fen("bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1");    // Church Chess
+    //load_fen("rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq - 0 1"); // Advance Chess
+    //load_fen("4rbqk/4rb1q/4r1bb/5rrr/RRR5/BB1R4/Q1BR4/KQBR4 w - - 0 1");    // Corner Chess
+    //load_fen("kbp2pbq/nrp2prn/pp4pp/8/8/PP4PP/NRP2PRN/QBP2PBK w - - 0 1");  // Corner Chess II
+    //load_fen("r6r/1nbqkbn1/pppppppp/8/8/PPPPPPPP/1NBQKBN1/R6R w - - 0 1"); // Corner Rooks Skirmish
+    //load_fen("1nrqkrn1/2b2b2/1pppppp1/8/8/1PPPPPP1/2B2B2/1NRQKRN1 w - - 0 1"); // Corridor Chess
+    //load_fen("kkkkkkkk/pppppppp/8/8/8/8/PPPPPPPP/KKKKKKKK w - - 0 1");  // Eight Kings Chess
+    //load_fen("bnrqkrnb/pppppppp/8/8/8/8/PPPPPPPP/BNRQKRNB w KQkq - 0 1"); // Fianchetto Chess
+    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R1BQKBNR w KQkq - 0 1"); // Knight Odds Chess
+    //load_fen("RNBQKBNR/pppppppp/8/8/8/8/PPPPP1PP/rnbqkbnr w KQkq - 0 1"); // Pawn Odds Chess
+    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNB1KBNR w KQkq - 0 1"); // Queen Odds Chess
+    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/1NBQKBNR w KQkq - 0 1"); // Rook Odds Chess
+    //load_fen("rbbqknnr/pppppppp/8/8/8/8/PPPPPPPP/RBBQKNNR w - - 0 1"); // Mongredian Chess
+    //load_fen("RNBQKBNR/pppppppp/8/8/8/8/PPPPPPPP/rnbqkbnr w KQkq - 0 1"); // Pawn Massacre Chess
+    //load_fen("rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w KQkq - 0 1"); // Pawnless Chess
+    //load_fen("1nn1k1n1/4p3/8/8/8/8/PPPPPPPP/4K3 w - - 0 1"); // Peasant Revolt Chess
+    //load_fen("qqqqkqqq/pppppppp/8/8/8/8/PPPPPPPP/QQQQKQQQ w - - 0 1"); // Power Chess
+    //load_fen("rrbqkbrr/bbnnnnbb/pppppppp/8/8/PPPPPPPP/BBNNNNBB/RRBQKBRR w - - 0 1");    // Power Chess II
+    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBKQBNR w KQkq - 0 1"); // Reverso Chess
+    //load_fen("nnnnknnn/pppppppp/8/8/8/8/PPPPPPPP/NNNNKNNN w - - 0 1"); // Royal Stables Chess
+    //load_fen("nnnnknnn/pppppppp/2p2p2/1pppppp1/8/8/PPPPPPPP/RNBQKBNR w - - 0 1");// Seven Knights Chess
+    //load_fen("rbqkkqbr/pppppppp/n6n/8/8/N6N/PPPPPPPP/RBQKKQBR w - - 0 1"); // Twin Chess
+    //load_fen("nkbqqbkn/r2pp2r/pppppppp/8/8/PPPPPPPP/R2PP2R/NKBQQBKN w - - 0 1"); // Twin Chess B
+    //load_fen("RNBQKBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbqkbnr w KQkq - 0 1"); // Upside-Down Chess
+    //load_fen("4k3/5ppp/8/8/8/8/PPP5/3K4 w - - 0 1"); // Wild Chess 7 
+    //load_fen("rnbqkbnr/8/8/pppppppp/PPPPPPPP/8/8/RNBQKBNR w KQkq - 0 1"); // Wild Chess 8
+    
+    //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
+    //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
+    //load_fen("rnbqkb1r/pp1ppppp/5n2/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 3");
+    //load_fen("7K/8/k1P5/7p/8/8/8/8 w KQkq - 42 42");
+    //load_fen("r1bqkb1r/pp1ppppp/2n2n2/2p5/2B2P3/5N2/PPPP1PPP/RN1QK2R w KQkq - 1 3");
+    //load_fen("k7/8/8/8/8/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); // test draw
+    //load_fen("k7/8/K7/8/8/8/8/8 b - - 0 30"); // K against K
+    //load_fen("4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5"); // remove check by capture
+    //load_fen("k1K5/8/8/8/8/8/p/88888888 b - - 0 5"); // pawn promotion
+    //load_fen("8/8/8/3pP3/8/8/8/8 w - d6 0 5"); // en passant
+    //load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); 
+    //load_fen("k7/8/8/8/8/8/8/5KQ1 w - d6 0 50");  // K + KQ
+    //load_fen("k7/8/8/8/8/8/8/5KR1 w - d6 0 50");  // K + KR
+    //load_fen("4r3/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle out of check
+    //load_fen("5r2/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle through check
+    //load_fen("1k/8/8/8/8/8/8/R3KQ1R w KQ - 0 1"); // can't castle with intervening pieces
+    //load_fen("rnbqkbnr/ppp2ppp/8/8/8/8/PPP2PPP/RNBQKBNR w KQkq - 0 1"); // to test "only move" 
+    
+    //load_fen("k7/8/8/8/8/8/3N4/6N1 w - - 0 1"); // disambiguate moves by file (Ngf3, Ndf3)
+    //load_fen("k7/8/8/6N1/8/8/8/6N1 w - - 0 1"); // disambiguate moves by rank (N5f3, N1f3)
+    //load_fen("k7/8/8/4N1N1/3N3N/8/3N3N/4N1N1 w - - 0 1"); // disambiguate both (Ne5f3, Nd4f3, Ng5f3, Nh4f3, Nh2f3, Ng1f3, Ne1f3, Nd2f3)
+    //load_fen("3Q4/6q1/2Q5/7q/1Q6/4q3/7Q/5q2 w - - 0 1"); // an eight queens solution, but with black+white queens. test disambig.
+
+    // TODO: library of interesting games, see
+    // http://www.xs4all.nl/~timkr/records/records.htm and http://www.xs4all.nl/~timkr/ChessTutor/pgnview.htm
+
+    // test PGN embedded notes
+    //pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
+    
+    //pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
+});
+
+// PGN (PORTABLE GAME NOTATION) FUNCTIONS
+
+// Make the PGN content editable (not to be confused with edible).
+var ORIGINAL_UI_HTML;
+function edit_pgn()
+{
+    ORIGINAL_UI_HTML = $("game_ui").innerHTML;
+
+    // TODO: build dynamically using Builder.node, but it gives me a 
+    // builder.js this.NODEMAP undefined error.
+    $("game_ui").innerHTML = "<textarea id='pgn' cols='80' rows='35'>" + save_pgn().escapeHTML() + 
+        "</textarea>" + 
+        "<button type='button' name='ok' accesskey='o' " + 
+        "onclick='javascript:reload_pgn()'>OK</button>" +
+        "<button type='button' name='cancel' onclick='restore_edit()' accesskey='x'>Cancel</button>";
+
+    $("pgn").focus();
+}
+
+// Restore the game interface, removing the edit area.
+function restore_edit()
+{
+    $("game_ui").innerHTML = ORIGINAL_UI_HTML;
+}
+
+// Export game as PGN.
+function save_pgn()
+{
+    var pgn = "", dict;
+    var tags = ["White", "WhiteElo", "Black", "BlackElo", "Event", "Round", "Site", "Date", "Time"];
+   
+    dict = {};
+    for (var i = 0; i < tags.length; ++i) {
+        var tag = tags[i];
+
+        dict[tag] = $(tag).innerHTML;
+    }
+    pgn = output_pgn_dict(dict);
+
+    // TODO: save moves
+    pgn += "\n";
+    
+    return pgn;
+}
+
+// Reload PGN after editing it.
+function reload_pgn()
+{
+    var pgn = $F("pgn");
+
+    restore_edit();
+
+    load_pgn(pgn);
+}
+
+// Load a game in Portable Game Notation (PGN) format
+//  TODO: recognize various ECO codes, see http://scid.sourceforge.net/help/ECO.html
+//  and http://scid.sourceforge.net/help/EPD.html
+// TODO: support any base 10 number, and asterisks for filling remainder of rank with empty
+// spaces, and {} for labels, see http://play.chessvariants.org/pbm/devguide.html
+function load_pgn(pgn)
+{
+    var game = parse_pgn(pgn);
+    var tags = ["White", "WhiteElo", "Black", "BlackElo", "Event", "Round", "Site", "Date", "Time"];
+
+    // Header
+    for (var i = 0; i < tags.length; ++i) {
+        var tag = tags[i];
+        var node = $(tag);
+
+        assert(node, "load_pgn(" + pgn + "): no element for tag " + tag);
+
+        if (game[tag] && game[tag].substr(0, 1) !== "?") {
+            var value = game[tag];
+
+            $(tag).show();
+
+            $(tag).innerHTML = value;
+
+            $$(".show_" + tag).invoke("show");
+        } else {
+            $(tag).hide();
+            $$(".show_" + tag).invoke("hide");
+        }
+    }
+
+    // Starting position
+    load_fen(game.FEN, true);
+    GAME_STATE.position_after[0] = game.FEN;
+
+    for (var ply = 1; ply < game.moves.length; ++ply) {
+        var move = game.moves[ply];
+
+        //console.log(ply, move);
+        //XYZ mv(move);
+    }
+}
+
+// Parse PGN into a dictionary
+function parse_pgn(pgn)
+{
+    var lines = pgn.split("\n");
+    var dict = {};
+    var move_text = "";
+
+    // Parse header into dictionary
+    for (var i = 0; i < lines.length; ++i) {
+        var line = lines[i];
+
+        if (line.substr(0, 1) === "[") {
+            for (var j = 0; j < line.length; ++j) {
+                var between, ary, tag, key, value;
+                    
+                between = line.substring(1, line.length - 1);
+                // Would have liked to use the 2nd parameter to split here, but it
+                // doesn't behave the same as in Perl. It just truncates the array,
+                // instead of stopping splitting after the deliminator.
+                // "foo,bar,baz".split(",", 2) === ["foo", "bar"]
+                // instead of ["foo", "bar,baz"].
+                ary = between.split(" ");
+                key = ary.shift();
+                value = ary.join(" ");
+
+                if (value.substr(0, 1) === '"') {
+                    value = value.substring(1, value.length - 1);
+                }
+
+                dict[key] = value;
+            }
+        } else if (line.substr(0, 1) === ";" || line.length === 0) {
+            ;
+        } else {
+            move_text += line + " ";
+        }
+    }
+
+    // Standard FEN
+    if (!dict.FEN) {
+        dict.FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        dict.SetUp = 1;
+    }
+
+    // Parse move text
+    var tokens = move_text.split(" ");
+    var fullmove_number, outcome, moves = [], color = "white";
+    var in_comment = false;
+
+    for (i = 0; i < tokens.length; ++i) {
+        var token = tokens[i];
+
+        if (token === "") {
+            ;
+        } else if (in_comment) {
+            if (token.substr(token.length - 1) === "}") {
+                in_comment = false;
+            }
+            // TODO: support annotations
+        } else if (token.substring(token.length - 1) === ".") {
+            fullmove_number = parseInt(token, 10);
+
+            // 3... means black moves
+            if (token.substring(token.length - 3) === "...") {
+                color = "black";
+            } else {
+                color = "white";
+            }
+
+        } else if (token === "1-0") {
+            outcome = "White wins";
+        } else if (token === "0-1") {
+            outcome = "Black wins";
+        } else if (token === "1/2-1/2") {
+            outcome = "Draw";
+        } else if (token === "*") { 
+            outcome = "(In progress)";
+        } else if (token.substr(0, 1) === "{") {
+            in_comment = true;
+        } else {
+            // Move 
+            
+            var ply = encode_ply(color, fullmove_number);
+            // TODO: handle #, + for checkmate and check, part of move
+            moves[ply] = token;
+
+            // white, then black
+            if (color === "white") {
+                color = opposite_color(color);
+            } 
+        }
+    }
+    dict.outcome = outcome;
+    dict.moves = moves;
+        
+    // TODO: parse more than one game per file, return in array, 
+    // then show drop-down list to select game from library.
+
+    //console.log(dict);
+    return dict;
+}
+
+// Export a PGN tag dictionary to PGN format, opposite of parse_pgn.
+function output_pgn_dict(dict)
+{
+    var pgn, quoted_value;
+
+    pgn = "";
+    for (var key in dict) {
+        var value = dict[key];
+
+        // TODO: unparenthetize, uncommaify, etc. .. or just set attributes
+        // to exactly what we want in load_pgn(), then fetch it.
+        // TODO: rules for quoting values?
+        quoted_value = '"' + value + '"';
+        pgn += "[" + key + " " + quoted_value + "]\n";
+    }
+
+    return pgn;
+}
+
+
+// Load a move by ply. Used to navigate to past moves.
+function load_ply(ply)
+{
+    // TODO: would be tool to be able to also decode
+    // color + fullmove number, for ease of human use.
+    // Make "1." be ply 1, and "1..." or "1. ..." be ply 2.
+    // Maybe make it a user function, go()
+    
+    $$("a.active_move").invoke("removeClassName", "active_move");
+
+    load_fen(GAME_STATE.position_after[ply]);
+
+    $("ply_" + ply).addClassName("active_move");
+
+    set_next_back_accesskeys(ply);
+}
+
+// Setup accesskeys for next and back given the current ply.
+function set_next_back_accesskeys(ply)
+{
+    var a;
+    
+    a = $$("a.accessible_move");
+    a.invoke("removeClassName", "accessible_move");
+    a.invoke("removeAttribute", "accesskey");
+
+    a = $$("a#ply_" + (ply + 1));
+    a.invoke("setAttribute", "accesskey", "."); // ctrl+option+.
+    a.invoke("addClassName", "accessible_moves");
+
+    a = $$("a#ply_" + (ply - 1));
+    a.invoke("setAttribute", "accesskey", ",");   // ctrl+option+,
+    a.invoke("addClassName", "accessible_move");
+}
+
+// Make a link to a move, click it and it loads the board after it.
+function move_link(ply, text)
+{
+    var extra;
+
+    // ctrl+option+/ (at least on Safari 4) to go to initial position
+    if (ply === 0) {
+        extra = ' accesskey="/"';
+    } else {
+        extra = "";
+    }
+
+    return '<a' + extra + ' id="ply_' + ply + '" class="active_move" ' +
+        'href="javascript:load_ply(' + 
+            ply +
+        ')">' + text + "</a>";
+}
+
+// Decode ply number to color and fullmove number.
+function decode_ply(ply)
+{
+    var color, fullmove_number;
+
+    color = (ply % 2 === 1) ? "white" : "black";
+    fullmove_number = Math.ceil(ply / 2);
+
+    return {color: color, fullmove_number: fullmove_number};
+}
+
+// Encode color and fullmove number back to ply. Ply is useful for 
+// arrays of moves, since it is one integer, instead of integer+color.
+function encode_ply(color, fullmove_number)
+{
+    var ply;
+
+    ply = fullmove_number * 2;
+    ply -= (color === "white" ? 1 : 0);
+
+    return ply;
+}
+
+//// USER FUNCTIONS
+
+// Convenience function to move given algebraic notation, for use within
+// JavaScript console (Develop -> Show Error Console in Safari) if you want
+// a command-line instead of a GUI. Computer move also uses this function, but it is
+// not used for drag-and-drop.
+function mv(alg_move)
+{
+    var piece_square, piece, square;
+
+    if (!alg_move) {
+        assert(VALID_MOVE_NOTATIONS, "mv(" + alg_move + "): called with VALID_MOVE_NOTATINS false");
+        return VALID_MOVE_NOTATIONS[AVAILABLE_NOTATIONS[0]].keys();
+    }
+
+    // Accept digits, but prefer the letter oh.
+    alg_move = alg_move.replace("0-0-0", "O-O-O").replace("0-0", "O-O");
+
+    // Prefer these move notations, in this order.
+    for (var i = 0; i < AVAILABLE_NOTATIONS.length; ++i) {
+        var notation = AVAILABLE_NOTATIONS[i];
+
+        if (notation === "descr" || notation === "adesc") {
+            alg_move = alg_move.replace(/Kt/g, "N");
+        }
+
+        piece_square = VALID_MOVE_NOTATIONS[notation].get(alg_move);
+
+        if (piece_square) {
+            // Found one.
+            break;
+        }
+    }
+
+    // TODO: allow synonymous moves, not part of VALID_MOVE_NOTATIONS, since are redundant.
+
+    // TODO: Non-ambiguous notations can be parsed directly, without needing to
+    // calculate the valid moves. Maybe useful for loading in-progress games? And
+    // would have to convert from SAN to non-ambiguous formats. Or just make 
+    // calculate_moves() faster.
+
+    assert(piece_square, "mv(" + alg_move + "): illegal move");
+
+    piece = piece_square[0];
+    square = piece_square[1];
+
+    // TODO: do some Effect.Move animation, optionally (make two functions)
+    //new Effect.Move(piece, { x: 10, y: 20, mode: 'relative' });
+
+    move_piece_to_square(piece, square);
+}
+
+//// SPECIAL MOVE FUNCTIONS
+
+// Return whether a piece should be promoted
+function should_promote(piece)
+{
+    var square;
+
+    // Does it promote?
+    if (!PIECE_TYPES[piece.type].promote) {
+        return false;
+    }
+
+    square = sq(piece);
+
+    // Is it on the last rank?
+    if (GAME_STATE.active_color === "white") {
+        return square.y === 8;    // 8th rank
+    } else if (GAME_STATE.active_color === "black") {
+        return square.y === 1;    // 1st rank
+    } else {
+        assert(false, "should_promote(" + piece + "): unknown active color");
+    }
+}
+
+// Change a piece to whatever it promotes to.
+function promote(piece)
+{
+    var promotes_to;
+
+    //console.log("promotion");
+
+    // TODO: give option to what to promote to, if more than one.
+    // Click/tap piece to change it, after moved? Cycle through?
+    // Most people choose queen, but it is really important, as 
+    // sometimes a queen promotion can lead to a stalemate, or a 
+    // knight promotion etc. might actually be a better move.
+    // TODO: would also need to codify this in algebraic move, =Q, etc.
+    promotes_to = PIECE_TYPES[piece.type].promote[0];
+
+    // TODO: Puff out, or fade in from new to old piece. Is there an
+    // effect that can fade from one image to another? LikE IE page transitions.
+    // http://sachiniscool.blogspot.com/2006/01/implementing-page-transitions-in.html
+    // ... except when changing images. Safari has CSS animations.
+    // new Effect.Puff(piece);
+    // or try CSS transitions, see CSS at the top of this document.
+    //piece.style.background = image_path_for(promotes_to, piece.hasClassName("white") ? "white" : "black");
+    // or TODO: create another img, same place same time, change opacity to reveal it
+    // but this leaves the old image behind..
+    
+    piece.src = image_path_for(promotes_to, piece.hasClassName("white") ? "white" : "black");
+
+
+    piece.type = promotes_to;
+}
+
+//// VALID MOVE FUNCTIONS
+//
+// TODO: step through moves, like on http://www.pgnview.com/ (jspgnviewer) as used on http://www.zenpawn.com/chessblog/
+
+// Check if any royal pieces of victim_color are being attacked; that is:
+// victim_color's royal pieces could be captured after any of all_moves
+function in_check(victim_color, all_moves)
+{
+    var attacker_color = opposite_color(victim_color);
+    var attacked = false;
+
+    assert(victim_color === "black" || victim_color === "white",
+            "in_check(" + victim_color + ", " + all_moves + "): color not given");
+    assert(all_moves, "in_check(" + victim_color + ", " + all_moves +
+            "): all_moves is false");
+     
+    // Pieces that can't be captured and need to move if attacked
+    var royals = $$("img.royal." + victim_color);
+
+    // Attack the royal pieces?
+    all_moves.each(function(pair) { 
+        var filerank = pair.key;
+        var moves = pair.value;
+
+        var piece = pc(filerank);
+
+        //console.log("|",filerank,piece);
+
+        moves.each(function(move) {
+            royals.each(function(royal) {
+                // Note that sq() will return the hypothetical location of the piece,
+                // if any.
+                var square = sq(royal);
+
+                //console.log("||", xy2filerank(move[0], move[1]));
+
+                if (move[0] === square.x && move[1] === square.y) { 
+                    // Being attacked!
+                    //console.log("CHECKED BY",piece,filerank,xy2filerank(move[0],move[1]));
+                    attacked = true;
+                }
+            });
+        });
+    });
+
+    return attacked;
+}
+
+// Calculate and save the move notations for a move.
+// Note: only do this if not hypothetical.
+function calculate_notations(color, piece, moves, starting_filerank, ps)
+{
+    // Create drop targets for the valid destinations, linking
+    // the draggables to droppables using piece- + source square.
+    piece.addClassName("piece-" + starting_filerank);
+    piece.prior_position = starting_filerank;    // for removal
+
+    moves.each(function(move) {
+        var square = sq(move[0], move[1]);
+
+        // Building blocks
+        var dest_filerank = xy2filerank(move[0], move[1]);      // e4
+        var dest_file = dest_filerank.substr(0, 1);             // e
+        var dest_rank = dest_filerank.substr(1, 1);             // 4
+        // starting_filerank (passed in as parameter)           // e2
+        var starting_file = starting_filerank.substr(0, 1);     // e
+        var starting_rank = starting_filerank.substr(1, 1);     // 2
+        var descriptive_origin = xy2descriptive(color, filerank2xy(starting_filerank));             // K2
+        var adescriptive_origin = xy2adescriptive(color, filerank2xy(starting_filerank));           // e2
+        var descriptive_dest = xy2descriptive(color, move);                                         // K4
+        var adescriptive_dest = xy2adescriptive(color, move);                                       // e4
+        var descriptive_dest_file = descriptive_dest.substr(0, descriptive_dest.length - 1);        // K
+        var descriptive_dest_rank = descriptive_dest.substr(descriptive_dest.length - 1);           //  4
+        var descriptive_origin_file = descriptive_origin.substr(0, descriptive_origin.length - 1);  // K
+        var descriptive_origin_rank = descriptive_dest.substr(descriptive_dest.length - 1);         //  4
+        var adescriptive_dest_file = adescriptive_dest.substr(0, 1);                                // e
+        var adescriptive_dest_rank = adescriptive_dest.substr(1, 1);                                //  4
+        var adescriptive_origin_file = adescriptive_origin.substr(0, 1);                            // e
+        var adescriptive_origin_rank = adescriptive_dest.substr(1, 1);                              //  4
+
+        var capture_x;                  // x/blank
+        var capture_slash;              // slash/blank
+        var capture_or_dash;            // x/-
+        var captured_letter = "";       // capital letter of piece, P for pawn, etc. or blank
+        var captured_colon_letter = ""; // colon if captured, then piece letter if not pawn
+
+        var captured_piece = move[2].capture; 
+
+        if (captured_piece) {
+            capture_x = "x";
+            capture_slash = "/";
+            capture_or_dash = "x";
+            captured_letter = full_piece_prefix(captured_piece);
+            captured_colon_letter = ":" + (captured_letter === "P" ? "": captured_letter);
+        } else {
+            capture_or_dash = "-";
+            capture_x = "";
+            capture_slash = "";
+            captured_letter = "";
+            captured_colon_letter = "";
+        }
+
+
+        // Compute notations: SAN, FAN,  LAN, RAN, CRAN and also descriptive.
+        // But first check if the move text was overridden in decode_one_parlett(), for the
+        // notations where it can be overridden.
+        if (move[2].algebraic) {
+            // Override notation; used for special moves (castling)
+            // Note: not all notations have special notation for castling.
+            ps.SAN.push([piece, square, [move[2].algebraics]]);
+            ps.LAN.push([piece, square, [move[2].algebraics]]);
+            ps.RAN.push([piece, square, [move[2].algebraics]]);
+            ps.CRAN.push([piece, square, [move[2].algebraics]]);
+            ps.descr.push([piece, square, [move[2].algebraics]]);
+            ps.adesc.push([piece, square, [move[2].algebraics]]);
+        } else {
+            var algs, figurine_prefix, algebraic_prefix, piece_letter;
+
+            if (capture_x === "x" && piece.type === "pawn") {
+                // Pawn captures begin with file of pawn.
+                algs = [starting_file + capture_x + dest_filerank]; // ?xd5
+            } else {
+                algs = [
+                    capture_x + dest_filerank,                    // ?f3
+                    starting_file + capture_x + dest_filerank,    // ?gf3
+                    starting_rank + capture_x + dest_filerank,    // ?1f3
+                    starting_filerank + capture_x + dest_filerank // ?g1f3
+                ];
+
+            }
+
+            piece_letter = full_piece_prefix(piece);               // P, N, etc.
+            algebraic_prefix = algebraic_piece_prefix(piece);      // blank, N, etc.
+            figurine_prefix = figurine_piece_prefix(color, piece); // ♟, ♞, ♙, ♘, etc.
+
+            ps.SAN.push([piece, square, algs.map(function(a) { return algebraic_prefix + a; })]);  // N??
+            ps.FAN.push([piece, square, algs.map(function(a) { return figurine_prefix + a; })]);   // ♘??
+
+            ps.LAN.push([piece, square, [algebraic_prefix + starting_filerank + capture_or_dash + dest_filerank]]);
+
+            ps.RAN.push([piece, square, [algebraic_prefix + starting_filerank + capture_or_dash + 
+                captured_letter + dest_filerank]]);
+
+            // Best online documentation I could find on CRAN: 
+            //  http://main.uschess.org/forums/viewtopic.php?f=2&t=1428&start=30
+            // Always gives origin square filerank, then only non-redundant file/rank of dest square
+            // Uses ':' for capture instead of 'x', and piece letter isn't given if pawn
+            // Full description will have to wait until I receive the book
+            //  http://www.amazon.com/Play-Stronger-Chess-Examining-Chess960/dp/0977452107
+            ps.CRAN.push([piece, square, [
+                algebraic_prefix + starting_filerank + captured_colon_letter + dest_filerank,  // Rd3:d7
+                algebraic_prefix + starting_filerank + captured_colon_letter + dest_file,      // Rd3:7
+                algebraic_prefix + starting_filerank + captured_colon_letter + dest_rank       // Rd3:e
+                ]]);
+
+            // English descriptive notation
+            // TODO: 
+            // - alt_letter (Kt for knight instead of N) and
+            //   alt_descriptive_dest (QKt1 for b1 instead of QN1) - currently, Kt is preprocessed to N in mv()
+            //   would be nice to have an option to prefer Kt over N, for using old books (though N/Kt would be synonyms)
+            // - allow slashes in addition to parenthesises, or maybe not, since would be shorter and therefore preferred
+            // - short piece name, NP instead of QNP or KNP
+ 
+            // Descriptive vs algebraic is like imperial vs. metric units, in some ways. Descriptive
+            // is from each player's perspective, so 1. P-K4 P-K4 is easily recognizable as the same
+            // move from both players, more readily than 1. e4 e5. And 2. PxP PxP more clearly shows
+            // a pawn trade than 10. exd5 cxd5. Smith notation shows the latter, too, but the coordinates
+            // are still not symmetric from each player's perspective. I like descriptive. Problem is
+            // just that it needs to be disambiguated often, algebraic less so.
+            // This paper mentions how a book on openings for black showed all of the diagrams from
+            // white's perspective: http://www.castlelong.com/essay/Essay_HSym_fd47b_Doc_Prn.PDF
+            // -- it discusses symmetric figurines, interesting. Although it says algebraic is superior.
+          
+            var piece_name = piece.descriptive_name;
+            var short_piece_name = short_descriptive(piece_name);
+            var short_descriptive_dest = short_descriptive(descriptive_dest_file) + descriptive_dest_rank;
+
+            var piece_aname = piece.adescriptive_name;
+
+            if (capture_or_dash === "-") { 
+                // non-capturing move
+                ps.descr.push([piece, square, [
+                    piece_letter + capture_or_dash + short_descriptive_dest,        // P-B4
+                    piece_name + capture_or_dash + short_descriptive_dest,          // QBP-B4
+                    short_piece_name + capture_or_dash + short_descriptive_dest,    // BP-B4
+                    piece_letter + capture_or_dash + descriptive_dest,              // P-QB4
+                    short_piece_name + capture_or_dash + descriptive_dest,          // BP-QB4
+                    piece_name + capture_or_dash + descriptive_dest,                // QBP-QB4
+
+                    piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + descriptive_dest,      // P(K2)-K4
+                    piece_letter + "(" + descriptive_origin_rank + ")" + capture_or_dash + descriptive_dest, // P(2)-K4
+                    piece_letter + "(" + descriptive_origin_file + ")" + capture_or_dash + descriptive_dest  // P(K)-K4
+
+                // Must uniq() the array, since some of the notations actually appear twice
+                // in the list above, and disambiguate_moves() will delete both since it'll think they
+                // are ambiguous. This would have occurred when piece_name === short_piece_name, that is,
+                // for KP, QP, K, and Q. 
+                ].uniq()])
+
+
+                ps.adesc.push([piece, square, [
+                    piece_letter + capture_or_dash + adescriptive_dest,             // P-c4
+                    piece_aname + capture_or_dash + adescriptive_dest,              // cP-c4
+                    piece_letter + "(" + adescriptive_origin + ")" + capture_or_dash + adescriptive_dest,       // P(c2)-c4
+                    piece_letter + "(" + adescriptive_origin_rank + ")" + capture_or_dash + adescriptive_dest,  // P(2)-c4
+                    piece_letter + "(" + adescriptive_origin_file + ")" + capture_or_dash + adescriptive_dest   // P(c)-c4
+                ].uniq()])
+            } else if (capture_or_dash === "x") {
+                var captured_name = captured_piece.descriptive_name;
+                var short_captured_name = short_descriptive(captured_name);
+                
+                var captured_aname = captured_piece.adescriptive_name;
+
+                // capture
+                ps.descr.push([piece, square, [
+                    // Note: a permutation function would be handy here
+                    piece_letter + capture_or_dash + captured_letter,           // PxP
+                    piece_letter + capture_or_dash + short_captured_name,       // PxBP
+                    piece_letter + capture_or_dash + captured_name,             // PxQBP
+                    short_piece_name + capture_or_dash + captured_letter,       // NPxP
+                    short_piece_name + capture_or_dash + short_captured_name,   // NPxBP
+                    short_piece_name + capture_or_dash + captured_name,         // NPxQBP
+                    piece_name + capture_or_dash + captured_letter,             // QNPxP
+                    piece_name + capture_or_dash + short_captured_name,         // QNPxBP
+                    piece_name + capture_or_dash + captured_name,               // QNPxQBP
+
+                    piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + captured_name,    // P(K4)xQP
+                    piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + captured_letter,  // P(K4)xP
+                    piece_letter + capture_or_dash + captured_letter + "(" + descriptive_dest + ")",    // PxP(Q4)
+                    piece_name + capture_or_dash + captured_letter + "(" + descriptive_dest + ")"       // KPxP(Q4)
+                ].uniq()])
+
+                ps.adesc.push([piece, square, [
+                    piece_letter + capture_or_dash + captured_letter,           // PxP
+                    piece_letter + capture_or_dash + captured_aname,            // PxcP
+                    piece_aname + capture_or_dash + captured_letter,            // bPxP
+                    piece_aname + capture_or_dash + captured_aname,             // bPxcP
+
+                    piece_letter + "(" + adescriptive_origin + ")" + capture_or_dash + captured_aname,  // P(b4)xcP
+                    piece_letter + "(" + adescriptive_origin + ")" + capture_or_dash + captured_letter, // P(b4)xP
+                    piece_letter + capture_or_dash + captured_letter + "(" + adescriptive_dest + ")",   // PxP(c5)
+                    piece_aname + capture_or_dash + captured_letter + "(" + adescriptive_dest + ")"     // bPxP(c5)
+                ].uniq()])
+            } else {
+                assert(false, "calculate_notations: " + capture_or_dash + " is not - or x");
+            }
+        }
+
+        // Coordinate notation - least descriptive notation possible
+        ps.coord.push([piece, square, [starting_filerank.toUpperCase() + "-" + dest_filerank.toUpperCase()]]);
+
+        // ICCF numeric notation
+        // TODO: promotion number, 1234 = QRBN
+        var starting_xy = filerank2xy(starting_filerank);
+        var starting_x = starting_xy[0], starting_y = starting_xy[1];
+        ps.ICCF.push([piece, square, [starting_x + "" + starting_y + "" + move[0] + "" + move[1]]]);
+
+        // Smith notation, reversible, non-ambiguous: https://www.chessclub.com/chessviewer/smith.html
+        var smith_capture_letter;
+        if (move[2].smith_castle) {
+            // c = short castle, C = long castle
+            smith_capture_letter = move[2].smith_castle;
+        } else if (move[2].en_passant_capture) { 
+            // E = en passant capture
+            smith_capture_letter = "E";
+        } else if (move[2].capture) {
+            // pnbrqk = captured respective piece. This is what makes it reversible.
+            smith_capture_letter = captured_letter.toLowerCase();
+        } else {
+            smith_capture_letter = "";
+        }
+        ps.smith.push([piece, square, [starting_filerank + dest_filerank + smith_capture_letter]]);
+        
+        // TODO: support promotation in all notations, make separate moves (a8=Q, a8=N, etc.)
+
+
+        // For removal
+        ALL_DROP_TARGETS.push(square);
+
+        // You can drop here
+        Droppables.add(square, {
+            accept: "piece-" + starting_filerank,
+            onDrop: move_dropped_piece,
+            hoverclass: 'hover'});
+    });
+
+    // TODO: check for cross-notation ambiguities. Inputs are tested in the order of
+    // AVAILABLE_NOTATIONS, but a notation that matches two different moves in
+    // two different notations, if it exists, is sure to cause trouble!
+}
+
+// Given a list of all valid move notations, remove the ambiguous 
+// (Nf3 and Nf3, remove both) overly-disambiguated (Ng1f3 if Ngf3
+// or N1f3 is not ambiguous).
+function disambiguate_notations(notations)
+{
+    var freq_count = new Hash();
+    var canonical_notations = new Hash();
+    var synonymous_notations = new Hash();
+
+    for (var i = 0; i < notations.length; ++i) {
+        var piece, square, moves;
+
+        piece = notations[i][0];
+        square = notations[i][1];
+        moves = notations[i][2];
+
+        if (!moves) {
+            console.log(notations[i]);
+        }
+
+        for (var j = 0; j < moves.length; ++j) {
+            var move = moves[j];
+
+            if (!freq_count.get(move)) {
+                // Store index so can delete if is a dupe
+                freq_count.set(move, [[i, j]]);
+            } else {
+                freq_count.get(move).push([i, j]);
+            }
+        }
+    }
+
+    // Delete ambiguous moves (or actually, replace with 'undefined')
+    freq_count.each(function(pair) {
+        var notation = pair[0];
+        var locations = pair[1];
+
+        if (locations.length > 1) {
+            for (var k = 0; k < locations.length; ++k) { 
+                var i = locations[k][0], j = locations[k][1];
+                delete notations[i][2][j];
+            }
+        }
+    });
+
+    for (i = 0; i < notations.length; ++i) {
+        var piece = notations[i][0];
+        var square = notations[i][1];
+        var same_moves = notations[i][2];
+        var shortest, synonyms;
+
+        // Remove undefined elements
+        same_moves = same_moves.compact();
+       
+        // Choose shortest (now unambiguous) notation
+        // Could also do: min_length = same_moves.pluck("length").min();, then partition
+        // Rather, sort by length, ascending.
+        same_moves.sort(function(x, y) { return x.length - y.length });
+
+        // The shortest, non-ambiguous move is canonical. But also keep the
+        // synonymous moves around.
+        shortest = same_moves.shift();
+        synonyms = same_moves;
+
+        canonical_notations.set(shortest, [piece, square]);
+
+        for (j = 0; j < synonyms.length; ++j) {
+            synonymous_notations.set(synonyms[j], [piece, square]);
+        }
+    }
+
+    // TODO: also return synonymous_notations, so overly-disambiguated move
+    // notations can be used, too, but return them separately so they won't be
+    // listed as unique, canonical moves.
+    return canonical_notations;
+}
+
+// After the board changes and it is the next person's turn, calculate 
+// what the next possible allowable moves are, and update the globals with this information.
+//
+// If is_hypothetical, do not update globals, and allow "moves" that put in
+// check (useful for attacks, see is_hypothetical elsewhere).
+function calculate_moves(color, is_hypothetical)
+{
+    var valid_moves = new Hash();
+    var possible_notations;
+
+    assert(color === "black" || color === "white",
+            "calculate_moves(" + color + "): bad color or no color given");
+
+    if (!is_hypothetical) { 
+        // Values are [ [ [piece, square ], [possible move names] ], ... ]
+        // Instead of a hash or assocative array, because I couldn't use
+        // [piece, square] as a key, even with Prototype's Hash. Could use
+        // http://www.tutorials4html.com/2009/02/06/true-javascript-hash-table/
+        // but instead, using an array with linear lookup.
+        possible_notations = {};
+        for (var i = 0; i < AVAILABLE_NOTATIONS.length; ++i) {
+            var notation = AVAILABLE_NOTATIONS[i];
+
+            possible_notations[notation] = [];
+        }
+    }
+
+    // Look at all the active pieces
+    $$("img." + color).each(function(piece) { 
+        var starting_filerank, square_from, moves;
+
+        moves = filtered_moves(piece, color, is_hypothetical);
+        square_from = sq(piece);
+
+        if (!square_from) {
+            // Piece was hypothetically captured
+            return;
+        }
+
+        // Convert xy to filerank notation (a string), so it can be easily used
+        // as a hash key, class name for droppables, and also for notations.
+        starting_filerank = square_from.filerank;
+
+        if (!is_hypothetical) {
+            // Fills in possible_notations with possibly-ambiguous move notations in each system
+            calculate_notations(color, piece, moves, starting_filerank, possible_notations);
+        }
+
+        // Store valid moves for mouseovers etc.
+        if (moves.length !== 0) {
+            valid_moves.set(starting_filerank, moves);
+        }
+
+        //console.log(starting_filerank, moves);
+    });
+
+
+    // Gather all the notations, disambiguate and apply
+    if (!is_hypothetical) {
+        notations = possible_notations;
+        VALID_MOVE_NOTATIONS = {};
+        for (i = 0; i < AVAILABLE_NOTATIONS.length; ++i) {
+            var notation = AVAILABLE_NOTATIONS[i];
+
+            VALID_MOVE_NOTATIONS[notation] = disambiguate_notations(notations[notation]);
+        }
+
+        // For reals.
+        VALID_MOVES = valid_moves;
+    }
+
+    return valid_moves;
+}
+
+// Make a move as the computer, if we're supposed to.
+// TODO: also get moves from network via Ajax, maybe a third-party 
+// chess engine, or a real live human, remotely
+function computer_move_if_applicable()
+{
+    if (!$F(GAME_STATE.active_color + "_computer")) {
+        return;
+    }
+
+    // simply choose a random move
+    // TODO: weak AI, take most valuable piece, checkmate if can, check if can,
+    //     fork if can.. something to entertain a beginner. Or better yet,
+    // plugin to a remote network server.
+    var keys = VALID_MOVE_NOTATIONS.SAN.keys();
+    var alg_move = keys[randint(0, keys.length - 1)];
+
+    var piece_square = VALID_MOVE_NOTATIONS.SAN.get(alg_move);
+
+    // TODO: do some animation when moving, Effect.Move, to slow it down so we can see it.
+    mv(alg_move);
+}
+
+// Compute legal moves for a piece, removing illegal moves. This
+// takes a while, so it is only done once when the board changes.
+// Use VALID_MOVES otherwise.
+//
+// Also filters moves that after making, color would be in check,
+// unless is_hypothetical is true (for checking for attacks, see comment).
+function filtered_moves(piece, color, is_hypothetical)
+{
+    //XYZ ABC test
+    //return NEW_filtered_moves(piece, color, is_hypothetical);
+
+    var xy = piece_location(piece);    // TODO: OO
+    if (!xy) {
+        // Piece was taken, so no moves for it
+        return [];
+    }
+
+    var x = xy[0], y = xy[1];
+    var parlett = PIECE_TYPES[piece.type].parlett;
+    var filtered;
+
+    var unfiltered = unfiltered_moves(parlett, xy, color);
+
+    filtered = unfiltered.select(function(move) {
+        // The piece that this move will capture, if any. 
+        // Only includes pieces that are captured by moving over. For
+        // en passant captures, capture is set in decode_one_parlett.
+        if (!move[2].capture) {
+            move[2].capture = pc(move[0], move[1]);
+        }
+
+        // If castle move, check if castling allowed
+        if (move[2].castle) {
+            var castle;
+          
+            if (GAME_STATE.active_in_check) {
+                // Can't castle out of check
+                return false;
+            // If king moved, won't be able to castle on either side, don't need to check anything else
+            } else if (GAME_STATE.can_castle[color].long === false &&
+                GAME_STATE.can_castle[color].short === false) {
+                return false;
+            } 
+            
+        }
+
+        if (move[2].initial_only) {
+            // Can only move if have not moved this piece yet
+            if (piece_moved(piece)) {
+                return false;
+            } 
+        }
+
+        if (move[2].capture_only) {
+            // Destination square must be occupied by enemy piece
+            if (!move[2].capture) {
+                return false;    // needs something to capture
+            }
+        }
+        
+        if (move[2].no_capture) {
+            // Can only move if unoccupied, not to capture
+            if (move[2].capture) {
+                return false;    // can't capture, man
+            }
+        }
+
+        // Used to have this rule to not move to self-occupied squares,
+        // but unfiltered_moves() should already not return these moves.
+        /*
+        if (pc(move[0], move[1]) && pc(move[0], move[1]).hasClassName(color)) {
+                return false;
+        }
+        */
+
+        // Can't put in check, or remain in check
+        // Note that this isn't called in hypothetical moves: because royal
+        // pieces can't actually be captured, checks that can't be cashed are
+        // still valid. Consider:
+        //
+        //    K
+        // R p    k
+        //
+        // p couldn't actually capture K, because then k would be in check by R,
+        // but royal pieces can't be captured in the first place, so K is still
+        // in check and has to move (even though p is pinned!)
+        if (!is_hypothetical && would_check(piece, move, color)) { 
+            return false; 
+            //console.log("would_check",color,piece,xy2filerank([move[0], move[1]]));
+        }
+
+        if (!is_hypothetical && move[2].creates_en_passant) {
+            var backward = -forwards_vector(color);
+            var ep_target = [move[0], move[1] + backward];
+            var pawn_dest = xy2filerank([move[0], move[1]]);
+
+            // Map pawn moves to what the en passant target will be if
+            // the pawn moves there.
+            POSSIBLE_EP_TARGETS[pawn_dest] = ep_target;
+        }
+
+        return true;
+    });
+
+
+    // Filter castle-through-check moves. 
+    filtered2 = filtered.select(function(move) {
+        if (move[2].castle) {
+            var castle;
+
+            if (move[0] === 7) {
+                castle = "short";
+                move[2].algebraic = "O-O";
+                move[2].smith_castle = "c";
+            } else if (move[0] === 3) {
+                castle = "long";
+                move[2].algebraic = "O-O-O";
+                move[2].smith_castle = "C";
+            } else {
+                return false; // not allowed
+                assert(false, "filtered_moves(" + piece + "): unknown name of castling to x="+x+", not long/short. " +
+                    "filerank = " + xy2filerank([move[0], move[1]]) + ", piece = " + piece + "\n\n" +
+                    "Note: you might get this if you specified in FEN that castling was possible, but it really isn't.");
+            }
+
+            // Has privileges?
+            if (!GAME_STATE.can_castle[color][castle]) {
+                return false;
+            }
+
+            // If intervening pieces, or the king would move through an attacked
+            // square, do not allow castling. To check for this, see if the king
+            // could normally move to the intervening squares, since if not,
+            // it'll have been filtered in the first loop.
+            var first_rank = (color === "white" ? 1 : 8);
+        
+            if (castle === "short") {
+                var found = false;
+
+                if (!find_move(filtered, [6, first_rank])) { 
+                    return false;
+                }
+
+                if (!find_move(filtered, [7, first_rank])) {
+                    return false;
+                } 
+
+            } else if (castle === "long") {
+                // Square must not be occupied, but it can be attacked. See
+                // http://www.flickr.com/photos/theyoungthousands/3456432277
+                // IMPORTANT NOTE: In Chess960, the rook can't castle through check either. But not chess1.
+                if (pc(2, first_rank)) {
+                    return false;
+                }
+
+                if (!find_move(filtered, [3, first_rank])) {
+                    return false;
+                }
+
+                if (!find_move(filtered, [4, first_rank])) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    });
+
+    return filtered2;
+}
+
+
+
+// Return true if "move" is found in the move list "moves", used by filtered_moves()
+function find_move(moves, move)
+{
+    var found = false;
+
+    moves.each(function(m) {
+            if (m[0] === move[0] && m[1] === move[1]) {
+                found = true;
+                throw $break;
+            }
+    });
+
+    return found;
+}
+
+// Return whether moving piece to move would mean that
+// color is in check. Note, that doesn't mean that the move
+// *caused* the check, they could have already been in check and
+// this move didn't take them out. Either way, its illegal.
+function would_check(piece, move, color)
+{
+    var from_square = sq(piece);
+    var to_square = sq(move[0], move[1]);
+    var checked, all_moves;
+
+    assert(piece, "would_check(" + piece + ", " + move + ", " + color +"): piece false");
+
+    HYPOTHETICAL_PIECE = piece;
+    HYPOTHETICAL_CAPTURED = pc(to_square.x, to_square.y);
+    HYPOTHETICAL_FROM = [from_square.x, from_square.y];
+    HYPOTHETICAL_TO = [to_square.x, to_square.y];
+
+    // TODO: This is a lot of calculation to do, see if can speed it up
+    all_moves = calculate_moves(opposite_color(color), true);
+    checked = in_check(color, all_moves);
+
+    HYPOTHETICAL_FROM = HYPOTHETICAL_PIECE = HYPOTHETICAL_TO = HYPOTHETICAL_CAPTURED = null;
+
+    return checked;
+}
+
+// Return whether a pawn has moved from its initial position. Unfortunately,
+// the starting ranks of black and white pawns are hardcoded, so that games
+// in-progress can be loaded and pawns that have moved, but we haven't seen move,
+// are recognized as in fact having moved. Other games with pawns in ranks other
+// than 2nd and 7th (Chinese Chess, etc.) will need to have this modified.
+// TODO: store initial rank in piece information
+function piece_moved(piece)
+{
+    // Bit of a hack, but castling privileges take care of this.
+    if (piece.type === "king") {
+        return false;
+    }
+
+    assert(piece.type === "pawn", "piece_moved(" + piece + "): can only tell if pawns moved, not " + piece.type);
+
+    if (piece.hasClassName("white")) {
+        return sq(piece).y !== 2;    // 2nd rank
+    } else if (piece.hasClassName("black")) {
+        return sq(piece).y !== 7;    // 7th rank
+    } else {
+        assert("piece_moved(" + piece + "): neither white nor black");
+    }
+}
+
+// Convert relative move destinations (0,0 = where the piece is,
+// the coordinates are +/-) to absolute (0,0 = top-left board).
+// Note: Coordinates out of bounds *are* discarded, but not those that
+// land on an existing piece (one's own or the enemy's).
+// Note2: moves must be array of [x,y,flags]; the third element is required
+function move_rel2abs(xy_location, moves)
+{
+    var absolutes = [];
+
+    for (var i = 0; i < moves.length; ++i) {
+        var rel = moves[i];
+        var flags = rel[2];
+        var x = xy_location[0] + rel[0];
+        var y = xy_location[1] + rel[1];
+
+        if (x < 1 || x > FILE_MAX || y < 1 || y > RANK_MAX) {
+            //console.log("reject", x, y);
+            continue;    // off board, TODO: option for chess variants to wrap around?
+        }
+
+        var abs = [x, y, flags];
+
+        absolutes.push(abs);
+    }
+
+    return absolutes;
+}
+
+//// PARLETT NOTATION FUNCTIONS
+
+// Get unfiltered (might be occupied by own piece, cause to put in check) 
+/// list of moves for a piece, with Parlett moves given, at given location
+function unfiltered_moves(parlett, xy, color)
+{
+    var choice_groups, moves;
+
+    moves = [];
+
+    // Mutually exclusive choices
+    choice_groups = parlett.split(", ");
+
+    //console.log(choice_groups);
+    for (var i = 0; i < choice_groups.length; ++i) {
+            // For each group, gather the move options. 
+            // (Would be nice if JavaScript arrays had a Python-like .extend)
+            moves.push.apply(moves, decode_one_parlett(choice_groups[i], xy, color));
+    }    
+
+    // Last step: remove duplicates. Maybe the caller should do this.
+    moves = without_dupes(moves);
+
+    return moves;
+}
+
+// Get the direction vector (y component only) that is "forward" for the given color
+function forwards_vector(color)
+{
+    if (color === "white") {
+        return 1;
+    } else if (color === "black") {
+        return -1;
+    } else {
+        assert(false, "forwards_vector(" + color+ "): bad active color");
+    }
+}
+
+ 
+// Decode a Parlett direction character, or return a false value if that is not what it is.
+// Returns an 2-element array:
+// 0th element: array of two-element arrays of direction vectors.
+// 1st element: true if ch2 was consumed, false if only ch was used
+function decode_direction(ch, ch2, color)
+{
+    var forward, backward;
+
+    forward = forwards_vector(color);
+    backward = -forward;
+
+    if (ch === "+") { 
+        // orthogonally four possible directions
+        return [include_reversed(times_each([1, 0], [1, -1])), false];
+    } else if (ch === "=") {
+        // orthogonally sideways
+        return [[[1, 0], [-1, 0]], false];
+    } else if (ch === ">") {
+        if (ch2 === "=") {
+            // >= orthogonally forwards or sideways
+            return [decode_direction(">", undefined, color)[0].concat(decode_direction("=", undefined, color)[0]), true];
+        } else {
+            // = orthogonally forward
+            return [[[0, forward]], false];
+        }
+    } else if (ch === "<") {
+        if (ch2 === ">") {
+            // <> orthogonally forwards and backwards
+            return [[[0, forward], [0, backward]], true];
+        } else if (ch2 === "=") {
+            // <= orthogonally backwards or sideways
+            return [decode_direction("<", undefined, color)[0].concat(decode_direction("=", undefined, color)[0]), true];
+        } else {
+            // < orthogonally backwards
+            return [[[0, backward]], false];
+        }
+    } else if (ch === "X") { 
+        if (ch2 === ">") {
+            // X> diagonally forwards
+            return [[[1, forward], [-1, forward]], true];
+        } else if (ch2 === "<") {
+            // X< diagonally backwards
+            return [[[1, backwards], [-1, backwards]], true];
+        } else {
+            // X diagonally four possible directions
+            return [include_reversed(times_each([1, 1], [1, -1])), false];
+        }
+    } else if (ch === "*") {    
+        // orthogonally or diagonally (eight possible directions)
+        return [decode_direction("+", undefined, color)[0].concat(decode_direction("X", undefined, color)[0]), false];
+    } else {
+        return null;
+    }
+}
+
+// Get the unfiltered, relative moves for a Parlett string.
+function NEW_unfiltered_moves(parlett)
+{
+    var choice_groups;
+
+    // TODO: cache! This is constant per parlett. Performance improvement?
+
+    // Get all the unfiltered moves for the mutually exclusive choices
+    choice_groups = parlett.split(", ");
+
+    rel_moves = []
+    for (var i = 0; i < choice_groups.length; ++i) {
+            // For each group, gather the move options. 
+            // (Would be nice if JavaScript arrays had a Python-like .extend)
+            rel_moves.push.apply(rel_moves, relative_decode_parlett(choice_groups[i]));
+    }   
+    rel_moves = without_dupes(rel_moves);
+
+    return rel_moves;
+}
+
+// TODO: new move filtering
+function NEW_filtered_moves(piece, color, is_hypothetical)
+{
+    var parlett, rel_moves, moves, start_xy;
+    var blocked, start_x, start_y;
+
+    start_xy = piece_location(piece);
+    start_x = start_xy[0];
+    start_y = start_xy[1];
+
+    parlett = PIECE_TYPES[piece.type].parlett;
+
+    rel_moves = NEW_unfiltered_moves(parlett);
+
+    // Absolutize and find what is allowed
+    moves = [];
+    blocked = {};
+    for (var i = 0; i < rel_moves.length; ++i) {
+        var rel_x = rel_moves[i][0], rel_y = rel_moves[i][1]; 
+        var flags = rel_moves[i][2];
+
+        // Positive is forwards, so mirror for black.
+        if (color === "black") {
+            rel_y = -rel_y;
+            // Reverse any embedded relative coordinates.
+            if (flags.if_unblocked) { flags.if_unblocked[1] = -flags.if_unblocked[1]; }
+            if (flags.if_unblocked2) { flags.if_unblocked[1] = -flags.if_unblocked2[1]; }
+            if (flags.if_unblocked3) { flags.if_unblocked[1] = -flags.if_unblocked3[1]; }
+            if (flags.capture_at) { flags.capture_at[1] = -flags.capture_at[1]; }
+            if (flags.mark_ep_target) { flags.mark_ep_target[1] = -flags.mark_ep_target[1]; }
+        }
+
+        var x = rel_x + start_x;
+        var y = rel_y + start_y;
+
+        if (x < 1 || y < 1 || x > FILE_MAX || y > RANK_MAX) {
+            // Out of bounds
+            continue;
+        }
+
+        var dest_square = sq(x, y);
+        var capture_piece = pc(x, y);
+
+        // If there is any piece there, it may block other moves
+        if (capture_piece) {
+            var key = rel_moves[i][0] + "," + rel_moves[i][1];
+            blocked[key] = true;
+        }
+
+
+        // Can't move to self-occupied square
+        if (capture_piece && capture_piece.hasClassName(color)) {
+            continue;
+        }
+
+        // Must be a capture
+        if (flags.capture_only && !capture_piece) {
+            continue;
+        }
+
+        // Must not be capture
+        if (flags.no_capture && capture_piece) {
+            continue;
+        }
+
+        if (flags.initial_only && piece_moved(piece)) {
+            continue;
+        }
+
+        // Blocked by an obstruction. Can check for up to three spaces.
+        if (flags.if_unblocked) {
+            var key = flags.if_unblocked[0] + "," + flags.if_unblocked[1];
+            // If was either blocked by a previous move (faster), or there is a
+            // piece there but it wasn't a valid move. For example, elephant (2X)
+            // can be blocked, since it is not a leaper (sticking the elephant's eye),
+            // non-hippogonal rider.
+            if (blocked[key] || pc_or_offboard(flags.if_unblocked[0] + start_x, flags.if_unblocked[1] + start_y)) {
+                blocked[rel_moves[i][0] + "," + rel_moves[i][1]] = true;
+                continue;
+            }
+        }
+        if (flags.if_unblocked2) {
+            var key = flags.if_unblocked2[0] + "," + flags.if_unblocked2[1];
+            if (blocked[key] || pc_or_offboard(flags.if_unblocked2[0] + start_x, flags.if_unblocked2[1] + start_y)) {
+                blocked[rel_moves[i][0] + "," + rel_moves[i][1]] = true;
+                continue;
+            }
+        }
+        if (flags.if_unblocked3) {
+            var key = flags.if_unblocked3[0] + "," + flags.if_unblocked3[1];
+            if (blocked[key] || pc_or_offboard(flags.if_unblocked3[0] + start_x, flags.if_unblocked3[1] + start_y)) {
+                blocked[rel_moves[i][0] + "," + rel_moves[i][1]] = true;
+                continue;
+            }
+        }
+
+
+
+
+        // Map pawn moves to what the en passant target will be if
+        // the pawn moves there.
+
+        if (!is_hypothetical) {
+           if (flags.mark_ep_target) {
+                POSSIBLE_EP_TARGETS[xy2filerank([x, y])] = 
+                    [flags.mark_ep_target[0] + start_x,
+                     flags.mark_ep_target[1] + start_y];
+                // relative positions are hardcoded above. 
+            }
+
+        }
+
+        // Only valid if this move is to an ep target.
+        if (flags.if_ep_target) {
+            if (!GAME_STATE.ep_target || GAME_STATE.ep_target[0] !== x ||
+                GAME_STATE.ep_target[1] !== y)  {
+                continue;
+            }
+
+            // For move notations, informational purposes, only.
+            flags.en_passant_capture = true;
+        }
+
+        // Castling moves
+        if (flags.if_can_castle_short) {
+            if (!GAME_STATE.can_castle[color].short) {
+                continue;
+            }
+            // TODO: check if unimpeded here? instead of if_unblockedX in Parlett
+        }
+
+        if (flags.if_can_castle_long) {
+            if (!GAME_STATE.can_castle[color].long) {
+                continue;
+            }
+        }
+
+        // Capture at relative location, instead of at destination square.
+        // Not actually implemented. En passant capture location is hardcoded.
+        /*
+        if (flags.capture_at) {
+           var cx = flags.capture_at[0] + start_x, cy = flags.capture_at[1] + start_y;
+
+           if (cx < 1 || cy < 1 || cx > RANK_MAX || cy > FILE_MAX) {
+               continue;
+           }
+
+           var capture = pc(cx, cy);
+           console.log("C",xy2filerank([cx,cy]));
+           if (capture) {
+               flags.capture = capture;
+           } else {
+               // Nothing there to capture.
+               continue;
+           }
+        }*/
+
+        moves.push([x, y, flags]);
+    }
+
+    return moves;
+}
+
+// Return an array of [direction vectors, ch2 consumed]. The vectors
+// are positive for forward, negative for backwards.
+// NEW
+function relative_decode_direction(ch, ch2)
+{
+    if (ch === "+") { 
+        // orthogonally four possible directions
+        return [include_reversed(times_each([1, 0], [1, -1])), false];
+    } else if (ch === "=") {
+        // orthogonally sideways
+        return [[[1, 0], [-1, 0]], false];
+    } else if (ch === ">") {
+        if (ch2 === "=") {
+            // >= orthogonally forwards or sideways
+            return [relative_decode_direction(">", undefined)[0].concat(relative_decode_direction("=", undefined)[0]), true];
+        } else if (ch2 === ">") {
+            // >> right (Extended Parlett)
+            return [[[1, 0]], true];
+        } else {
+            // = orthogonally forward
+            return [[[0, 1]], false];
+        }
+    } else if (ch === "<") {
+        if (ch2 === ">") {
+            // <> orthogonally forwards and backwards
+            return [[[0, 1], [0, -1]], true];
+        } else if (ch2 === "=") {
+            // <= orthogonally backwards or sideways
+            return [relative_decode_direction("<", undefined)[0].concat(relative_decode_direction("=", undefined)[0]), true];
+        } else if (ch2 === "<") {
+            // << left (Extended Parlett)
+            return [[[-1, 0]], true];
+        } else {
+            // < orthogonally backwards
+            return [[[0, -1]], false];
+        }
+    } else if (ch === "X") { 
+        if (ch2 === ">") {
+            // X> diagonally forwards
+            return [[[1, 1], [-1, 1]], true];
+        } else if (ch2 === "<") {
+            // X< diagonally backwards
+            return [[[1, -1], [-1, -1]], true];
+        } else {
+            // X diagonally four possible directions
+            return [include_reversed(times_each([1, 1], [1, -1])), false];
+        }
+    } else if (ch === "*") {    
+        // orthogonally or diagonally (eight possible directions)
+        return [relative_decode_direction("+", undefined)[0].concat(relative_decode_direction("X", undefined)[0]), false];
+    } else {
+        assert(false, "relative_decode_direction('" + ch + "', '" + ch2 + "'): invalid direction");
+    }
+}
+
+// Parse semicolon separated flags, possibly key/value pairs
+// foo;bar sets foo:true and bar:true, can also set relative coordinates:
+// if_unblocked=1,2.
+function parse_flags(text, flags)
+{
+    var flags_text;
+
+    if (flags === undefined) {
+        flags = {};
+    }
+
+    if (Object.isArray(text)) {
+        flags_text = text;
+    } else {
+        flags_text = text.split(";");
+    }
+
+    // Semicolon-separated flags
+    for (var i = 0; i < flags_text.length; ++i) {
+        var flag_text = flags_text[i];
+        var key, value;
+       
+        // Allow if_unblocked=0,1, etc.
+        if (/=/.test(flag_text)) {
+            // Unfortunately, need JavaScript 1.8 to do [x,y] = ...
+            var ary = flag_text.split("=");
+            var left = ary[0], right = ary[1];
+            value = right.split(",");
+            value = value.map(function(x) { return parseInt(x, 10); });
+            key = left;
+        } else {
+            key = flag_text;
+            value = true;
+        }
+        flags[key] = value;
+    }
+
+    return flags;
+}
+
+// Decode the Extended Parlett {} construct, which adds flags
+// to arbitrary move text. {parlett, flags}
+function nested_flags(parlett)
+{
+    var rel_moves, flags_text, flags;
+    
+    flags_text = parlett.split(";");
+    rel_moves = NEW_unfiltered_moves(flags_text.shift());
+
+    flags = parse_flags(flags_text);
+
+    for (var flag in flags) {
+        for (var j = 0; j < rel_moves.length; ++j) {
+            rel_moves[j][2][flag] = flags[flag];
+        }
+    }
+
+    return rel_moves;
+}
+
+// Decodes an explicit relative move that was in square brackets: [0,2;initial_only]
+function decode_relative_raw_move(text_move, existing_flags)
+{
+    var xy_text_flags, xy_text, xy, x, y;
+    
+    xy_text_flags = text_move.split(";");
+    xy_text = xy_text_flags.shift();
+
+    if (xy_text.indexOf(",") != 0) {
+        // Relative x,y
+        xy = xy_text.split(",");
+        x = parseInt(xy[0], 10);
+        y = parseInt(xy[1], 10);
+    } else {
+        // TODO: call relative_decode_parlett, to allow
+        // [oi2>;flags] or oi[2>;flags], etc.
+        assert(false, "decode_relative_raw_move(" + text_move + ", " + flags + "): not [x,y;flags], missing comma");
+    }
+
+    flags = parse_flags(xy_text_flags, existing_flags);
+
+    return [x, y, flags];
+}
+
+// Decode a Parlett notation into a list of [x,y,flags], where
+// x and y are destinations relative to the piece origin, and flags describes
+// under what conditions the move can be made. + is forward, - is backwards,
+// from the perspective of the active color. Has no knowledge of board state.
+// The moves must be filtered to determine their validity.
+// NEW
+function relative_decode_parlett(parlett)
+{
+    var distances, directions, flags, movement, rel_moves;
+    var hippogonal = false;
+    var end_only = false;
+
+    flags = {};
+    distances = [];
+    rel_moves = [];
+
+    movement = "rider";
+    for (var i = 0; i < parlett.length; ++i) {
+        var ch = parlett.substr(i, 1);
+
+        if (ch === "~") {
+            movement = "leaper";
+
+        // Flags, documented on http://en.wikipedia.org/wiki/Fairy_chess_piece#Additions_to_Parlett.27s
+        } else if (ch === "i") { 
+            // Initial move: Can only if the piece is in its original position
+            // (pawn's 2 move forward)
+            flags.initial_only = true;
+        } else if (ch === "c") {
+            // Capture only: may only be used if destination is occupied by enemy piece
+            // (pawn's diagnal capture)
+            flags.capture_only = true;
+        } else if (ch === "o") {
+            // Can not capture: destination square must be unoccupied; since by default, piece
+            // can move to enemy square in order to capture it
+            // (pawn's forward move)
+            flags.no_capture = true;
+
+        // Extended Parlett
+        
+        // Direct move text: [rel_x,rel_y;flag1;flag2;...] 
+        } else if (ch === "[") {
+            var text_move = "";
+            var nest = 1;
+            while(i < parlett.length)
+            {
+                i += 1;
+                var ch = parlett.substr(i, 1);
+                if (ch === "]") { nest -= 1; }
+                if (ch === "[") { nest += 1; }
+                if (nest === 0) { break; } 
+
+                text_move += ch;
+            }
+            rel_moves.push(decode_relative_raw_move(text_move, flags));
+
+        } else if (ch === "{") {
+            var inner, nest;
+            
+            inner = "";
+            nest = 1;
+            while(i < parlett.length)
+            {
+                i += 1;
+                var ch = parlett.substr(i, 1);
+                if (ch === "}") { nest -= 1; }
+                if (ch === "{") { nest += 1; }
+                if (nest === 0) { break; } 
+
+                inner += ch;
+            }
+
+            // {oi2>, asdf.. ;flag1;flag2;flag3...]
+            return nested_flags(inner);
+
+        // Standard Parlett
+        } else if (/[0-9]/.test(ch)) {
+            distances.push(parseInt(ch, 10));
+        } else if (ch === "n" || ch === "m") {
+            distances.push(Infinity);
+        } else if (ch === "/") {
+            hippogonal = true;
+        } else if (ch == " ") {
+            assert(false, "relative_parlett(" + parlett + "): whitespace encountered, did you forget a comma?");
+        } else {
+            var maybe_directions = relative_decode_direction(ch, parlett.substr(i + 1, 1));
+
+            if (maybe_directions) {
+                directions = maybe_directions[0];
+                if (maybe_directions[1]) {
+                    i += 1; // two-character direction
+                }
+            } else {
+                assert(false, "relative_parlett(" + parlett + "): unsupported: '" + ch + "'");
+            }
+        }
+    }
+
+    if (hippogonal) {
+        assert(distances.length === 2, "relative_parlett(" + parlett + "): for hippogonal, expected exactly two distances");
+        var a = distances[0], b = distances[1];
+
+        // TODO: remove expand_hippogonal, include_reversed, times_each, add_flags. They just generate this.
+        // But keep without_dupes. It is useful.
+        rel_moves.push.apply(rel_moves, without_dupes([
+            [-a, -b, flags],
+            [-a, +b, flags],
+            [+a, -b, flags],
+            [+a, +b, flags],
+
+            [-b, -a, flags],
+            [-b, +a, flags],
+            [+b, -a, flags],
+            [+b, +a, flags],
+            ]));
+    } else if (directions) {
+        for (i = 0; i < directions.length; ++i) {
+            var dir = directions[i];
+            var rel_x, rel_y, prev_rel_x, prev_rel_y, distance;
+
+            // Optional limit on number of steps to take of direction vector
+            if (distances.length !== 0) {
+                distance = distances[0];
+
+                assert(distances.length === 1, "relative_parlett(" + parlett + "): multiple distances given for rider, expected one or none");
+            } else {
+                distance = Infinity;
+            }
+
+            rel_x = rel_y = 0;
+            prev_rel_x = null, prev_rel_y = null;
+            for (var j = 1; j < Math.max(RANK_MAX, FILE_MAX); ++j) {
+                // Riders get blocked. Note that you can have a non-hippogonal leaper.
+                // ~n* (lion) for example, is like a queen, but not blocked by intervening pieces.
+                
+                if (prev_rel_x !== null && prev_rel_y !== null && movement === "rider") { 
+                    flags.if_unblocked = [prev_rel_x, prev_rel_y];
+                } else {
+                    delete flags.if_unblocked;
+                }
+
+                rel_x += dir[0];
+                rel_y += dir[1];
+
+                if (distance === Infinity || j === distance) {
+                    rel_moves.push([rel_x, rel_y, Object.clone(flags)]);
+
+                    if (j === distance) { 
+                        break;
+                    }
+                }
+
+                prev_rel_x = rel_x;
+                prev_rel_y = rel_y;
+            }
+        }
+    }
+
+    return rel_moves;
+}
+
+// Decode a single group in extended Parlett notation into unfiltered absolute moves
+// See http://en.wikipedia.org/wiki/Fairy_chess_piece#Notations
+function decode_one_parlett(parlett, xy, color)
+{
+    var movement, hippogonal;
+    var distances, directions, flags, maybe_directions, extremities;
+
+    assert(xy, "decode_one_parlett("+ parlett + ", " + xy + "): piece xy not given");
+
+    flags = {};
+    distances = [];
+
+    for (var i = 0; i < parlett.length; ++i) {
+        // Btw, MSIE doesn't support [] for indexing into strings.. I never knew.
+        var ch = parlett.substr(i, 1);
+
+        if (ch === "~") {
+            // Moves by leaping to a fixed number (well, it can be
+            // reduced later) of relative positions, jumping over
+            // pieces if needed, capturing where it ends up. 
+            // ex: knight = (2,1)leaper, king (1,0)+(1,1)leaper
+            movement = "leaper";
+
+        // Conditional modifiers that all returned moves should note.
+        // Additions to Parlett, documented on http://en.wikipedia.org/wiki/Fairy_chess_piece#Additions_to_Parlett.27s
+        } else if (ch === "i") { 
+            // Initial move: Can only if the piece is in its original position
+            // (pawn's 2 move forward)
+            flags.initial_only = true;
+        } else if (ch === "c") {
+            // Capture only: may only be used if destination is occupied by enemy piece
+            // (pawn's diagnal capture)
+            flags.capture_only = true;
+        } else if (ch === "o") {
+            // Can not capture: destination square must be unoccupied; since by default, piece
+            // can move to enemy square in order to capture it
+            // (pawn's forward move)
+            flags.no_capture = true;
+
+        // Kraken can go to any square, represented by n/m arbitrary
+        // hippogonal moves in any direction, but its not necessary to
+        // calculate it as a hippogonal, since its every square.
+        } else if (parlett.substring(i).indexOf("n/m") != -1) {
+            i += "n/m".length;
+
+            var kraken_moves = [];
+            for (var a = 1; a <= RANK_MAX; ++a) {
+                for (var b = 1; b < FILE_MAX; ++b) {
+                    var piece = pc(a, b);
+
+                    // Can't move to self-occupied squares, of course.
+                    if (piece && piece.hasClassName(color)) {
+                        continue;
+                    }
+
+                    kraken_moves.push([a, b]);
+                }
+            }
+
+            kraken_moves = add_flags(kraken_moves, flags);
+
+            return kraken_moves;
+
+        // Multi-move, my own extension for castling
+        } else if (ch === "m") {
+            // TODO: multi-move other pieces, castling: imR2=e, more generic
+            var letter = parlett.substr(i + 1, 1);
+            var type = piece_letter2name(letter);
+            assert(type, "decode_one_parlett(" + parlett + "): multimove letter " + letter + 
+                    " piece type not found");
+            i += 1;
+            assert(type === "rook", "sorry, only castling with rooks currently supported");
+
+            flags.castle = type;
+        } else if (ch === "e") {
+            // Riders can only go to the max, not any place in between
+            // So 2= means can go two spaces sideways, but not one space sideways.
+            extremities = true;
+        } else if (ch === "P") {
+            var ep_moves;
+            var forward = forwards_vector(opposite_color(color));
+
+            // It looks like this:
+            //
+            //   1
+            //  234
+            //
+            // 1 = ep target square
+            // 3 = opponent's pawn that will be captured 
+            // 2, 4 = squares where you can capture from, we must be on
+         
+            // Are we on the capture-from squares, (2) or (4) in the diagram above?
+            if (GAME_STATE.ep_target && xy[1] === GAME_STATE.ep_target[1] + forward &&
+                (GAME_STATE.ep_target[0] === xy[0] + 1 || GAME_STATE.ep_target[0] === xy[0] - 1)) {
+
+                // We can move to the ep target square.. even though there is no piece there, we'll
+                // capture the pawn in front of it.
+                ep_moves = [[GAME_STATE.ep_target[0], GAME_STATE.ep_target[1]]];
+                flags.en_passant_capture = true;   
+                
+                // (3), opponent's piece to capture
+                flags.capture = pc(GAME_STATE.ep_target[0], GAME_STATE.ep_target[1] + forward);
+            } else {
+                ep_moves = [];
+            }
+
+            return add_flags(ep_moves, flags);
+        } else if (ch === "E") {
+            // This move creates an en passant target square
+            flags.creates_en_passant = true;
+
+        // Standard Parlett
+        } else if (/[0-9]/.test(ch)) {
+            distances.push(parseInt(ch, 10));
+        } else if (ch === "n") {
+            distances.push(Infinity);
+        } else if (ch === "/") {
+            hippogonal = true;
+
+        } else if (ch == " ") {
+            assert(false, "decode_one_parlett(" + parlett + "): whitespace encountered, did you forget a comma?");
+        } else {
+            maybe_directions = decode_direction(ch, parlett.substr(i + 1, 1), color);
+            if (maybe_directions) {
+                directions = maybe_directions[0];
+                if (maybe_directions[1]) {
+                    i += 1; // two-character direction
+                }
+            } else {
+                assert(false, "decode_one_parlett(" + parlett + "): unsupported: '" + ch + "'");
+            }
+        }
+    }
+    if (!movement) {
+        // Move unlimited distance in one direction, as long as its not blocked
+        // rook = (1,0)rider, bishop = (1,1)rider, queen (1,1)+(1,0)rider
+        movement = "rider";
+    }
+
+    //console.log("movement=",movement);
+    //console.log("directions=",directions);
+
+    if (hippogonal) {
+        assert(movement === "leaper", "decode_one_parlett(" + parlett + 
+            "): only hippogonals that are leapers are currently supported");
+
+        // First get valid destinations, then convert to absolute coordinates.
+        // Relatively easy, since with leapers, can disregard pieces on the path
+        var rel_moves = add_flags(expand_hippogonal(distances), flags);
+
+        moves = move_rel2abs(xy, rel_moves).reject(function(xy) {
+            var piece = pc(xy[0], xy[1]);
+            if (!piece) {
+                return false;    // unoccupied, good
+            }
+
+            // skip squares that are occupied by friendly pieces
+            return piece.hasClassName(color);
+        });
+
+    } else if (movement === "leaper") {
+        assert(false, "decode_one_parlett(" + parlett + 
+            "): only leapers that are hippogonals are currently supported");
+    } else if (movement === "rider") {
+        var limit;
+
+        assert(distances.length === 1, "decode_one_parlett(" + parlett + 
+            "): for non-hippogonal parletts, must have exactly one distance, not: " +
+            distances);
+
+        // The distance is the move limit (1 for king, "infinity" for Q, B, R).
+        limit = distances[0];
+
+        moves = add_flags(expand_rider(limit, directions, xy, extremities, color), flags);
+    } else {
+        assert(false, "decode_one_parlett(" + parlett + "): unsupported movement");
+    }
+
+    return moves;
+}
+
+// Get the absolute moves for a "rider" piece. It
+// can move up to limit steps, in the direction vectors given,
+// starting at the given location -- but it will be blocked by
+// an occupied square. Note that there could be pieces that move
+// in this way, but won't be blocked (leapers, locusts), but they
+// are not supported here.
+function expand_rider(limit, directions, xy, extremities, color)
+{
+    var moves = [];
+
+    //console.log("expand_rider",limit, directions, xy);
+
+    directions.each(function(direction) {
+        moves.push.apply(moves, expand_direction(limit, direction, xy, extremities, color));
+    });
+
+    return without_dupes(moves);
+}
+
+// Iterate up to limit steps (may be Infinity), in the direction 
+// vector, starting at start_xy. Stop when reaching the end of the
+// board, on an enemy piece, or before a friendly piece.
+// If extremities is true, only add square at end of the direction.
+function expand_direction(limit, direction, start_xy, extremities, color)
+{
+    var x, y, moves;
+
+    moves = [];
+
+    x = start_xy[0];
+    y = start_xy[1];
+
+    for (var i = 0; i < limit; ++i) {
+        var piece;
+
+        x += direction[0];
+        y += direction[1];
+
+        if (x < 1 || x > FILE_MAX || y < 1 || y > RANK_MAX) {
+            break;
+        }
+
+        piece = pc(x, y);
+        if (piece) {
+            if (piece.hasClassName(color)) {
+                // blocked by own piece, can't move on top
+                break;
+            } else {
+                // can capture enemy piece
+                moves.push([x, y]);
+                break;
+            }
+        }
+
+        //console.log(xy2filerank(x,y));    
+        moves.push([x, y]);
+    }
+
+    if (extremities) {
+        // End only. Allows using 2=, for example, to move
+        // two spaces sideways, without going 1 space sideways.
+        var end_move = moves[moves.length - 1];
+        if (end_move) {
+            return [end_move];
+        } else {
+            return [];
+       }
+    }
+
+    return moves;
+}
+
+// Add a third element to a list of moves, extra "flags" that describe
+// under what conditions the move is valid. 
+//     add_flags([[7,2],[4,1],[5,2]], "hi") === [[7,2,"hi"],[[4,1,"hi"], etc.
+// but the flags should be something useful: a dictionary. The flags will
+// be cloned, so that they can be modified in one move without influencing
+// the flags in another move.
+function add_flags(moves, flags)
+{
+    var new_moves = [];
+
+    for (var i = 0; i < moves.length; ++i) {
+        var move = moves[i];
+
+        new_moves.push([move[0], move[1], Object.clone(flags)]);
+    }
+
+    return new_moves;
+}
+
+// Expand the shorthand for hippogonal moves, such as the knight:
+//     expand_hippogonal([1,2]) -> [[1, 2], [2, 1], [-1, 2], [2, -1], [1, -2], [-2, 1], [-1, -2], [-2, -1]]
+// Requires constants, so for example it can't represent the
+// Kraken fairy chess piece, with Parlett notation ~n/m, but there are probably easier
+// ways to handle that, if I get that far (it leaps to any square on the board).
+function expand_hippogonal(a)
+{
+    // Can cache the results, since they're the same every time. Doesn't give much
+    // performance improvement, however.
+    if (CACHE_HIPPOGONAL[a[0]] && CACHE_HIPPOGONAL[a[0]][a[1]]) {
+        return CACHE_HIPPOGONAL[a[0]][a[1]];
+    } else {
+        if (!CACHE_HIPPOGONAL[a[0]]) {
+            // I miss Perl's autovivification..
+            CACHE_HIPPOGONAL[a[0]] = {};
+        }
+        CACHE_HIPPOGONAL[a[0]][a[1]] = include_reversed(times_each(a, [1, -1]));
+        return CACHE_HIPPOGONAL[a[0]][a[1]];
+    }
+}
+
+// Return a list of lists, where each element in the first is multiplied
+// by each combination of the second. For example, to implement +/-:
+//     times_each([1,2], [1,-1]) === [[1,2], [1,-2], [-1,2], [-1,2]]
+// This is not the cross product or Cartesian product, something else.
+function times_each(a, b)
+{
+    // Maybe there is a more elegant way to do this, with
+    // arbitrary array sizes..
+    return [
+        [a[0] * b[0], a[1] * b[0]],
+        [a[0] * b[0], a[1] * b[1]],
+        [a[0] * b[1], a[1] * b[0]],
+        [a[0] * b[1], a[1] * b[1]]
+    ];
+
+}
+
+// Include reversed pairs of nested lists, example:
+//     include_reversed([[1,2], [1,0]]) === [[1,2], [2,1], [1,0], [0,1]]
+// Removes duplicates.
+function include_reversed(a)
+{
+    var all = [];
+
+    for (var i = 0; i < a.length; ++i)
+    {
+        var element = a[i];
+        var reversed, flags;
+
+        all.push(element);
+
+        // Need to clone before reversing, to not modify original
+        assert(element.clone, "include_reversed(" + a + "): no clone property (is Prototype loaded?) on element: " + element);
+
+        all.push(element.clone().reverse());
+    }
+
+    return without_dupes(all);
+}
+
+// Return an array of objects without any duplicate entries, where
+// duplicity is determined by string equality. This is ugly, but
+//    [1,2] in [[1,2], [3,4]]
+// is false, since 
+//    [1,2] === [1,2]
+// is false, so its not easy (as far as I could tell) to check if
+// a complex element is already in an array before adding it. Worse yet,
+// hash keys can't be complex, so for example the set implementation at
+// http://laurens.vd.oever.nl/weblog/items2005/setsinjavascript/ , even
+// modified to use Prototype's Hash, won't do because the keys will be 
+// converted to strings. But at least the ugliness is confined to this function.
+// Note: flags also differentiate a move.
+function without_dupes(a)
+{
+    var hash = new Hash();
+    var result = [];
+
+    for (var i = 0; i < a.length; ++i) {
+        // Add if not a dupe
+        if (!hash.get(Object.toJSON(a[i]))) {
+            result.push(a[i]);
+        }
+
+        // Record that this element was added. Converts to a string,
+        // unfortunately, so can't just use hash.keys() after filling 
+        // in the hash.
+        hash.set(Object.toJSON(a[i]), true);
+    }
+
+    return result;
+}
+
+//// TURN FUNCTIONS
+
+function opposite_color(color)
+{
+    var opposite = {white: "black", black: "white"}[color];
+
+    assert(opposite === "black" || opposite === "white", "opposite_color(" + color + "): bad color");
+
+    return opposite;
+}
+
+// Set the active color to white or black, or go to the next color (toggling).
+// Returns a character for algebraic notation, + = check, etc., if applicable
+// If historical, do not check for threefold repetition.
+function set_turn(color, historical)
+{
+    var new_color, active_pieces, checked, no_moves, text_move, text_end, old_color, old_fullmove, repeats;
+
+    assert(color === "white" || color === "black" || color === "next", "set_turn(" + color + "): invalid color");
+
+    old_color = GAME_STATE.active_color;
+
+    if (color === "next") {
+        new_color = opposite_color(GAME_STATE.active_color);
+    } else {
+        new_color = color;
+    }
+
+    $("status").innerHTML = ucfirst(new_color) + "'s Turn";
+
+    // Move number is incremented after black moves, according to rules.
+    old_fullmove = GAME_STATE.fullmove_number;
+    if (GAME_STATE.active_color === "black") {
+        GAME_STATE.fullmove_number += 1;
+    }
+
+    GAME_STATE.active_color = new_color;
+    POSSIBLE_EP_TARGETS = {};
+   
+    // Active player in check?
+    checked = GAME_STATE.active_in_check = in_check(GAME_STATE.active_color, calculate_moves(opposite_color(new_color), true));
+
+    // Note: this takes some time... is there any way to run it right AFTER the piece has
+    // gone through the endeffect? This is called in onDrop.
+    // TODO: find out how to run something *after* the endeffect, for smoother UI.
+    calculate_moves(GAME_STATE.active_color);
+
+    // Zero mobility? For detecting stalemate, checkmate.
+    no_moves = VALID_MOVES.keys().length == 0;
+
+    // Results. 
+    if (checked && !no_moves) {
+        set_check_message("Check!");
+        text_move = "+";
+        // TODO: detect double-check, allow ++ for descriptive/algebraic descriptive, but not algebraic
+    } else if (!checked && no_moves) {
+        set_check_message("Draw (stalemate)");
+        text_end = "1/2-1/2";
+    } else if (checked && no_moves) {
+        set_check_message("Checkmate.");
+        if (new_color == "white") { 
+            text_move = "#";
+            text_end = "0-1";  // white lost
+        } else {
+            text_move = "#";
+            text = "1-0";
+        }
+    } else {
+        set_check_message("");
+    }
+
+    var new_state = save_fen();
+    var ply = encode_ply(old_color, old_fullmove);
+
+    if (!old_color) {
+        // If no one has moved yet, ply is 0 for initial board position.
+        ply = 0;
+    }
+
+    if (!historical) {
+        repeats = check_repetition(ply);
+    }
+    
+    if (color === "next") { 
+        GAME_STATE.position_after[ply] = new_state;
+    }
+
+    return {text_move: text_move, text_end: text_end, repeats: repeats};
+}
+
+function set_check_message(msg)
+{
+    $("check").innerHTML = msg;
+    if (msg) {
+        $("dash").show();
+    } else {
+        $("dash").hide();
+    }
+}
+
+// Check for three-move repetition
+function check_repetition(ply)
+{
+    var new_state = save_fen(true);
+    var reps;
+
+    // Save new board state for three-move repetition
+    if (GAME_STATE.position_moves[new_state] === undefined) {
+        GAME_STATE.position_moves[new_state] = [ply];
+    } else {
+
+        reps = GAME_STATE.position_moves[new_state].slice();
+
+        // This occurred here, too.
+        GAME_STATE.position_moves[new_state].push(ply);
+
+        if (GAME_STATE.position_moves[new_state].length >= 3) {
+            // Player can claim a draw, but its not required (you might have a better position)
+            // See http://en.wikipedia.org/wiki/Threefold_repetition
+            set_check_message("Draw (repetition) claimable");
+
+            // Return moves for highlighting, except this move (it is too early
+            // for mark_repeated_moves to highlight, so move_piece_to_square will
+            // add the current move, if we return something).
+            return reps;
+        }
+    }
+
+    return null;
+}
+
+//// BOARD FUNCTIONS
+
+// TODO: a "board lab", where can drag pieces onto board in arbitrary
+// positions, or drag off (with an Effect.Puff), to load arbitrary fen.
+
+// Internally name the square cells with their (x,y) coordinates
+// and filerank notation, once when the page loads. This is only code so I
+// don't have to manually type <td x=0 y=0 filerank=a8> etc. in all the cells.
+function name_squares()
+{
+    for (var x = 1; x <= FILE_MAX; ++x){
+        for (var y = 1; y <= RANK_MAX; ++y) {
+            var square = sq(x, y);
+
+            square.x = x;
+            square.y = y;
+            square.filerank = xy2filerank(x, y);
+
+            square.descriptive = {};
+            square.descriptive.white = xy2descriptive("white", [x, y]);
+            square.descriptive.black = xy2descriptive("black", [x, y]);
+            //console.log(square);
+        }
+    }
+
+    // Konami code
+    KEYS_PRESSED = [];
+    document.onkeydown = 
+            function(event) {
+            KEYS_PRESSED.push(event.keyCode);
+            if (KEYS_PRESSED.length > 11) {
+                KEYS_PRESSED.shift();
+            }
+            if (KEYS_PRESSED.join('') === '3838404037393739666513') {
+                alert("TODO: easter egg");
+            }
+    };
+}
+
+// Acknowledge that a piece was captured. Called by move_piece_to_square(), which
+// does all the DOM manipulation. 
+function capture_piece(piece)
+{
+    assert(piece, "capture_piece(" + piece + "): piece is false");
+
+    // If rook captured, remove castling privileges
+    if (piece.type === "rook") {
+        // Note that this is the first rank of the *other* player
+        var opponent = opposite_color(GAME_STATE.active_color);
+        var first_rank = opponent === "white" ? 1 : 8;
+        var square = sq(piece);
+        
+        // TODO: really would like to not have to hardcode this
+        if (square.y === first_rank) {
+            if (square.x === 1) {
+                GAME_STATE.can_castle[opponent].long = false;
+                //console.log("no more long");
+            } else if (square.x === 8) {
+                GAME_STATE.can_castle[opponent].short = false;
+                //console.log("no more short");
+            }
+        }
+    }
+
+    // TODO: show as captured, somewhere with icons
+}
+
+// Find precomputed algebraic notation for this move. Called when
+// user drags a piece to a square and we don't know what move it is.
+function algebraic_from_piece_square(piece, square)
+{
+    var ret;
+
+    // TODO: better data structure, inverted hash table lookup
+    VALID_MOVE_NOTATIONS[PREFS.OUTPUT_NOTATION].each(function(alg_piece_square) {
+            var alg = alg_piece_square[0];
+            var this_piece = alg_piece_square[1][0];
+            var this_square = alg_piece_square[1][1];
+
+            if (this_square === square && this_piece === piece) {
+                ret = alg;
+                throw $break;
+            }
+        });
+
+    return ret;
+}
+
+// Manipulate the DOM nodes to move the piece to its new location,
+// and advance to the next move. Does not do anything graphical
+// with dragging.
+// If is_hypothetical is true, this is an internal move part of another move
+// (castling) so it shouldn't be logged.
+function move_piece_to_square(piece, square, is_hypothetical)
+{
+    var from_square, move_text, castle_move_text, old_ep_target;
+
+    assert(piece, "move_piece_to_square(" + piece + ", " + square + "): piece is false");
+    assert(square, "move_piece_to_square(" + piece + ", " + square + "): square is false");
+
+    from_square = sq(piece);
+
+    // Moving king makes it ineligible for castling
+    if (PIECE_TYPES[piece.type].castles_with) {
+        GAME_STATE.can_castle[GAME_STATE.active_color].short = false;
+        GAME_STATE.can_castle[GAME_STATE.active_color].long = false;
+    } else if (PIECE_TYPES[piece.type].castle) {
+        // TODO: More generic, so will work with chess960 or 480
+        // If moved either rook, can't castle on that side.
+        if (from_square.x == 8)
+            GAME_STATE.can_castle[GAME_STATE.active_color].short = false;
+        else if (from_square.x == 1)
+            GAME_STATE.can_castle[GAME_STATE.active_color].long = false;
+    }
+
+    // If castling, move the rook in place. Ugly hardcoded.
+    if (piece.type === "king") {
+        var first_rank = (GAME_STATE.active_color === "white" ? 1 : 8);
+        if (from_square.x === 5) {
+            if (square.x === 7) {
+                // TODO: actually calculate square moved over, then move rook there
+                // (instead of hardcoding). Short.
+                move_piece_to_square(pc(8, first_rank), sq(6, first_rank), true);
+                castle_move_text = "O-O";
+            } else if (square.x === 3) {
+                // Castle long.
+                move_piece_to_square(pc(1, first_rank), sq(4, first_rank), true);
+                castle_move_text = "O-O-O";
+            }
+        }
+    }
+
+
+
+    // Lookup standard algebraic move notation (precomputed)
+    move_text = algebraic_from_piece_square(piece, square);
+    
+    // Capture piece(s) on destination square. Multiple pieces
+    // are supported here, but not elsewhere in the code (yet). Might be
+    // an interesting variation to have multiple pieces occupy same square.
+    while (square.firstChild) {
+        capture_piece(square.firstChild);
+        square.removeChild(square.firstChild);
+    }
+
+    // Special case: en passant captures to an empty square
+    if (GAME_STATE.ep_target &&
+        square.x === GAME_STATE.ep_target[0] && 
+        square.y === GAME_STATE.ep_target[1]) {
+
+        var forward = forwards_vector(GAME_STATE.active_color);
+        var dead_pawn_square = sq(square.x, square.y - forward);
+
+        capture_piece(pc(dead_pawn_square));
+        dead_pawn_square.removeChild(dead_pawn_square.firstChild);
+    }
+
+    // If double pawn move, this creates an en passant target square
+    filerank = xy2filerank([square.x, square.y]);
+    if (POSSIBLE_EP_TARGETS[filerank]) {
+        GAME_STATE.ep_target = POSSIBLE_EP_TARGETS[filerank];
+    } else {
+        // En passant possibility disappears immediately after any other move
+        GAME_STATE.ep_target = null;
+    }
+
+    //TODOmove_text += filerank;
+
+    // Move to new square
+    if (piece.parentNode) {
+        piece.parentNode.removeChild(piece);
+    }
+
+    square.appendChild(piece);
+
+    if (should_promote(piece)) {
+        promote(piece);
+
+        move_text += "=Q";  // TODO: get return value from promote(), different values. Maybe need a callback, user interaction.
+    }
+
+    if (castle_move_text) {
+        move_text = castle_move_text;
+    }
+
+    // If not a multi-move (moving rook in castling), log and go to next turn
+    if (!is_hypothetical) {
+        // TODO: ellipsis if black is first recorded move, or intervening commentary
+        var alg_move, ply, turn_info;
+       
+        if (GAME_STATE.active_color === "white") {
+            alg_move = '<span class="fullmove_number">' + GAME_STATE.fullmove_number + '</span>';
+            if (GAME_STATE.fullmove_number === 1) {
+                // Period goes to initial position, kind of strange, but its uninstrusive
+                alg_move += move_link(0, ".");
+            } else {
+                alg_move += ".";
+            }
+            alg_move += " " 
+        } else {
+            alg_move = " ";
+        }
+
+        ply = encode_ply(GAME_STATE.active_color, GAME_STATE.fullmove_number);
+
+        only_move = VALID_MOVE_NOTATIONS.SAN.keys().length === 1;
+
+        turn_info = set_turn("next");
+        if (turn_info.text_move) {
+            move_text += turn_info.text_move;
+        }
+
+        alg_move += move_link(ply, move_text) + " ";
+
+        if (only_move) {
+            // NAG for "only move", see http://www.markalowery.net/Chess/Notation/NAG.html
+            alg_move += "$7 ";
+        }
+
+        $$("a.active_move").each(function(m) {
+                m.removeClassName("active_move");
+            });
+
+        set_next_back_accesskeys(ply);
+
+        $("moves").innerHTML += alg_move;
+
+        // End-text, not a move. Terminates the game.
+        if (turn_info.text_end) {
+            $("moves").innerHTML += "\n" + turn_info.text_end;
+        }
+
+        // If there was a repetition, it occurred on this move. Indicate the moves.
+        if (turn_info.repeats) { 
+            turn_info.repeats.push(ply);
+            mark_repeated_moves(turn_info.repeats);
+        }
+    }
+
+    // AI - artificial intelligence 
+    // Do this after a delay, so that when playing computer vs. computer, you can
+    // see the move, since they are not animated (Effect.Move) yet.
+    setTimeout(function() { 
+            computer_move_if_applicable()
+            }, 100);
+}
+
+// Visually indicate the moves which after threefold repetition
+// Unfortunately, we highlight the move *after* the board state was repeated. This is
+// because the first clickable link, say 1. Nf3, loads the move after
+// Nf3 was made, not before (the initial board position). But you can
+// repeat the initial board position:
+// 1. Nf3 Nf6 2. Ng1 Ng8 3. Nf3 Nf6 4. Ng1 Ng8
+var HIGHLIGHT_COLORS = ["yellow", "aquamarine", "lime", "khaki", "aqua"];
+var REPEAT_COLOR_COUNT = 0;
+function mark_repeated_moves(reps)
+{
+    var color = HIGHLIGHT_COLORS[REPEAT_COLOR_COUNT];
+
+    REPEAT_COLOR_COUNT += 1;
+    for (var i = 0; i < reps.length; ++i) {
+        var ply = reps[i];
+
+        $$("a#ply_" + ply).each(function(m) {
+                //m.addClassName("repeated_move");
+                m.setStyle({backgroundColor: color});
+            });
+    }
+}
+
+// Handle graphically moving of a piece, dropping it to its new location
+function move_dropped_piece(piece, square, event)
+{
+    //console.log(piece);
+    //console.log(square);
+   
+    // Scriptaculous sets position:relative when creating a draggable,
+    // but this will cause the relative position when it was in the container it
+    // moved from, to apply to the new container it moved to, so either it will be
+    // positioned at the wrong place (if revert:false) or will jump by an amount
+    // proportionate to the amount it first moved, then be moved back. This fixes it.
+    piece.style.position = "static";
+
+    // TODO: do some cool effects when a piece is captured, but not too cool
+    // Any way to finish running the code AFTER the effect finishes? New effect?
+    //if (square.firstChild) {
+    //   new Effect.Squish(pc(square));
+    //}
+
+    // Can't drop this piece anywhere anymore.
+    piece.removeClassName("piece-" + piece.prior_position);
+    ALL_DROP_TARGETS.each(function(square) {
+        Droppables.remove(square);
+    });
+    ALL_DROP_TARGETS = [];
+
+    unhighlight_all();
+
+    move_piece_to_square(piece, square);
+
+    // Scriptaculous requires position:relative; with static, you can drag it
+    // but it won't move with the cursor, so set it and crucially, reset the
+    // relative position so that it won' be misaligned.
+    piece.style.position = "relative";
+    piece.style.left = piece.style.right = piece.style.top = piece.style.bottom = 0;
+}
+
+// Generate FEN from board state. If strip_moves, does not
+// include move count.
+function save_fen(strip_moves)
+{
+    var fen = "", castles;
+
+    // Board position
+    for (var y = RANK_MAX; y > 0; --y) {
+        var blanks = 0;
+        for (var x = 1; x <= FILE_MAX; ++x) {
+            var piece = pc(x, y);
+            var letter;
+
+            if (piece) {
+                if (blanks) {
+                    fen += blanks.toString();
+                    blanks = 0;
+                }
+                letter = full_piece_prefix(piece);
+
+                // Uppercase = white, lowercase = black
+                if (piece.hasClassName("black")) {
+                    letter = letter.toLowerCase();
+                }
+
+                fen += letter;
+            } else {
+                blanks += 1;
+            }
+        }
+        if (blanks) {
+            fen += blanks.toString();
+        }
+        if (y != 1) {
+            fen += "/";
+        }
+    }
+
+    // Active color
+    fen += " ";
+    if (GAME_STATE.active_color === "white") {
+        fen += "w";
+    } else {
+        fen += "b";
+    }
+
+    // Castling availability
+    fen += " ";
+    castles = false;
+    if (GAME_STATE.can_castle.white.short) { fen += "K"; castles = true; }
+    if (GAME_STATE.can_castle.white.long)  { fen += "Q"; castles = true; }
+    if (GAME_STATE.can_castle.black.short) { fen += "k"; castles = true; }
+    if (GAME_STATE.can_castle.black.long)  { fen += "q"; castles = true; }
+    if (!castles) { fen += "-"; }
+
+    // En passant target square
+    fen += " ";
+    if (GAME_STATE.ep_target) {
+        fen += xy2filerank(GAME_STATE.ep_target);
+    } else {
+        fen += "-";
+    }
+
+    if (!strip_moves) {
+        fen += " " + GAME_STATE.halfmove_clock;
+        fen += " " + GAME_STATE.fullmove_number;
+    }
+
+    return fen;
+}
+
+// Load board state. If clear is true, clear previous moves, because
+// this is a new game.
+function load_fen(fen, clear)
+{
+    var parts, castling;
+
+    parts = fen.split(" ");
+    load_starting_position(parts[0]);
+
+    assert(/^[wb]$/.test(parts[1]), "load_fen(" + fen + "): bad active color: " + parts[1]);
+
+    castling = parts[2];
+    GAME_STATE.can_castle.white.short = /K/.test(castling);
+    GAME_STATE.can_castle.white.long  = /Q/.test(castling);
+    GAME_STATE.can_castle.black.short = /k/.test(castling);
+    GAME_STATE.can_castle.black.long  = /q/.test(castling);
+
+    if (parts[3] === "-") {
+        GAME_STATE.ep_target = null;
+    } else {
+        GAME_STATE.ep_target = filerank2xy(parts[3]);
+    }
+
+    GAME_STATE.halfmove_clock = parseInt(parts[4], 10);
+    GAME_STATE.fullmove_number = parseInt(parts[5], 10);
+
+    if (clear) { GAME_STATE.position_moves = {}; }
+    if (clear) { GAME_STATE.position_after = {}; }
+
+    // Now that everything is loaded, set the turn.
+    set_turn({w:"white", b:"black"}[parts[1]], !clear);
+}
+
+// Remove all pieces from the board.
+function clear_board()
+{
+    for (var x = 1; x <= RANK_MAX; ++x) {
+        for (var y = 1; y <= FILE_MAX; ++y) {
+            var square = sq(x, y);
+            while(square.firstChild) {
+                square.removeChild(square.firstChild);
+            }
+        }
+    }
+}
+
+// Load starting position in FEN. Example, at beginning of game:
+// rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR
+function load_starting_position(fen)
+{
+    var i, x, y, code, square;
+
+    clear_board();
+
+    // Note that ranks and files internally are represented here by
+    // x,y coordinates, so a8 = 1,8. That is where FEN starts.
+    x = 1;
+    y = 8;
+    for (i = 0; i < fen.length; ++i) {
+        code = fen.charAt(i);
+        if (code === "X" || code === "x") {
+            i += 1;
+            code += fen.charAt(i);
+
+            if (code === "X(" || code === "x(") {
+                // Read until closing paren
+                var ch;
+                i += 1;
+                while(i < fen.length) {
+                    ch = fen.charAt(i);
+                    code += ch;
+                    if (ch === ")") { break; }
+                    i += 1;
+                }
+            }
+            // TODO: extended extended codes, multiple x's? or just use names?
+
+            sq(x, y).appendChild(create_piece(code));
+            ++x;
+        } else if (/[a-zA-Z]/.test(code)) {
+            sq(x, y).appendChild(create_piece(code));
+            ++x;
+        } else if (code === "/") {
+            x = 1;
+            --y;
+        } else if (/[0-9]/.test(code)) {
+            x += code.charCodeAt(0) - "0".charCodeAt(0);
+        } else if (code === " ") {
+            break;
+        } else {
+            assert("load_starting_position(" + fen + "): unknown code: " + code);
+        }
+    }
+
+    name_pieces();
+}
+
+//// PIECE FUNCTIONS
+
+// Name each piece, in standard chess1 locations, using English descriptive notation.
+function name_pieces()
+{
+    for (var file_number = 1; file_number <= FILE_MAX; ++file_number) {
+        // English descriptive notation (only really applicable to chess1)
+        var file = xy2descriptive("white", file_number);
+        var piece;
+
+        // White's pieces and pawns
+        piece = pc(file_number, 1); if (piece) { piece.descriptive_name = file; }
+        piece = pc(file_number, 2); if (piece) { descriptive_name = file + "P"; }
+
+        // Black's pieces and pawns
+        piece = pc(file_number, 8); if (piece) { descriptive_name = file; }
+        piece = pc(file_number, 7); if (piece) { descriptive_name = file + "P"; }
+
+
+        // Algebraic descriptive notation
+        var afile = xy2filerank(file_number, "");
+        for (var white_rank = 1; white_rank <= RANK_MAX; ++white_rank) {
+            var black_rank = 9 - white_rank;
+            var piece = pc(file_number, white_rank);
+            var rank, piece_letter;
+
+            if (!piece) {
+                continue;
+            }
+
+            if (piece.hasClassName("white")) {
+                rank = white_rank;
+            } else {
+                rank = black_rank;
+            }
+
+            piece_letter = full_piece_prefix(piece);
+            // aP, bP, etc.. TODO: use rank, if needed to disambiguate (two
+            // pieces of same type on same file). Use file, rank, or filerank
+            // like disambiguating moves.
+            piece.adescriptive_name = afile + piece_letter;
+        }
+    }
+}
+
+/// TODO: a "piece lab", where can dynamically create new pieces,
+// browse existing pieces. Show piece on board by itself, highlighting 
+// valid moves, update when change Parlett movement types, allow to operate
+// the piece and see how it behaves. Then return to the main board.
+
+// Return the letter, if any, used for representing the piece type (name)
+// in algebraic notation.
+function algebraic_letter(type)
+{
+    if (PIECE_TYPES[type].alg_letter !== undefined)
+        return PIECE_TYPES[type].alg_letter;
+    else
+        return PIECE_TYPES[type].letter;
+}
+
+// Given a letter, find the name of the piece (R = rook, etc.). The letter
+// can either be for FEN (P = pawn), or algebraic notation (blank = pawn);
+// both are recognized.
+var cache_letter2name;
+function piece_letter2name(letter)
+{
+    // If given a name, return what we were given.
+    if (PIECE_TYPES[letter]) {
+        return letter;
+    }
+
+    letter = letter.toUpperCase();
+
+    if (!cache_letter2name) {
+        cache_letter2name = new Hash();
+
+        for (var name in PIECE_TYPES) {
+            var info = PIECE_TYPES[name];
+
+            if (info.letter !== undefined) {
+                cache_letter2name.set(info.letter, name);
+            } else if (info.alg_letter !== undefined) {
+                cache_letter2name.set(info.alg_letter, name);
+            }
+        }
+    }
+
+    return cache_letter2name.get(letter.toUpperCase());
+}
+
+// Return the full piece prefix, succiently indicating the piece type.
+// Will not return an empty string but may return E-FEN piece codes. 
+function full_piece_prefix(piece)
+{
+    var letter = PIECE_TYPES[piece.type].letter;
+
+    if (letter !== undefined) {
+        return letter;
+    } else {
+        return (piece.hasClassName("white") ? "X" : "x") + "(" + piece.type + ")";
+    }
+}
+
+// Return algebraic prefix for a piece. May return an empty 
+// string (for pawns, for example): prefers alg_letter over letter.
+// To always get a non-empty string, use full_piece_prefix() instead.
+function algebraic_piece_prefix(piece)
+{
+    if (PIECE_TYPES[piece.type].alg_letter !== undefined) {
+        return PIECE_TYPES[piece.type].alg_letter;
+    } else {
+        return full_piece_prefix(piece);
+    }
+}
+
+// Get the Unicode figurine for a piece of a given color, or fall back on 
+// algebraic_piece_prefix if there isn't one.
+function figurine_piece_prefix(color, piece)
+{
+    if (PIECE_TYPES[piece.type].figurines) {
+        return PIECE_TYPES[piece.type].figurines[color === "white" ? 0 : 1];
+    } else {
+        return algebraic_piece_prefix(piece);
+    }
+}
+
+// Return a piece at (x,y), or "offboard" if the coordinates are out of range.
+function pc_or_offboard(x, y)
+{
+    if (x < 1 || y < 1 || x > FILE_MAX || y > RANK_MAX) {
+        return "offboard";
+    }
+
+    return pc(x, y);
+}
+
+// Return an existing piece somewhere (or a false value), given:
+// - (x,y) coordinates, like (8,1)
+// - location in filerank notation, like "a8"
+// - a square, from sq()
+function pc(x, y)
+{
+    var square;
+
+    // Get square
+    if (x.hasClassName && x.hasClassName("square")) {
+        square = x;
+    } else {
+        square = sq(x, y);
+    }
+
+    // A virtual, off-board "hypothetical" piece, or lack of (null, empty square).
+    if (HYPOTHETICAL_TO && square.x === HYPOTHETICAL_TO[0] && square.y === HYPOTHETICAL_TO[1]) {
+        // As if it moved here
+        return HYPOTHETICAL_PIECE;
+    } else if (HYPOTHETICAL_FROM && square.x === HYPOTHETICAL_FROM[0] && square.y === HYPOTHETICAL_FROM[1]) {
+        // As if it moved off of here, so empty
+        return null;
+    }
+
+    return square.childNodes[0];
+}
+
+// Get (x,y) of piece. For filerank notation, use xy2filerank on this.
+// TODO: Make this return the square, and replace sq() use with this. 
+// (But be sure not to break filtering moves that put in check)
+// Returns null if the piece was taken.
+function piece_location(piece)
+{
+    assert(piece, "piece_location(" + piece + "): piece is false");
+
+    // If the piece would have moved.. 
+    if (HYPOTHETICAL_PIECE === piece) {
+        return HYPOTHETICAL_TO;
+    }
+
+    // .. or was captured and is no longer on-board
+    if (HYPOTHETICAL_CAPTURED === piece) {
+        return null;
+    }
+
+    // TODO: fix this, it happens sometimes when the computer takes a piece to get out of check, caller is sq()
+    //assert(piece.parentNode, "piece_location(" + piece + "): piece.parentNode is false");
+    if (!piece.parentNode) { 
+        return null;
+    }
+
+    return [piece.parentNode.x, piece.parentNode.y];
+}
+
+// Return the path to an image for the piece of that color
+function image_path_for(type, color)
+{
+    var base;
+
+    assert(PIECE_TYPES[type], "image_path_for(" + type + ", " + color + "): no such piece type");
+
+    // Override image name
+    if (PIECE_TYPES[type].image) {
+        base = PIECE_TYPES[type].image;
+    } else {
+        base = type;
+    }
+
+    // TODO: pngs
+    // TODO: even better, use Unicode characters in a span!! How cool would that be? Infinite resolution.
+    // See for example http://en.wikipedia.org/wiki/Knight_(chess)
+    // Unfortunately, MSIE doesn't seem to support it, though it should..different font?
+    // TODO: use web fonts! Supported on Firefox 3.1+, Opera 10+, Safari 3.1+, IE4+
+    // See http://fonts.philip.html5.org/
+    
+    return "images/" + PREFS.IMAGE_SET + "/" + {white:"w", black:"b"}[color] + base + ".gif";
+}
+
+// Create a new piece or pawn, given the name in
+// Forsyth-Edwards Notation, for example:
+//  r = black rook, R = white rook, N = white knight
+// TODO: make this a class so you can do new Piece().
+function create_piece(name)
+{
+    var color, filename, piece, letter, type, classes;
+
+    // In FEN, uppercase=white, lower=black
+    if (/^[A-Z]/.test(name)) {
+        color = "white";
+    } else if (/^[a-z]/.test(name)) {
+        color = "black";
+    } else {
+        assert("create_piece(" + name + "): not a letter");
+    }
+    letter = name.toLowerCase();
+
+    // x(name) or X(name) is explicit name, otherwise, is a letter
+    if (/\(/.test(letter)) {
+        var ary = /^[xX]\(([^)]+)/.exec(letter);
+        type = ary[1];
+    } else {
+        type = piece_letter2name(letter);
+    }
+    assert(type, "create_piece(" + name + "): unrecognized piece type: " + type);
+
+    filename = image_path_for(type, color);
+
+    // Color is the most important class. Type is added
+    // mostly for debugging purposes.
+    classes = "piece " + color + " " + type;
+
+    // Royal class is very important.
+    if (PIECE_TYPES[type].royal) {
+        classes += " royal";
+    }
+
+    // TODO Use a div with background-image instead, then can have arbitrary
+    // characters, instead of just images, more flexible, maybe transition too.
+    piece = Builder.node('img', {'src': filename, 'class': classes});
+
+    // Property will tell name of piece. To tell what color, or if it is
+    // a piece in the first place, check the class names.
+    piece.type = type;
+
+    // Highlight/unhighlight legal moves on mouse over, like Chess with Friends.
+    // Yahoo Games does this too, but uses a yellow outline.
+    Event.observe(piece, 'mouseover', function() {
+            highlight_moves(piece, true);
+            // for debugging
+            //piece.setStyle({border: '1px solid black'});
+        });
+    Event.observe(piece, 'mouseout', function() {
+            highlight_moves(piece, false);
+            //piece.setStyle({border: 'none'});
+        });
+
+    // Make all new pieces draggable. I tried only making the active color's
+    // pieces draggable, but then in Safari they can still be selected like text,
+    // even with enable_document_selection(false), maybe I need to enable it on the
+    // images too, but it wasn't appealing. In Firefox, the images can be dragged
+    // as ghosts, which is cool, but instead: now pieces can only be dropped anywhere
+    // if they are the active colors move. The player can drag the opponent's pieces
+    // around but not drop anywhere.
+
+    // TODO: instead of reverting, check if valid move
+    // TODO: Figure out how to fix how the draggable jumps, by the amount it moved,
+    // when being dropped. http://www.tutorialspoint.com/cgi-bin/practice.cgi?file=scriptaculous_12 
+    // does this too. reverteffect defaults to Effect.Move, and it reverts back to *something*,
+    // figure this point.
+
+    // Note: http://www.jslint.com/ stops here for some reason
+    new Draggable(piece, { 
+        revert: true, 
+        starteffect: undefined, 
+        endeffect: undefined,
+        onStart: function() { GAME_STATE.dragging = true; },
+        onEnd: function() { GAME_STATE.dragging = false; }
+        // TODO: figure out why on IE7, dragged pieces are below the highlighted squares!
+        // even with zindex: 1001
+     });
+
+
+    return piece;
+}
+
+// Highlight/unhighlight moves for a given piece, unless dragging.
+function highlight_moves(piece, enable)
+{
+    var from_square, moves;
+
+    // If player is dragging a piece over another piece, don't show
+    // legal moves for the piece under it.
+    if (GAME_STATE.dragging) {
+        return;
+        }
+
+    // If not this player's turn, no legal moves
+    if (!piece.hasClassName(GAME_STATE.active_color)) {
+        return [];
+    }
+
+    from_square = sq(piece);
+
+    if (!from_square) {
+        // Could not find a square for the piece, it no longer exists,
+        // so no need to concern ourselves with highlighting its moves.
+        return;
+    }
+
+    //console.log(from_square.filerank);
+    moves = VALID_MOVES.get(from_square.filerank);
+    //console.log(moves);
+    if (!moves) {
+        return;    
+    }
+
+    moves.each(function(move) {
+        var x, y, flags, to_square;
+        
+        x = move[0];
+        y = move[1];
+        flags = move[2];
+        to_square = sq(x, y);
+
+        if (enable) {
+            if (to_square.hasClassName("white")) {
+                to_square.addClassName("legal-move-white");
+                        } else {
+                to_square.addClassName("legal-move-black");
+                        }
+        } else {
+                to_square.removeClassName("legal-move-white");
+                to_square.removeClassName("legal-move-black");
+        }
+    });
+}
+
+// Unhighlight all highlighted black/white squares. Used in onEnd draggable, for
+// some reason, highlight_moves(piece, false) does not unhighlight, maybe the piece changed..
+function unhighlight_all()
+{
+    $$("td.legal-move-white", "td.legal-move-black").each(function(square) {
+        square.removeClassName("legal-move-white");
+        square.removeClassName("legal-move-black");
+    });
+}
+
+//// SQUARE FUNCTIONS / FILE-RANK NOTATION
+
+// Convert filerank f8 to the x,y coordinate [8,6], etc. These coordinates
+// are used internally, but filerank notation is useful for human consumption
+// (though I actually think better in descriptive notation, but maybe I'm in the minority there)
+// Note: does not accept piece name as initial character, yet.
+// Also note: the returned coordinate is useful for looking up in a
+// one-based table cell with (8,1) at the top-left. In filerank notation, this
+// square is labeled a8. The bottom-right square (8,1) is filerank's h1.
+function filerank2xy(code)
+{
+    assert(code, "filerank2xy(" + code + "): is false");
+    assert(code.charCodeAt, "filerank2xy(" + code +"): is missing charCodeAt, is it a string?" +
+            " code.className=" + code.className);
+
+    var x = code.charCodeAt(0) - "a".charCodeAt(0) + 1; // corresponds to file (horizontal)
+    var y = code.charCodeAt(1) - "1".charCodeAt(0) + 1; // corresponds to rank (vertical)
+
+    assert(x >= 1 && x <= FILE_MAX, "filerank2xy(" + code + "): bad x: " + x);
+    assert(y >= 1 && y <= RANK_MAX, "filerank2xy(" + code + "): bad y: " + y);
+
+    return [x, y];
+}
+
+// Convert from x,y coordinates to filerank notation for human consumption. Can either pass
+// xy2filerank(1, 8) === "a8"
+// xy2filerank([1, 8]) === "a8"
+// xy2filerank(1, "") === "a"
+function xy2filerank(x, y)
+{
+    var filerank;
+
+    if (y === undefined) {
+        // Passed array
+        y = x[1];
+        x = x[0];
+    }
+
+    assert(x >= 1 && x <= FILE_MAX, "xy2filerank(" + x + ", " + y + "): bad x: " + x);
+    assert(y === "" || (y >= 1 && y <= RANK_MAX), "xy2filerank(" + x + ", " + y + "): bad y: " + y);
+
+    filerank = String.fromCharCode(x + "a".charCodeAt(0) - 1);
+    if (y !== "") {
+        filerank += String.fromCharCode(y + "1".charCodeAt(0) - 1);
+    }
+
+    return filerank;
+}
+
+
+// Return name of square from color's perspective in English descriptive notation
+// Accepts an array of two numbers, for file and rank, or just a file
+// Only works for chess1, not any variants where the pieces are arranged differently.
+function xy2descriptive(color, xy)
+{
+    var x, y;
+    if (Object.isArray(xy)) {
+        x = xy[0], y = xy[1];
+    } else {
+        x = xy;
+        y = "";
+    }
+
+    assert(x >= 1 && x <= FILE_MAX, "xy2descriptive(" + x + ", " + y + "): bad x: " + x);
+    assert(y === "" || (y >= 1 && y <= RANK_MAX), "xy2descriptive(" + x + ", " + y + "): bad y: " + y);
+
+    return [null, "QR", "QN", "QB", "Q", "K", "KB", "KN", "KR"][x] + (color === "white" ? y : 9 - y);
+}
+
+// Return name of square from color's perspective in "algebraic descriptive notation".
+// Same file as xy2algebraic, but rank is from symmetric, not always white's perspective.
+function xy2adescriptive(color, xy)
+{
+    var x, y, file;
+    
+    x = xy[0], y = xy[1];
+
+    assert(x >= 1 && x <= FILE_MAX, "xy2adescriptive(" + x + ", " + y + "): bad x: " + x);
+    assert(y >= 1 && y <= RANK_MAX, "xy2adescriptive(" + x + ", " + y + "): bad y: " + y);
+
+    return xy2filerank(x, "") + (color === "white" ? y : 9 - y);
+}
+
+// Shorten a file name, in descriptive notation, to a possibly-ambiguous name.
+// QR for queen's rook file is shortened to R, and so is KR for king's rook. 
+function short_descriptive(descriptive_file)
+{
+    return {
+        QR:"R", QN:"N", QB:"B", KB:"B", KN:"N", KR:"R", K:"K", Q:"Q",
+        QRP:"RP", QNP:"NP", QBP:"BP", KBP:"BP", KNP:"NP", KRP:"RP", KP:"KP", QP:"QP" 
+    }[descriptive_file];
+}
+
+// Get a square cell, given location in either
+// - filerank notation (example: "a8", one argument), or
+// - x,y coordinates, (equivalent example: 1,8)
+// - a piece, returned by pc(), will return the enclosing square
+function sq(code, extra)
+{
+    var x, y;
+
+    assert(code !== undefined, "sq(" + code + ", " + extra + "): code is undefined");
+    assert(code !== null, "sq(" + code + ", " + extra + "): code is null");
+
+    // Is it a piece?
+    if (code.hasClassName && code.hasClassName("piece")) {
+        // TODO: replace all uses of sq() to get the square of a piece, with
+        // direct calls to piece_location(), but make it return a square
+        var xy = piece_location(code);
+
+        if (!xy) {
+            // Piece was taken, no square
+            return null;
+        }
+
+        x = xy[0];
+        y = xy[1];
+    // Is it x,y passed as separate parameters?
+    } else if (extra !== undefined) {
+        x = code;
+        y = extra;
+    // Is it a string in algebraic notation that can be converted?
+    } else if (code.charCodeAt) {
+        var xy = filerank2xy(code);
+
+        // TODO: can JS do list element assignment like x,y=...?    
+        x = xy[0];
+        y = xy[1];
+    } else {
+        assert(false, "sq(" + code + ", " + extra + "): couldn't find out what I was given");
+    }
+
+    assert(x >= 1 && x <= FILE_MAX && y >= 1 && y <= RANK_MAX, "sq(" + code + ", " + extra + 
+        "): out of range (" + x + ", " + y + ")");
+
+    return $('board-body').childNodes[9 - y].childNodes[x];
+}
+
+//// LOW-LEVEL FUNCTIONS
+
+// Random integer within range
+function randint(minimum, maximum)
+{
+    return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
+}
+
+// Uppercase first character, like in Perl
+function ucfirst(s)
+{
+    assert(s.substring, "ucfirst(" + s + "): no substring method, not a string? callee=" + 
+            arguments.callee);
+    return s.substring(0, 1).toUpperCase() + s.substring(1);
+}
+
+// Based on http://aymanh.com/9-javascript-tips-you-may-not-know
+function AssertException(message) { this.message = message; }
+AssertException.prototype.toString = function() {
+    return 'AssertException: ' + this.message;
+};
+
+function assert(expression, message)
+{
+    if (!expression) {
+        alert(message);
+        if (window.console && console.trace) {
+            // Give a stack trace for Firebug
+            console.trace();
+        }
+
+        throw new AssertException(message);
+    }
+}
+
+// Based on http://tech.hickorywind.org/articles/2008/10/24/turning-off-text-selection-in-javascript
+function enable_document_selection(enable) {
+    if(enable) {
+        document.onselectstart = _original_onselectstart;
+    } else {
+        _original_onselectstart = document.onselectstart;
+        document.onselectstart = function() { return false; }
+    }
+}
+
+</script>
+</head>
+<body>
+<table id="outer">
+ <tr>
+  <td style="vertical-align: top">
+<table class="board" id="board">
+<tbody id="board-body"
+><tr
+  ><td></td
+  ><td class="file label">a</td
+  ><td class="file label">b</td
+  ><td class="file label">c</td
+  ><td class="file label">d</td
+  ><td class="file label">e</td
+  ><td class="file label">f</td
+  ><td class="file label">g</td
+  ><td class="file label">h</td
+></tr
+><tr
+  ><td class="rank label">8</td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square right-edge"></td
+></tr
+><tr
+ ><td class="rank label">7</td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square right-edge"></td
+></tr
+><tr
+  ><td class="rank label">6</td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square right-edge"></td
+></tr
+><tr
+ ><td class="rank label">5</td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square right-edge"></td
+></tr
+><tr
+  ><td class="rank label">4</td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square right-edge"></td
+></tr
+><tr
+ ><td class="rank label">3</td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square right-edge"></td
+></tr
+><tr
+  ><td class="rank label">2</td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square right-edge"></td
+></tr
+><tr
+ ><td class="rank label">1</td
+ ><td class="black square bottom-edge"></td
+ ><td class="white square bottom-edge"></td
+ ><td class="black square bottom-edge"></td
+ ><td class="white square bottom-edge"></td
+ ><td class="black square bottom-edge"></td
+ ><td class="white square bottom-edge"></td
+ ><td class="black square bottom-edge"></td
+ ><td class="white square bottom-edge right-edge"></td
+></tr
+></tbody
+></table>
+
+ </td><td style="vertical-align: top">
+ <noscript><p>JavaScript is disabled, nothing will work!</p></noscript>
+
+ <div id="game_ui">
+
+ <!-- Header elements, game metadata. Hidden/shown as needed. -->
+  <!-- TODO: click header to edit as PGN, instead of FEN. Overlay header and
+    move text with a text field, output PGN, then when saved, load PGN and
+    with new header and move text -->
+ <p id="header" style="xdisplay: none; text-align: center" 
+  onclick="javascript:edit_pgn()">
+  <span class="players">
+   <span id="White" class="player_name" style="display: none">White</span>
+   <span class="player_elo"><span style="display: none" class="show_WhiteElo">(</span><span id="WhiteElo" style="display: none">1500</span><span class="show_WhiteElo" style="display: none">)</span></span>
+    <span id="vs" style="display: none" class="show_White">vs.</span>
+   <span id="Black" class="player_name" style="display: none">Black</span>
+   <span class="player_elo"><span style="display: none" class="show_BlackElo">(</span><span id="BlackElo" style="display: none">1500</span><span class="show_BlackElo" style="display: none">)</span></span>
+  </span>
+   <br>
+
+   <span id="Event" style="display: none">Event</span>
+   <span style="display: none" class="show_Round">(</span><span id="Round" style="display: none">Round</span><span style="display: none" class="show_Round">)</span>
+   <span id="Site" style="display: none">Site</span><br>
+
+   <span id="Date" style="display: none">Date</span>
+   <span id="Time" style="display: none">Time</span>
+ </p> 
+
+ <!-- TODO: hide all this, since the purpose of this app is
+ not to implement chess AI. But having automatic moves is useful for testing. -->
+ <label for="white_computer">White PC<input type="checkbox" id="white_computer" name="white_computer" onclick="computer_move_if_applicable()"></label> 
+ <label for="black_computer">Black PC<input type="checkbox" id="black_computer" name="black_computer" onclick="computer_move_if_applicable()"></label><br>
+
+ <p>
+  <span id="status"></span> 
+  <span id="dash" style="display: none">&mdash;</span>
+  <span id="check"></span>
+ </p>
+
+  <div id="moves_container" style="width: 500px; text-align: justify">
+  <!-- TODO: scrollbar, http://livepipe.net/control/scrollbar -->
+  <p id="moves"></p>
+  </div>
+</div>
+
+ </td>
+</tr>
+</table>
+
+</body>
+</html>
