@@ -352,8 +352,6 @@ described on that page. Additionally:
 <p>~n/m is a special token representing all squares on the board, except where the piece is currently at. For all squares everywhere, combine
 with ~0/0 for ~n/m, ~0/0.
 
-<!-- TODO: m for multi-move, to represent castling rooks? -->
-
 <p>The "e" flag indicates that the piece can only move to the last square in the direction given, exactly not any less. For example, 2&gt;e means the piece must move exactly two squares forward, not one square, even though it is still a rider (cannot leap).
 
 <p>"E" says to store the square behind where the piece moved, in a special global GAME_STATE.ep_target. This is used for pawn en passant moves. The two-move causes this variable to be updated, for example: oi2&gt;eE.
@@ -369,6 +367,10 @@ perspective of the active color.
 <p>Flags for raw moves can be entered in brackets after a semicolon, with additional flags after another semicolon. A flag alone
 specifies a true value: [0,2;initial_only] is the same as using the "o" flag. Flags can also accept relative moves
 as values: [0,2;initial_only;if_unblocked=0,1].
+
+<p>Braces add flags to arbitrary Parlett moves. Example: {oi2>;mark_ep_target}.
+
+<p>Parlett only supports = for sideways moves. Extended Parlett adds &gt;&gt; for right, and &lt;&lt; for left.
 
 <h1>Algebraic Descriptive Notation</h1>
 <p><em>English descriptive notation</em> has several advantages over algebraic notation. Unfortunately, it labels pieces and squares based on chess1 pieces.
