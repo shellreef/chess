@@ -1838,6 +1838,45 @@ function relative_decode_direction(ch, ch2)
     }
 }
 
+// Decode {nested parlett;flag1;flag2;...}
+function nested_flags(parlett)
+{
+    var rel_moves, flags_text, flags;
+    
+    flags_text = parlett.split(";");
+    rel_moves = NEW_unfiltered_moves(flags_text.shift());
+
+    // Semicolon-separated flags
+    flags = {};
+    for (var i = 0; i < flags_text.length; ++i) {
+        var flag_text = flags_text[i];
+        var key, value;
+       
+        // Allow if_unblocked=0,1, etc.
+        if (/=/.test(flag_text)) {
+            // Unfortunately, need JavaScript 1.8 to do [x,y] = ...
+            var ary = flag_text.split("=");
+            var left = ary[0], right = ary[1];
+            value = right.split(",");
+            value = value.map(function(x) { return parseInt(x, 10); });
+            key = left;
+        } else {
+            key = flag_text;
+            value = true;
+        }
+        flags[key] = value;
+    }
+
+
+    for (var flag in flags) {
+        for (var j = 0; j < rel_moves.length; ++j) {
+            rel_moves[j][2][flag] = flags[flag];
+        }
+    }
+
+    return rel_moves;
+}
+
 // Decodes an explicit relative move that was in square brackets: [0,2;initial_only]
 function decode_relative_raw_move(text_move, flags)
 {
@@ -1935,6 +1974,25 @@ function relative_decode_parlett(parlett)
                 text_move += ch;
             }
             rel_moves.push(decode_relative_raw_move(text_move, flags));
+
+        } else if (ch === "{") {
+            var inner, nest;
+            
+            inner = "";
+            nest = 1;
+            while(i < parlett.length)
+            {
+                i += 1;
+                var ch = parlett.substr(i, 1);
+                if (ch === "}") { nest -= 1; }
+                if (ch === "{") { nest += 1; }
+                if (nest === 0) { break; } 
+
+                inner += ch;
+            }
+
+            // {oi2>, asdf.. ;flag1;flag2;flag3...]
+            return nested_flags(inner);
 
         // Standard Parlett
         } else if (/[0-9]/.test(ch)) {
