@@ -1838,16 +1838,24 @@ function relative_decode_direction(ch, ch2)
     }
 }
 
-// Decode {nested parlett;flag1;flag2;...}
-function nested_flags(parlett)
+// Parse semicolon separated flags, possibly key/value pairs
+// foo;bar sets foo:true and bar:true, can also set relative coordinates:
+// if_unblocked=1,2.
+function parse_flags(text, flags)
 {
-    var rel_moves, flags_text, flags;
-    
-    flags_text = parlett.split(";");
-    rel_moves = NEW_unfiltered_moves(flags_text.shift());
+    var flags_text;
+
+    if (flags === undefined) {
+        flags = {};
+    }
+
+    if (Object.isArray(text)) {
+        flags_text = text;
+    } else {
+        flags_text = text.split(";");
+    }
 
     // Semicolon-separated flags
-    flags = {};
     for (var i = 0; i < flags_text.length; ++i) {
         var flag_text = flags_text[i];
         var key, value;
@@ -1867,6 +1875,19 @@ function nested_flags(parlett)
         flags[key] = value;
     }
 
+    return flags;
+}
+
+// Decode the Extended Parlett {} construct, which adds flags
+// to arbitrary move text. {parlett, flags}
+function nested_flags(parlett)
+{
+    var rel_moves, flags_text, flags;
+    
+    flags_text = parlett.split(";");
+    rel_moves = NEW_unfiltered_moves(flags_text.shift());
+
+    flags = parse_flags(flags_text);
 
     for (var flag in flags) {
         for (var j = 0; j < rel_moves.length; ++j) {
@@ -1878,13 +1899,12 @@ function nested_flags(parlett)
 }
 
 // Decodes an explicit relative move that was in square brackets: [0,2;initial_only]
-function decode_relative_raw_move(text_move, flags)
+function decode_relative_raw_move(text_move, existing_flags)
 {
-    var xy_text_opts, xy_text, opts, xy, x, y;
+    var xy_text_flags, xy_text, xy, x, y;
     
-    xy_text_opts = text_move.split(";");
-    xy_text = xy_text_opts.shift();
-    opts = xy_text_opts;
+    xy_text_flags = text_move.split(";");
+    xy_text = xy_text_flags.shift();
 
     if (xy_text.indexOf(",") != 0) {
         // Relative x,y
@@ -1897,24 +1917,7 @@ function decode_relative_raw_move(text_move, flags)
         assert(false, "decode_relative_raw_move(" + text_move + ", " + flags + "): not [x,y;flags], missing comma");
     }
 
-    // Semicolon-separated flags
-    for (var i = 0; i < opts.length; ++i) {
-        var opt = opts[i];
-        var key, value;
-       
-        // Allow if_unblocked=0,1, etc.
-        if (/=/.test(opt)) {
-            var ary = opt.split("=");
-            var left = ary[0], right = ary[1];
-            value = right.split(",");
-            value = value.map(function(x) { return parseInt(x, 10); });
-            key = left;
-        } else {
-            key = opt;
-            value = true;
-        }
-        flags[key] = value;
-    }
+    flags = parse_flags(xy_text_flags, existing_flags);
 
     return [x, y, flags];
 }
