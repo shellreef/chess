@@ -349,7 +349,9 @@ google.setOnLoadCallback(function() {
 
     //load_fen("r/8/8/1N3b2/3PP3/1P1BBN/8/8 w - - 0 17"); // test riders being blocked
     //load_fen("8/8/8/5b2/3PP3/1P2B/8/8 w - - 0 17"); // bug: bishop can't leap
-    load_fen("8/8/8/5b2/3PP3/1P2B/8/8 w - - 0 17"); // bug: bishop can't leap
+    load_fen("8/8/8/5b2/3PP3/1P2B/8/8 w - - 0 17"); 
+    //load_fen("8/8/8/8/3PP3/1P2B/8/8 w - - 0 17"); 
+    
     //load_fen("rnbqkbnr/pppppppp/9/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"); // 1. P-K4
     //load_fen("8/8/8/3x(test)X(test)3/8/8/8/8 w - d6 0 5"); 
     //load_fen("8/4x(test)X(test)/x(test)4X(test)/8/2x(test)1DDE/2x(test)x(test)X(test)/1X(test)X(test) w KQkq - 0 1");
@@ -1389,8 +1391,10 @@ function NEW_unfiltered_moves(parlett)
 {
     var choice_groups;
 
-    // TODO: cache! This is constant per parlett. Performance improvement?
-    if (PARLETT_CACHE[parlett]) {
+    // Cache for a performance improvement, since Parlett is constant per move.
+    // XXX Disabled since reuse causes different pieces of same type to interfere, need to clone flags.
+    if (0 && PARLETT_CACHE[parlett]) {
+        // TODO TODO: deep clone
         return PARLETT_CACHE[parlett];
     }
 
@@ -1587,7 +1591,7 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
         if (!is_hypothetical && would_check(piece, move, color)) { 
             continue; 
         }
- 
+
         moves.push(move);
     }
 
