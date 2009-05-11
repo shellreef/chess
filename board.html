@@ -1388,7 +1388,8 @@ function NEW_unfiltered_moves(parlett)
 
     // Cache for a performance improvement, since Parlett is constant per move.
     if (PARLETT_CACHE[parlett]) {
-        return PARLETT_CACHE[parlett].evalJSON();
+        //return eval(PARLETT_CACHE[parlett].evalJSON();
+        return PARLETT_CACHE[parlett];
     }
 
     // Get all the unfiltered moves for the mutually exclusive choices
@@ -1402,7 +1403,8 @@ function NEW_unfiltered_moves(parlett)
     }   
     rel_moves = without_dupes(rel_moves);
 
-    PARLETT_CACHE[parlett] = Object.toJSON(rel_moves);
+    //PARLETT_CACHE[parlett] = Object.toJSON(rel_moves);
+    PARLETT_CACHE[parlett] = rel_moves;
 
     return rel_moves;
 }
