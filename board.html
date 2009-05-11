@@ -347,8 +347,9 @@ google.setOnLoadCallback(function() {
 
     name_squares();    
 
-    //load_fen("r/8/8/1N3b2/3PP3/1P1BBN/8/8 w Q - 0 17"); // test riders being blocked
-    load_fen("8/8/8/5b2/3PP3/1P2B/8/8 w Q - 0 17"); // bug: bishop can't leap
+    //load_fen("r/8/8/1N3b2/3PP3/1P1BBN/8/8 w - - 0 17"); // test riders being blocked
+    //load_fen("8/8/8/5b2/3PP3/1P2B/8/8 w - - 0 17"); // bug: bishop can't leap
+    load_fen("8/8/8/5b2/3PP3/1P2B/8/8 w - - 0 17"); // bug: bishop can't leap
     //load_fen("rnbqkbnr/pppppppp/9/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"); // 1. P-K4
     //load_fen("8/8/8/3x(test)X(test)3/8/8/8/8 w - d6 0 5"); 
     //load_fen("8/4x(test)X(test)/x(test)4X(test)/8/2x(test)1DDE/2x(test)x(test)X(test)/1X(test)X(test) w KQkq - 0 1");
@@ -1467,8 +1468,7 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
             if (capture_piece.hasClassName(color)) {
                 continue;
             }
-        }
-
+        } 
 
         // Must be a capture
         if (flags.capture_only && !capture_piece) {
@@ -1488,6 +1488,7 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
         // more, chain the moves. TODO: fix bug where riders aren't blocked sometimes!
         if (flags.if_unblocked) {
             var key = flags.if_unblocked[0] + "," + flags.if_unblocked[1];
+
             // If was either blocked by a previous move (faster), or there is a
             // piece there but it wasn't a valid move. For example, elephant (2X)
             // can be blocked, since it is not a leaper (sticking the elephant's eye),
@@ -1575,14 +1576,20 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
 
         move = [x, y, flags];
 
+        // TODO: faster check checking? maybe split into:
+        // 1. if not in check, can't move into
+        //   a. can't move a pinned piece that would cause check, unblocks attack
+        //   b. can't move royal piece into attacked square
+        // 2. if in check, must move out of
+        //   a. move royal piece (if double check, only can move)
+        //   b. capture with another piece
+        //   c. block with another piece
         if (!is_hypothetical && would_check(piece, move, color)) { 
             continue; 
         }
  
         moves.push(move);
     }
-
-    // TODO: check if puts in check! See oldmvgenboard.html.
 
     return moves;
 }
