@@ -347,18 +347,17 @@ google.setOnLoadCallback(function() {
 
     name_squares();    
 
-    load_fen("r/8/8/1N3b2/3PP3/1P1BBN/8/8 w - - 0 17"); // test that Parlett moves are being cloned
+    //load_fen("r/8/8/1N3b2/3PP3/1P1BBN/8/8 w - - 0 17"); // test that Parlett moves are being cloned
     //load_fen("8/8/8/5b2/3PP3/1P2B/8/8 w - - 0 17"); 
     //load_fen("8/8/8/5b2/3PP3/1P2B/8/8 w - - 0 17"); 
     //load_fen("8/8/8/8/3PP3/1P2B/8/8 w - - 0 17"); 
-
     //load_fen("rnbqkbnr/pppppppp/9/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"); // 1. P-K4
     //load_fen("8/8/8/3x(test)X(test)3/8/8/8/8 w - d6 0 5"); 
     //load_fen("8/4x(test)X(test)/x(test)4X(test)/8/2x(test)1DDE/2x(test)x(test)X(test)/1X(test)X(test) w KQkq - 0 1");
     //load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // test fairy pieces
     //load_fen("rnbqmbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQMBNR w KQkq - 0 1");   // no royal pieces
 
-    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
+    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
     //load_fen("bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1");    // Church Chess
     //load_fen("rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq - 0 1"); // Advance Chess
     //load_fen("4rbqk/4rb1q/4r1bb/5rrr/RRR5/BB1R4/Q1BR4/KQBR4 w - - 0 1");    // Corner Chess
@@ -1505,6 +1504,9 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
             if (capture_piece.hasClassName(color)) {
                 continue;
             }
+
+            // For move notations
+            flags.capture = capture_piece;
         } 
 
         // Must be a capture
