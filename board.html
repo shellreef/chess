@@ -131,6 +131,7 @@ var PREFS = {
 
 // Chess movement notations, in descending precedence. 
 // For more info see http://en.wikipedia.org/wiki/Chess_notation
+// TODO: make an assocative array, map to description, for output_notation selection
 var AVAILABLE_NOTATIONS = [
     "SAN",  // Standard Algebraic Notation              Bxc6        e5
     "LAN",  // Long Algebraic Notation                  Bb5xc6      e7-e5
@@ -347,7 +348,7 @@ google.setOnLoadCallback(function() {
     /* Safari & IE7: Disable text selection to stop interfering with dragging */
     enable_document_selection(false);    
 
-    name_squares();    
+    name_squares();
 
     //load_fen("r/8/8/1N3b2/3PP3/1P1BBN/8/8 w - - 0 17"); // test that Parlett moves are being cloned
     //load_fen("8/8/8/5b2/3PP3/1P2B/8/8 w - - 0 17"); 
@@ -2164,6 +2165,8 @@ function name_squares()
                 alert("TODO: easter egg");
             }
     };
+
+    
 }
 
 // Acknowledge that a piece was captured. Called by move_piece_to_square(), which
@@ -3308,6 +3311,12 @@ function enable_document_selection(enable) {
  not to implement chess AI. But having automatic moves is useful for testing. -->
  <label for="white_computer">White PC<input type="checkbox" id="white_computer" name="white_computer" onclick="computer_move_if_applicable()"></label> 
  <label for="black_computer">Black PC<input type="checkbox" id="black_computer" name="black_computer" onclick="computer_move_if_applicable()"></label><br>
+
+ <!-- TODO: populate from AVAILABLE_NOTATIONS -->
+ <p>notation: <select id="output_notation" name="output_notation">
+ </select>
+
+ <p><a href="#" onclick="edit_pgn()">edit pgn</a>
  </div>
  </div>
 
