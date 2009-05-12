@@ -166,7 +166,7 @@ var GAME_STATE = {
 };    
 
 // Moves that can be made right now, for each active piece.
-var VALID_MOVES = null;            // Keyed by filerank of source, array of [[x,y,flags]] destinations
+var VALID_MOVES = null;            // Keyed by filerank of source, array of moves, x, y and any flags
 var VALID_MOVES_OPP = null;        // Moves opponent could make, if it was their turn (attacking)
 var VALID_MOVE_NOTATIONS = null;   // Map SAN, LAN, RAN, CRAN, FAN, coordinate, Smith etc. -> [piece, square]
 var ALL_DROP_TARGETS = [];         // Droppables for UI
@@ -1354,34 +1354,6 @@ function piece_moved(piece)
     } else {
         assert("piece_moved(" + piece + "): neither white nor black");
     }
-}
-
-// Convert relative move destinations (0,0 = where the piece is,
-// the coordinates are +/-) to absolute (0,0 = top-left board).
-// Note: Coordinates out of bounds *are* discarded, but not those that
-// land on an existing piece (one's own or the enemy's).
-// Note2: moves must be array of [x,y,flags]; the third element is required
-function move_rel2abs(xy_location, moves)
-{
-    var absolutes = [];
-
-    for (var i = 0; i < moves.length; ++i) {
-        var rel = moves[i];
-        var flags = rel[2];
-        var x = xy_location[0] + rel[0];
-        var y = xy_location[1] + rel[1];
-
-        if (x < 1 || x > FILE_MAX || y < 1 || y > RANK_MAX) {
-            //console.log("reject", x, y);
-            continue;    // off board, TODO: option for chess variants to wrap around?
-        }
-
-        var abs = [x, y, flags];
-
-        absolutes.push(abs);
-    }
-
-    return absolutes;
 }
 
 //// PARLETT NOTATION FUNCTIONS
