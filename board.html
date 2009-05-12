@@ -1452,11 +1452,11 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
         if (color === "black") {
             rel_y = -rel_y;
             // Reverse any embedded relative coordinates.
-            if (flags.if_unblocked_dy) { flags.if_unblocked_dy = -flags.if_unblocked_dy; }
-            if (flags.if_unblocked2_dy) { flags.if_unblocked2_dy = -flags.if_unblocked2_dy; }
-            if (flags.if_unblocked3_dy) { flags.if_unblocked3_dy = -flags.if_unblocked3_dy; }
-            if (flags.capture_at_dy) { flags.capture_at_dy = -flags.capture_at_dy; }
-            if (flags.mark_ep_target_dy) { flags.mark_ep_target_dy = -flags.mark_ep_target_dy; }
+            if (flags.if_unblocked) { flags.if_unblocked[1] = -flags.if_unblocked[1]; }
+            if (flags.if_unblocked2) { flags.if_unblocked2[1] = -flags.if_unblocked2[1]; }
+            if (flags.if_unblocked3) { flags.if_unblocked3[1] = -flags.if_unblocked3[1]; }
+            if (flags.capture_at) { flags.capture_at[1] = -flags.capture_at[1]; }
+            if (flags.mark_ep_target) { flags.mark_ep_target[1] = -flags.mark_ep_target[1]; }
         }
 
         x = rel_x + start_x;
@@ -1499,28 +1499,28 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
 
         // Blocked by an obstruction. Can check for up to three spaces. To check
         // more, chain the moves. TODO: fix bug where riders aren't blocked sometimes!
-        if (flags.if_unblocked_dx) {
-            var key = flags.if_unblocked_dx + "," + flags.if_unblocked_dy;
+        if (flags.if_unblocked) {
+            var key = flags.if_unblocked[0] + "," + flags.if_unblocked[1];
 
             // If was either blocked by a previous move (faster), or there is a
             // piece there but it wasn't a valid move. For example, elephant (2X)
             // can be blocked, since it is not a leaper (sticking the elephant's eye),
             // non-hippogonal rider.
-            if (blocked[key] || pc_or_offboard(flags.if_unblocked_dx + start_x, flags.if_unblocked_dy + start_y)) {
+            if (blocked[key] || pc_or_offboard(flags.if_unblocked[0] + start_x, flags.if_unblocked[1] + start_y)) {
                 blocked[rel_x + "," + rel_y] = true;
                 continue;
             }
         }
-        if (flags.if_unblocked2_dx) {
-            var key = flags.if_unblocked2_dx + "," + flags.if_unblocked2_dy;
-            if (blocked[key] || pc_or_offboard(flags.if_unblocked2_dx + start_x, flags.if_unblocked2_dy + start_y)) {
+        if (flags.if_unblocked2) {
+            var key = flags.if_unblocked2[0] + "," + flags.if_unblocked2[1];
+            if (blocked[key] || pc_or_offboard(flags.if_unblocked2[0] + start_x, flags.if_unblocked2[1] + start_y)) {
                 blocked[rel_x + "," + rel_y] = true;
                 continue;
             }
         }
-        if (flags.if_unblocked3_dx) {
-            var key = flags.if_unblocked3_dx + "," + flags.if_unblocked3_dy;
-            if (blocked[key] || pc_or_offboard(flags.if_unblocked3_dx + start_x, flags.if_unblocked3_dy + start_y)) {
+        if (flags.if_unblocked3) {
+            var key = flags.if_unblocked3[0] + "," + flags.if_unblocked3[1];
+            if (blocked[key] || pc_or_offboard(flags.if_unblocked3[0] + start_x, flags.if_unblocked3[1] + start_y)) {
                 blocked[rel_x + "," + rel_y] = true;
                 continue;
             }
@@ -1533,10 +1533,10 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
         // the pawn moves there.
 
         if (!is_hypothetical) {
-           if (flags.mark_ep_target_dx) {
+           if (flags.mark_ep_target) {
                 POSSIBLE_EP_TARGETS[xy2filerank([x, y])] = 
-                    [flags.mark_ep_target_dx + start_x,
-                     flags.mark_ep_target_dy + start_y];
+                    [flags.mark_ep_target[0] + start_x,
+                     flags.mark_ep_target[1] + start_y];
                 // relative positions are hardcoded above. 
             }
 
@@ -1571,7 +1571,7 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
         // Not actually implemented. En passant capture location is hardcoded.
         /*
         if (flags.capture_at) {
-           var cx = flags.capture_at_x + start_x, cy = flags.capture_at_y + start_y;
+           var cx = flags.capture_at[0] + start_x, cy = flags.capture_at[1] + start_y;
 
            if (cx < 1 || cy < 1 || cx > RANK_MAX || cy > FILE_MAX) {
                continue;
@@ -1600,8 +1600,6 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
         if (!is_hypothetical && would_check(piece, move, color)) { 
             continue; 
         }
-
-        // TODO: important: don't let move through check, or to get out of check! IMPORTANT`a
 
         moves.push(move);
     }
@@ -1696,9 +1694,8 @@ function parse_flags(text, flags)
             if (value.length === 1) {
                 flags[left] = value[0];
             } else if (value.length === 2) {
-                // Relative coordinates
-                flags[left + "_dx"] = value[0];
-                flags[left + "_dy"] = value[1];
+                flags[left] = [value[0], value[1]];
+                // TODO: _dx, _dy
             } else {
                 assert(false, "parse_flags(" + text + ", " + flags + "): not 1 or 2 elements: " + value);
             }
@@ -1888,11 +1885,9 @@ function relative_decode_parlett(parlett)
                 // ~n* (lion) for example, is like a queen, but not blocked by intervening pieces.
                 
                 if (prev_rel_x !== null && prev_rel_y !== null && movement === "rider") { 
-                    flags.if_unblocked_dx = prev_rel_x;
-                    flags.if_unblocked_dy = prev_rel_y;
+                    flags.if_unblocked = [prev_rel_x, prev_rel_y];
                 } else {
-                    delete flags.if_unblocked_dx;
-                    delete flags.if_unblocked_dy;
+                    delete flags.if_unblocked;
                 }
 
                 rel_x += dir[0];
