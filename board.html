@@ -1389,7 +1389,6 @@ function deep_copy(obj) {
    };
    return f(obj);
 }
-// XXXXXXXXXXX TODO!
 
 // Get the unfiltered, relative moves for a Parlett string.
 var PARLETT_CACHE = {};
@@ -1401,6 +1400,7 @@ function NEW_unfiltered_moves(parlett)
     if (PARLETT_CACHE[parlett]) {
         //return deep_copy(PARLETT_CACHE[parlett]);
         return PARLETT_CACHE[parlett].evalJSON();
+        //return PARLETT_CACHE[parlett];
     }
 
     // Get all the unfiltered moves for the mutually exclusive choices
@@ -1442,7 +1442,7 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
     moves = [];
     blocked = {};
     for (var i = 0; i < rel_moves.length; ++i) {
-        var rel_x, rel_y, flags, move, x, y;
+        var rel_x, rel_y, flags, abs_move, x, y, abs_flags;
         
         rel_x = rel_moves[i][0], rel_y = rel_moves[i][1]; 
         flags = rel_moves[i][2];
@@ -1462,6 +1462,9 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
         x = rel_x + start_x;
         y = rel_y + start_y;
 
+        abs_flags = {};
+        abs_move = [x, y, abs_flags];
+
         if (x < 1 || y < 1 || x > FILE_MAX || y > RANK_MAX) {
             // Out of bounds
             continue;
@@ -1480,7 +1483,7 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
             }
 
             // For move notations
-            flags.capture = capture_piece;
+            abs_flags.capture = capture_piece;
         } 
 
         // Must be a capture
@@ -1527,8 +1530,6 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
         }
 
 
-
-
         // Map pawn moves to what the en passant target will be if
         // the pawn moves there.
 
@@ -1550,7 +1551,7 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
             }
 
             // For move notations, informational purposes, only.
-            flags.en_passant_capture = true;
+            abs_flags.en_passant_capture = true;
         }
 
         // Castling moves
@@ -1580,14 +1581,12 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
            var capture = pc(cx, cy);
            console.log("C",xy2filerank([cx,cy]));
            if (capture) {
-               flags.capture = capture;
+               abs_flags.capture = capture;
            } else {
                // Nothing there to capture.
                continue;
            }
         }*/
-
-        move = [x, y, flags];
 
         // TODO: faster check checking? maybe split into:
         // 1. if not in check, can't move into
@@ -1597,11 +1596,11 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
         //   a. move royal piece (if double check, only can move)
         //   b. capture with another piece
         //   c. block with another piece
-        if (!is_hypothetical && would_check(piece, move, color)) { 
+        if (!is_hypothetical && would_check(piece, abs_move, color)) { 
             continue; 
         }
 
-        moves.push(move);
+        moves.push(abs_move);
     }
 
     return moves;
