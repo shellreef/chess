@@ -1421,7 +1421,7 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
         var if_unblocked2_dx = flags.if_unblocked2_dx, if_unblocked2_dy = flags.if_unblocked2_dy;
         var if_unblocked3_dx = flags.if_unblocked3_dx, if_unblocked3_dy = flags.if_unblocked3_dy;
         var capture_at_dx = flags.capture_at_dx, capture_at_dy = flags.capture_at_dy;
-        var mark_ep_target_dx = flags.capture_at_dx, mark_ep_target_dy = flags.mark_ep_target_dy;
+        var mark_ep_target_dx = flags.mark_ep_target_dx, mark_ep_target_dy = flags.mark_ep_target_dy;
 
         // Positive is forwards, so mirror for black.
         if (color === "black") {
@@ -1477,7 +1477,7 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
 
         // Blocked by an obstruction. Can check for up to three spaces. To check
         // more, chain the moves. TODO: fix bug where riders aren't blocked sometimes!
-        if (if_unblocked_dy) {
+        if (if_unblocked_dy !== undefined) {
             var key = if_unblocked_dx + "," + if_unblocked_dy;
 
             // If was either blocked by a previous move (faster), or there is a
@@ -1489,14 +1489,14 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
                 continue;
             }
         }
-        if (if_unblocked2_dy) {
+        if (if_unblocked2_dy !== undefined) {
             var key = if_unblocked2_dx + "," + if_unblocked2_dy;
             if (blocked[key] || pc_or_offboard(if_unblocked2_dx + start_x, if_unblocked2_dy + start_y)) {
                 blocked[rel_x + "," + rel_y] = true;
                 continue;
             }
         }
-        if (if_unblocked3_dy) {
+        if (if_unblocked3_dy !== undefined) {
             var key = if_unblocked3_dx + "," + if_unblocked3_dy;
             if (blocked[key] || pc_or_offboard(if_unblocked3_dx + start_x, if_unblocked3_dy + start_y)) {
                 blocked[rel_x + "," + rel_y] = true;
@@ -1509,7 +1509,7 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
         // the pawn moves there.
 
         if (!is_hypothetical) {
-           if (flags.mark_ep_target_dx) {
+           if (mark_ep_target_dx !== undefined) {
                 POSSIBLE_EP_TARGETS[xy2filerank([x, y])] = 
                     [mark_ep_target_dx + start_x,
                      mark_ep_target_dy + start_y];
@@ -1546,7 +1546,7 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
         // Capture at relative location, instead of at destination square.
         // Not actually implemented. En passant capture location is hardcoded.
         /*
-        if (flags.capture_at) {
+        if (capture_at_dx !== undefined) {
            var cx = capture_at_dx + start_x, cy = capture_at_dy + start_y;
 
            if (cx < 1 || cy < 1 || cx > RANK_MAX || cy > FILE_MAX) {
