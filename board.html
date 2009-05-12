@@ -1282,8 +1282,8 @@ function computer_move_if_applicable()
     //     fork if can.. something to entertain a beginner. Or better yet,
     // plugin to a remote network server.
     var keys = VALID_MOVE_NOTATIONS.SAN.keys();
-    //var alg_move = keys[randint(0, keys.length - 1)];
-    var alg_move = keys[0];
+    var alg_move = keys[randint(0, keys.length - 1)];
+    //var alg_move = keys[0];
 
     var piece_square = VALID_MOVE_NOTATIONS.SAN.get(alg_move);
 
