@@ -1358,38 +1358,6 @@ function piece_moved(piece)
 
 //// PARLETT NOTATION FUNCTIONS
 
-// Based on http://www.jasonclawson.com/2008/05/29/extjs-javascript-deep-copy/
-function deep_copy(obj) {
-   var seenObjects = [];
-   var mappingArray = [];
-   var  f = function(simpleObject) {
-          var indexOf = seenObjects.indexOf(simpleObject);
-          if (indexOf == -1) {
-                   if (Ext.type(simpleObject)) {
-                           seenObjects.push(simpleObject);
-                           var newObject = {};
-                           mappingArray.push(newObject);
-                           for (var p in simpleObject)
-                                  newObject[p] = f(simpleObject[p]);
-                           newObject.constructor = simpleObject.constructor;
-                        return newObject;
-                  } else if (simpleObject.length) { 
-                           seenObjects.push(simpleObject);
-                           var newArray = [];
-                           mappingArray.push(newArray);
-                           for(var i=0,len=simpleObject.length; i<len; i++)
-                                  newArray.push(f(simpleObject[i]));
-                        return newArray;
-                  } else {
-                        return simpleObject;
-                  }
-          } else {
-                 return mappingArray[indexOf];
-          }
-   };
-   return f(obj);
-}
-
 // Get the unfiltered, relative moves for a Parlett string.
 // Warning: do not modify the moves! Otherwise other moves will get confused.
 var PARLETT_CACHE = {};
