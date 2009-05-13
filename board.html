@@ -344,6 +344,11 @@ var HYPOTHETICAL_PIECE = null;
 var HYPOTHETICAL_TO = null;
 var HYPOTHETICAL_CAPTURED = null;
 
+/* Global functions for jslint to recognize. TODO: make this in objects */
+
+/*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved NEW_unfiltered_moves NEW_filtered_moves relative_decode_direction parse_flags nested_flags decode_relative_raw_move relative_decode_parlett without_dupes opposite_color set_turn set_check_message check_repetition name_squares capture_piece algebraic_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc piece_location image_path_for create_piece highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection*/
+ 
+
 google.setOnLoadCallback(function() {
     /* Safari & IE7: Disable text selection to stop interfering with dragging */
     enable_document_selection(false);    
@@ -2593,10 +2598,11 @@ function name_pieces()
 // in algebraic notation.
 function algebraic_letter(type)
 {
-    if (PIECE_TYPES[type].alg_letter !== undefined)
+    if (PIECE_TYPES[type].alg_letter !== undefined) {
         return PIECE_TYPES[type].alg_letter;
-    else
+    } else {
         return PIECE_TYPES[type].letter;
+    }
 }
 
 // Given a letter, find the name of the piece (R = rook, etc.). The letter
@@ -3081,7 +3087,7 @@ function assert(expression, message)
 var ORIGINAL_ONSELECTSTART;
 function enable_document_selection(enable) {
     if(enable) {
-        document.onselectstart = ORIGINAL_ONSELECTSTART;;
+        document.onselectstart = ORIGINAL_ONSELECTSTART;
     } else {
         ORIGINAL_ONSELECTSTART = document.onselectstart;
         document.onselectstart = function() { return false; };
