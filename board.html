@@ -1180,7 +1180,7 @@ function disambiguate_notations(notations)
         // Choose shortest (now unambiguous) notation
         // Could also do: min_length = same_moves.pluck("length").min();, then partition
         // Rather, sort by length, ascending.
-        same_moves.sort(function(x, y) { return x.length - y.length });
+        same_moves.sort(function(x, y) { return x.length - y.length; });
 
         // The shortest, non-ambiguous move is canonical. But also keep the
         // synonymous moves around.
@@ -1721,7 +1721,7 @@ function decode_relative_raw_move(text_move, existing_flags)
     xy_text_flags = text_move.split(";");
     xy_text = xy_text_flags.shift();
 
-    if (xy_text.indexOf(",") != 0) {
+    if (xy_text.indexOf(",") !== 0) {
         // Relative x,y
         xy = xy_text.split(",");
         x = parseInt(xy[0], 10);
@@ -1780,16 +1780,16 @@ function relative_decode_parlett(parlett)
         // Direct move text: [rel_x,rel_y;flag1;flag2;...] 
         } else if (ch === "[") {
             var text_move = "";
-            var nest = 1;
+            var nest_level = 1;
             while(i < parlett.length)
             {
                 i += 1;
-                var ch = parlett.substr(i, 1);
-                if (ch === "]") { nest -= 1; }
-                if (ch === "[") { nest += 1; }
-                if (nest === 0) { break; } 
+                var chi = parlett.substr(i, 1);
+                if (chi === "]") { nest_level -= 1; }
+                if (chi === "[") { nest_level += 1; }
+                if (nest_level === 0) { break; } 
 
-                text_move += ch;
+                text_move += chi;
             }
             rel_moves.push(decode_relative_raw_move(text_move, flags));
 
@@ -1801,12 +1801,12 @@ function relative_decode_parlett(parlett)
             while(i < parlett.length)
             {
                 i += 1;
-                var ch = parlett.substr(i, 1);
-                if (ch === "}") { nest -= 1; }
-                if (ch === "{") { nest += 1; }
+                var cho = parlett.substr(i, 1);
+                if (cho === "}") { nest -= 1; }
+                if (cho === "{") { nest += 1; }
                 if (nest === 0) { break; } 
 
-                inner += ch;
+                inner += cho;
             }
 
             // {oi2>, asdf.. ;flag1;flag2;flag3...]
@@ -1848,7 +1848,7 @@ function relative_decode_parlett(parlett)
             [-b, -a, flags],
             [-b, +a, flags],
             [+b, -a, flags],
-            [+b, +a, flags],
+            [+b, +a, flags]
             ]));
     } else if (directions) {
         for (i = 0; i < directions.length; ++i) {
@@ -1865,7 +1865,8 @@ function relative_decode_parlett(parlett)
             }
 
             rel_x = rel_y = 0;
-            prev_rel_x = null, prev_rel_y = null;
+            prev_rel_x = null;
+            prev_rel_y = null;
             for (var j = 1; j < Math.max(RANK_MAX, FILE_MAX); ++j) {
                 // Riders get blocked. Note that you can have a non-hippogonal leaper.
                 // ~n* (lion) for example, is like a queen, but not blocked by intervening pieces.
@@ -2257,10 +2258,11 @@ function move_piece_to_square(piece, square, is_hypothetical)
     } else if (PIECE_TYPES[piece.type].castle) {
         // TODO: More generic, so will work with chess960 or 480
         // If moved either rook, can't castle on that side.
-        if (from_square.x == 8)
+        if (from_square.x == 8) {
             GAME_STATE.can_castle[GAME_STATE.active_color].short = false;
-        else if (from_square.x == 1)
+        } else if (from_square.x == 1) {
             GAME_STATE.can_castle[GAME_STATE.active_color].long = false;
+        }
     }
 
     // If castling, move the rook in place. Ugly hardcoded.
@@ -2339,14 +2341,14 @@ function move_piece_to_square(piece, square, is_hypothetical)
         var alg_move, ply, turn_info;
        
         if (GAME_STATE.active_color === "white") {
-            alg_move = '<span class="fullmove_number">' + GAME_STATE.fullmove_number + '</span>';
+            alg_move = '<span class="fullmove_number">' + GAME_STATE.fullmove_number + '<\/span>';
             if (GAME_STATE.fullmove_number === 1) {
                 // Period goes to initial position, kind of strange, but its uninstrusive
                 alg_move += move_link(0, ".");
             } else {
                 alg_move += ".";
             }
-            alg_move += " " 
+            alg_move += " ";
         } else {
             alg_move = " ";
         }
@@ -2391,7 +2393,7 @@ function move_piece_to_square(piece, square, is_hypothetical)
     // Do this after a delay, so that when playing computer vs. computer, you can
     // see the move, since they are not animated (Effect.Move) yet.
     setTimeout(function() { 
-            computer_move_if_applicable()
+            computer_move_if_applicable();
             }, 1);
 }
 
