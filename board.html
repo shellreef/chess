@@ -37,7 +37,7 @@ img.piece
   * a CSS property, but a tag attribute. And even if tried to animate
   * background-image, it wouldn't work until 6806248 is fixed.
   *
- /* Or could have two images and change their opacity, see
+  * Or could have two images and change their opacity, see
   * http://www.the-art-of-web.com/css/timing-function/ section 4, but
   * that is even worse. */
  /*-webkit-transition: background 1s linear;*/
@@ -101,10 +101,10 @@ td.legal-move-black { background-color: #a15b17; }
 /* Would be cool to use CSS3 expressions to make the pattern, but they're not in
  * Firefox 3.0.8, maybe in Firefox 3.1. Safari has them though! 
  * If do this, would need to remember to shift nth-child per ranks. 
-/*td:nth-child(2n) { background-color: green } */
+ *td:nth-child(2n) { background-color: green } */
 
 </style>
-<script src="http://www.google.com/jsapi" type="text/javascript"></script>
+<script src="http://www.google.com/jsapi"></script>
 <script type="text/javascript">
 if (!window.google) {
     alert("Google was not found. Nothing will work.");
@@ -127,7 +127,7 @@ var PREFS = {
     IMAGE_SET: "alfaerie"   // http://www.chessvariants.org/graphics.dir/alfaerie/index.html
     //IMAGE_SET: "ariel"    // based on Ariel Unicode MS
     //IMAGE_SET: "chessos"
-}
+};
 
 // Chess movement notations, in descending precedence. 
 // For more info see http://en.wikipedia.org/wiki/Chess_notation
@@ -431,10 +431,10 @@ function edit_pgn()
     // TODO: build dynamically using Builder.node, but it gives me a 
     // builder.js this.NODEMAP undefined error.
     $("game_ui").innerHTML = "<textarea id='pgn' cols='80' rows='35'>" + save_pgn().escapeHTML() + 
-        "</textarea>" + 
+        "<\/textarea>" + 
         "<button type='button' name='ok' accesskey='o' " + 
-        "onclick='javascript:reload_pgn()'>OK</button>" +
-        "<button type='button' name='cancel' onclick='restore_edit()' accesskey='x'>Cancel</button>";
+        "onclick='javascript:reload_pgn()'>OK<\/button>" +
+        "<button type='button' name='cancel' onclick='restore_edit()' accesskey='x'>Cancel<\/button>";
 
     $("pgn").focus();
 }
@@ -459,7 +459,7 @@ function save_pgn()
     }
 
     // Non-standard. The standard tags are FEN and SetUp, for starting position only.
-    dict["CurrentFEN"] = save_fen();
+    dict.CurrentFEN = save_fen();
 
     pgn = output_pgn_dict(dict);
 
@@ -554,7 +554,7 @@ function parse_pgn(pgn)
                 dict[key] = value;
             }
         } else if (line.substr(0, 1) === ";" || line.length === 0) {
-            ;
+            // Comment
         } else {
             move_text += line + " ";
         }
@@ -575,7 +575,7 @@ function parse_pgn(pgn)
         var token = tokens[i];
 
         if (token === "") {
-            ;
+            // Skip
         } else if (in_comment) {
             if (token.substr(token.length - 1) === "}") {
                 in_comment = false;
@@ -630,6 +630,7 @@ function output_pgn_dict(dict)
     var pgn, quoted_value;
 
     pgn = "";
+    // TODO: Use a hash table, avoid for..in
     for (var key in dict) {
         var value = dict[key];
 
@@ -694,7 +695,7 @@ function move_link(ply, text)
     return '<a' + extra + ' id="ply_' + ply + '" class="active_move" ' +
         'href="javascript:load_ply(' + 
             ply +
-        ')">' + text + "</a>";
+        ')">' + text + "<\/a>";
 }
 
 // Decode ply number to color and fullmove number.
@@ -1027,7 +1028,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps)
                 // in the list above, and disambiguate_moves() will delete both since it'll think they
                 // are ambiguous. This would have occurred when piece_name === short_piece_name, that is,
                 // for KP, QP, K, and Q. 
-                ].uniq()])
+                ].uniq()]);
 
 
                 ps.adesc.push([piece, square, [
@@ -1036,7 +1037,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps)
                     piece_letter + "(" + adescriptive_origin + ")" + capture_or_dash + adescriptive_dest,       // P(c2)-c4
                     piece_letter + "(" + adescriptive_origin_rank + ")" + capture_or_dash + adescriptive_dest,  // P(2)-c4
                     piece_letter + "(" + adescriptive_origin_file + ")" + capture_or_dash + adescriptive_dest   // P(c)-c4
-                ].uniq()])
+                ].uniq()]);
             } else if (capture_or_dash === "x") {
                 var captured_name = captured_piece.descriptive_name;
                 var short_captured_name = short_descriptive(captured_name);
@@ -1060,7 +1061,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps)
                     piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + captured_letter,  // P(K4)xP
                     piece_letter + capture_or_dash + captured_letter + "(" + descriptive_dest + ")",    // PxP(Q4)
                     piece_name + capture_or_dash + captured_letter + "(" + descriptive_dest + ")"       // KPxP(Q4)
-                ].uniq()])
+                ].uniq()]);
 
                 ps.adesc.push([piece, square, [
                     piece_letter + capture_or_dash + captured_letter,           // PxP
@@ -1072,7 +1073,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps)
                     piece_letter + "(" + adescriptive_origin + ")" + capture_or_dash + captured_letter, // P(b4)xP
                     piece_letter + capture_or_dash + captured_letter + "(" + adescriptive_dest + ")",   // PxP(c5)
                     piece_aname + capture_or_dash + captured_letter + "(" + adescriptive_dest + ")"     // bPxP(c5)
-                ].uniq()])
+                ].uniq()]);
             } else {
                 assert(false, "calculate_notations: " + capture_or_dash + " is not - or x");
             }
@@ -1129,9 +1130,10 @@ function disambiguate_notations(notations)
     var freq_count = new Hash();
     var canonical_notations = new Hash();
     var synonymous_notations = new Hash();
+    var piece, square;
 
     for (var i = 0; i < notations.length; ++i) {
-        var piece, square, moves;
+        var moves;
 
         piece = notations[i][0];
         square = notations[i][1];
@@ -1167,8 +1169,8 @@ function disambiguate_notations(notations)
     });
 
     for (i = 0; i < notations.length; ++i) {
-        var piece = notations[i][0];
-        var square = notations[i][1];
+        piece = notations[i][0];
+        square = notations[i][1];
         var same_moves = notations[i][2];
         var shortest, synonyms;
 
@@ -1206,7 +1208,7 @@ function disambiguate_notations(notations)
 function calculate_moves(color, is_hypothetical)
 {
     var valid_moves = new Hash();
-    var possible_notations;
+    var possible_notations, notation;
 
     assert(color === "black" || color === "white",
             "calculate_moves(" + color + "): bad color or no color given");
@@ -1219,7 +1221,7 @@ function calculate_moves(color, is_hypothetical)
         // but instead, using an array with linear lookup.
         possible_notations = {};
         for (var i = 0; i < AVAILABLE_NOTATIONS.length; ++i) {
-            var notation = AVAILABLE_NOTATIONS[i];
+            notation = AVAILABLE_NOTATIONS[i];
 
             possible_notations[notation] = [];
         }
@@ -1260,7 +1262,7 @@ function calculate_moves(color, is_hypothetical)
         notations = possible_notations;
         VALID_MOVE_NOTATIONS = {};
         for (i = 0; i < AVAILABLE_NOTATIONS.length; ++i) {
-            var notation = AVAILABLE_NOTATIONS[i];
+            notation = AVAILABLE_NOTATIONS[i];
 
             VALID_MOVE_NOTATIONS[notation] = disambiguate_notations(notations[notation]);
         }
@@ -1379,7 +1381,7 @@ function NEW_unfiltered_moves(parlett)
     // Get all the unfiltered moves for the mutually exclusive choices
     choice_groups = parlett.split(", ");
 
-    rel_moves = []
+    rel_moves = [];
     for (var i = 0; i < choice_groups.length; ++i) {
             // For each group, gather the move options. 
             // (Would be nice if JavaScript arrays had a Python-like .extend)
@@ -1417,7 +1419,8 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
     for (var i = 0; i < rel_moves.length; ++i) {
         var rel_x, rel_y, flags, abs_move, x, y, abs_flags;
        
-        rel_x = rel_moves[i][0], rel_y = rel_moves[i][1]; 
+        rel_x = rel_moves[i][0];
+        rel_y = rel_moves[i][1]; 
         flags = rel_moves[i][2];
 
         // Local copies of relative coords, so don't modify original.
@@ -1481,8 +1484,9 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
 
         // Blocked by an obstruction. Can check for up to three spaces. To check
         // more, chain the moves. TODO: fix bug where riders aren't blocked sometimes!
+        var key;
         if (if_unblocked_dy !== undefined) {
-            var key = if_unblocked_dx + "," + if_unblocked_dy;
+            key = if_unblocked_dx + "," + if_unblocked_dy;
 
             // If was either blocked by a previous move (faster), or there is a
             // piece there but it wasn't a valid move. For example, elephant (2X)
@@ -1494,14 +1498,14 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
             }
         }
         if (if_unblocked2_dy !== undefined) {
-            var key = if_unblocked2_dx + "," + if_unblocked2_dy;
+            key = if_unblocked2_dx + "," + if_unblocked2_dy;
             if (blocked[key] || pc_or_offboard(if_unblocked2_dx + start_x, if_unblocked2_dy + start_y)) {
                 blocked[rel_x + "," + rel_y] = true;
                 continue;
             }
         }
         if (if_unblocked3_dy !== undefined) {
-            var key = if_unblocked3_dx + "," + if_unblocked3_dy;
+            key = if_unblocked3_dx + "," + if_unblocked3_dy;
             if (blocked[key] || pc_or_offboard(if_unblocked3_dx + start_x, if_unblocked3_dy + start_y)) {
                 blocked[rel_x + "," + rel_y] = true;
                 continue;
@@ -1667,7 +1671,7 @@ function parse_flags(text, flags)
         var key, value;
        
         // Allow if_unblocked=0,1, etc.
-        if (/=/.test(flag_text)) {
+        if (flag_text.indexOf("=") != -1) { 
             // Unfortunately, need JavaScript 1.8 to do [x,y] = ...
             var ary = flag_text.split("=");
             var left = ary[0], right = ary[1];
