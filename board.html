@@ -839,7 +839,6 @@ function promote(piece)
 // victim_color's royal pieces could be captured after any of all_moves
 function in_check(victim_color, all_moves)
 {
-    var attacker_color = opposite_color(victim_color);
     var attacked = false;
 
     assert(victim_color === "black" || victim_color === "white",
@@ -855,17 +854,11 @@ function in_check(victim_color, all_moves)
         var filerank = pair.key;
         var moves = pair.value;
 
-        var piece = pc(filerank);
-
-        //console.log("|",filerank,piece);
-
         moves.each(function(move) {
             royals.each(function(royal) {
                 // Note that sq() will return the hypothetical location of the piece,
                 // if any.
                 var square = sq(royal);
-
-                //console.log("||", xy2filerank(move[0], move[1]));
 
                 if (move[0] === square.x && move[1] === square.y) { 
                     // Being attacked!
@@ -1140,7 +1133,7 @@ function disambiguate_notations(notations)
         moves = notations[i][2];
 
         if (!moves) {
-            console.log(notations[i]);
+            //console.log(notations[i]);
         }
 
         for (var j = 0; j < moves.length; ++j) {
@@ -1259,7 +1252,7 @@ function calculate_moves(color, is_hypothetical)
 
     // Gather all the notations, disambiguate and apply
     if (!is_hypothetical) {
-        notations = possible_notations;
+        var notations = possible_notations;
         VALID_MOVE_NOTATIONS = {};
         for (i = 0; i < AVAILABLE_NOTATIONS.length; ++i) {
             notation = AVAILABLE_NOTATIONS[i];
@@ -1291,25 +1284,10 @@ function computer_move_if_applicable()
     var alg_move = keys[randint(0, keys.length - 1)];
     //var alg_move = keys[0];
 
-    var piece_square = VALID_MOVE_NOTATIONS.SAN.get(alg_move);
+    //var piece_square = VALID_MOVE_NOTATIONS.SAN.get(alg_move);
 
     // TODO: do some animation when moving, Effect.Move, to slow it down so we can see it.
     mv(alg_move);
-}
-
-// Return true if "move" is found in the move list "moves", used by filtered_moves()
-function find_move(moves, move)
-{
-    var found = false;
-
-    moves.each(function(m) {
-            if (m[0] === move[0] && m[1] === move[1]) {
-                found = true;
-                throw $break;
-            }
-    });
-
-    return found;
 }
 
 // Return whether moving piece to move would mean that
@@ -1369,7 +1347,7 @@ function piece_moved(piece)
 var PARLETT_CACHE = {};
 function NEW_unfiltered_moves(parlett)
 {
-    var choice_groups;
+    var choice_groups, rel_moves;
 
     // Cache for a performance improvement, since Parlett is constant per move.
     if (PARLETT_CACHE[parlett]) {
@@ -1747,7 +1725,6 @@ function relative_decode_parlett(parlett)
 {
     var distances, directions, flags, movement, rel_moves;
     var hippogonal = false;
-    var end_only = false;
 
     flags = {};
     distances = [];
@@ -1899,77 +1876,6 @@ function relative_decode_parlett(parlett)
     return rel_moves;
 }
 
-// can move up to limit steps, in the direction vectors given,
-// starting at the given location -- but it will be blocked by
-// an occupied square. Note that there could be pieces that move
-// in this way, but won't be blocked (leapers, locusts), but they
-// are not supported here.
-function expand_rider(limit, directions, xy, extremities, color)
-{
-    var moves = [];
-
-    //console.log("expand_rider",limit, directions, xy);
-
-    directions.each(function(direction) {
-        moves.push.apply(moves, expand_direction(limit, direction, xy, extremities, color));
-    });
-
-    return without_dupes(moves);
-}
-
-// Iterate up to limit steps (may be Infinity), in the direction 
-// vector, starting at start_xy. Stop when reaching the end of the
-// board, on an enemy piece, or before a friendly piece.
-// If extremities is true, only add square at end of the direction.
-function expand_direction(limit, direction, start_xy, extremities, color)
-{
-    var x, y, moves;
-
-    moves = [];
-
-    x = start_xy[0];
-    y = start_xy[1];
-
-    for (var i = 0; i < limit; ++i) {
-        var piece;
-
-        x += direction[0];
-        y += direction[1];
-
-        if (x < 1 || x > FILE_MAX || y < 1 || y > RANK_MAX) {
-            break;
-        }
-
-        piece = pc(x, y);
-        if (piece) {
-            if (piece.hasClassName(color)) {
-                // blocked by own piece, can't move on top
-                break;
-            } else {
-                // can capture enemy piece
-                moves.push([x, y]);
-                break;
-            }
-        }
-
-        //console.log(xy2filerank(x,y));    
-        moves.push([x, y]);
-    }
-
-    if (extremities) {
-        // End only. Allows using 2=, for example, to move
-        // two spaces sideways, without going 1 space sideways.
-        var end_move = moves[moves.length - 1];
-        if (end_move) {
-            return [end_move];
-        } else {
-            return [];
-       }
-    }
-
-    return moves;
-}
-
 // Return an array of objects without any duplicate entries, where
 // duplicity is determined by string equality. This is ugly, but
 //    [1,2] in [[1,2], [3,4]]
@@ -2018,7 +1924,7 @@ function opposite_color(color)
 // If historical, do not check for threefold repetition.
 function set_turn(color, historical)
 {
-    var new_color, active_pieces, checked, no_moves, text_move, text_end, old_color, old_fullmove, repeats;
+    var new_color, checked, no_moves, text_move, text_end, old_color, old_fullmove, repeats;
 
     assert(color === "white" || color === "black" || color === "next", "set_turn(" + color + "): invalid color");
 
@@ -2143,7 +2049,7 @@ function check_repetition(ply)
 // don't have to manually type <td x=0 y=0 filerank=a8> etc. in all the cells.
 function name_squares()
 {
-    for (var x = 1; x <= FILE_MAX; ++x){
+    for (var x = 1; x <= FILE_MAX; ++x) {
         for (var y = 1; y <= RANK_MAX; ++y) {
             var square = sq(x, y);
 
@@ -2160,8 +2066,7 @@ function name_squares()
 
     // Konami code
     KEYS_PRESSED = [];
-    document.onkeydown = 
-            function(event) {
+    document.onkeydown = function(event) {
             KEYS_PRESSED.push(event.keyCode);
             if (KEYS_PRESSED.length > 11) {
                 KEYS_PRESSED.shift();
@@ -2169,9 +2074,7 @@ function name_squares()
             if (KEYS_PRESSED.join('') === '3838404037393739666513') {
                 alert("TODO: easter egg");
             }
-    };
-
-    
+        };
 }
 
 // Acknowledge that a piece was captured. Called by move_piece_to_square(), which
@@ -2244,7 +2147,7 @@ function forwards_vector(color)
 // (castling) so it shouldn't be logged.
 function move_piece_to_square(piece, square, is_hypothetical)
 {
-    var from_square, move_text, castle_move_text, old_ep_target;
+    var from_square, move_text, castle_move_text;
 
     assert(piece, "move_piece_to_square(" + piece + ", " + square + "): piece is false");
     assert(square, "move_piece_to_square(" + piece + ", " + square + "): square is false");
@@ -2578,7 +2481,7 @@ function clear_board()
 // rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR
 function load_starting_position(fen)
 {
-    var i, x, y, code, square;
+    var i, x, y, code;
 
     clear_board();
 
@@ -2630,7 +2533,7 @@ function load_starting_position(fen)
 // Name each piece, in standard chess1 locations, using English descriptive notation.
 function name_pieces()
 {
-    var piece;
+    var piece, descriptive_name;
 
     for (var file_number = 1; file_number <= FILE_MAX; ++file_number) {
         // English descriptive notation (only really applicable to chess1)
@@ -3063,7 +2966,7 @@ function xy2descriptive(color, xy)
 // Same file as xy2algebraic, but rank is from symmetric, not always white's perspective.
 function xy2adescriptive(color, xy)
 {
-    var x, y, file;
+    var x, y;
     
     x = xy[0];
     y = xy[1];
@@ -3165,11 +3068,12 @@ function assert(expression, message)
 }
 
 // Based on http://tech.hickorywind.org/articles/2008/10/24/turning-off-text-selection-in-javascript
+var ORIGINAL_ONSELECTSTART;
 function enable_document_selection(enable) {
     if(enable) {
-        document.onselectstart = _original_onselectstart;
+        document.onselectstart = ORIGINAL_ONSELECTSTART;;
     } else {
-        _original_onselectstart = document.onselectstart;
+        ORIGINAL_ONSELECTSTART = document.onselectstart;
         document.onselectstart = function() { return false; };
     }
 }
