@@ -2050,7 +2050,7 @@ function set_turn(color, historical)
     calculate_moves(GAME_STATE.active_color);
 
     // Zero mobility? For detecting stalemate, checkmate.
-    no_moves = VALID_MOVES.keys().length == 0;
+    no_moves = VALID_MOVES.keys().length === 0;
 
     // Results. 
     if (checked && !no_moves) {
@@ -2630,10 +2630,11 @@ function load_starting_position(fen)
 // Name each piece, in standard chess1 locations, using English descriptive notation.
 function name_pieces()
 {
+    var piece;
+
     for (var file_number = 1; file_number <= FILE_MAX; ++file_number) {
         // English descriptive notation (only really applicable to chess1)
         var file = xy2descriptive("white", file_number);
-        var piece;
 
         // White's pieces and pawns
         piece = pc(file_number, 1); if (piece) { piece.descriptive_name = file; }
@@ -2648,7 +2649,7 @@ function name_pieces()
         var afile = xy2filerank(file_number, "");
         for (var white_rank = 1; white_rank <= RANK_MAX; ++white_rank) {
             var black_rank = 9 - white_rank;
-            var piece = pc(file_number, white_rank);
+            piece = pc(file_number, white_rank);
             var rank, piece_letter;
 
             if (!piece) {
@@ -3045,7 +3046,8 @@ function xy2descriptive(color, xy)
 {
     var x, y;
     if (Object.isArray(xy)) {
-        x = xy[0], y = xy[1];
+        x = xy[0];
+        y = xy[1];
     } else {
         x = xy;
         y = "";
@@ -3063,7 +3065,8 @@ function xy2adescriptive(color, xy)
 {
     var x, y, file;
     
-    x = xy[0], y = xy[1];
+    x = xy[0];
+    y = xy[1];
 
     assert(x >= 1 && x <= FILE_MAX, "xy2adescriptive(" + x + ", " + y + "): bad x: " + x);
     assert(y >= 1 && y <= RANK_MAX, "xy2adescriptive(" + x + ", " + y + "): bad y: " + y);
@@ -3167,7 +3170,7 @@ function enable_document_selection(enable) {
         document.onselectstart = _original_onselectstart;
     } else {
         _original_onselectstart = document.onselectstart;
-        document.onselectstart = function() { return false; }
+        document.onselectstart = function() { return false; };
     }
 }
 
