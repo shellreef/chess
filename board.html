@@ -402,7 +402,7 @@ google.setOnLoadCallback(function() {
     //load_fen("k7/8/8/8/8/8/8/5KQ1 w - d6 0 50");  // K + KQ
     //load_fen("k7/8/8/8/8/8/8/5KR1 w - d6 0 50");  // K + KR
     //load_fen("4r3/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle out of check
-    //load_fen("5r2/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle through check
+    load_fen("5r2/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle through check
     //load_fen("1k/8/8/8/8/8/8/R3KQ1R w KQ - 0 1"); // can't castle with intervening pieces
     //load_fen("rnbqkbnr/ppp2ppp/8/8/8/8/PPP2PPP/RNBQKBNR w KQkq - 0 1"); // to test "only move" 
     
@@ -1517,10 +1517,17 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
 
         // Castling moves
         if (flags.if_can_castle_short) {
+            // Moved and lost castling privileges
             if (!GAME_STATE.can_castle[color].short) {
                 continue;
             }
+
+            // Can't castle if in check
+            if (GAME_STATE.active_in_check) {
+                continue;
+            }
             // TODO: check if unimpeded here? instead of if_unblockedX in Parlett
+            // TODO: check if castling through check
 
             abs_flags.notation_override = "O-O";
         }
@@ -1529,7 +1536,10 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
             if (!GAME_STATE.can_castle[color].long) {
                 continue;
             }
-
+            if (GAME_STATE.active_in_check) {
+                continue;
+            }
+ 
             abs_flags.notation_override = "O-O-O";
         }
 
