@@ -348,7 +348,7 @@ var HYPOTHETICAL_CAPTURED = null;
 
 /* Global functions for jslint to recognize. TODO: make this in objects */
 
-/*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved NEW_unfiltered_moves NEW_filtered_moves relative_decode_direction parse_flags nested_flags decode_relative_raw_move relative_decode_parlett without_dupes opposite_color set_turn set_check_message check_repetition name_squares capture_piece algebraic_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc piece_location image_path_for create_piece highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection*/
+/*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved unfiltered_moves filtered_moves relative_decode_direction parse_flags nested_flags decode_relative_raw_move relative_decode_parlett without_dupes opposite_color set_turn set_check_message check_repetition name_squares capture_piece algebraic_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc piece_location image_path_for create_piece highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection*/
  
 
 google.setOnLoadCallback(function() {
@@ -1231,7 +1231,7 @@ function calculate_moves(color, is_hypothetical)
     $$("img." + color).each(function(piece) { 
         var starting_filerank, square_from, moves;
 
-        moves = NEW_filtered_moves(piece, color, is_hypothetical);
+        moves = filtered_moves(piece, color, is_hypothetical);
         square_from = sq(piece);
 
         if (!square_from) {
@@ -1352,7 +1352,7 @@ function piece_moved(piece)
 // Get the unfiltered, relative moves for a Parlett string.
 // Warning: do not modify the moves! Otherwise other moves will get confused.
 var PARLETT_CACHE = {};
-function NEW_unfiltered_moves(parlett)
+function unfiltered_moves(parlett)
 {
     var choice_groups, rel_moves;
 
@@ -1381,7 +1381,7 @@ function NEW_unfiltered_moves(parlett)
 }
 
 // Get the legal moves for a piece.
-function NEW_filtered_moves(piece, color, is_hypothetical)
+function filtered_moves(piece, color, is_hypothetical)
 {
     var parlett, rel_moves, moves, start_xy;
     var blocked, start_x, start_y;
@@ -1396,7 +1396,7 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
 
     parlett = PIECE_TYPES[piece.type].parlett;
 
-    rel_moves = NEW_unfiltered_moves(parlett);
+    rel_moves = unfiltered_moves(parlett);
 
     // Absolutize and find what is allowed
     moves = [];
@@ -1695,7 +1695,7 @@ function nested_flags(parlett)
     var rel_moves, flags_text, flags;
     
     flags_text = parlett.split(";");
-    rel_moves = NEW_unfiltered_moves(flags_text.shift());
+    rel_moves = unfiltered_moves(flags_text.shift());
 
     flags = parse_flags(flags_text);
 
