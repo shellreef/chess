@@ -346,6 +346,7 @@ var HYPOTHETICAL_CAPTURED = null;
 
 /* Global functions for jslint to recognize. TODO: make this in objects */
 
+/*global window google $ $F $$ Hash*/
 /*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved NEW_unfiltered_moves NEW_filtered_moves relative_decode_direction parse_flags nested_flags decode_relative_raw_move relative_decode_parlett without_dupes opposite_color set_turn set_check_message check_repetition name_squares capture_piece algebraic_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc piece_location image_path_for create_piece highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection*/
  
 
@@ -457,7 +458,7 @@ function save_pgn()
     var tags = ["White", "WhiteElo", "Black", "BlackElo", "Event", "Round", "Site", "Date", "Time"];
    
     dict = {};
-    for (var i = 0; i < tags.length; ++i) {
+    for (var i = 0; i < tags.length; i += 1) {
         var tag = tags[i];
 
         dict[tag] = $(tag).innerHTML;
@@ -495,7 +496,7 @@ function load_pgn(pgn)
     var tags = ["White", "WhiteElo", "Black", "BlackElo", "Event", "Round", "Site", "Date", "Time"];
 
     // Header
-    for (var i = 0; i < tags.length; ++i) {
+    for (var i = 0; i < tags.length; i += 1) {
         var tag = tags[i];
         var node = $(tag);
 
@@ -519,7 +520,7 @@ function load_pgn(pgn)
     load_fen(game.FEN, true);
     GAME_STATE.position_after[0] = game.FEN;
 
-    for (var ply = 1; ply < game.moves.length; ++ply) {
+    for (var ply = 1; ply < game.moves.length; ply += 1) {
         var move = game.moves[ply];
 
         //console.log(ply, move);
@@ -535,11 +536,11 @@ function parse_pgn(pgn)
     var move_text = "";
 
     // Parse header into dictionary
-    for (var i = 0; i < lines.length; ++i) {
+    for (var i = 0; i < lines.length; i += 1) {
         var line = lines[i];
 
         if (line.substr(0, 1) === "[") {
-            for (var j = 0; j < line.length; ++j) {
+            for (var j = 0; j < line.length; j += 1) {
                 var between, ary, tag, key, value;
                     
                 between = line.substring(1, line.length - 1);
@@ -576,7 +577,7 @@ function parse_pgn(pgn)
     var fullmove_number, outcome, moves = [], color = "white";
     var in_comment = false;
 
-    for (i = 0; i < tokens.length; ++i) {
+    for (i = 0; i < tokens.length; i += 1) {
         var token = tokens[i];
 
         if (token === "") {
@@ -748,7 +749,7 @@ function mv(alg_move)
     alg_move = alg_move.replace("+", "").replace("#", "");
 
     // Prefer these move notations, in this order.
-    for (var i = 0; i < AVAILABLE_NOTATIONS.length; ++i) {
+    for (var i = 0; i < AVAILABLE_NOTATIONS.length; i += 1) {
         var notation = AVAILABLE_NOTATIONS[i];
 
         if (notation === "descr" || notation === "adesc") {
@@ -1130,7 +1131,7 @@ function disambiguate_notations(notations)
     var synonymous_notations = new Hash();
     var piece, square;
 
-    for (var i = 0; i < notations.length; ++i) {
+    for (var i = 0; i < notations.length; i += 1) {
         var moves;
 
         piece = notations[i][0];
@@ -1141,7 +1142,7 @@ function disambiguate_notations(notations)
             //console.log(notations[i]);
         }
 
-        for (var j = 0; j < moves.length; ++j) {
+        for (var j = 0; j < moves.length; j += 1) {
             var move = moves[j];
 
             if (!freq_count.get(move)) {
@@ -1159,14 +1160,14 @@ function disambiguate_notations(notations)
         var locations = pair[1];
 
         if (locations.length > 1) {
-            for (var k = 0; k < locations.length; ++k) { 
+            for (var k = 0; k < locations.length; k += 1) { 
                 var i = locations[k][0], j = locations[k][1];
                 delete notations[i][2][j];
             }
         }
     });
 
-    for (i = 0; i < notations.length; ++i) {
+    for (i = 0; i < notations.length; i += 1) {
         piece = notations[i][0];
         square = notations[i][1];
         var same_moves = notations[i][2];
@@ -1187,7 +1188,7 @@ function disambiguate_notations(notations)
 
         canonical_notations.set(shortest, [piece, square]);
 
-        for (j = 0; j < synonyms.length; ++j) {
+        for (j = 0; j < synonyms.length; j += 1) {
             synonymous_notations.set(synonyms[j], [piece, square]);
         }
     }
@@ -1218,7 +1219,7 @@ function calculate_moves(color, is_hypothetical)
         // http://www.tutorials4html.com/2009/02/06/true-javascript-hash-table/
         // but instead, using an array with linear lookup.
         possible_notations = {};
-        for (var i = 0; i < AVAILABLE_NOTATIONS.length; ++i) {
+        for (var i = 0; i < AVAILABLE_NOTATIONS.length; i += 1) {
             notation = AVAILABLE_NOTATIONS[i];
 
             possible_notations[notation] = [];
@@ -1259,7 +1260,7 @@ function calculate_moves(color, is_hypothetical)
     if (!is_hypothetical) {
         var notations = possible_notations;
         VALID_MOVE_NOTATIONS = {};
-        for (i = 0; i < AVAILABLE_NOTATIONS.length; ++i) {
+        for (i = 0; i < AVAILABLE_NOTATIONS.length; i += 1) {
             notation = AVAILABLE_NOTATIONS[i];
 
             VALID_MOVE_NOTATIONS[notation] = disambiguate_notations(notations[notation]);
@@ -1365,7 +1366,7 @@ function NEW_unfiltered_moves(parlett)
     choice_groups = parlett.split(", ");
 
     rel_moves = [];
-    for (var i = 0; i < choice_groups.length; ++i) {
+    for (var i = 0; i < choice_groups.length; i += 1) {
             // For each group, gather the move options. 
             // (Would be nice if JavaScript arrays had a Python-like .extend)
             rel_moves.push.apply(rel_moves, relative_decode_parlett(choice_groups[i]));
@@ -1399,7 +1400,7 @@ function NEW_filtered_moves(piece, color, is_hypothetical)
     // Absolutize and find what is allowed
     moves = [];
     blocked = {};
-    for (var i = 0; i < rel_moves.length; ++i) {
+    for (var i = 0; i < rel_moves.length; i += 1) {
         var rel_x, rel_y, flags, abs_move, x, y, abs_flags;
        
         rel_x = rel_moves[i][0];
@@ -1659,7 +1660,7 @@ function parse_flags(text, flags)
     }
 
     // Semicolon-separated flags
-    for (var i = 0; i < flags_text.length; ++i) {
+    for (var i = 0; i < flags_text.length; i += 1) {
         var flag_text = flags_text[i];
         var key, value;
        
@@ -1698,7 +1699,7 @@ function nested_flags(parlett)
     flags = parse_flags(flags_text);
 
     for (var flag in flags) {
-        for (var j = 0; j < rel_moves.length; ++j) {
+        for (var j = 0; j < rel_moves.length; j += 1) {
             rel_moves[j][2][flag] = flags[flag];
         }
     }
@@ -1746,7 +1747,7 @@ function relative_decode_parlett(parlett)
     rel_moves = [];
 
     movement = "rider";
-    for (var i = 0; i < parlett.length; ++i) {
+    for (var i = 0; i < parlett.length; i += 1) {
         var ch = parlett.substr(i, 1);
 
         if (ch === "~") {
@@ -1843,7 +1844,7 @@ function relative_decode_parlett(parlett)
             [+b, +a, flags]
             ]));
     } else if (directions) {
-        for (i = 0; i < directions.length; ++i) {
+        for (i = 0; i < directions.length; i += 1) {
             var dir = directions[i];
             var rel_x, rel_y, prev_rel_x, prev_rel_y, distance;
 
@@ -1859,7 +1860,7 @@ function relative_decode_parlett(parlett)
             rel_x = rel_y = 0;
             prev_rel_x = null;
             prev_rel_y = null;
-            for (var j = 1; j < Math.max(RANK_MAX, FILE_MAX); ++j) {
+            for (var j = 1; j < Math.max(RANK_MAX, FILE_MAX); j += 1) {
                 // Riders get blocked. Note that you can have a non-hippogonal leaper.
                 // ~n* (lion) for example, is like a queen, but not blocked by intervening pieces.
                 
@@ -1908,7 +1909,7 @@ function without_dupes(a)
     var hash = new Hash();
     var result = [];
 
-    for (var i = 0; i < a.length; ++i) {
+    for (var i = 0; i < a.length; i += 1) {
         // Add if not a dupe
         if (!hash.get(Object.toJSON(a[i]))) {
             result.push(a[i]);
@@ -2064,8 +2065,8 @@ function check_repetition(ply)
 // don't have to manually type <td x=0 y=0 filerank=a8> etc. in all the cells.
 function name_squares()
 {
-    for (var x = 1; x <= FILE_MAX; ++x) {
-        for (var y = 1; y <= RANK_MAX; ++y) {
+    for (var x = 1; x <= FILE_MAX; x += 1) {
+        for (var y = 1; y <= RANK_MAX; y += 1) {
             var square = sq(x, y);
 
             square.x = x;
@@ -2328,7 +2329,7 @@ function mark_repeated_moves(reps)
     var color = HIGHLIGHT_COLORS[REPEAT_COLOR_COUNT];
 
     REPEAT_COLOR_COUNT += 1;
-    for (var i = 0; i < reps.length; ++i) {
+    for (var i = 0; i < reps.length; i += 1) {
         var ply = reps[i];
 
         $$("a#ply_" + ply).each(function(m) {
@@ -2382,9 +2383,9 @@ function save_fen(strip_moves)
     var fen = "", castles;
 
     // Board position
-    for (var y = RANK_MAX; y > 0; --y) {
+    for (var y = RANK_MAX; y > 0; y -= 1) {
         var blanks = 0;
-        for (var x = 1; x <= FILE_MAX; ++x) {
+        for (var x = 1; x <= FILE_MAX; x += 1) {
             var piece = pc(x, y);
             var letter;
 
@@ -2482,8 +2483,8 @@ function load_fen(fen, clear)
 // Remove all pieces from the board.
 function clear_board()
 {
-    for (var x = 1; x <= RANK_MAX; ++x) {
-        for (var y = 1; y <= FILE_MAX; ++y) {
+    for (var x = 1; x <= RANK_MAX; x += 1) {
+        for (var y = 1; y <= FILE_MAX; y += 1) {
             var square = sq(x, y);
             while(square.firstChild) {
                 square.removeChild(square.firstChild);
@@ -2504,7 +2505,7 @@ function load_starting_position(fen)
     // x,y coordinates, so a8 = 1,8. That is where FEN starts.
     x = 1;
     y = 8;
-    for (i = 0; i < fen.length; ++i) {
+    for (i = 0; i < fen.length; i += 1) {
         code = fen.charAt(i);
         if (code === "X" || code === "x") {
             i += 1;
@@ -2524,13 +2525,13 @@ function load_starting_position(fen)
             // TODO: extended extended codes, multiple x's? or just use names?
 
             sq(x, y).appendChild(create_piece(code));
-            ++x;
+            x += 1;
         } else if (/[a-zA-Z]/.test(code)) {
             sq(x, y).appendChild(create_piece(code));
-            ++x;
+            x += 1;
         } else if (code === "/") {
             x = 1;
-            --y;
+            y -= 1;
         } else if (/[0-9]/.test(code)) {
             x += code.charCodeAt(0) - "0".charCodeAt(0);
         } else if (code === " ") {
@@ -2550,7 +2551,7 @@ function name_pieces()
 {
     var piece, descriptive_name;
 
-    for (var file_number = 1; file_number <= FILE_MAX; ++file_number) {
+    for (var file_number = 1; file_number <= FILE_MAX; file_number += 1) {
         // English descriptive notation (only really applicable to chess1)
         var file = xy2descriptive("white", file_number);
 
@@ -2565,7 +2566,7 @@ function name_pieces()
 
         // Algebraic descriptive notation
         var afile = xy2filerank(file_number, "");
-        for (var white_rank = 1; white_rank <= RANK_MAX; ++white_rank) {
+        for (var white_rank = 1; white_rank <= RANK_MAX; white_rank += 1) {
             var black_rank = 9 - white_rank;
             piece = pc(file_number, white_rank);
             var rank, piece_letter;
@@ -3009,7 +3010,7 @@ function short_descriptive(descriptive_file)
 // - a piece, returned by pc(), will return the enclosing square
 function sq(code, extra)
 {
-    var x, y;
+    var x, y, xy;
 
     assert(code !== undefined, "sq(" + code + ", " + extra + "): code is undefined");
     assert(code !== null, "sq(" + code + ", " + extra + "): code is null");
@@ -3018,7 +3019,7 @@ function sq(code, extra)
     if (code.hasClassName && code.hasClassName("piece")) {
         // TODO: replace all uses of sq() to get the square of a piece, with
         // direct calls to piece_location(), but make it return a square
-        var xy = piece_location(code);
+        xy = piece_location(code);
 
         if (!xy) {
             // Piece was taken, no square
@@ -3033,7 +3034,7 @@ function sq(code, extra)
         y = extra;
     // Is it a string in algebraic notation that can be converted?
     } else if (code.charCodeAt) {
-        var xy = filerank2xy(code);
+        xy = filerank2xy(code);
 
         // TODO: can JS do list element assignment like x,y=...?    
         x = xy[0];
