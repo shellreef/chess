@@ -106,7 +106,8 @@ td.legal-move-black { background-color: #a15b17; }
 </style>
 <script src="http://www.google.com/jsapi"></script>
 <script type="text/javascript">
-/*global window google $ $F $$ Hash $break Builder Event*/
+/*jslint bitwise: true, browser: true, eqeqeq: true, immed: true, newcap: true, nomen: true, plusplus: true, regexp: true, undef: true*/
+/*global window google $ $F $$ Hash $break Builder Event Droppables Draggable*/
 
 if (!window.google) {
     alert("Google was not found. Nothing will work.");
@@ -639,13 +640,15 @@ function output_pgn_dict(dict)
     pgn = "";
     // TODO: Use a hash table, avoid for..in
     for (var key in dict) {
-        var value = dict[key];
+        if (dict.hasOwnProperty(key)) {
+            var value = dict[key];
 
-        // TODO: unparenthetize, uncommaify, etc. .. or just set attributes
-        // to exactly what we want in load_pgn(), then fetch it.
-        // TODO: rules for quoting values?
-        quoted_value = '"' + value + '"';
-        pgn += "[" + key + " " + quoted_value + "]\n";
+            // TODO: unparenthetize, uncommaify, etc. .. or just set attributes
+            // to exactly what we want in load_pgn(), then fetch it.
+            // TODO: rules for quoting values?
+            quoted_value = '"' + value + '"';
+            pgn += "[" + key + " " + quoted_value + "]\n";
+        }
     }
 
     return pgn;
@@ -1122,6 +1125,12 @@ function calculate_notations(color, piece, moves, starting_filerank, ps)
     // two different notations, if it exists, is sure to cause trouble!
 }
 
+// Used for sorting a function by length
+function by_length(x, y) 
+{ 
+    return x.length - y.length; 
+}
+
 // Given a list of all valid move notations, remove the ambiguous 
 // (Nf3 and Nf3, remove both) overly-disambiguated (Ng1f3 if Ngf3
 // or N1f3 is not ambiguous).
@@ -1180,7 +1189,7 @@ function disambiguate_notations(notations)
         // Choose shortest (now unambiguous) notation
         // Could also do: min_length = same_moves.pluck("length").min();, then partition
         // Rather, sort by length, ascending.
-        same_moves.sort(function(x, y) { return x.length - y.length; });
+        same_moves.sort(by_length);
 
         // The shortest, non-ambiguous move is canonical. But also keep the
         // synonymous moves around.
@@ -1643,6 +1652,11 @@ function relative_decode_direction(ch, ch2)
     }
 }
 
+function parseInt10(x) 
+{ 
+    return parseInt(x, 10); 
+}
+
 // Parse semicolon separated flags, possibly key/value pairs
 // foo;bar sets foo:true and bar:true, can also set relative coordinates:
 // if_unblocked=1,2.
@@ -1671,7 +1685,7 @@ function parse_flags(text, flags)
             var ary = flag_text.split("=");
             var left = ary[0], right = ary[1];
             value = right.split(",");
-            value = value.map(function(x) { return parseInt(x, 10); });
+            value = value.map(parseInt10);
             if (value.length === 1) {
                 flags[left] = value[0];
             } else if (value.length === 2) {
@@ -1700,8 +1714,10 @@ function nested_flags(parlett)
     flags = parse_flags(flags_text);
 
     for (var flag in flags) {
-        for (var j = 0; j < rel_moves.length; j += 1) {
-            rel_moves[j][2][flag] = flags[flag];
+        if (flags.hasOwnProperty(flag)) {
+            for (var j = 0; j < rel_moves.length; j += 1) {
+                rel_moves[j][2][flag] = flags[flag];
+            }
         }
     }
 
@@ -2331,13 +2347,16 @@ function mark_repeated_moves(reps)
     var color = HIGHLIGHT_COLORS[REPEAT_COLOR_COUNT];
 
     REPEAT_COLOR_COUNT += 1;
+   
+    var setcolor = function(m) {
+                //m.addClassName("repeated_move");
+                m.setStyle({backgroundColor: color});
+            };
+
     for (var i = 0; i < reps.length; i += 1) {
         var ply = reps[i];
 
-        $$("a#ply_" + ply).each(function(m) {
-                //m.addClassName("repeated_move");
-                m.setStyle({backgroundColor: color});
-            });
+        $$("a#ply_" + ply).each(setcolor);
     }
 }
 
@@ -2625,12 +2644,14 @@ function piece_letter2name(letter)
         cache_letter2name = new Hash();
 
         for (var name in PIECE_TYPES) {
-            var info = PIECE_TYPES[name];
+            if (PIECE_TYPES.hasOwnProperty(name)) {
+                var info = PIECE_TYPES[name];
 
-            if (info.letter !== undefined) {
-                cache_letter2name.set(info.letter, name);
-            } else if (info.alg_letter !== undefined) {
-                cache_letter2name.set(info.alg_letter, name);
+                if (info.letter !== undefined) {
+                    cache_letter2name.set(info.letter, name);
+                } else if (info.alg_letter !== undefined) {
+                    cache_letter2name.set(info.alg_letter, name);
+                }
             }
         }
     }
