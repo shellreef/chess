@@ -410,7 +410,7 @@ google.setOnLoadCallback(function() {
     //load_fen("k7/8/8/8/8/8/8/5KQ1 w - d6 0 50");  // K + KQ
     //load_fen("k7/8/8/8/8/8/8/5KR1 w - d6 0 50");  // K + KR
     //load_fen("4r3/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle out of check
-    load_fen("1k3r2/8/8/8/8/7Q/8/R3K2R w KQkq - 0 1"); // can't castle through check
+    //load_fen("1k3r2/8/8/8/8/7Q/8/R3K2R w KQkq - 0 1"); // can't castle through check
     //load_fen("1k/8/8/8/8/8/8/R3KQ1R w KQ - 0 1"); // can't castle with intervening pieces
     //load_fen("rnbqkbnr/ppp2ppp/8/8/8/8/PPP2PPP/RNBQKBNR w KQkq - 0 1"); // to test "only move" 
     
@@ -426,6 +426,51 @@ google.setOnLoadCallback(function() {
     //pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
     
     //pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
+    
+
+     /* Note: chessos generates PGNs with minimal algebraic notation, sometimes, 
+      * not always standard algebraic. 4. ... Bb4 should be Bxb4. Need synonym 
+      * support in order to read this, or MAN support. 
+pgn = load_pgn(
+"[Event \"ChesSOS Game\"]\n" + 
+"[Site \"http://www.chessos.com\"]\n" + 
+"[Date \"2009.03.18\"]\n" + 
+"[Round \"-\"]\n" + 
+"[White \"Dema9o9ue\"]\n" + 
+"[Black \"shellreef\"]\n" + 
+"[WhiteElo \"1500\"]\n" + 
+"[BlackElo \"1500\"]\n" + 
+"[Result \"0-1\"]\n" + 
+"[URL \"http://www.chessos.com/p/?m=board&g=15722\"]\n" + 
+"\n" + 
+"1. b4 e5 2. Nc3 Bb4 3. a3 Bc3 4. dxc3 Nf6 5. h3 O-O 6. f3 d5 \n" + 
+"7. e3 Nc6 8. a4 Qd6 9. Ba3 Qd8 10. g4 g5 11. h4 gxh4 12. Rh4 \n" + 
+"Ne4 13. fxe4 Qh4 14. Ke2 Bg4 15. Nf3 Qh2 16. Kd3 dxe4 17. Ke4 \n" + 
+"f5 18. Kd5 Rad8 19. Ke6 Qh6 \n" + 
+"0-1");*/
+
+     /* TODO: support 1.move in addition to 1. move 
+     pgn = load_pgn("[Event \"Berlin\"]\n" + 
+"[Site \"?\"]\n" + 
+"[Date \"1842\"]\n" + 
+"[Round \"?\"]\n" + 
+"[White \"Hanstein\"]\n" + 
+"[Black \"Von der Lasa\"]\n" + 
+"[Result \"1-0\"]\n" + 
+"\n" + 
+"1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 Bg7 5.d4 d6 6.O-O h6 7.c3 Ne7 8.h4 Ng6\n" + 
+"9.h5 Ne7 10.g3 fxg3 11.Nxg5 hxg5 12.Bxf7+ Kd7 13.Bxg5 c6 14.e5 d5\n" + 
+"15.e6+ Kc7 16.Bf4+ Kb6 17.Qb3+ Ka6 18.Qa3+ Kb6 19.b4 a5 20.Bxb8 Nf5\n" + 
+"21.Rxf5 Qh4 22.Qb2 Rxb8 23.b5 Qe4 24.Na3 Qxf5 25.bxc6+ Kc7 26.Nb5+\n" + 
+"Kxc6 27.Na7+ Kc7 28.Nb5+ Kd8 29.Rf1 Qh3 30.e7+ Kxe7 31.Qa3+ Kd8\n" + 
+"32.Qd6+ Qd7 33.Qb6+ Ke7 34.Re1+ Kxf7 35.Qg6+ Kg8 36.Re8+ Qxe8\n" + 
+"37.Qxe8+ Kh7 38.Qg6+ Kg8 39.Qd6 Ra8 40.Qxd5+ Kh7 41.Qe4+ Kg8\n" + 
+"42.Qe8+ Kh7 43.Qg6+ Kg8 44.Nc7 Ra6 45.Nxa6 bxa6 46.h6 Rxh6 47.Qe8+\n" + 
+"Bf8 48.Qxc8 Kf7 49.Kg2 Bd6 50.Qb7+ Ke8 51.Qc6+ Kf8 52.c4 Rf6 53.c5\n" + 
+"Rf2+ 54.Kg1 Bf4 55.Qf6+ Ke8 56.d5 Kd7 57.Qf7+ Kc8 58.Qe8+ Kc7\n" + 
+"59.Qe7+ Kb8 60.c6 1-0");*/
+
+
 });
 
 // PGN (PORTABLE GAME NOTATION) FUNCTIONS
@@ -737,6 +782,7 @@ function encode_ply(color, fullmove_number)
 // JavaScript console (Develop -> Show Error Console in Safari) if you want
 // a command-line instead of a GUI. Computer move also uses this function, but it is
 // not used for drag-and-drop.
+// TODO: Support multiple moves
 function mv(alg_move)
 {
     var piece_square, piece, square;
