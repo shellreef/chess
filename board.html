@@ -1382,15 +1382,35 @@ function calculate_moves(color, is_hypothetical)
     return valid_moves;
 }
 
+// Populate the menu of valid moves, where you can make a move
+// by selection instead of moving a piece with your mouse.
 function populate_make_a_move_list()
 {
+    var active_notation = $F("input_notation");
+    var active_name = AVAILABLE_NOTATIONS[active_notation];
+    var move_group, change_group;
+
     // Select a move by menu.
     $("valid_moves").innerHTML = "";
     $("valid_moves").appendChild(Builder.node("option", {value:""}, "Make a move..."));
+    
+    move_group = Builder.node("optgroup", {label:active_name});
+    $("valid_moves").appendChild(move_group);
+
     VALID_MOVE_NOTATIONS[$F("input_notation")].each(function(move) {
             var notation = move[0];
-            $("valid_moves").appendChild(Builder.node("option", {value:notation}, notation));
+            move_group.appendChild(Builder.node("option", {value:notation}, notation));
         });
+
+    change_group = Builder.node("optgroup", {label:"Set Input Notation"});
+    $("valid_moves").appendChild(change_group);
+
+    for (var n in AVAILABLE_NOTATIONS) {
+        if (AVAILABLE_NOTATIONS.hasOwnProperty(n) && n !== active_notation) {
+            var name = AVAILABLE_NOTATIONS[n];
+            change_group.appendChild(Builder.node("option", {value:n}, name));
+        }
+    }
 }
 
 // Make a move as the computer, if we're supposed to.
