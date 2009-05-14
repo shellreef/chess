@@ -125,6 +125,7 @@ google.load("scriptaculous", "1.8.2");
 
 // Preferences, not game state.
 var PREFS = {
+    INPUT_NOTATION: "SAN",
 
     // What piece images to use                     
     IMAGE_SET: "alfaerie"   // http://www.chessvariants.org/graphics.dir/alfaerie/index.html
@@ -485,7 +486,6 @@ function load_notations()
         if (AVAILABLE_NOTATIONS.hasOwnProperty(notation)) {
             var name = AVAILABLE_NOTATIONS[notation];
 
-            $("input_notation").appendChild(Builder.node("option", {value: notation}, name));
             $("output_notation").appendChild(Builder.node("option", {value: notation}, name));
         }
     }
@@ -805,7 +805,7 @@ function mv(alg_move)
 
     if (!alg_move) {
         assert(VALID_MOVE_NOTATIONS, "mv(" + alg_move + "): called with VALID_MOVE_NOTATINS false");
-        return VALID_MOVE_NOTATIONS[$F("input_notation")].keys();
+        return VALID_MOVE_NOTATIONS[PREFS.INPUT_NOTATION].keys();
     }
 
     // Accept digits, but prefer the letter oh.
@@ -1386,8 +1386,7 @@ function calculate_moves(color, is_hypothetical)
 // by selection instead of moving a piece with your mouse.
 function populate_make_a_move_list()
 {
-    var active_notation = $F("input_notation");
-    var active_name = AVAILABLE_NOTATIONS[active_notation];
+    var active_name = AVAILABLE_NOTATIONS[PREFS.INPUT_NOTATION];
     var move_group, change_group;
 
     // Select a move by menu.
@@ -1397,19 +1396,35 @@ function populate_make_a_move_list()
     move_group = Builder.node("optgroup", {label:active_name});
     $("make_move_menu").appendChild(move_group);
 
-    VALID_MOVE_NOTATIONS[$F("input_notation")].each(function(move) {
+    VALID_MOVE_NOTATIONS[PREFS.INPUT_NOTATION].each(function(move) {
             var notation = move[0];
-            move_group.appendChild(Builder.node("option", {value:notation}, notation));
+            move_group.appendChild(Builder.node("option", {value: notation}, notation));
         });
 
-    change_group = Builder.node("optgroup", {label:"Set Input Notation"});
+    change_group = Builder.node("optgroup", {label:"Other notation..."});
     $("make_move_menu").appendChild(change_group);
 
     for (var n in AVAILABLE_NOTATIONS) {
-        if (AVAILABLE_NOTATIONS.hasOwnProperty(n) && n !== active_notation) {
+        if (AVAILABLE_NOTATIONS.hasOwnProperty(n) && n !== PREFS.INPUT_NOTATION) {
             var name = AVAILABLE_NOTATIONS[n];
-            change_group.appendChild(Builder.node("option", {value:n}, name));
+            change_group.appendChild(Builder.node("option", {value: "change_" + n}, name));
         }
+    }
+}
+
+// Called when the make a move menu is changed, either to change the
+// input notation or actually make a move by the menu.
+function make_move_by_menu(menu)
+{
+    var choice = $F("make_move_menu");
+
+    // Notation change
+    if (choice.indexOf("change_") === 0) {
+        var new_notation = choice.substring("change_".length);
+   
+        PREFS.INPUT_NOTATION = new_notation;
+        populate_make_a_move_list();
+        return;
     }
 }
 
@@ -3415,7 +3430,7 @@ function enable_document_selection(enable) {
    <span id="Time" style="display: none">Time</span>
  </p> 
 
- <select id="make_move_menu"></select>
+ <select id="make_move_menu" onchange="make_move_by_menu(this)"></select>
 
  <p>
   <span id="status"></span> 
@@ -3432,9 +3447,7 @@ function enable_document_selection(enable) {
  <label for="white_computer">White PC<input type="checkbox" id="white_computer" name="white_computer" onclick="computer_move_if_applicable()"></label> 
  <label for="black_computer">Black PC<input type="checkbox" id="black_computer" name="black_computer" onclick="computer_move_if_applicable()"></label><br>
 
- <p>Notation: 
- <select id="input_notation" name="input_notation" onchange="populate_make_a_move_list()"></select> &rarr;
- <select id="output_notation" name="output_notation"></select>
+ <p><select id="output_notation" name="output_notation"></select>
 
  <p><a href="#" onclick="edit_pgn()">Edit PGN</a>
  </div>
