@@ -1375,16 +1375,22 @@ function calculate_moves(color, is_hypothetical)
         // For reals.
         VALID_MOVES = valid_moves;
 
-        // Select a move by menu.
-        $("valid_moves").innerHTML = "";
-        $("valid_moves").appendChild(Builder.node("option", {value:""}, "Make a move..."));
-        VALID_MOVE_NOTATIONS[$F("input_notation")].each(function(move) {
-                var notation = move[0];
-                $("valid_moves").appendChild(Builder.node("option", {value:notation}, notation));
-            });
-    }
+        populate_make_a_move_list();
+
+   }
 
     return valid_moves;
+}
+
+function populate_make_a_move_list()
+{
+    // Select a move by menu.
+    $("valid_moves").innerHTML = "";
+    $("valid_moves").appendChild(Builder.node("option", {value:""}, "Make a move..."));
+    VALID_MOVE_NOTATIONS[$F("input_notation")].each(function(move) {
+            var notation = move[0];
+            $("valid_moves").appendChild(Builder.node("option", {value:notation}, notation));
+        });
 }
 
 // Make a move as the computer, if we're supposed to.
@@ -3407,7 +3413,7 @@ function enable_document_selection(enable) {
  <label for="black_computer">Black PC<input type="checkbox" id="black_computer" name="black_computer" onclick="computer_move_if_applicable()"></label><br>
 
  <p>Notation: 
- <select id="input_notation" name="input_notation"></select> &rarr;
+ <select id="input_notation" name="input_notation" onchange="populate_make_a_move_list()"></select> &rarr;
  <select id="output_notation" name="output_notation"></select>
 
  <p><a href="#" onclick="edit_pgn()">Edit PGN</a>
