@@ -3433,8 +3433,6 @@ function enable_document_selection(enable) {
    <span id="Time" style="display: none">Time</span>
  </p> 
 
- <select id="make_move_menu" onchange="make_move_by_menu(this)"></select>
-
  <p>
   <span id="status"></span> 
   <span id="dash" style="display: none">&mdash;</span>
@@ -3442,12 +3440,16 @@ function enable_document_selection(enable) {
  </p>
 
 
- <p><a href="#" onclick="javascript:new Effect.toggle('controls', 'slide', { duration: 0.1 })">settings</a>
+ <p><a href="#" onclick="javascript:new Effect.toggle('controls', 'slide', { duration: 0.1 })">advanced</a>
+ 
  <div id="controls" xstyle="display: none">
  <div>
+
+ <p><select id="make_move_menu" onchange="make_move_by_menu(this)"></select>
+
  <!-- TODO: hide all this, since the purpose of this app is
  not to implement chess AI. But having automatic moves is useful for testing. -->
- <label for="white_computer">White PC<input type="checkbox" id="white_computer" name="white_computer" onclick="computer_move_if_applicable()"></label> 
+ <p><label for="white_computer">White PC<input type="checkbox" id="white_computer" name="white_computer" onclick="computer_move_if_applicable()"></label> 
  <label for="black_computer">Black PC<input type="checkbox" id="black_computer" name="black_computer" onclick="computer_move_if_applicable()"></label><br>
 
  <p><select id="output_notation" name="output_notation"></select>
