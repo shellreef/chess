@@ -138,6 +138,7 @@ var PREFS = {
 var AVAILABLE_NOTATIONS = [
     "SAN",  // Standard Algebraic Notation              Bxc6        e5
     "LAN",  // Long Algebraic Notation                  Bb5xc6      e7-e5
+    "MAN",  // Minimal Algebraic Notation               Bc6         e5
     "RAN",  // Reversible Algebraic Notation            Bb5xNc6     e7-e5
     "CRAN", // Concise Reversible Algebraic Notation    Bb5:Nc6     e75
     "FAN",  // Figurine Algebraic Notation              ♗xc6        ♟e5
@@ -172,7 +173,7 @@ var GAME_STATE = {
 // Moves that can be made right now, for each active piece.
 var VALID_MOVES = null;            // Keyed by filerank of source, array of moves, x, y and any flags
 var VALID_MOVES_OPP = null;        // Moves opponent could make, if it was their turn (attacking)
-var VALID_MOVE_NOTATIONS = null;   // Map SAN, LAN, RAN, CRAN, FAN, coordinate, Smith etc. -> [piece, square]
+var VALID_MOVE_NOTATIONS = null;   // Map SAN, LAN, MAN, RAN, CRAN, FAN, coord, desc, Smith etc. -> [piece, square]
 var ALL_DROP_TARGETS = [];         // Droppables for UI
 var POSSIBLE_EP_TARGETS = null;             // If move to key, set en passant target to value
 
@@ -431,6 +432,7 @@ google.setOnLoadCallback(function() {
      /* Note: chessos generates PGNs with minimal algebraic notation, sometimes, 
       * not always standard algebraic. 4. ... Bb4 should be Bxb4. Need synonym 
       * support in order to read this, or MAN support. 
+      */
 pgn = load_pgn(
 "[Event \"ChesSOS Game\"]\n" + 
 "[Site \"http://www.chessos.com\"]\n" + 
@@ -447,7 +449,7 @@ pgn = load_pgn(
 "7. e3 Nc6 8. a4 Qd6 9. Ba3 Qd8 10. g4 g5 11. h4 gxh4 12. Rh4 \n" + 
 "Ne4 13. fxe4 Qh4 14. Ke2 Bg4 15. Nf3 Qh2 16. Kd3 dxe4 17. Ke4 \n" + 
 "f5 18. Kd5 Rad8 19. Ke6 Qh6 \n" + 
-"0-1");*/
+"0-1");
 
      /* TODO: support 1.move in addition to 1. move 
      pgn = load_pgn("[Event \"Berlin\"]\n" + 
@@ -983,7 +985,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps)
         }
 
 
-        // Compute notations: SAN, FAN,  LAN, RAN, CRAN and also descriptive.
+        // Compute notations: SAN, FAN, MAN, LAN, RAN, CRAN and also descriptive.
         // But first check if the move text was overridden in decode_one_parlett(), for the
         // notations where it can be overridden. Not all have special notation for castling.
         if (move[2].notation_override) {
@@ -991,12 +993,13 @@ function calculate_notations(color, piece, moves, starting_filerank, ps)
             // Note: not all notations have special notation for castling.
             ps.SAN.push([piece, square, [move[2].notation_override]]);
             ps.LAN.push([piece, square, [move[2].notation_override]]);
+            ps.MAN.push([piece, square, [move[2].notation_override]]);
             ps.RAN.push([piece, square, [move[2].notation_override]]);
             ps.CRAN.push([piece, square, [move[2].notation_override]]);
             ps.descr.push([piece, square, [move[2].notation_override]]);
             ps.adesc.push([piece, square, [move[2].notation_override]]);
         } else {
-            var algs, figurine_prefix, algebraic_prefix, piece_letter;
+            var algs, figurine_prefix, algebraic_prefix, piece_letter, minimal_algs;
 
             if (capture_x === "x" && piece.type === "pawn") {
                 // Pawn captures begin with file of pawn.
@@ -1008,7 +1011,6 @@ function calculate_notations(color, piece, moves, starting_filerank, ps)
                     starting_rank + capture_x + dest_filerank,    // ?1f3
                     starting_filerank + capture_x + dest_filerank // ?g1f3
                 ];
-
             }
 
             piece_letter = full_piece_prefix(piece);               // P, N, etc.
@@ -1017,6 +1019,14 @@ function calculate_notations(color, piece, moves, starting_filerank, ps)
 
             ps.SAN.push([piece, square, algs.map(function(a) { return algebraic_prefix + a; })]);  // N??
             ps.FAN.push([piece, square, algs.map(function(a) { return figurine_prefix + a; })]);   // ♘??
+
+            // Minimal notation, supposedly used in Informant
+            minimal_algs = [
+                algebraic_prefix + dest_filerank,                      // ?f3
+                algebraic_prefix + starting_file + dest_filerank,      // ?gf3
+                algebraic_prefix + starting_rank + dest_filerank,      // ?1f3
+                algebraic_prefix + starting_filerank + dest_filerank]; // ?g1f3
+            ps.MAN.push([piece, square, minimal_algs]);
 
             ps.LAN.push([piece, square, [algebraic_prefix + starting_filerank + capture_or_dash + dest_filerank]]);
 
