@@ -123,8 +123,6 @@ google.load("scriptaculous", "1.8.2");
 
 // Preferences, not game state.
 var PREFS = {
-    // TODO: UI element drop-down to change
-    OUTPUT_NOTATION: "descr",
 
     // What piece images to use                     
     IMAGE_SET: "alfaerie"   // http://www.chessvariants.org/graphics.dir/alfaerie/index.html
@@ -135,19 +133,19 @@ var PREFS = {
 // Chess movement notations, in descending precedence. 
 // For more info see http://en.wikipedia.org/wiki/Chess_notation
 // TODO: make an assocative array, map to description, for output_notation selection
-var AVAILABLE_NOTATIONS = [
-    "SAN",  // Standard Algebraic Notation              Bxc6        e5
-    "LAN",  // Long Algebraic Notation                  Bb5xc6      e7-e5
-    "MAN",  // Minimal Algebraic Notation               Bc6         e5
-    "RAN",  // Reversible Algebraic Notation            Bb5xNc6     e7-e5
-    "CRAN", // Concise Reversible Algebraic Notation    Bb5:Nc6     e75
-    "FAN",  // Figurine Algebraic Notation              ♗xc6        ♟e5
-    "ICCF", // ICCF Numeric Notation                    2536        5755
-    "coord",// Coordinate                               B5-C6       E7-E5
-    "smith",// Smith                                    b5c6n       e7e5
-    "descr",// English Descriptive Notation             BxN         P-K4
-    "adesc" // Algebraic Descriptive Notation           BxN         P-e4
-    ];
+var AVAILABLE_NOTATIONS = {
+    SAN:  "Standard Algebraic Notation",//              Bxc6        e5
+    LAN:  "Long Algebraic Notation",//                  Bb5xc6      e7-e5
+    MAN:  "Minimal Algebraic Notation",//               Bc6         e5
+    RAN:  "Reversible Algebraic Notation",//            Bb5xNc6     e7-e5
+    CRAN: "Concise Reversible Algebraic Notation",//    Bb5:Nc6     e75
+    FAN:  "Figurine Algebraic Notation",//              ♗xc6        ♟e5
+    ICCF: "ICCF Numeric Notation",//                    2536        5755
+    coord:"Coordinate Notation",//                      B5-C6       E7-E5
+    smith:"Smith Notation",//                           b5c6n       e7e5
+    descr:"English Descriptive Notation",//             BxN         P-K4
+    adesc:"Algebraic Descriptive Notation"//            BxN         P-e4
+};
 
 
 // Info about the game
@@ -357,8 +355,8 @@ var HYPOTHETICAL_CAPTURED = null;
 google.setOnLoadCallback(function() {
     /* Safari & IE7: Disable text selection to stop interfering with dragging */
     enable_document_selection(false);    
-
     name_squares();
+    load_notations();
 
     //load_fen("r/8/8/1N3b2/3PP3/1P1BBN/8/8 w - - 0 17"); // test that Parlett moves are being cloned
     //load_fen("8/8/8/5b2/3PP3/1P2B/8/8 w - - 0 17"); 
@@ -477,6 +475,19 @@ pgn = load_pgn(
 });
 
 // PGN (PORTABLE GAME NOTATION) FUNCTIONS
+
+// Load the chess notations into the input/output notation select boxes
+function load_notations()
+{
+    for (notation in AVAILABLE_NOTATIONS) {
+        if (AVAILABLE_NOTATIONS.hasOwnProperty(notation)) {
+            var name = AVAILABLE_NOTATIONS[notation];
+
+            $("input_notation").appendChild(Builder.node("option", {value: notation}, name));
+            $("output_notation").appendChild(Builder.node("option", {value: notation}, name));
+        }
+    }
+}
 
 // Make the PGN content editable (not to be confused with edible).
 var ORIGINAL_UI_HTML;
@@ -792,7 +803,7 @@ function mv(alg_move)
 
     if (!alg_move) {
         assert(VALID_MOVE_NOTATIONS, "mv(" + alg_move + "): called with VALID_MOVE_NOTATINS false");
-        return VALID_MOVE_NOTATIONS[AVAILABLE_NOTATIONS[0]].keys();
+        return VALID_MOVE_NOTATIONS[$F("input_notation")].keys();
     }
 
     // Accept digits, but prefer the letter oh.
@@ -802,18 +813,18 @@ function mv(alg_move)
     alg_move = alg_move.replace("+", "").replace("#", "");
 
     // Prefer these move notations, in this order.
-    for (var i = 0; i < AVAILABLE_NOTATIONS.length; i += 1) {
-        var notation = AVAILABLE_NOTATIONS[i];
+    for (var notation in AVAILABLE_NOTATIONS) {
+        if (AVAILABLE_NOTATIONS.hasOwnProperty(notation)) {
+            if (notation === "descr" || notation === "adesc") {
+                alg_move = alg_move.replace(/Kt/g, "N");
+            }
 
-        if (notation === "descr" || notation === "adesc") {
-            alg_move = alg_move.replace(/Kt/g, "N");
-        }
+            piece_square = VALID_MOVE_NOTATIONS[notation].get(alg_move);
 
-        piece_square = VALID_MOVE_NOTATIONS[notation].get(alg_move);
-
-        if (piece_square) {
-            // Found one.
-            break;
+            if (piece_square) {
+                // Found one.
+                break;
+            }
         }
     }
 
@@ -823,22 +834,23 @@ function mv(alg_move)
     // it can also be written as N1h3 or Ngh3 or Ng1h3, even though this longer
     // form is only supposed to be used when Nh3 is ambiguous, and it is not
     // standard. But you might see it, so allow it.
-    for (i = 0; i < AVAILABLE_NOTATIONS.length; i += 1) {
-        var notation = AVAILABLE_NOTATIONS[i];
+    if (!piece_square) {
+        for (notation in AVAILABLE_NOTATIONS) {
+            if (AVAILABLE_NOTATIONS.hasOwnProperty(notation)) {
+                if (notation === "descr" || notation === "adesc") {
+                    alg_move = alg_move.replace(/Kt/g, "N");
+                }
 
-        if (notation === "descr" || notation === "adesc") {
-            alg_move = alg_move.replace(/Kt/g, "N");
-        }
+                piece_square = ALT_MOVE_NOTATIONS[notation].get(alg_move);
 
-        piece_square = ALT_MOVE_NOTATIONS[notation].get(alg_move);
-
-        if (piece_square) {
-            //console.log("Warning: non-canonical move notation: ", notation);
-            break;
+                if (piece_square) {
+                    //console.log("Warning: non-canonical move notation: ", notation);
+                    break;
+                }
+            }
         }
     }
 
- 
     // TODO: Non-ambiguous notations can be parsed directly, without needing to
     // calculate the valid moves. Maybe useful for loading in-progress games? And
     // would have to convert from SAN to non-ambiguous formats. Or just make 
@@ -1306,10 +1318,10 @@ function calculate_moves(color, is_hypothetical)
         // http://www.tutorials4html.com/2009/02/06/true-javascript-hash-table/
         // but instead, using an array with linear lookup.
         possible_notations = {};
-        for (var i = 0; i < AVAILABLE_NOTATIONS.length; i += 1) {
-            notation = AVAILABLE_NOTATIONS[i];
-
-            possible_notations[notation] = [];
+        for (var notation in AVAILABLE_NOTATIONS) {
+            if (AVAILABLE_NOTATIONS.hasOwnProperty(notation)) {
+                possible_notations[notation] = [];
+            }
         }
     }
 
@@ -1348,14 +1360,14 @@ function calculate_moves(color, is_hypothetical)
         var notations = possible_notations;
         VALID_MOVE_NOTATIONS = {};
         ALT_MOVE_NOTATIONS = {};
-        for (i = 0; i < AVAILABLE_NOTATIONS.length; i += 1) {
-            var canonical_and_synonyms;
+        for (var notation in AVAILABLE_NOTATIONS) {
+            if (AVAILABLE_NOTATIONS.hasOwnProperty(notation)) {
+                var canonical_and_synonyms;
 
-            notation = AVAILABLE_NOTATIONS[i];
-
-            canonical_and_synonyms = disambiguate_notations(notations[notation]);
-            VALID_MOVE_NOTATIONS[notation] = canonical_and_synonyms[0];
-            ALT_MOVE_NOTATIONS[notation] = canonical_and_synonyms[1];
+                canonical_and_synonyms = disambiguate_notations(notations[notation]);
+                VALID_MOVE_NOTATIONS[notation] = canonical_and_synonyms[0];
+                ALT_MOVE_NOTATIONS[notation] = canonical_and_synonyms[1];
+            }
         }
 
         // For reals.
@@ -2256,7 +2268,7 @@ function algebraic_from_piece_square(piece, square)
     var ret;
 
     // TODO: better data structure, inverted hash table lookup
-    VALID_MOVE_NOTATIONS[PREFS.OUTPUT_NOTATION].each(function(alg_piece_square) {
+    VALID_MOVE_NOTATIONS[$F("output_notation")].each(function(alg_piece_square) {
             var alg = alg_piece_square[0];
             var this_piece = alg_piece_square[1][0];
             var this_square = alg_piece_square[1][1];
@@ -3368,18 +3380,18 @@ function enable_document_selection(enable) {
  </p> 
 
  <p><a href="#" onclick="javascript:new Effect.toggle('controls', 'slide', { duration: 0.1 })">settings</a>
- <div id="controls" style="display: none">
+ <div id="controls" xstyle="display: none">
  <div>
  <!-- TODO: hide all this, since the purpose of this app is
  not to implement chess AI. But having automatic moves is useful for testing. -->
  <label for="white_computer">White PC<input type="checkbox" id="white_computer" name="white_computer" onclick="computer_move_if_applicable()"></label> 
  <label for="black_computer">Black PC<input type="checkbox" id="black_computer" name="black_computer" onclick="computer_move_if_applicable()"></label><br>
 
- <!-- TODO: populate from AVAILABLE_NOTATIONS -->
- <p>notation: <select id="output_notation" name="output_notation">
- </select>
+ <p>Notation: 
+ <select id="input_notation" name="input_notation"></select> &rarr;
+ <select id="output_notation" name="output_notation"></select>
 
- <p><a href="#" onclick="edit_pgn()">edit pgn</a>
+ <p><a href="#" onclick="edit_pgn()">Edit PGN</a>
  </div>
  </div>
 
