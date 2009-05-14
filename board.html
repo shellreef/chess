@@ -1391,11 +1391,11 @@ function populate_make_a_move_list()
     var move_group, change_group;
 
     // Select a move by menu.
-    $("make_move").innerHTML = "";
-    $("make_move").appendChild(Builder.node("option", {value:""}, "Make a move..."));
+    $("make_move_menu").innerHTML = "";
+    $("make_move_menu").appendChild(Builder.node("option", {value:""}, "Make a move..."));
     
     move_group = Builder.node("optgroup", {label:active_name});
-    $("make_move").appendChild(move_group);
+    $("make_move_menu").appendChild(move_group);
 
     VALID_MOVE_NOTATIONS[$F("input_notation")].each(function(move) {
             var notation = move[0];
@@ -1403,7 +1403,7 @@ function populate_make_a_move_list()
         });
 
     change_group = Builder.node("optgroup", {label:"Set Input Notation"});
-    $("make_move").appendChild(change_group);
+    $("make_move_menu").appendChild(change_group);
 
     for (var n in AVAILABLE_NOTATIONS) {
         if (AVAILABLE_NOTATIONS.hasOwnProperty(n) && n !== active_notation) {
@@ -3415,7 +3415,7 @@ function enable_document_selection(enable) {
    <span id="Time" style="display: none">Time</span>
  </p> 
 
- <select id="make_move"></select>
+ <select id="make_move_menu"></select>
 
  <p>
   <span id="status"></span> 
