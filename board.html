@@ -174,6 +174,7 @@ var GAME_STATE = {
 var VALID_MOVES = null;            // Keyed by filerank of source, array of moves, x, y and any flags
 var VALID_MOVES_OPP = null;        // Moves opponent could make, if it was their turn (attacking)
 var VALID_MOVE_NOTATIONS = null;   // Map SAN, LAN, MAN, RAN, CRAN, FAN, coord, desc, Smith etc. -> [piece, square]
+var ALT_MOVE_NOTATIONS = null;     // Same as above, but non-canonical, longer forms (Nb1c3 when Nc3 would do, etc.)
 var ALL_DROP_TARGETS = [];         // Droppables for UI
 var POSSIBLE_EP_TARGETS = null;             // If move to key, set en passant target to value
 
@@ -432,7 +433,7 @@ google.setOnLoadCallback(function() {
      /* Note: chessos generates PGNs with minimal algebraic notation, sometimes, 
       * not always standard algebraic. 4. ... Bb4 should be Bxb4. Need synonym 
       * support in order to read this, or MAN support. 
-      */
+      *
 pgn = load_pgn(
 "[Event \"ChesSOS Game\"]\n" + 
 "[Site \"http://www.chessos.com\"]\n" + 
@@ -449,7 +450,7 @@ pgn = load_pgn(
 "7. e3 Nc6 8. a4 Qd6 9. Ba3 Qd8 10. g4 g5 11. h4 gxh4 12. Rh4 \n" + 
 "Ne4 13. fxe4 Qh4 14. Ke2 Bg4 15. Nf3 Qh2 16. Kd3 dxe4 17. Ke4 \n" + 
 "f5 18. Kd5 Rad8 19. Ke6 Qh6 \n" + 
-"0-1");
+"0-1");*/
 
      /* TODO: support 1.move in addition to 1. move 
      pgn = load_pgn("[Event \"Berlin\"]\n" + 
@@ -816,8 +817,28 @@ function mv(alg_move)
         }
     }
 
-    // TODO: allow synonymous moves, not part of VALID_MOVE_NOTATIONS, since are redundant.
+    // Allow alternate, non-canonical forms. These are overly-descriptive
+    // notations for ambiguous move notation formats. For example, in SAN
+    // the canonical form of a particularly bad opening move is Nh3, but 
+    // it can also be written as N1h3 or Ngh3 or Ng1h3, even though this longer
+    // form is only supposed to be used when Nh3 is ambiguous, and it is not
+    // standard. But you might see it, so allow it.
+    for (i = 0; i < AVAILABLE_NOTATIONS.length; i += 1) {
+        var notation = AVAILABLE_NOTATIONS[i];
 
+        if (notation === "descr" || notation === "adesc") {
+            alg_move = alg_move.replace(/Kt/g, "N");
+        }
+
+        piece_square = ALT_MOVE_NOTATIONS[notation].get(alg_move);
+
+        if (piece_square) {
+            //console.log("Warning: non-canonical move notation: ", notation);
+            break;
+        }
+    }
+
+ 
     // TODO: Non-ambiguous notations can be parsed directly, without needing to
     // calculate the valid moves. Maybe useful for loading in-progress games? And
     // would have to convert from SAN to non-ambiguous formats. Or just make 
@@ -1262,7 +1283,7 @@ function disambiguate_notations(notations)
     // TODO: also return synonymous_notations, so overly-disambiguated move
     // notations can be used, too, but return them separately so they won't be
     // listed as unique, canonical moves.
-    return canonical_notations;
+    return [canonical_notations, synonymous_notations];
 }
 
 // After the board changes and it is the next person's turn, calculate 
@@ -1326,10 +1347,15 @@ function calculate_moves(color, is_hypothetical)
     if (!is_hypothetical) {
         var notations = possible_notations;
         VALID_MOVE_NOTATIONS = {};
+        ALT_MOVE_NOTATIONS = {};
         for (i = 0; i < AVAILABLE_NOTATIONS.length; i += 1) {
+            var canonical_and_synonyms;
+
             notation = AVAILABLE_NOTATIONS[i];
 
-            VALID_MOVE_NOTATIONS[notation] = disambiguate_notations(notations[notation]);
+            canonical_and_synonyms = disambiguate_notations(notations[notation]);
+            VALID_MOVE_NOTATIONS[notation] = canonical_and_synonyms[0];
+            ALT_MOVE_NOTATIONS[notation] = canonical_and_synonyms[1];
         }
 
         // For reals.
