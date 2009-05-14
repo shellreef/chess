@@ -1389,10 +1389,10 @@ function populate_make_a_move_list()
     var active_name = AVAILABLE_NOTATIONS[PREFS.INPUT_NOTATION];
     var move_group, change_group;
 
-    // Select a move by menu.
     $("make_move_menu").innerHTML = "";
     $("make_move_menu").appendChild(Builder.node("option", {value:""}, "Make a move..."));
-    
+   
+    // Moves in active input notation.
     move_group = Builder.node("optgroup", {label:active_name});
     $("make_move_menu").appendChild(move_group);
 
@@ -1401,6 +1401,7 @@ function populate_make_a_move_list()
             move_group.appendChild(Builder.node("option", {value: notation}, notation));
         });
 
+    // Change the input notation.
     change_group = Builder.node("optgroup", {label:"Other notation..."});
     $("make_move_menu").appendChild(change_group);
 
@@ -1426,6 +1427,8 @@ function make_move_by_menu(menu)
         populate_make_a_move_list();
         return;
     }
+
+    mv(choice);
 }
 
 // Make a move as the computer, if we're supposed to.
