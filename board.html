@@ -1374,6 +1374,14 @@ function calculate_moves(color, is_hypothetical)
 
         // For reals.
         VALID_MOVES = valid_moves;
+
+        // Select a move by menu.
+        $("valid_moves").innerHTML = "";
+        $("valid_moves").appendChild(Builder.node("option", {value:""}, "Make a move..."));
+        VALID_MOVE_NOTATIONS[$F("input_notation")].each(function(move) {
+                var notation = move[0];
+                $("valid_moves").appendChild(Builder.node("option", {value:notation}, notation));
+            });
     }
 
     return valid_moves;
@@ -3381,7 +3389,7 @@ function enable_document_selection(enable) {
    <span id="Time" style="display: none">Time</span>
  </p> 
 
- <select id="valid_moves"><option value="">Make a move...</option></select>
+ <select id="valid_moves"></select>
 
  <p>
   <span id="status"></span> 
