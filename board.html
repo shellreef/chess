@@ -1387,10 +1387,12 @@ function calculate_moves(color, is_hypothetical)
 function populate_make_a_move_list()
 {
     var active_name = AVAILABLE_NOTATIONS[PREFS.INPUT_NOTATION];
-    var move_group, change_group;
+    var move_group, change_group, count;
 
     $("make_move_menu").innerHTML = "";
-    $("make_move_menu").appendChild(Builder.node("option", {value:""}, "Make a move..."));
+
+    count = VALID_MOVE_NOTATIONS[PREFS.INPUT_NOTATION].keys().length;
+    $("make_move_menu").appendChild(Builder.node("option", {value:""}, "Make a move... (" + count + ")"));
    
     // Moves in active input notation.
     move_group = Builder.node("optgroup", {label:active_name});
