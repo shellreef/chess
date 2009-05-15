@@ -352,7 +352,7 @@ var HYPOTHETICAL_CAPTURED = null;
 
 /* Global functions for jslint to recognize. TODO: make this in objects */
 
-/*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved unfiltered_moves filtered_moves relative_decode_direction parse_flags nested_flags decode_relative_raw_move relative_decode_parlett without_dupes opposite_color set_turn set_check_message check_repetition name_squares capture_piece algebraic_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc piece_location image_path_for create_piece highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection*/
+/*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved unfiltered_moves filtered_moves relative_decode_direction parse_flags nested_flags decode_relative_raw_move relative_decode_parlett without_dupes opposite_color set_turn set_check_message check_repetition name_squares capture_piece algebraic_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc piece_location image_path_for create_piece highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection make_move_by_menu populate_make_a_move_list*/
  
 
 google.setOnLoadCallback(function() {
@@ -953,9 +953,9 @@ function in_check(victim_color, all_moves)
                 // if any.
                 var square = sq(royal);
 
-                if (move[0] === square.x && move[1] === square.y) { 
+                if (move.x === square.x && move.y === square.y) { 
                     // Being attacked!
-                    //console.log("CHECKED BY",piece,filerank,xy2filerank(move[0],move[1]));
+                    //console.log("CHECKED BY",piece,filerank,xy2filerank(move.x, move.y));
                     attacked = true;
                 }
             });
@@ -975,10 +975,10 @@ function calculate_notations(color, piece, moves, starting_filerank, ps)
     piece.prior_position = starting_filerank;    // for removal
 
     moves.each(function(move) {
-        var square = sq(move[0], move[1]);
+        var square = sq(move.x, move.y);
 
         // Building blocks
-        var dest_filerank = xy2filerank(move[0], move[1]);      // e4
+        var dest_filerank = xy2filerank(move.x, move.y);      // e4
         var dest_file = dest_filerank.substr(0, 1);             // e
         var dest_rank = dest_filerank.substr(1, 1);             // 4
         // starting_filerank (passed in as parameter)           // e2
@@ -1003,7 +1003,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps)
         var captured_letter = "";       // capital letter of piece, P for pawn, etc. or blank
         var captured_colon_letter = ""; // colon if captured, then piece letter if not pawn
 
-        var captured_piece = move[2].capture; 
+        var captured_piece = move.capture; 
 
         if (captured_piece) {
             capture_x = "x";
@@ -1023,16 +1023,16 @@ function calculate_notations(color, piece, moves, starting_filerank, ps)
         // Compute notations: SAN, FAN, MAN, LAN, RAN, CRAN and also descriptive.
         // But first check if the move text was overridden in decode_one_parlett(), for the
         // notations where it can be overridden. Not all have special notation for castling.
-        if (move[2].notation_override) {
+        if (move.notation_override) {
             // Override notation; used for special moves (castling)
             // Note: not all notations have special notation for castling.
-            ps.SAN.push([piece, square, [move[2].notation_override]]);
-            ps.LAN.push([piece, square, [move[2].notation_override]]);
-            ps.MAN.push([piece, square, [move[2].notation_override]]);
-            ps.RAN.push([piece, square, [move[2].notation_override]]);
-            ps.CRAN.push([piece, square, [move[2].notation_override]]);
-            ps.descr.push([piece, square, [move[2].notation_override]]);
-            ps.adesc.push([piece, square, [move[2].notation_override]]);
+            ps.SAN.push([piece, square, [move.notation_override]]);
+            ps.LAN.push([piece, square, [move.notation_override]]);
+            ps.MAN.push([piece, square, [move.notation_override]]);
+            ps.RAN.push([piece, square, [move.notation_override]]);
+            ps.CRAN.push([piece, square, [move.notation_override]]);
+            ps.descr.push([piece, square, [move.notation_override]]);
+            ps.adesc.push([piece, square, [move.notation_override]]);
         } else {
             var algs, figurine_prefix, algebraic_prefix, piece_letter, minimal_algs;
 
@@ -1180,17 +1180,17 @@ function calculate_notations(color, piece, moves, starting_filerank, ps)
         // TODO: promotion number, 1234 = QRBN
         var starting_xy = filerank2xy(starting_filerank);
         var starting_x = starting_xy[0], starting_y = starting_xy[1];
-        ps.ICCF.push([piece, square, [starting_x + "" + starting_y + "" + move[0] + "" + move[1]]]);
+        ps.ICCF.push([piece, square, [starting_x + "" + starting_y + "" + move.x + "" + move.y]]);
 
         // Smith notation, reversible, non-ambiguous: https://www.chessclub.com/chessviewer/smith.html
         var smith_capture_letter;
-        if (move[2].smith_castle) {
+        if (move.smith_castle) {
             // c = short castle, C = long castle
-            smith_capture_letter = move[2].smith_castle;
-        } else if (move[2].en_passant_capture) { 
+            smith_capture_letter = move.smith_castle;
+        } else if (move.en_passant_capture) { 
             // E = en passant capture
             smith_capture_letter = "E";
-        } else if (move[2].capture) {
+        } else if (move.capture) {
             // pnbrqk = captured respective piece. This is what makes it reversible.
             smith_capture_letter = captured_letter.toLowerCase();
         } else {
@@ -1463,7 +1463,7 @@ function computer_move_if_applicable()
 function would_check(piece, move, color)
 {
     var from_square = sq(piece);
-    var to_square = sq(move[0], move[1]);
+    var to_square = sq(move.x, move.y);
     var checked, all_moves;
 
     assert(piece, "would_check(" + piece + ", " + move + ", " + color +"): piece false");
@@ -1561,7 +1561,7 @@ function filtered_moves(piece, color, is_hypothetical)
     moves = [];
     blocked = {};
     for (var i = 0; i < rel_moves.length; i += 1) {
-        var rel_x, rel_y, flags, abs_move, x, y, abs_flags;
+        var rel_x, rel_y, flags, abs_move, x, y;
        
         rel_x = rel_moves[i][0];
         rel_y = rel_moves[i][1]; 
@@ -1588,8 +1588,7 @@ function filtered_moves(piece, color, is_hypothetical)
         x = rel_x + start_x;
         y = rel_y + start_y;
 
-        abs_flags = {};
-        abs_move = [x, y, abs_flags];
+        abs_move = {x: x, y: y};
 
         if (x < 1 || y < 1 || x > FILE_MAX || y > RANK_MAX) {
             // Out of bounds
@@ -1609,7 +1608,7 @@ function filtered_moves(piece, color, is_hypothetical)
             }
 
             // For move notations
-            abs_flags.capture = capture_piece;
+            abs_move.capture = capture_piece;
         } 
 
         // Must be a capture
@@ -1678,7 +1677,7 @@ function filtered_moves(piece, color, is_hypothetical)
             }
 
             // For move notations, informational purposes, only.
-            abs_flags.en_passant_capture = true;
+            abs_move.en_passant_capture = true;
         }
 
         // Castling moves
@@ -1698,7 +1697,7 @@ function filtered_moves(piece, color, is_hypothetical)
             // the castling move in Parlett).
             var found = false;
             for (var j = 0; j < moves.length; j += 1) {
-                if (moves[j][0] === 6) {
+                if (moves[j].x === 6) {
                     found = true;
                     break;
                 }
@@ -1708,9 +1707,8 @@ function filtered_moves(piece, color, is_hypothetical)
             }
 
             // TODO: check if unimpeded here? instead of if_unblockedX in Parlett
-            // TODO: check if castling through check
 
-            abs_flags.notation_override = "O-O";
+            abs_move.notation_override = "O-O";
         }
 
         if (flags.if_can_castle_long) {
@@ -1724,7 +1722,7 @@ function filtered_moves(piece, color, is_hypothetical)
             // Another ugly hardcoded "can't castle through check"
             found = false;
             for (j = 0; j < moves.length; j += 1) {
-                if (moves[j][0] === 4) {
+                if (moves[j].x === 4) {
                     found = true;
                     break;
                 }
@@ -1734,7 +1732,7 @@ function filtered_moves(piece, color, is_hypothetical)
             }
 
 
-            abs_flags.notation_override = "O-O-O";
+            abs_move.notation_override = "O-O-O";
         }
 
         // Capture at relative location, instead of at destination square.
@@ -1750,7 +1748,7 @@ function filtered_moves(piece, color, is_hypothetical)
            var capture = pc(cx, cy);
            console.log("C",xy2filerank([cx,cy]));
            if (capture) {
-               abs_flags.capture = capture;
+               abs_move.capture = capture;
            } else {
                // Nothing there to capture.
                continue;
@@ -3082,9 +3080,9 @@ function highlight_moves(piece, enable)
     moves.each(function(move) {
         var x, y, flags, to_square;
         
-        x = move[0];
-        y = move[1];
-        flags = move[2];
+        x = move.x;
+        y = move.y;
+        flags = move;
         to_square = sq(x, y);
 
         if (enable) {
@@ -3169,6 +3167,9 @@ function xy2descriptive(color, xy)
     if (Object.isArray(xy)) {
         x = xy[0];
         y = xy[1];
+    } else if (xy.x && xy.y) {
+        x = xy.x;
+        y = xy.y;
     } else {
         x = xy;
         y = "";
@@ -3185,9 +3186,17 @@ function xy2descriptive(color, xy)
 function xy2adescriptive(color, xy)
 {
     var x, y;
-    
-    x = xy[0];
-    y = xy[1];
+ 
+    if (Object.isArray(xy)) {
+        x = xy[0];
+        y = xy[1];
+    } else if (xy.x && xy.y) {
+        x = xy.x;
+        y = xy.y;
+    } else {
+        x = xy;
+        y = "";
+    }
 
     assert(x >= 1 && x <= FILE_MAX, "xy2adescriptive(" + x + ", " + y + "): bad x: " + x);
     assert(y >= 1 && y <= RANK_MAX, "xy2adescriptive(" + x + ", " + y + "): bad y: " + y);
