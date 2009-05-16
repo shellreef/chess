@@ -2483,14 +2483,12 @@ function move_piece_to_square(piece, square, is_hypothetical)
         GAME_STATE.ep_target = null;
     }
 
-    //TODOmove_text += filerank;
-
     // Move to new square
     if (piece.parentNode) {
         piece.parentNode.removeChild(piece);
     }
-
     square.appendChild(piece);
+    piece.square = square;
 
     if (should_promote(piece)) {
         promote(piece);
@@ -2776,9 +2774,11 @@ function load_starting_position(fen)
             // TODO: extended extended codes, multiple x's? or just use names?
 
             SQUARES[x][y].appendChild(create_piece(code));
+            SQUARES[x][y].childNodes[0].square = SQUARES[x][y];
             x += 1;
         } else if (/[a-zA-Z]/.test(code)) {
             SQUARES[x][y].appendChild(create_piece(code));
+            SQUARES[x][y].childNodes[0].square = SQUARES[x][y];
             x += 1;
         } else if (code === "/") {
             x = 1;
