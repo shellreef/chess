@@ -361,6 +361,7 @@ google.setOnLoadCallback(function() {
     name_squares();
     load_notations();
 
+    load_fen("rnbQ1bnr/ppp1kppp/8/4p3/7q/8/PPPP1PPP/RNBQKBNR b KQ - 0 5");
     //load_fen("r/8/8/1N3b2/3PP3/1P1BBN/8/8 w - - 0 17"); // test that Parlett moves are being cloned
     //load_fen("8/8/8/5b2/3PP3/1P2B/8/8 w - - 0 17"); 
     //load_fen("8/8/8/5b2/3PP3/1P2B/8/8 w - - 0 17"); 
@@ -371,7 +372,7 @@ google.setOnLoadCallback(function() {
     //load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // test fairy pieces
     //load_fen("rnbqmbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQMBNR w KQkq - 0 1");   // no royal pieces
 
-    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
+    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
     //load_fen("bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1");    // Church Chess
     //load_fen("rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq - 0 1"); // Advance Chess
     //load_fen("4rbqk/4rb1q/4r1bb/5rrr/RRR5/BB1R4/Q1BR4/KQBR4 w - - 0 1");    // Corner Chess
@@ -1470,8 +1471,8 @@ function would_check(piece, move, color)
 
     HYPOTHETICAL_PIECE = piece;
     HYPOTHETICAL_CAPTURED = pc(to_square.x, to_square.y);
-    HYPOTHETICAL_FROM = [from_square.x, from_square.y];
-    HYPOTHETICAL_TO = [to_square.x, to_square.y];
+    HYPOTHETICAL_FROM = from_square;
+    HYPOTHETICAL_TO = to_square;
 
     // TODO: This is a lot of calculation to do, see if can speed it up
     all_moves = calculate_moves(opposite_color(color), true);
@@ -1542,16 +1543,15 @@ function unfiltered_moves(parlett)
 // Get the legal moves for a piece.
 function filtered_moves(piece, color, is_hypothetical)
 {
-    var parlett, rel_moves, moves, start_xy;
-    var blocked, start_x, start_y;
+    var parlett, rel_moves, moves, start, blocked;
 
-    start_xy = piece_location(piece);
-    if (!start_xy) {
+    start = piece_location(piece);
+    if (!start) {
         return [];
     }
 
-    start_x = start_xy[0];
-    start_y = start_xy[1];
+    start_x = start.x;
+    start_y = start.y;
 
     parlett = PIECE_TYPES[piece.type].parlett;
 
@@ -2898,10 +2898,10 @@ function pc(x, y)
     }
 
     // A virtual, off-board "hypothetical" piece, or lack of (null, empty square).
-    if (HYPOTHETICAL_TO && square.x === HYPOTHETICAL_TO[0] && square.y === HYPOTHETICAL_TO[1]) {
+    if (HYPOTHETICAL_TO && square.x === HYPOTHETICAL_TO.x && square.y === HYPOTHETICAL_TO.y) {
         // As if it moved here
         return HYPOTHETICAL_PIECE;
-    } else if (HYPOTHETICAL_FROM && square.x === HYPOTHETICAL_FROM[0] && square.y === HYPOTHETICAL_FROM[1]) {
+    } else if (HYPOTHETICAL_FROM && square.x === HYPOTHETICAL_FROM.x && square.y === HYPOTHETICAL_FROM.y) {
         // As if it moved off of here, so empty
         return null;
     }
@@ -2933,7 +2933,7 @@ function piece_location(piece)
         return null;
     }
 
-    return [piece.parentNode.x, piece.parentNode.y];
+    return piece.parentNode;
 }
 
 // Return the path to an image for the piece of that color
@@ -3230,15 +3230,7 @@ function sq(code, extra)
     if (code.hasClassName && code.hasClassName("piece")) {
         // TODO: replace all uses of sq() to get the square of a piece, with
         // direct calls to piece_location(), but make it return a square
-        xy = piece_location(code);
-
-        if (!xy) {
-            // Piece was taken, no square
-            return null;
-        }
-
-        x = xy[0];
-        y = xy[1];
+        return piece_location(code);
     // Is it x,y passed as separate parameters?
     } else if (extra !== undefined) {
         x = code;
