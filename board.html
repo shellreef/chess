@@ -2429,7 +2429,7 @@ function move_piece_to_square(piece, square, is_hypothetical)
         var forward = forwards_vector(GAME_STATE.active_color);
         var dead_pawn_square = SQUARES[square.x][square.y - forward];
 
-        capture_piece(pc(dead_pawn_square));
+        capture_piece(piece_at(dead_pawn_square));
         dead_pawn_square.removeChild(dead_pawn_square.firstChild);
     }
 
@@ -2565,7 +2565,7 @@ function move_dropped_piece(piece, square, event)
     // TODO: do some cool effects when a piece is captured, but not too cool
     // Any way to finish running the code AFTER the effect finishes? New effect?
     //if (square.firstChild) {
-    //   new Effect.Squish(pc(square));
+    //   new Effect.Squish(piece_at(square));
     //}
 
     // Can't drop this piece anywhere anymore.
@@ -2897,18 +2897,25 @@ function pc_or_offboard(x, y)
 // Return an existing piece somewhere (or a false value), given:
 // - (x,y) coordinates, like (8,1)
 // - location in filerank notation, like "a8"
-// - a square, from SQUARES
+// To get piece from a square, use piece_at()
 function pc(x, y)
 {
-    var square;
-
-    // Get square
-    if (x.hasClassName && x.hasClassName("square")) {
-        square = x;
-    } else {
-        square = SQUARES[x][y];
+    if (x.charAt) {
+        var xy = filerank2xy(x);
+        x = xy[0];
+        y = xy[1];
     }
 
+    assert(x >= 1 && x <= FILE_MAX, "pc(" + x + ", " + y + "): bad x: " + x);
+    assert(y >= 1 && y <= RANK_MAX, "pc(" + x + ", " + y + "): bad y: " + y);
+
+
+    return piece_at(SQUARES[x][y]);
+}
+
+// Return the piece at the given square, or null
+function piece_at(square)
+{
     // A virtual, off-board "hypothetical" piece, or lack of (null, empty square).
     if (HYPOTHETICAL_TO && square.x === HYPOTHETICAL_TO.x && square.y === HYPOTHETICAL_TO.y) {
         // As if it moved here
