@@ -1543,16 +1543,16 @@ function unfiltered_moves(parlett)
 // Get the legal moves for a piece.
 function filtered_moves(piece, color, is_hypothetical)
 {
-    var parlett, rel_moves, moves, start_xy;
+    var parlett, rel_moves, moves, start, blocked;
     var blocked, start_x, start_y;
 
-    start_xy = piece_location(piece);
-    if (!start_xy) {
+    start = piece_location(piece);
+    if (!start) {
         return [];
     }
 
-    start_x = start_xy[0];
-    start_y = start_xy[1];
+    start_x = start.x;
+    start_y = start.y;
 
     parlett = PIECE_TYPES[piece.type].parlett;
 
@@ -2920,7 +2920,7 @@ function piece_location(piece)
 
     // If the piece would have moved.. 
     if (HYPOTHETICAL_PIECE === piece) {
-        return HYPOTHETICAL_TO;
+        return sq(HYPOTHETICAL_TO[0], HYPOTHETICAL_TO[1]);
     }
 
     // .. or was captured and is no longer on-board
@@ -2934,7 +2934,7 @@ function piece_location(piece)
         return null;
     }
 
-    return [piece.parentNode.x, piece.parentNode.y];
+    return piece.parentNode;
 }
 
 // Return the path to an image for the piece of that color
@@ -3231,15 +3231,7 @@ function sq(code, extra)
     if (code.hasClassName && code.hasClassName("piece")) {
         // TODO: replace all uses of sq() to get the square of a piece, with
         // direct calls to piece_location(), but make it return a square
-        xy = piece_location(code);
-
-        if (!xy) {
-            // Piece was taken, no square
-            return null;
-        }
-
-        x = xy[0];
-        y = xy[1];
+        return piece_location(code);
     // Is it x,y passed as separate parameters?
     } else if (extra !== undefined) {
         x = code;
