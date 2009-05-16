@@ -2273,8 +2273,10 @@ function check_repetition(ply)
 // Have a different mode where pieces can be dragged anywhere, including
 // to offboard, and from a piece library.
 
-// Load the virtual board into the displayed board.
-function apply_vboard()
+// Load the virtual board into the displayed board. Any number of operations
+// can be conducted on the virtual in-memory board, then when it is finished,
+// only then does the board need to be rendered in HTML. 
+function realize_vboard()
 {
     for (var x = 1; x <= FILE_MAX; x += 1) {
         for (var y = 1; y <= RANK_MAX; y += 1) {
@@ -2296,6 +2298,24 @@ function apply_vboard()
     }
 
     calculate_moves(GAME_STATE.active_color);
+}
+
+// Save the current displayed board state to VBOARD.
+function make_vboard()
+{
+    for (var x = 1; x <= FILE_MAX; x += 1) {
+        for (var y = 1; y <= RANK_MAX; y += 1) {
+            var square = SQUARES[x][y];
+            var piece = square.childNodes[0];
+
+            if (piece) {
+                // TODO: Store arbitrary parameters?
+                VBOARD[x][y].piece = {color:piece.color, type:piece.type};
+            } else {
+                VBOARD[x][y].piece = null;
+            }
+        }
+    }
 }
 
 // Internally name the square cells with their (x,y) coordinates
