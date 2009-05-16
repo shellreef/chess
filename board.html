@@ -3219,13 +3219,14 @@ function short_descriptive(descriptive_file)
     }[descriptive_file];
 }
 
+var SQ_CACHE = {};
 // Get a square cell, given location in either
 // - filerank notation (example: "a8", one argument), or
 // - x,y coordinates, (equivalent example: 1,8)
 // To get the square of a piece, use piece_location()
 function sq(code, extra)
 {
-    var x, y, xy;
+    var x, y, xy, ret, key;
 
     assert(code !== undefined, "sq(" + code + ", " + extra + "): code is undefined");
     assert(code !== null, "sq(" + code + ", " + extra + "): code is null");
@@ -3245,10 +3246,19 @@ function sq(code, extra)
         assert(false, "sq(" + code + ", " + extra + "): couldn't find out what I was given");
     }
 
+    key = x + "," + y;
+    if (SQ_CACHE[key]) { 
+        return SQ_CACHE[key];
+    }
+
     assert(x >= 1 && x <= FILE_MAX && y >= 1 && y <= RANK_MAX, "sq(" + code + ", " + extra + 
         "): out of range (" + x + ", " + y + ")");
 
-    return $('board-body').childNodes[9 - y].childNodes[x];
+    ret = $('board-body').childNodes[9 - y].childNodes[x];
+
+    SQ_CACHE[key] = ret;
+
+    return ret;
 }
 
 //// LOW-LEVEL FUNCTIONS
