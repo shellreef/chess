@@ -1929,7 +1929,6 @@ function decode_relative_raw_move(text_move, existing_flags)
 // under what conditions the move can be made. + is forward, - is backwards,
 // from the perspective of the active color. Has no knowledge of board state.
 // The moves must be filtered to determine their validity.
-// NEW
 function relative_decode_parlett(parlett)
 {
     var distances, directions, flags, movement, rel_moves;
@@ -2053,23 +2052,25 @@ function relative_decode_parlett(parlett)
             rel_x = rel_y = 0;
             prev_rel_x = null;
             prev_rel_y = null;
+
             for (var j = 1; j < Math.max(RANK_MAX, FILE_MAX); j += 1) {
+                var these_flags = {};
+
                 // Riders get blocked. Note that you can have a non-hippogonal leaper.
                 // ~n* (lion) for example, is like a queen, but not blocked by intervening pieces.
                 
                 if (prev_rel_x !== null && prev_rel_y !== null && movement === "rider") { 
-                    flags.if_unblocked_dx = prev_rel_x;
-                    flags.if_unblocked_dy = prev_rel_y;
-                } else {
-                    delete flags.if_unblocked_dx;
-                    delete flags.if_unblocked_dy;
-                }
+                    // TODO: skip all remaining in this group, instead of chaining
+                    these_flags.if_unblocked_dx = prev_rel_x;
+                    these_flags.if_unblocked_dy = prev_rel_y;
+                } 
 
                 rel_x += dir[0];
                 rel_y += dir[1];
 
+                Object.extend(these_flags, flags);
                 if (distance === Infinity || j === distance) {
-                    rel_moves.push([rel_x, rel_y, Object.clone(flags)]);
+                    rel_moves.push([rel_x, rel_y, these_flags]);
 
                     if (j === distance) { 
                         break;
