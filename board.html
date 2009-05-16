@@ -177,11 +177,12 @@ var VALID_MOVES_OPP = null;        // Moves opponent could make, if it was their
 var VALID_MOVE_NOTATIONS = null;   // Map SAN, LAN, MAN, RAN, CRAN, FAN, coord, desc, Smith etc. -> [piece, square]
 var ALT_MOVE_NOTATIONS = null;     // Same as above, but non-canonical, longer forms (Nb1c3 when Nc3 would do, etc.)
 var ALL_DROP_TARGETS = [];         // Droppables for UI
-var POSSIBLE_EP_TARGETS = null;             // If move to key, set en passant target to value
+var POSSIBLE_EP_TARGETS = null;    // If move to key, set en passant target to value
 
-// Board size
+// Board 
 var RANK_MAX = 8;
 var FILE_MAX = 8;
+var SQUARES = null;               // Get table cell square node by rank and file
 
 // Movement of pieces in extended Parlett notation
 var PIECE_TYPES = {
@@ -2260,12 +2261,17 @@ function check_repetition(ply)
 // Internally name the square cells with their (x,y) coordinates
 // and filerank notation, once when the page loads. This is only code so I
 // don't have to manually type <td x=0 y=0 filerank=a8> etc. in all the cells.
+// Also populates SQUARES for fast lookup.
 var KEYS_PRESSED;
 function name_squares()
 {
+    SQUARES = [];
     for (var x = 1; x <= FILE_MAX; x += 1) {
+        SQUARES[x] = [];
         for (var y = 1; y <= RANK_MAX; y += 1) {
-            var square = sq(x, y);
+            // Lookup the table cell from the DOM. This is extraordinarly expensive,
+            // so it is only done once here then stored in a global for sq().
+            var square  = $('board-body').childNodes[9 - y].childNodes[x];
 
             square.x = x;
             square.y = y;
@@ -2274,11 +2280,14 @@ function name_squares()
             square.descriptive = {};
             square.descriptive.white = xy2descriptive("white", [x, y]);
             square.descriptive.black = xy2descriptive("black", [x, y]);
-            //console.log(square);
+
+            SQUARES[x][y] = square;
         }
     }
 
+
     // Konami code
+    // TODO: type to move, match anything
     KEYS_PRESSED = [];
     document.onkeydown = function(event) {
             KEYS_PRESSED.push(event.keyCode);
@@ -3219,14 +3228,13 @@ function short_descriptive(descriptive_file)
     }[descriptive_file];
 }
 
-var SQ_CACHE = {};
 // Get a square cell, given location in either
 // - filerank notation (example: "a8", one argument), or
 // - x,y coordinates, (equivalent example: 1,8)
 // To get the square of a piece, use piece_location()
 function sq(code, extra)
 {
-    var x, y, xy, ret, key;
+    var x, y, xy;
 
     assert(code !== undefined, "sq(" + code + ", " + extra + "): code is undefined");
     assert(code !== null, "sq(" + code + ", " + extra + "): code is null");
@@ -3246,19 +3254,10 @@ function sq(code, extra)
         assert(false, "sq(" + code + ", " + extra + "): couldn't find out what I was given");
     }
 
-    key = x + "," + y;
-    if (SQ_CACHE[key]) { 
-        return SQ_CACHE[key];
-    }
-
     assert(x >= 1 && x <= FILE_MAX && y >= 1 && y <= RANK_MAX, "sq(" + code + ", " + extra + 
         "): out of range (" + x + ", " + y + ")");
 
-    ret = $('board-body').childNodes[9 - y].childNodes[x];
-
-    SQ_CACHE[key] = ret;
-
-    return ret;
+    return SQUARES[x][y];
 }
 
 //// LOW-LEVEL FUNCTIONS
