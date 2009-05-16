@@ -969,7 +969,7 @@ function in_check(victim_color, all_moves)
 
 // Calculate and save the move notations for a move.
 // Note: only do this if not hypothetical.
-function calculate_notations(color, piece, moves, starting_filerank, ps)
+function calculate_notations(color, piece, moves, starting_filerank, ps, square_from)
 {
     // Create drop targets for the valid destinations, linking
     // the draggables to droppables using piece- + source square.
@@ -1211,7 +1211,18 @@ function calculate_notations(color, piece, moves, starting_filerank, ps)
             accept: "piece-" + starting_filerank,
             onDrop: move_dropped_piece,
             hoverclass: 'hover'});
+
     });
+    // TODO: droppable on original square, if dropped there, then retain
+    // move highlighting, but allow clicking/tapping to move to destination.
+    /*
+    Droppables.add(square_from, {
+        accept: "piece-" + starting_filerank,
+        onDrop: function() { alert(1); },
+        // No hoverclass
+        });
+    ALL_DROP_TARGETS.push(square_from);
+    */
 
     // TODO: check for cross-notation ambiguities. Inputs are tested in the order of
     // AVAILABLE_NOTATIONS, but a notation that matches two different moves in
@@ -1347,7 +1358,7 @@ function calculate_moves(color, is_hypothetical)
 
         if (!is_hypothetical) {
             // Fills in possible_notations with possibly-ambiguous move notations in each system
-            calculate_notations(color, piece, moves, starting_filerank, possible_notations);
+            calculate_notations(color, piece, moves, starting_filerank, possible_notations, square_from);
         }
 
         // Store valid moves for mouseovers etc.
@@ -2283,7 +2294,7 @@ function name_squares()
             square.descriptive.black = xy2descriptive("black", [x, y]);
 
             Event.observe(square, 'click', function() {
-                        // TODO: move, would allow iPhone tap to move?
+                        // TODO: tap-to-move, as an alternative to dragging
                         if (GAME_STATE.dragging) {
                             alert(1);
                             //function move_dropped_piece(piece, square, event)
