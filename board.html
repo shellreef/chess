@@ -1542,16 +1542,13 @@ function unfiltered_moves(parlett)
 // Get the legal moves for a piece.
 function filtered_moves(piece, color, is_hypothetical)
 {
-    var parlett, rel_moves, moves, start_xy;
-    var blocked, start_x, start_y;
+    var parlett, rel_moves, moves;
+    var blocked, start;
 
-    start_xy = piece_location(piece);
-    if (!start_xy) {
+    start = piece_location(piece);
+    if (!start) {
         return [];
     }
-
-    start_x = start_xy[0];
-    start_y = start_xy[1];
 
     parlett = PIECE_TYPES[piece.type].parlett;
 
@@ -1585,8 +1582,8 @@ function filtered_moves(piece, color, is_hypothetical)
             if (mark_ep_target_dy) { mark_ep_target_dy = -mark_ep_target_dy; }
         }
 
-        x = rel_x + start_x;
-        y = rel_y + start_y;
+        x = rel_x + start.x;
+        y = rel_y + start.y;
 
         abs_move = {x: x, y: y};
 
@@ -1635,21 +1632,21 @@ function filtered_moves(piece, color, is_hypothetical)
             // piece there but it wasn't a valid move. For example, elephant (2X)
             // can be blocked, since it is not a leaper (sticking the elephant's eye),
             // non-hippogonal rider.
-            if (blocked[key] || pc_or_offboard(if_unblocked_dx + start_x, if_unblocked_dy + start_y)) {
+            if (blocked[key] || pc_or_offboard(if_unblocked_dx + start.x, if_unblocked_dy + start.y)) {
                 blocked[rel_x + "," + rel_y] = true;
                 continue;
             }
         }
         if (if_unblocked2_dy !== undefined) {
             key = if_unblocked2_dx + "," + if_unblocked2_dy;
-            if (blocked[key] || pc_or_offboard(if_unblocked2_dx + start_x, if_unblocked2_dy + start_y)) {
+            if (blocked[key] || pc_or_offboard(if_unblocked2_dx + start.x, if_unblocked2_dy + start.y)) {
                 blocked[rel_x + "," + rel_y] = true;
                 continue;
             }
         }
         if (if_unblocked3_dy !== undefined) {
             key = if_unblocked3_dx + "," + if_unblocked3_dy;
-            if (blocked[key] || pc_or_offboard(if_unblocked3_dx + start_x, if_unblocked3_dy + start_y)) {
+            if (blocked[key] || pc_or_offboard(if_unblocked3_dx + start.x, if_unblocked3_dy + start.y)) {
                 blocked[rel_x + "," + rel_y] = true;
                 continue;
             }
@@ -1662,8 +1659,8 @@ function filtered_moves(piece, color, is_hypothetical)
         if (!is_hypothetical) {
            if (mark_ep_target_dx !== undefined) {
                 POSSIBLE_EP_TARGETS[xy2filerank([x, y])] = 
-                    [mark_ep_target_dx + start_x,
-                     mark_ep_target_dy + start_y];
+                    [mark_ep_target_dx + start.x,
+                     mark_ep_target_dy + start.y];
                 // relative positions are hardcoded above. 
             }
 
@@ -1739,7 +1736,7 @@ function filtered_moves(piece, color, is_hypothetical)
         // Not actually implemented. En passant capture location is hardcoded.
         /*
         if (capture_at_dx !== undefined) {
-           var cx = capture_at_dx + start_x, cy = capture_at_dy + start_y;
+           var cx = capture_at_dx + start.x, cy = capture_at_dy + start.y;
 
            if (cx < 1 || cy < 1 || cx > RANK_MAX || cy > FILE_MAX) {
                continue;
@@ -2909,10 +2906,7 @@ function pc(x, y)
     return square.childNodes[0];
 }
 
-// Get (x,y) of piece. For filerank notation, use xy2filerank on this.
-// TODO: Make this return the square, and replace sq() use with this. 
-// (But be sure not to break filtering moves that put in check)
-// Returns null if the piece was taken.
+// Return square of where the piece is, or null if piece was taken.
 function piece_location(piece)
 {
     assert(piece, "piece_location(" + piece + "): piece is false");
@@ -2933,7 +2927,7 @@ function piece_location(piece)
         return null;
     }
 
-    return [piece.parentNode.x, piece.parentNode.y];
+    return piece.parentNode;
 }
 
 // Return the path to an image for the piece of that color
@@ -3226,31 +3220,24 @@ function sq(code, extra)
     assert(code !== undefined, "sq(" + code + ", " + extra + "): code is undefined");
     assert(code !== null, "sq(" + code + ", " + extra + "): code is null");
 
-    // Is it a piece?
-    if (code.hasClassName && code.hasClassName("piece")) {
-        // TODO: replace all uses of sq() to get the square of a piece, with
-        // direct calls to piece_location(), but make it return a square
-        xy = piece_location(code);
-
-        if (!xy) {
-            // Piece was taken, no square
-            return null;
-        }
-
-        x = xy[0];
-        y = xy[1];
     // Is it x,y passed as separate parameters?
-    } else if (extra !== undefined) {
+    if (extra !== undefined) {
         x = code;
         y = extra;
+
     // Is it a string in algebraic notation that can be converted?
     } else if (code.charCodeAt) {
         xy = filerank2xy(code);
 
-        // TODO: can JS do list element assignment like x,y=...?    
+        // TODO: JavaScript 1.8 can do var [x,y] = ...
         x = xy[0];
         y = xy[1];
-    } else {
+
+    // Is it a piece?
+    } else if (code.hasClassName && code.hasClassName("piece")) {
+        // Return square directly
+        return piece_location(code);
+   } else {
         assert(false, "sq(" + code + ", " + extra + "): couldn't find out what I was given");
     }
 
