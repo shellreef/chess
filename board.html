@@ -2270,7 +2270,7 @@ function name_squares()
         SQUARES[x] = [];
         for (var y = 1; y <= RANK_MAX; y += 1) {
             // Lookup the table cell from the DOM. This is extraordinarly expensive,
-            // so it is only done once here then stored in a global for sq().
+            // so it is only done once here then stored in a global, SQUARES.
             var square  = $('board-body').childNodes[9 - y].childNodes[x];
 
             square.x = x;
@@ -2897,7 +2897,7 @@ function pc_or_offboard(x, y)
 // Return an existing piece somewhere (or a false value), given:
 // - (x,y) coordinates, like (8,1)
 // - location in filerank notation, like "a8"
-// - a square, from sq()
+// - a square, from SQUARES
 function pc(x, y)
 {
     var square;
@@ -2922,10 +2922,7 @@ function pc(x, y)
     return square.childNodes[0];
 }
 
-// Get (x,y) of piece. For filerank notation, use xy2filerank on this.
-// TODO: Make this return the square, and replace sq() use with this. 
-// (But be sure not to break filtering moves that put in check)
-// Returns null if the piece was taken.
+// Get the square of a piece, or null if it is offboard.
 function piece_location(piece)
 {
     assert(piece, "piece_location(" + piece + "): piece is false");
@@ -2940,8 +2937,6 @@ function piece_location(piece)
         return null;
     }
 
-    // TODO: fix this, it happens sometimes when the computer takes a piece to get out of check, caller is sq()
-    //assert(piece.parentNode, "piece_location(" + piece + "): piece.parentNode is false");
     if (!piece.parentNode) { 
         return null;
     }
@@ -3232,6 +3227,8 @@ function short_descriptive(descriptive_file)
 // - filerank notation (example: "a8", one argument), or
 // - x,y coordinates, (equivalent example: 1,8)
 // To get the square of a piece, use piece_location()
+// Note: code should use SQUARES[x][y] or piece_location(). This is 
+// only for user convenience.
 function sq(code, extra)
 {
     var x, y, xy;
@@ -3247,7 +3244,7 @@ function sq(code, extra)
     } else if (code.charCodeAt) {
         xy = filerank2xy(code);
 
-        // TODO: can JS do list element assignment like x,y=...?    
+        // Note JavaScript 1.8 can do var [x,y] = ...
         x = xy[0];
         y = xy[1];
     } else {
