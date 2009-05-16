@@ -916,11 +916,11 @@ function promote(piece)
     // ... except when changing images. Safari has CSS animations.
     // new Effect.Puff(piece);
     // or try CSS transitions, see CSS at the top of this document.
-    //piece.style.background = image_path_for(promotes_to, piece.hasClassName("white") ? "white" : "black");
+    //piece.style.background = image_path_for(promotes_to, piece.color);
     // or TODO: create another img, same place same time, change opacity to reveal it
     // but this leaves the old image behind..
     
-    piece.src = image_path_for(promotes_to, piece.hasClassName("white") ? "white" : "black");
+    piece.src = image_path_for(promotes_to, piece.color);
 
 
     piece.type = promotes_to;
@@ -1501,9 +1501,9 @@ function piece_moved(piece)
 
     var square = piece_location(piece);
 
-    if (piece.hasClassName("white")) {
+    if (piece.color === "white") {
         return square.y !== 2;    // 2nd rank
-    } else if (piece.hasClassName("black")) {
+    } else if (piece.color === "black") {
         return square.y !== 7;    // 7th rank
     } else {
         assert("piece_moved(" + piece + "): neither white nor black");
@@ -1607,7 +1607,7 @@ function filtered_moves(piece, color, is_hypothetical)
             blocked[rel_x + "," + rel_y] = true;
 
             // Can't move to self-occupied square
-            if (capture_piece.hasClassName(color)) {
+            if (capture_piece.color === color) {
                 continue;
             }
 
@@ -2276,6 +2276,7 @@ function name_squares()
             square.x = x;
             square.y = y;
             square.filerank = xy2filerank(x, y);
+            square.color = square.hasClassName("white") ? "white" : "black";
 
             square.descriptive = {};
             square.descriptive.white = xy2descriptive("white", [x, y]);
@@ -2607,7 +2608,7 @@ function save_fen(strip_moves)
                 letter = full_piece_prefix(piece);
 
                 // Uppercase = white, lowercase = black
-                if (piece.hasClassName("black")) {
+                if (piece.color === "black") {
                     letter = letter.toLowerCase();
                 }
 
@@ -2785,7 +2786,7 @@ function name_pieces()
                 continue;
             }
 
-            if (piece.hasClassName("white")) {
+            if (piece.color === "white") {
                 rank = white_rank;
             } else {
                 rank = black_rank;
@@ -2857,7 +2858,7 @@ function full_piece_prefix(piece)
     if (letter !== undefined) {
         return letter;
     } else {
-        return (piece.hasClassName("white") ? "X" : "x") + "(" + piece.type + ")";
+        return (piece.color === "white" ? "X" : "x") + "(" + piece.type + ")";
     }
 }
 
@@ -3004,9 +3005,12 @@ function create_piece(name)
 
     filename = image_path_for(type, color);
 
-    // Color is the most important class. Type is added
-    // mostly for debugging purposes.
-    classes = "piece " + color + " " + type;
+
+    // CSS classes, can use with $$ and also shown in toString (useful 
+    // for debugging), however, note that Prototype hasClassName/addClassName
+    // are slow! because they use RegExp to parse the space-joined class list.
+    // Use .type and .piece (set below) instead of classes for speed.
+    classes = ["piece", color, type].join(" ");
 
     // Royal class is very important.
     if (PIECE_TYPES[type].royal) {
@@ -3020,6 +3024,7 @@ function create_piece(name)
     // Property will tell name of piece. To tell what color, or if it is
     // a piece in the first place, check the class names.
     piece.type = type;
+    piece.color = color;
 
     // Highlight/unhighlight legal moves on mouse over, like Chess with Friends.
     // Yahoo Games does this too, but uses a yellow outline.
@@ -3074,7 +3079,7 @@ function highlight_moves(piece, enable)
         }
 
     // If not this player's turn, no legal moves
-    if (!piece.hasClassName(GAME_STATE.active_color)) {
+    if (piece.color !== GAME_STATE.active_color) {
         return [];
     }
 
@@ -3102,11 +3107,11 @@ function highlight_moves(piece, enable)
         to_square = SQUARES[x][y];
 
         if (enable) {
-            if (to_square.hasClassName("white")) {
+            if (to_square.color === "white") {
                 to_square.addClassName("legal-move-white");
-                        } else {
+            } else {
                 to_square.addClassName("legal-move-black");
-                        }
+            }
         } else {
                 to_square.removeClassName("legal-move-white");
                 to_square.removeClassName("legal-move-black");
