@@ -1471,8 +1471,8 @@ function would_check(piece, move, color)
 
     HYPOTHETICAL_PIECE = piece;
     HYPOTHETICAL_CAPTURED = pc(to_square.x, to_square.y);
-    HYPOTHETICAL_FROM = from_square;
-    HYPOTHETICAL_TO = to_square;
+    HYPOTHETICAL_FROM = [from_square.x, from_square.y];
+    HYPOTHETICAL_TO = [to_square.x, to_square.y];
 
     // TODO: This is a lot of calculation to do, see if can speed it up
     all_moves = calculate_moves(opposite_color(color), true);
@@ -1543,15 +1543,16 @@ function unfiltered_moves(parlett)
 // Get the legal moves for a piece.
 function filtered_moves(piece, color, is_hypothetical)
 {
-    var parlett, rel_moves, moves, start, blocked;
+    var parlett, rel_moves, moves, start_xy;
+    var blocked, start_x, start_y;
 
-    start = piece_location(piece);
-    if (!start) {
+    start_xy = piece_location(piece);
+    if (!start_xy) {
         return [];
     }
 
-    start_x = start.x;
-    start_y = start.y;
+    start_x = start_xy[0];
+    start_y = start_xy[1];
 
     parlett = PIECE_TYPES[piece.type].parlett;
 
@@ -2898,10 +2899,10 @@ function pc(x, y)
     }
 
     // A virtual, off-board "hypothetical" piece, or lack of (null, empty square).
-    if (HYPOTHETICAL_TO && square.x === HYPOTHETICAL_TO.x && square.y === HYPOTHETICAL_TO.y) {
+    if (HYPOTHETICAL_TO && square.x === HYPOTHETICAL_TO[0] && square.y === HYPOTHETICAL_TO[1]) {
         // As if it moved here
         return HYPOTHETICAL_PIECE;
-    } else if (HYPOTHETICAL_FROM && square.x === HYPOTHETICAL_FROM.x && square.y === HYPOTHETICAL_FROM.y) {
+    } else if (HYPOTHETICAL_FROM && square.x === HYPOTHETICAL_FROM[0] && square.y === HYPOTHETICAL_FROM[1]) {
         // As if it moved off of here, so empty
         return null;
     }
@@ -2933,7 +2934,7 @@ function piece_location(piece)
         return null;
     }
 
-    return piece.parentNode;
+    return [piece.parentNode.x, piece.parentNode.y];
 }
 
 // Return the path to an image for the piece of that color
@@ -3230,7 +3231,15 @@ function sq(code, extra)
     if (code.hasClassName && code.hasClassName("piece")) {
         // TODO: replace all uses of sq() to get the square of a piece, with
         // direct calls to piece_location(), but make it return a square
-        return piece_location(code);
+        xy = piece_location(code);
+
+        if (!xy) {
+            // Piece was taken, no square
+            return null;
+        }
+
+        x = xy[0];
+        y = xy[1];
     // Is it x,y passed as separate parameters?
     } else if (extra !== undefined) {
         x = code;
