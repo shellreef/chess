@@ -184,6 +184,7 @@ var POSSIBLE_EP_TARGETS = null;    // If move to key, set en passant target to v
 var RANK_MAX = 8;
 var FILE_MAX = 8;
 var SQUARES = null;               // Get table cell square node by rank and file
+var VBOARD = null;                // Virtual in-memory board
 
 // Movement of pieces in extended Parlett notation
 var PIECE_TYPES = {
@@ -354,13 +355,13 @@ var HYPOTHETICAL_CAPTURED = null;
 
 /* Global functions for jslint to recognize. TODO: make this in objects */
 
-/*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved unfiltered_moves filtered_moves relative_decode_direction parse_flags nested_flags decode_relative_raw_move relative_decode_parlett without_dupes opposite_color set_turn set_check_message check_repetition name_squares capture_piece algebraic_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc piece_location image_path_for create_piece highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection make_move_by_menu populate_make_a_move_list*/
+/*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved unfiltered_moves filtered_moves relative_decode_direction parse_flags nested_flags decode_relative_raw_move relative_decode_parlett without_dupes opposite_color set_turn set_check_message check_repetition init_board capture_piece algebraic_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc piece_location image_path_for create_piece highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection make_move_by_menu populate_make_a_move_list*/
  
 
 google.setOnLoadCallback(function() {
     /* Safari & IE7: Disable text selection to stop interfering with dragging */
     enable_document_selection(false);    
-    name_squares();
+    init_board();
     load_notations();
 
     //load_fen("rnbQ1bnr/ppp1kppp/8/4p3/7q/8/PPPP1PPP/RNBQKBNR b KQ - 0 5"); // check checking
@@ -2273,13 +2274,15 @@ function check_repetition(ply)
 // Internally name the square cells with their (x,y) coordinates
 // and filerank notation, once when the page loads. This is only code so I
 // don't have to manually type <td x=0 y=0 filerank=a8> etc. in all the cells.
-// Also populates SQUARES for fast lookup.
+// Also populates SQUARES for fast lookup, and VBOARD virtual board.
 var KEYS_PRESSED;
-function name_squares()
+function init_board()
 {
     SQUARES = [];
+    VBOARD = [];
     for (var x = 1; x <= FILE_MAX; x += 1) {
         SQUARES[x] = [];
+        VBOARD[x] = [];
         for (var y = 1; y <= RANK_MAX; y += 1) {
             // Lookup the table cell from the DOM. This is extraordinarly expensive,
             // so it is only done once here then stored in a global, SQUARES.
@@ -2294,10 +2297,13 @@ function name_squares()
             square.descriptive.white = xy2descriptive("white", [x, y]);
             square.descriptive.black = xy2descriptive("black", [x, y]);
 
-            // http://www.sitepen.com/labs/code/iphone/events.html
+            // http://www.sitepen.com/labs/code/iphone/events.html - fast
             // TODO: get this working on desktop and phone
+            // http://www.manifestinteractive.com/iphone/touch/
+            // jQuery Touch is slow. Prototype + Scriptaculous is expected to be as well,
+            // maybe look into switching to a more lightweight JavaScript library.
             /*
-            Event.observe(square, "touchend", function() {
+            Event.observe(square, "click", function() {
                         // TODO: tap-to-move, as an alternative to dragging
                         if (GAME_STATE.dragging) {
                             alert(1);
@@ -2307,6 +2313,16 @@ function name_squares()
             */
 
             SQUARES[x][y] = square;
+
+            // Virtual, in-memory board
+            VBOARD[x][y] = {
+                virtual: true,
+                x: x, 
+                y: y, 
+                filerank: square.filerank, 
+                color: square.color,
+                descriptive: {white: square.descriptive.white, black: square.descriptive.black}
+            };
         }
     }
 
