@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+<meta name="viewport" content="width = 320">
 <title>Chess by Jeff</title>
 <!-- Copyright (C) 2009 Jeff Connelly -->
 <!-- Created:20090411 -->
@@ -2294,7 +2295,8 @@ function name_squares()
             square.descriptive.black = xy2descriptive("black", [x, y]);
 
             // http://www.sitepen.com/labs/code/iphone/events.html
-            /* TODO: get this working on desktop and phone
+            // TODO: get this working on desktop and phone
+            /*
             Event.observe(square, "touchend", function() {
                         // TODO: tap-to-move, as an alternative to dragging
                         if (GAME_STATE.dragging) {
