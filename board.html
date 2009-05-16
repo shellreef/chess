@@ -881,7 +881,7 @@ function should_promote(piece)
         return false;
     }
 
-    square = sq(piece);
+    square = piece_location(piece);
 
     // Is it on the last rank?
     if (GAME_STATE.active_color === "white") {
@@ -951,7 +951,7 @@ function in_check(victim_color, all_moves)
             royals.each(function(royal) {
                 // Note that sq() will return the hypothetical location of the piece,
                 // if any.
-                var square = sq(royal);
+                var square = piece_location(royal);
 
                 if (move.x === square.x && move.y === square.y) { 
                     // Being attacked!
@@ -1332,7 +1332,7 @@ function calculate_moves(color, is_hypothetical)
         var starting_filerank, square_from, moves;
 
         moves = filtered_moves(piece, color, is_hypothetical);
-        square_from = sq(piece);
+        square_from = piece_location(piece);
 
         if (!square_from) {
             // Piece was hypothetically captured
@@ -1462,7 +1462,7 @@ function computer_move_if_applicable()
 // this move didn't take them out. Either way, its illegal.
 function would_check(piece, move, color)
 {
-    var from_square = sq(piece);
+    var from_square = piece_location(piece);
     var to_square = sq(move.x, move.y);
     var checked, all_moves;
 
@@ -1497,10 +1497,12 @@ function piece_moved(piece)
 
     assert(piece.type === "pawn", "piece_moved(" + piece + "): can only tell if pawns moved, not " + piece.type);
 
+    var square = piece_location(piece);
+
     if (piece.hasClassName("white")) {
-        return sq(piece).y !== 2;    // 2nd rank
+        return square.y !== 2;    // 2nd rank
     } else if (piece.hasClassName("black")) {
-        return sq(piece).y !== 7;    // 7th rank
+        return square.y !== 7;    // 7th rank
     } else {
         assert("piece_moved(" + piece + "): neither white nor black");
     }
@@ -2296,7 +2298,7 @@ function capture_piece(piece)
         // Note that this is the first rank of the *other* player
         var opponent = opposite_color(GAME_STATE.active_color);
         var first_rank = opponent === "white" ? 1 : 8;
-        var square = sq(piece);
+        var square = piece_location(piece);
         
         // TODO: really would like to not have to hardcode this
         if (square.y === first_rank) {
@@ -2360,7 +2362,7 @@ function move_piece_to_square(piece, square, is_hypothetical)
     assert(piece, "move_piece_to_square(" + piece + ", " + square + "): piece is false");
     assert(square, "move_piece_to_square(" + piece + ", " + square + "): square is false");
 
-    from_square = sq(piece);
+    from_square = piece_location(piece);
 
     // Moving king makes it ineligible for castling
     if (PIECE_TYPES[piece.type].castles_with) {
@@ -3057,7 +3059,7 @@ function highlight_moves(piece, enable)
         return [];
     }
 
-    from_square = sq(piece);
+    from_square = piece_location(piece);
 
     if (!from_square) {
         // Could not find a square for the piece, it no longer exists,
