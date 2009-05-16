@@ -2270,16 +2270,32 @@ function check_repetition(ply)
 
 // TODO: a "board lab", where can drag pieces onto board in arbitrary
 // positions, or drag off (with an Effect.Puff), to load arbitrary fen.
+// Have a different mode where pieces can be dragged anywhere, including
+// to offboard, and from a piece library.
 
-// TODO: realize the virtual board on the actual board
+// Load the virtual board into the displayed board.
 function apply_vboard()
 {
     for (var x = 1; x <= FILE_MAX; x += 1) {
         for (var y = 1; y <= RANK_MAX; y += 1) {
-            // TODO: VBOARD[x][y].piece
+            var v = VBOARD[x][y];
+            var square = SQUARES[x][y];
+            var piece;
 
+            while (square.firstChild) {
+                square.removeChild(square.firstChild);
+            }
+
+            if (v.piece) {
+                piece = create_piece(v.piece.color, v.piece.type);
+                piece.square = SQUARES[x][y];
+
+                square.appendChild(piece);
+            }
         }
     }
+
+    calculate_moves(GAME_STATE.active_color);
 }
 
 // Internally name the square cells with their (x,y) coordinates
