@@ -1471,8 +1471,8 @@ function would_check(piece, move, color)
 
     HYPOTHETICAL_PIECE = piece;
     HYPOTHETICAL_CAPTURED = pc(to_square.x, to_square.y);
-    HYPOTHETICAL_FROM = [from_square.x, from_square.y];
-    HYPOTHETICAL_TO = [to_square.x, to_square.y];
+    HYPOTHETICAL_FROM = from_square;
+    HYPOTHETICAL_TO = to_square;
 
     // TODO: This is a lot of calculation to do, see if can speed it up
     all_moves = calculate_moves(opposite_color(color), true);
@@ -2899,10 +2899,11 @@ function pc(x, y)
     }
 
     // A virtual, off-board "hypothetical" piece, or lack of (null, empty square).
-    if (HYPOTHETICAL_TO && square.x === HYPOTHETICAL_TO[0] && square.y === HYPOTHETICAL_TO[1]) {
+    if (HYPOTHETICAL_TO && square.x === HYPOTHETICAL_TO.x && square.y === HYPOTHETICAL_TO.y) {
         // As if it moved here
         return HYPOTHETICAL_PIECE;
-    } else if (HYPOTHETICAL_FROM && square.x === HYPOTHETICAL_FROM[0] && square.y === HYPOTHETICAL_FROM[1]) {
+    } else if (HYPOTHETICAL_FROM && square.x === HYPOTHETICAL_FROM.x 
+            && square.y === HYPOTHETICAL_FROM.y) {
         // As if it moved off of here, so empty
         return null;
     }
@@ -2920,7 +2921,7 @@ function piece_location(piece)
 
     // If the piece would have moved.. 
     if (HYPOTHETICAL_PIECE === piece) {
-        return sq(HYPOTHETICAL_TO[0], HYPOTHETICAL_TO[1]);
+        return HYPOTHETICAL_TO;
     }
 
     // .. or was captured and is no longer on-board
