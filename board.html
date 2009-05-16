@@ -2293,6 +2293,7 @@ function name_squares()
             square.descriptive.white = xy2descriptive("white", [x, y]);
             square.descriptive.black = xy2descriptive("black", [x, y]);
 
+            /* TODO: get this working, ontouchup, onclick
             Event.observe(square, "touchup", function() {
                         // TODO: tap-to-move, as an alternative to dragging
                         if (GAME_STATE.dragging) {
@@ -2300,6 +2301,7 @@ function name_squares()
                             //function move_dropped_piece(piece, square, event)
                         }
                     });
+            */
 
             SQUARES[x][y] = square;
         }
