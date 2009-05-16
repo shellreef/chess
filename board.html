@@ -2282,6 +2282,14 @@ function name_squares()
             square.descriptive.white = xy2descriptive("white", [x, y]);
             square.descriptive.black = xy2descriptive("black", [x, y]);
 
+            Event.observe(square, 'click', function() {
+                        // TODO: move, would allow iPhone tap to move?
+                        if (GAME_STATE.dragging) {
+                            alert(1);
+                            //function move_dropped_piece(piece, square, event)
+                        }
+                    });
+
             SQUARES[x][y] = square;
         }
     }
