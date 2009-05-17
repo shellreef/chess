@@ -378,8 +378,9 @@ google.setOnLoadCallback(function() {
     //load_fen("8/4x(test)X(test)/x(test)4X(test)/8/2x(test)1DDE/2x(test)x(test)X(test)/1X(test)X(test) w KQkq - 0 1");
     //load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // test fairy pieces
     //load_fen("rnbqmbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQMBNR w KQkq - 0 1");   // no royal pieces
-
-    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
+    //load_fen("K w KQkq - 0 1");   // one lone king, for testing valid moves
+    
+    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
     //load_fen("bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1");    // Church Chess
     //load_fen("rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq - 0 1"); // Advance Chess
     //load_fen("4rbqk/4rb1q/4r1bb/5rrr/RRR5/BB1R4/Q1BR4/KQBR4 w - - 0 1");    // Corner Chess
@@ -429,7 +430,6 @@ google.setOnLoadCallback(function() {
     //load_fen("k7/8/8/6N1/8/8/8/6N1 w - - 0 1"); // disambiguate moves by rank (N5f3, N1f3)
     //load_fen("k7/8/8/4N1N1/3N3N/8/3N3N/4N1N1 w - - 0 1"); // disambiguate both (Ne5f3, Nd4f3, Ng5f3, Nh4f3, Nh2f3, Ng1f3, Ne1f3, Nd2f3)
     //load_fen("3Q4/6q1/2Q5/7q/1Q6/4q3/7Q/5q2 w - - 0 1"); // an eight queens solution, but with black+white queens. test disambig.
-    load_fen("K w KQkq - 0 1");
 
     // TODO: library of interesting games, see
     // http://www.xs4all.nl/~timkr/records/records.htm and http://www.xs4all.nl/~timkr/ChessTutor/pgnview.htm
@@ -1321,6 +1321,44 @@ function disambiguate_notations(notations)
     return [canonical_notations, synonymous_notations];
 }
 
+// Make the drop targets for a piece and its moves.
+function make_droppables(real_piece, moves)
+{
+    assert(!real_piece.virtual, "make_droppables(" + real_piece + ", " + moves + "): called with virtual piece");
+
+    //var real_piece = piece_at(SQUARES[x][y]);
+    var starting_filerank = real_piece.square.filerank;
+    
+    // Create drop targets for the valid destinations, linking
+    // the draggables to droppables using piece- + source square.
+    real_piece.addClassName("piece-" + starting_filerank);
+    real_piece.prior_position = starting_filerank;    // for removal
+
+    // TODO: droppable on original square, if dropped there, then retain
+    // move highlighting, but allow clicking/tapping to move to destination.
+    /*
+    Droppables.add(square_from, {
+        accept: "piece-" + starting_filerank,
+        onDrop: function() { alert(1); },
+        // No hoverclass
+        });
+    ALL_DROP_TARGETS.push(square_from);
+    */
+   
+    moves.each(function(move) {
+            var square = SQUARES[move.x][move.y];
+
+            // For removal
+            ALL_DROP_TARGETS.push(square);
+
+            // You can drop here
+            Droppables.add(square, {
+                accept: "piece-" + starting_filerank,
+                onDrop: move_dropped_piece,
+                hoverclass: 'hover'});
+            });
+}
+
 // After the board changes and it is the next person's turn, calculate 
 // what the next possible allowable moves are, and update the globals with this information.
 //
@@ -1337,8 +1375,6 @@ function calculate_moves(color, is_hypothetical)
             "calculate_moves(" + color + "): bad color or no color given");
 
     if (!is_hypothetical) { 
-        make_vboard();
-
         // Values are [ [ [piece, square ], [possible move names] ], ... ]
         // Instead of a hash or assocative array, because I couldn't use
         // [piece, square] as a key, even with Prototype's Hash. Could use
@@ -1376,43 +1412,10 @@ function calculate_moves(color, is_hypothetical)
                 // Fills in possible_notations with possibly-ambiguous move notations in each system
                 calculate_notations(color, piece, moves, starting_filerank, possible_notations, square_from);
 
-                //XYZ
+
+                // TODO: get out of this function, since it might be virtual (but not hypothetical) and this is unneeded
                 var real_piece = piece_at(SQUARES[x][y]);
-                if (1 || !piece.virtual) {
-                    // Create drop targets for the valid destinations, linking
-                    // the draggables to droppables using piece- + source square.
-                    real_piece.addClassName("piece-" + starting_filerank);
-                    real_piece.prior_position = starting_filerank;    // for removal
-
-                    // TODO: droppable on original square, if dropped there, then retain
-                    // move highlighting, but allow clicking/tapping to move to destination.
-                    /*
-                    Droppables.add(square_from, {
-                        accept: "piece-" + starting_filerank,
-                        onDrop: function() { alert(1); },
-                        // No hoverclass
-                        });
-                    ALL_DROP_TARGETS.push(square_from);
-                    }*/
-                   
-                    moves.each(function(move) {
-                            var square = SQUARES[move.x][move.y];
-
-                            // For removal
-                            ALL_DROP_TARGETS.push(square);
-
-                            // You can drop here
-                            Droppables.add(square, {
-                                accept: "piece-" + starting_filerank,
-                                onDrop: move_dropped_piece,
-                                hoverclass: 'hover'});
-                            });
-
-                }
-
-
-                //XYZ
-                //
+                make_droppables(real_piece, moves);
             }
 
             // Store valid moves for mouseovers etc.
@@ -2234,10 +2237,6 @@ function set_turn(color, historical)
     POSSIBLE_EP_TARGETS = {};
    
     // Active player in check?
-    // Need to save to virtual board, since that is what in_check() looks at.
-    // TODO: PERFORMANCE: allow in_check to look at non-virtual board, so we can avoid 
-    // creating the virtual board.
-    make_vboard();
     checked = GAME_STATE.active_in_check = in_check(GAME_STATE.active_color, calculate_moves(opposite_color(new_color), true));
 
     // Note: this takes some time... is there any way to run it right AFTER the piece has
@@ -2553,6 +2552,7 @@ function move_piece_to_square(piece, square, is_hypothetical)
             if (square.x === 7) {
                 // TODO: actually calculate square moved over, then move rook there
                 // (instead of hardcoding). Short.
+                // TODO: test virtual
                 move_piece_to_square(pc(8, first_rank), piece.virtual ? VBOARD[6][first_rank] : SQUARES[6][first_rank], true);
                 castle_move_text = "O-O";
             } else if (square.x === 3) {
@@ -2651,6 +2651,9 @@ function move_piece_to_square(piece, square, is_hypothetical)
 
         only_move = VALID_MOVE_NOTATIONS.SAN.keys().length === 1;
 
+        if (!piece.virtual) {
+            make_vboard();
+        }
         turn_info = set_turn("next");
         if (turn_info.text_move) {
             move_text += turn_info.text_move;
@@ -2857,6 +2860,7 @@ function load_fen(fen, replay)
     if (!replay) { GAME_STATE.position_after = {}; }
    
     // Now that everything is loaded, set the turn.
+    make_vboard();
     set_turn({w:"white", b:"black"}[parts[1]], replay);
 }
 
