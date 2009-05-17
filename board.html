@@ -358,7 +358,7 @@ var HYPOTHETICAL_CAPTURED = null;
 
 /* Global functions for jslint to recognize. TODO: make this in objects */
 
-/*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved unfiltered_moves filtered_moves relative_decode_direction parse_flags nested_flags decode_relative_raw_move relative_decode_parlett without_dupes opposite_color set_turn set_check_message check_repetition init_board capture_piece algebraic_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc piece_location image_path_for create_piece highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection make_move_by_menu populate_make_a_move_list*/
+/*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved unfiltered_moves filtered_moves relative_decode_direction parse_flags nested_flags decode_relative_raw_move relative_decode_parlett without_dupes opposite_color set_turn set_check_message check_repetition init_board capture_piece notation_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc piece_location image_path_for create_piece highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection make_move_by_menu populate_make_a_move_list*/
  
 
 google.setOnLoadCallback(function() {
@@ -379,7 +379,7 @@ google.setOnLoadCallback(function() {
     //load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // test fairy pieces
     //load_fen("rnbqmbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQMBNR w KQkq - 0 1");   // no royal pieces
 
-    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
+    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
     //load_fen("bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1");    // Church Chess
     //load_fen("rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq - 0 1"); // Advance Chess
     //load_fen("4rbqk/4rb1q/4r1bb/5rrr/RRR5/BB1R4/Q1BR4/KQBR4 w - - 0 1");    // Corner Chess
@@ -427,7 +427,7 @@ google.setOnLoadCallback(function() {
     
     //load_fen("k7/8/8/8/8/8/3N4/6N1 w - - 0 1"); // disambiguate moves by file (Ngf3, Ndf3)
     //load_fen("k7/8/8/6N1/8/8/8/6N1 w - - 0 1"); // disambiguate moves by rank (N5f3, N1f3)
-    //load_fen("k7/8/8/4N1N1/3N3N/8/3N3N/4N1N1 w - - 0 1"); // disambiguate both (Ne5f3, Nd4f3, Ng5f3, Nh4f3, Nh2f3, Ng1f3, Ne1f3, Nd2f3)
+    load_fen("k7/8/8/4N1N1/3N3N/8/3N3N/4N1N1 w - - 0 1"); // disambiguate both (Ne5f3, Nd4f3, Ng5f3, Nh4f3, Nh2f3, Ng1f3, Ne1f3, Nd2f3)
     //load_fen("3Q4/6q1/2Q5/7q/1Q6/4q3/7Q/5q2 w - - 0 1"); // an eight queens solution, but with black+white queens. test disambig.
 
     // TODO: library of interesting games, see
@@ -588,7 +588,7 @@ function load_pgn(pgn)
     }
 
     // Starting position
-    load_fen(game.FEN, true);
+    load_fen(game.FEN);
     GAME_STATE.position_after[0] = game.FEN;
 
     for (var ply = 1; ply < game.moves.length; ply += 1) {
@@ -734,7 +734,7 @@ function load_ply(ply)
     
     $$("a.active_move").invoke("removeClassName", "active_move");
 
-    load_fen(GAME_STATE.position_after[ply]);
+    load_fen(GAME_STATE.position_after[ply], true);
 
     $("ply_" + ply).addClassName("active_move");
 
@@ -992,11 +992,10 @@ function in_check(victim_color, all_moves)
 
 // Calculate and save the move notations for a move.
 // Note: only do this if not hypothetical.
-// TODO: piece virtual
 function calculate_notations(color, piece, moves, starting_filerank, ps, square_from)
 {
     moves.each(function(move) {
-        var square = piece.virtual ? VBOARD[move.x][move.y] : SQUARES[move.x][move.y];
+        var square = VBOARD[move.x][move.y];
 
         // Building blocks
         var dest_filerank = xy2filerank(move.x, move.y);      // e4
@@ -1365,9 +1364,10 @@ function calculate_moves(color, is_hypothetical)
 
             if (!is_hypothetical) {
                 // Fills in possible_notations with possibly-ambiguous move notations in each system
-                var real_piece = piece_at(SQUARES[x][y]);
-                calculate_notations(color, real_piece, moves, starting_filerank, possible_notations, square_from);
+                calculate_notations(color, piece, moves, starting_filerank, possible_notations, square_from);
 
+                //XYZ
+                var real_piece = piece_at(SQUARES[x][y]);
                 if (1 || !piece.virtual) {
                     // Create drop targets for the valid destinations, linking
                     // the draggables to droppables using piece- + source square.
@@ -2358,7 +2358,7 @@ function make_vboard()
 
             if (piece) {
                 // TODO: Store arbitrary parameters?
-                VBOARD[x][y].piece = {virtual:true, color:piece.color, type:piece.type, square:VBOARD[x][y]};
+                VBOARD[x][y].piece = {virtual:true, color:piece.color, type:piece.type, square:VBOARD[x][y], unique_id:piece.unique_id};
             } else {
                 VBOARD[x][y].piece = null;
             }
@@ -2466,7 +2466,7 @@ function capture_piece(piece)
 
 // Find precomputed algebraic notation for this move. Called when
 // user drags a piece to a square and we don't know what move it is.
-function algebraic_from_piece_square(piece, square)
+function notation_from_piece_square(piece, square)
 {
     var ret;
 
@@ -2476,7 +2476,9 @@ function algebraic_from_piece_square(piece, square)
             var this_piece = alg_piece_square[1][0];
             var this_square = alg_piece_square[1][1];
 
-            if (this_square === square && this_piece === piece) {
+            //XXX
+            if (this_square.x === square.x && this_square.y === square.y && 
+                this_piece === piece) {
                 ret = alg;
                 throw $break;
             }
@@ -2547,7 +2549,7 @@ function move_piece_to_square(piece, square, is_hypothetical)
 
 
     // Lookup standard algebraic move notation (precomputed)
-    move_text = algebraic_from_piece_square(piece, square);
+    move_text = notation_from_piece_square(piece, square);
 
     if (!piece.virtual) { 
         // Capture piece(s) on destination square. Multiple pieces
@@ -2808,14 +2810,14 @@ function save_fen(strip_moves)
     return fen;
 }
 
-// Load board state. If clear is true, clear previous moves, because
-// this is a new game.
-function load_fen(fen, clear)
+// Load board state. If replay is true, this is reloading an 
+// existing position, not loading a new game.
+function load_fen(fen, replay)
 {
     var parts, castling;
 
     parts = fen.split(" ");
-    load_starting_position(parts[0]);
+    load_starting_position(parts[0], replay);
 
     assert(/^[wb]$/.test(parts[1]), "load_fen(" + fen + "): bad active color: " + parts[1]);
 
@@ -2834,11 +2836,11 @@ function load_fen(fen, clear)
     GAME_STATE.halfmove_clock = parseInt(parts[4], 10);
     GAME_STATE.fullmove_number = parseInt(parts[5], 10);
 
-    if (clear) { GAME_STATE.position_moves = {}; }
-    if (clear) { GAME_STATE.position_after = {}; }
+    if (!replay) { GAME_STATE.position_moves = {}; }
+    if (!replay) { GAME_STATE.position_after = {}; }
    
     // Now that everything is loaded, set the turn.
-    set_turn({w:"white", b:"black"}[parts[1]], !clear);
+    set_turn({w:"white", b:"black"}[parts[1]], replay);
 }
 
 // Remove all pieces from the board.
@@ -2855,8 +2857,9 @@ function clear_board()
 }
 
 // Load starting position in FEN. Example, at beginning of game:
-// rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR
-function load_starting_position(fen)
+// rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR.
+// If !replay, name pieces.
+function load_starting_position(fen, replay)
 {
     var i, x, y, code;
 
@@ -2908,7 +2911,9 @@ function load_starting_position(fen)
         }
     }
 
-    name_pieces();
+    if (!replay) {
+        name_pieces();
+    }
 }
 
 //// PIECE FUNCTIONS
@@ -2953,6 +2958,10 @@ function name_pieces()
             // pieces of same type on same file). Use file, rank, or filerank
             // like disambiguating moves.
             piece.adescriptive_name = afile + piece_letter;
+
+            // Unique identifier of piece. TODO: Use adescriptive_name, make it disambiguated
+            // so it will be always unique and descriptive.
+            piece.unique_id = afile + "" + white_rank + piece_letter;
         }
     }
 }
