@@ -367,6 +367,7 @@ google.setOnLoadCallback(function() {
     init_board();
     load_notations();
 
+    load_fen("rnbqkbnr/ppp1p1pp/4P3/3p3Q/5p2/8/PPPP1PPP/RNB1KBNR b KQkq - 0 4"); // get out of check
     //load_fen("rnbQ1bnr/ppp1kppp/8/4p3/7q/8/PPPP1PPP/RNBQKBNR b KQ - 0 5"); // check checking
     //load_fen("r/8/8/1N3b2/3PP3/1P1BBN/8/8 w - - 0 17"); // test that Parlett moves are being cloned
     //load_fen("8/8/8/5b2/3PP3/1P2B/8/8 w - - 0 17"); 
@@ -378,7 +379,7 @@ google.setOnLoadCallback(function() {
     //load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // test fairy pieces
     //load_fen("rnbqmbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQMBNR w KQkq - 0 1");   // no royal pieces
 
-    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
+    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
     //load_fen("bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1");    // Church Chess
     //load_fen("rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq - 0 1"); // Advance Chess
     //load_fen("4rbqk/4rb1q/4r1bb/5rrr/RRR5/BB1R4/Q1BR4/KQBR4 w - - 0 1");    // Corner Chess
@@ -1332,6 +1333,8 @@ function calculate_moves(color, is_hypothetical)
             "calculate_moves(" + color + "): bad color or no color given");
 
     if (!is_hypothetical) { 
+        make_vboard();
+
         // Values are [ [ [piece, square ], [possible move names] ], ... ]
         // Instead of a hash or assocative array, because I couldn't use
         // [piece, square] as a key, even with Prototype's Hash. Could use
@@ -1346,33 +1349,42 @@ function calculate_moves(color, is_hypothetical)
     }
 
     // Look at all the active pieces
-    $$("img." + color).each(function(piece) { 
-        var starting_filerank, square_from, moves;
+    //$$("img." + color).each(function(piece) { 
+    for (var x = 1; x <= FILE_MAX; x += 1) {
+        for (var y = 1; y <= RANK_MAX; y += 1) {
+            var starting_filerank, square_from, moves, piece;
 
-        moves = filtered_moves(piece, color, is_hypothetical);
-        square_from = piece_location(piece);
+            //square_from = piece_location(piece);
+            square_from = VBOARD[x][y];
+            piece = piece_at(square_from);
+ 
+            // Skip blank squares and inactive pieces
+            if (!piece || piece.color !== color) {
+                continue;
+            }
 
-        if (!square_from) {
-            // Piece was hypothetically captured
-            return;
+          
+            moves = filtered_moves(piece, color, is_hypothetical);
+
+            // Convert xy to filerank notation (a string), so it can be easily used
+            // as a hash key, class name for droppables, and also for notations.
+            starting_filerank = square_from.filerank;
+
+            if (!is_hypothetical) {
+                // Fills in possible_notations with possibly-ambiguous move notations in each system
+                var real_piece = piece_at(SQUARES[x][y]);
+                calculate_notations(color, real_piece, moves, starting_filerank, possible_notations, square_from);
+            }
+
+            // Store valid moves for mouseovers etc.
+            if (moves.length !== 0) {
+                valid_moves.set(starting_filerank, moves);
+            }
+
+            //console.log(starting_filerank, moves);
+        //});
         }
-
-        // Convert xy to filerank notation (a string), so it can be easily used
-        // as a hash key, class name for droppables, and also for notations.
-        starting_filerank = square_from.filerank;
-
-        if (!is_hypothetical) {
-            // Fills in possible_notations with possibly-ambiguous move notations in each system
-            calculate_notations(color, piece, moves, starting_filerank, possible_notations, square_from);
-        }
-
-        // Store valid moves for mouseovers etc.
-        if (moves.length !== 0) {
-            valid_moves.set(starting_filerank, moves);
-        }
-
-        //console.log(starting_filerank, moves);
-    });
+    }
 
 
     // Gather all the notations, disambiguate and apply
@@ -3008,7 +3020,8 @@ function pc(x, y)
     return piece_at(SQUARES[x][y]);
 }
 
-// Return the piece at the given square, or null
+// Return the piece at the given square, or null.
+// Accepts virtual or real squares, and takes hypothetical moves into account.
 function piece_at(square)
 {
     // A virtual, off-board "hypothetical" piece, or lack of (null, empty square).
@@ -3021,7 +3034,11 @@ function piece_at(square)
         return null;
     }
 
-    return square.childNodes[0];
+    if (square.virtual) {
+        return square.piece;
+    } else {
+        return square.childNodes[0];
+    }
 }
 
 // Get the square of a piece, or null if it is offboard.
