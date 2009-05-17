@@ -873,8 +873,13 @@ function mv(alg_move)
 
     // TODO: do some Effect.Move animation, optionally (make two functions)
     //new Effect.Move(piece, { x: 10, y: 20, mode: 'relative' });
+    
 
-    move_piece_to_square(piece, square);
+    // Move the real piece and square
+    var real_piece = piece_at(SQUARES[piece.square.x][piece.square.y]);
+    var real_square = SQUARES[square.x][square.y];
+
+    move_piece_to_square(real_piece, real_square);
 }
 
 //// SPECIAL MOVE FUNCTIONS
@@ -3649,7 +3654,7 @@ function enable_document_selection(enable) {
 
  <p><a href="#" onclick="javascript:new Effect.toggle('controls', 'slide', { duration: 0.1 })">advanced</a>
  
- <div id="controls" style="display: none; border-left: 2px solid blue">
+ <div id="controls" style="xdisplay: none; border-left: 2px solid blue">
  <div>
 
  <p><select id="make_move_menu" onchange="make_move_by_menu(this)"></select>
