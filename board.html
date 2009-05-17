@@ -979,7 +979,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
     piece.prior_position = starting_filerank;    // for removal
 
     moves.each(function(move) {
-        var square = VBOARD[move.x][move.y];
+        var square = SQUARES[move.x][move.y];
 
         // Building blocks
         var dest_filerank = xy2filerank(move.x, move.y);      // e4
@@ -1478,7 +1478,7 @@ function computer_move_if_applicable()
 function would_check(piece, move, color)
 {
     var from_square = piece_location(piece);
-    var to_square = VBOARD[move.x][move.y];
+    var to_square = SQUARES[move.x][move.y];
     var checked, all_moves;
 
     assert(piece, "would_check(" + piece + ", " + move + ", " + color +"): piece false");
@@ -1612,7 +1612,7 @@ function filtered_moves(piece, color, is_hypothetical)
             continue;
         }
 
-        var dest_square = VBOARD[x][y];
+        var dest_square = SQUARES[x][y];
         var capture_piece = pc(x, y);
 
         // If there is any piece there, it may block other moves
@@ -2280,7 +2280,7 @@ function realize_vboard()
 {
     for (var x = 1; x <= FILE_MAX; x += 1) {
         for (var y = 1; y <= RANK_MAX; y += 1) {
-            var v = VBOARD[x][y];
+            var v = SQUARES[x][y];
             var square = SQUARES[x][y];
             var piece;
 
@@ -2486,11 +2486,11 @@ function move_piece_to_square(piece, square, is_hypothetical)
             if (square.x === 7) {
                 // TODO: actually calculate square moved over, then move rook there
                 // (instead of hardcoding). Short.
-                move_piece_to_square(pc(8, first_rank), VBOARD[6][first_rank], true);
+                move_piece_to_square(pc(8, first_rank), SQUARES[6][first_rank], true);
                 castle_move_text = "O-O";
             } else if (square.x === 3) {
                 // Castle long.
-                move_piece_to_square(pc(1, first_rank), VBOARD[4][first_rank], true);
+                move_piece_to_square(pc(1, first_rank), SQUARES[4][first_rank], true);
                 castle_move_text = "O-O-O";
             }
         }
@@ -2515,7 +2515,7 @@ function move_piece_to_square(piece, square, is_hypothetical)
         square.y === GAME_STATE.ep_target[1]) {
 
         var forward = forwards_vector(GAME_STATE.active_color);
-        var dead_pawn_square = VBOARD[square.x][square.y - forward];
+        var dead_pawn_square = SQUARES[square.x][square.y - forward];
 
         capture_piece(piece_at(dead_pawn_square));
         dead_pawn_square.removeChild(dead_pawn_square.firstChild);
@@ -2774,9 +2774,6 @@ function load_fen(fen, clear)
    
     // Now that everything is loaded, set the turn.
     set_turn({w:"white", b:"black"}[parts[1]], !clear);
-
-    // Actually display
-    realize_vboard();
 }
 
 // Remove all pieces from the board.
@@ -2784,7 +2781,7 @@ function clear_board()
 {
     for (var x = 1; x <= RANK_MAX; x += 1) {
         for (var y = 1; y <= FILE_MAX; y += 1) {
-            var square = VBOARD[x][y];
+            var square = SQUARES[x][y];
             while(square.firstChild) {
                 square.removeChild(square.firstChild);
             }
@@ -2823,16 +2820,16 @@ function load_starting_position(fen)
             }
             // TODO: extended extended codes, multiple x's? or just use names?
 
-            //SQUARES[x][y].appendChild(create_piece_by_letter(code));
-            //SQUARES[x][y].childNodes[0].square = SQUARES[x][y];
-            VBOARD[x][y].piece = decode_piece_letter(code);
-            VBOARD[x][y].piece.square = VBOARD[x][y];
+            SQUARES[x][y].appendChild(create_piece_by_letter(code));
+            SQUARES[x][y].childNodes[0].square = SQUARES[x][y];
+            //VBOARD[x][y].piece = decode_piece_letter(code);
+            //VBOARD[x][y].piece.square = VBOARD[x][y];
             x += 1;
         } else if (/[a-zA-Z]/.test(code)) {
-            //SQUARES[x][y].appendChild(create_piece_by_letter(code));
-            //SQUARES[x][y].childNodes[0].square = SQUARES[x][y];
-            VBOARD[x][y].piece = decode_piece_letter(code);
-            VBOARD[x][y].piece.square = VBOARD[x][y];
+            SQUARES[x][y].appendChild(create_piece_by_letter(code));
+            SQUARES[x][y].childNodes[0].square = SQUARES[x][y];
+            //VBOARD[x][y].piece = decode_piece_letter(code);
+            //VBOARD[x][y].piece.square = VBOARD[x][y];
             x += 1;
         } else if (code === "/") {
             x = 1;
@@ -3005,7 +3002,7 @@ function pc(x, y)
     assert(y >= 1 && y <= RANK_MAX, "pc(" + x + ", " + y + "): bad y: " + y);
 
 
-    return piece_at(VBOARD[x][y]);
+    return piece_at(SQUARES[x][y]);
 }
 
 // Return the piece at the given square, or null
@@ -3021,8 +3018,7 @@ function piece_at(square)
         return null;
     }
 
-    //return square.childNodes[0];
-    return square.piece;
+    return square.childNodes[0];
 }
 
 // Get the square of a piece, or null if it is offboard.
@@ -3216,7 +3212,7 @@ function highlight_moves(piece, enable)
         x = move.x;
         y = move.y;
         flags = move;
-        to_square = VBOARD[x][y];
+        to_square = SQUARES[x][y];
 
         if (enable) {
             if (to_square.color === "white") {
@@ -3351,7 +3347,7 @@ function short_descriptive(descriptive_file)
 // - filerank notation (example: "a8", one argument), or
 // - x,y coordinates, (equivalent example: 1,8)
 // To get the square of a piece, use piece_location()
-// Note: code should use VBOARD[x][y] or piece_location(). This is 
+// Note: code should use SQUARES[x][y] or piece_location(). This is 
 // only for user convenience.
 function sq(code, extra)
 {
@@ -3378,7 +3374,7 @@ function sq(code, extra)
     assert(x >= 1 && x <= FILE_MAX && y >= 1 && y <= RANK_MAX, "sq(" + code + ", " + extra + 
         "): out of range (" + x + ", " + y + ")");
 
-    return VBOARD[x][y];
+    return SQUARES[x][y];
 }
 
 //// LOW-LEVEL FUNCTIONS
