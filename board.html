@@ -807,7 +807,7 @@ function encode_ply(color, fullmove_number)
 // a command-line instead of a GUI. Computer move also uses this function, but it is
 // not used for drag-and-drop.
 // TODO: Support multiple moves
-function mv(alg_move)
+function mv(alg_move, virtual)
 {
     var piece_square, piece, square;
 
@@ -875,11 +875,15 @@ function mv(alg_move)
     //new Effect.Move(piece, { x: 10, y: 20, mode: 'relative' });
     
 
-    // Move the real piece and square
-    var real_piece = piece_at(SQUARES[piece.square.x][piece.square.y]);
-    var real_square = SQUARES[square.x][square.y];
+    if (virtual) {
+        move_piece_to_square(piece, square);
+    } else {
+        // Move the real piece and square
+        var real_piece = piece_at(SQUARES[piece.square.x][piece.square.y]);
+        var real_square = SQUARES[square.x][square.y];
 
-    move_piece_to_square(real_piece, real_square);
+        move_piece_to_square(real_piece, real_square);
+    }
 }
 
 //// SPECIAL MOVE FUNCTIONS
@@ -2333,7 +2337,7 @@ function realize_vboard()
 {
     for (var x = 1; x <= FILE_MAX; x += 1) {
         for (var y = 1; y <= RANK_MAX; y += 1) {
-            var v = SQUARES[x][y];
+            var v = VBOARD[x][y];
             var square = SQUARES[x][y];
             var piece;
 
@@ -2344,6 +2348,8 @@ function realize_vboard()
             if (v.piece) {
                 piece = create_piece(v.piece.color, v.piece.type);
                 piece.square = SQUARES[x][y];
+                // TODO: what about descriptive_name, adescriptive_name?? Its important.
+                piece.unique_id = v.piece.unique_id;
 
                 square.appendChild(piece);
             }
@@ -2471,6 +2477,7 @@ function capture_piece(piece)
 
 // Find precomputed algebraic notation for this move. Called when
 // user drags a piece to a square and we don't know what move it is.
+// TODO: Also allow getting the original abs_move, so can perform multimoves generically.
 function notation_from_piece_square(piece, square)
 {
     var ret;
@@ -2540,17 +2547,15 @@ function move_piece_to_square(piece, square, is_hypothetical)
             if (square.x === 7) {
                 // TODO: actually calculate square moved over, then move rook there
                 // (instead of hardcoding). Short.
-                move_piece_to_square(pc(8, first_rank), SQUARES[6][first_rank], true);
+                move_piece_to_square(pc(8, first_rank), piece.virtual ? VBOARD[6][first_rank] : SQUARES[6][first_rank], true);
                 castle_move_text = "O-O";
             } else if (square.x === 3) {
                 // Castle long.
-                move_piece_to_square(pc(1, first_rank), SQUARES[4][first_rank], true);
+                move_piece_to_square(pc(1, first_rank), piece.virtual ? VBOARD[4][first_rank] : SQUARES[4][first_rank], true);
                 castle_move_text = "O-O-O";
             }
         }
     }
-
-
 
     // Lookup standard algebraic move notation (precomputed)
     move_text = notation_from_piece_square(piece, square);
@@ -2598,7 +2603,7 @@ function move_piece_to_square(piece, square, is_hypothetical)
     if (piece.virtual) { 
         piece.square.piece = null;  // Clear from
         square.piece = piece;       // Set to
-        piece.square = square;      // Link piece to destination square
+        piece.square = square;      // Link piece to new destination square
     } else {
         // Move to new square
         if (piece.square) {
@@ -2609,7 +2614,7 @@ function move_piece_to_square(piece, square, is_hypothetical)
     }
 
     if (should_promote(piece)) {
-        promote(piece);
+        promote(piece); // TODO: allow virtual
 
         move_text += "=Q";  // TODO: get return value from promote(), different values. Maybe need a callback, user interaction.
     }
@@ -2672,12 +2677,14 @@ function move_piece_to_square(piece, square, is_hypothetical)
         }
     }
 
-    // AI - artificial intelligence 
-    // Do this after a delay, so that when playing computer vs. computer, you can
-    // see the move, since they are not animated (Effect.Move) yet.
-    setTimeout(function() { 
-            computer_move_if_applicable();
-            }, 1);
+    if (!piece.virtual) { 
+        // AI - artificial intelligence 
+        // Do this after a delay, so that when playing computer vs. computer, you can
+        // see the move, since they are not animated (Effect.Move) yet.
+        setTimeout(function() { 
+                computer_move_if_applicable();
+                }, 1);
+    }
 }
 
 // Visually indicate the moves which after threefold repetition
