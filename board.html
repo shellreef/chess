@@ -948,7 +948,16 @@ function in_check(victim_color, all_moves)
             "): all_moves is false");
      
     // Pieces that can't be captured and need to move if attacked
-    var royals = $$("img.royal." + victim_color);
+    //var royals = $$("img.royal." + victim_color);
+    var royals = [];
+    for (var x = 1; x <= FILE_MAX; x += 1) {
+        for (var y = 1; y <= RANK_MAX; y += 1) {
+           var piece = piece_at(VBOARD[x][y]);
+           if (piece && PIECE_TYPES[piece.type].royal) {
+               royals.push(piece);
+           }
+        }
+    }
 
     // Attack the royal pieces?
     all_moves.each(function(pair) { 
@@ -1349,33 +1358,42 @@ function calculate_moves(color, is_hypothetical)
     }
 
     // Look at all the active pieces
-    $$("img." + color).each(function(piece) { 
-        var starting_filerank, square_from, moves;
+    //$$("img." + color).each(function(piece) { 
+    for (var x = 1; x <= FILE_MAX; x += 1) {
+        for (var y = 1; y <= RANK_MAX; y += 1) {
+            var starting_filerank, square_from, moves, piece;
 
-        moves = filtered_moves(piece, color, is_hypothetical);
-        square_from = piece_location(piece);
+            //square_from = piece_location(piece);
+            square_from = VBOARD[x][y];
+            piece = piece_at(square_from);
+ 
+            // Skip blank squares and inactive pieces
+            if (!piece || piece.color !== color) {
+                continue;
+            }
 
-        if (!square_from) {
-            // Piece was hypothetically captured
-            return;
+          
+            moves = filtered_moves(piece, color, is_hypothetical);
+
+            // Convert xy to filerank notation (a string), so it can be easily used
+            // as a hash key, class name for droppables, and also for notations.
+            starting_filerank = square_from.filerank;
+
+            if (!is_hypothetical) {
+                // Fills in possible_notations with possibly-ambiguous move notations in each system
+                var real_piece = piece_at(SQUARES[x][y]);
+                calculate_notations(color, real_piece, moves, starting_filerank, possible_notations, square_from);
+            }
+
+            // Store valid moves for mouseovers etc.
+            if (moves.length !== 0) {
+                valid_moves.set(starting_filerank, moves);
+            }
+
+            //console.log(starting_filerank, moves);
+        //});
         }
-
-        // Convert xy to filerank notation (a string), so it can be easily used
-        // as a hash key, class name for droppables, and also for notations.
-        starting_filerank = square_from.filerank;
-
-        if (!is_hypothetical) {
-            // Fills in possible_notations with possibly-ambiguous move notations in each system
-            calculate_notations(color, piece, moves, starting_filerank, possible_notations, square_from);
-        }
-
-        // Store valid moves for mouseovers etc.
-        if (moves.length !== 0) {
-            valid_moves.set(starting_filerank, moves);
-        }
-
-        //console.log(starting_filerank, moves);
-    });
+    }
 
 
     // Gather all the notations, disambiguate and apply
@@ -1484,13 +1502,14 @@ function computer_move_if_applicable()
 function would_check(piece, move, color)
 {
     var from_square = piece_location(piece);
-    var to_square = SQUARES[move.x][move.y];
+    var to_square = VBOARD[move.x][move.y];
     var checked, all_moves;
 
     assert(piece, "would_check(" + piece + ", " + move + ", " + color +"): piece false");
 
+
     HYPOTHETICAL_PIECE = piece;
-    HYPOTHETICAL_CAPTURED = pc(to_square.x, to_square.y);
+    HYPOTHETICAL_CAPTURED = piece_at(to_square);
     HYPOTHETICAL_FROM = from_square;
     HYPOTHETICAL_TO = to_square;
 
@@ -1618,8 +1637,8 @@ function filtered_moves(piece, color, is_hypothetical)
             continue;
         }
 
-        var dest_square = SQUARES[x][y];
-        var capture_piece = pc(x, y);
+        var dest_square = VBOARD[x][y];
+        var capture_piece = piece_at(dest_square);
 
         // If there is any piece there, it may block other moves
         if (capture_piece) {
@@ -1768,7 +1787,7 @@ function filtered_moves(piece, color, is_hypothetical)
                continue;
            }
 
-           var capture = pc(cx, cy);
+           var capture = piece_at(VBOARD[cx][cy]);
            console.log("C",xy2filerank([cx,cy]));
            if (capture) {
                abs_move.capture = capture;
@@ -1787,8 +1806,6 @@ function filtered_moves(piece, color, is_hypothetical)
         //   b. capture with another piece
         //   c. block with another piece
         if (!is_hypothetical && would_check(piece, abs_move, color)) { 
-            //XYZ
-            if (piece.type==="king")console.log("would_check",piece,xy2filerank([abs_move.x, abs_move.y]));
             continue; 
         }
 
