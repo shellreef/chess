@@ -427,8 +427,9 @@ google.setOnLoadCallback(function() {
     
     //load_fen("k7/8/8/8/8/8/3N4/6N1 w - - 0 1"); // disambiguate moves by file (Ngf3, Ndf3)
     //load_fen("k7/8/8/6N1/8/8/8/6N1 w - - 0 1"); // disambiguate moves by rank (N5f3, N1f3)
-    load_fen("k7/8/8/4N1N1/3N3N/8/3N3N/4N1N1 w - - 0 1"); // disambiguate both (Ne5f3, Nd4f3, Ng5f3, Nh4f3, Nh2f3, Ng1f3, Ne1f3, Nd2f3)
+    //load_fen("k7/8/8/4N1N1/3N3N/8/3N3N/4N1N1 w - - 0 1"); // disambiguate both (Ne5f3, Nd4f3, Ng5f3, Nh4f3, Nh2f3, Ng1f3, Ne1f3, Nd2f3)
     //load_fen("3Q4/6q1/2Q5/7q/1Q6/4q3/7Q/5q2 w - - 0 1"); // an eight queens solution, but with black+white queens. test disambig.
+    load_fen("K w KQkq - 0 1");
 
     // TODO: library of interesting games, see
     // http://www.xs4all.nl/~timkr/records/records.htm and http://www.xs4all.nl/~timkr/ChessTutor/pgnview.htm
@@ -595,7 +596,7 @@ function load_pgn(pgn)
         var move = game.moves[ply];
 
         //console.log(ply, move);
-        mv(move);
+        mv(move, true);
     }
 }
 
@@ -1459,6 +1460,11 @@ function populate_make_a_move_list()
     $("make_move_menu").innerHTML = "";
 
     count = VALID_MOVE_NOTATIONS[PREFS.INPUT_NOTATION].keys().length;
+    if (count === 0) {
+        $("make_move_menu").appendChild(Builder.node("option", {value:""}, "No legal moves"));
+        return;
+    }
+
     $("make_move_menu").appendChild(Builder.node("option", {value:""}, "Make a move... (" + count + ")"));
    
     // Moves in active input notation.
