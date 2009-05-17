@@ -936,25 +936,13 @@ function promote(piece)
 //
 // TODO: step through moves, like on http://www.pgnview.com/ (jspgnviewer) as used on http://www.zenpawn.com/chessblog/
 
-// Check if the player is currently in check
-function real_in_check(victim_color, all_moves)
-{
-    return in_check_maybe_virtual(victim_color, all_moves, false);
-}
-
-// Check if the player is in check on the virtual board
-function virtual_in_check(victim_color, all_moves)
-{
-    return in_check_maybe_virtual(victim_color, all_moves, true);
-}
-
 // Check if any royal pieces of victim_color are being attacked; that is:
 // victim_color's royal pieces could be captured after any of all_moves.
-// Should call as in_check() or virtual_in_check().
-function in_check_maybe_virtual(victim_color, all_moves, virtual)
+function in_check(victim_color, all_moves)
 {
     var royals;
     var attacked = false;
+    var virtual = true;
 
     assert(victim_color === "black" || victim_color === "white",
             "in_check(" + victim_color + ", " + all_moves + "): color not given");
@@ -1535,7 +1523,7 @@ function would_check(piece, move, color)
 
     // TODO: This is a lot of calculation to do, see if can speed it up
     all_moves = calculate_moves(opposite_color(color), true);
-    checked = virtual_in_check(color, all_moves);
+    checked = in_check(color, all_moves);
 
     HYPOTHETICAL_FROM = HYPOTHETICAL_PIECE = HYPOTHETICAL_TO = HYPOTHETICAL_CAPTURED = null;
 
@@ -2220,7 +2208,11 @@ function set_turn(color, historical)
     POSSIBLE_EP_TARGETS = {};
    
     // Active player in check?
-    checked = GAME_STATE.active_in_check = real_in_check(GAME_STATE.active_color, calculate_moves(opposite_color(new_color), true));
+    // Need to save to virtual board, since that is what in_check() looks at.
+    // TODO: PERFORMANCE: allow in_check to look at non-virtual board, so we can avoid 
+    // creating the virtual board.
+    make_vboard();
+    checked = GAME_STATE.active_in_check = in_check(GAME_STATE.active_color, calculate_moves(opposite_color(new_color), true));
 
     // Note: this takes some time... is there any way to run it right AFTER the piece has
     // gone through the endeffect? This is called in onDrop.
