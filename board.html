@@ -995,13 +995,6 @@ function in_check(victim_color, all_moves)
 // TODO: piece virtual
 function calculate_notations(color, piece, moves, starting_filerank, ps, square_from)
 {
-    if (!piece.virtual) {
-        // Create drop targets for the valid destinations, linking
-        // the draggables to droppables using piece- + source square.
-        piece.addClassName("piece-" + starting_filerank);
-        piece.prior_position = starting_filerank;    // for removal
-    }
-
     moves.each(function(move) {
         var square = piece.virtual ? VBOARD[move.x][move.y] : SQUARES[move.x][move.y];
 
@@ -1228,30 +1221,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
         // TODO: support promotation in all notations, make separate moves (a8=Q, a8=N, etc.)
 
 
-        if (!piece.virtual) {
-            // For removal
-            ALL_DROP_TARGETS.push(square);
-
-            // You can drop here
-            Droppables.add(square, {
-                accept: "piece-" + starting_filerank,
-                onDrop: move_dropped_piece,
-                hoverclass: 'hover'});
-        }
     });
-
-    // TODO: droppable on original square, if dropped there, then retain
-    // move highlighting, but allow clicking/tapping to move to destination.
-    /*
-    if (!piece.virtual) { 
-        Droppables.add(square_from, {
-            accept: "piece-" + starting_filerank,
-            onDrop: function() { alert(1); },
-            // No hoverclass
-            });
-        ALL_DROP_TARGETS.push(square_from);
-    }
-    */
 
     // TODO: check for cross-notation ambiguities. Inputs are tested in the order of
     // AVAILABLE_NOTATIONS, but a notation that matches two different moves in
@@ -1397,6 +1367,42 @@ function calculate_moves(color, is_hypothetical)
                 // Fills in possible_notations with possibly-ambiguous move notations in each system
                 var real_piece = piece_at(SQUARES[x][y]);
                 calculate_notations(color, real_piece, moves, starting_filerank, possible_notations, square_from);
+
+                if (1 || !piece.virtual) {
+                    // Create drop targets for the valid destinations, linking
+                    // the draggables to droppables using piece- + source square.
+                    real_piece.addClassName("piece-" + starting_filerank);
+                    real_piece.prior_position = starting_filerank;    // for removal
+
+                    // TODO: droppable on original square, if dropped there, then retain
+                    // move highlighting, but allow clicking/tapping to move to destination.
+                    /*
+                    Droppables.add(square_from, {
+                        accept: "piece-" + starting_filerank,
+                        onDrop: function() { alert(1); },
+                        // No hoverclass
+                        });
+                    ALL_DROP_TARGETS.push(square_from);
+                    }*/
+                   
+                    moves.each(function(move) {
+                            var square = SQUARES[move.x][move.y];
+
+                            // For removal
+                            ALL_DROP_TARGETS.push(square);
+
+                            // You can drop here
+                            Droppables.add(square, {
+                                accept: "piece-" + starting_filerank,
+                                onDrop: move_dropped_piece,
+                                hoverclass: 'hover'});
+                            });
+
+                }
+
+
+                //XYZ
+                //
             }
 
             // Store valid moves for mouseovers etc.
@@ -2339,7 +2345,7 @@ function realize_vboard()
         }
     }
 
-    calculate_moves(GAME_STATE.active_color);
+    //TODOcalculate_moves(GAME_STATE.active_color);
 }
 
 // Save the current displayed board state to VBOARD.
@@ -2352,7 +2358,7 @@ function make_vboard()
 
             if (piece) {
                 // TODO: Store arbitrary parameters?
-                VBOARD[x][y].piece = {color:piece.color, type:piece.type, square:VBOARD[x][y]};
+                VBOARD[x][y].piece = {virtual:true, color:piece.color, type:piece.type, square:VBOARD[x][y]};
             } else {
                 VBOARD[x][y].piece = null;
             }
