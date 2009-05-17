@@ -992,15 +992,18 @@ function in_check(victim_color, all_moves)
 
 // Calculate and save the move notations for a move.
 // Note: only do this if not hypothetical.
+// TODO: piece virtual
 function calculate_notations(color, piece, moves, starting_filerank, ps, square_from)
 {
-    // Create drop targets for the valid destinations, linking
-    // the draggables to droppables using piece- + source square.
-    piece.addClassName("piece-" + starting_filerank);
-    piece.prior_position = starting_filerank;    // for removal
+    if (!piece.virtual) {
+        // Create drop targets for the valid destinations, linking
+        // the draggables to droppables using piece- + source square.
+        piece.addClassName("piece-" + starting_filerank);
+        piece.prior_position = starting_filerank;    // for removal
+    }
 
     moves.each(function(move) {
-        var square = SQUARES[move.x][move.y];
+        var square = piece.virtual ? VBOARD[move.x][move.y] : SQUARES[move.x][move.y];
 
         // Building blocks
         var dest_filerank = xy2filerank(move.x, move.y);      // e4
@@ -1111,7 +1114,6 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
             //   alt_descriptive_dest (QKt1 for b1 instead of QN1) - currently, Kt is preprocessed to N in mv()
             //   would be nice to have an option to prefer Kt over N, for using old books (though N/Kt would be synonyms)
             // - allow slashes in addition to parenthesises, or maybe not, since would be shorter and therefore preferred
-            // - short piece name, NP instead of QNP or KNP
  
             // Descriptive vs algebraic is like imperial vs. metric units, in some ways. Descriptive
             // is from each player's perspective, so 1. P-K4 P-K4 is easily recognizable as the same
@@ -1226,25 +1228,29 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
         // TODO: support promotation in all notations, make separate moves (a8=Q, a8=N, etc.)
 
 
-        // For removal
-        ALL_DROP_TARGETS.push(square);
+        if (!piece.virtual) {
+            // For removal
+            ALL_DROP_TARGETS.push(square);
 
-        // You can drop here
-        Droppables.add(square, {
-            accept: "piece-" + starting_filerank,
-            onDrop: move_dropped_piece,
-            hoverclass: 'hover'});
-
+            // You can drop here
+            Droppables.add(square, {
+                accept: "piece-" + starting_filerank,
+                onDrop: move_dropped_piece,
+                hoverclass: 'hover'});
+        }
     });
+
     // TODO: droppable on original square, if dropped there, then retain
     // move highlighting, but allow clicking/tapping to move to destination.
     /*
-    Droppables.add(square_from, {
-        accept: "piece-" + starting_filerank,
-        onDrop: function() { alert(1); },
-        // No hoverclass
-        });
-    ALL_DROP_TARGETS.push(square_from);
+    if (!piece.virtual) { 
+        Droppables.add(square_from, {
+            accept: "piece-" + starting_filerank,
+            onDrop: function() { alert(1); },
+            // No hoverclass
+            });
+        ALL_DROP_TARGETS.push(square_from);
+    }
     */
 
     // TODO: check for cross-notation ambiguities. Inputs are tested in the order of
@@ -1341,6 +1347,8 @@ function disambiguate_notations(notations)
 //
 // If is_hypothetical, do not update globals, and allow "moves" that put in
 // check (useful for attacks, see is_hypothetical elsewhere).
+//
+// This operates on VBOARD only, for speed. Use make_vboard() before if needed.
 function calculate_moves(color, is_hypothetical)
 {
     var valid_moves = new Hash();
@@ -1366,12 +1374,10 @@ function calculate_moves(color, is_hypothetical)
     }
 
     // Look at all the active pieces
-    //$$("img." + color).each(function(piece) { 
     for (var x = 1; x <= FILE_MAX; x += 1) {
         for (var y = 1; y <= RANK_MAX; y += 1) {
             var starting_filerank, square_from, moves, piece;
 
-            //square_from = piece_location(piece);
             square_from = VBOARD[x][y];
             piece = piece_at(square_from);
  
@@ -1399,7 +1405,6 @@ function calculate_moves(color, is_hypothetical)
             }
 
             //console.log(starting_filerank, moves);
-        //});
         }
     }
 
@@ -2537,13 +2542,15 @@ function move_piece_to_square(piece, square, is_hypothetical)
 
     // Lookup standard algebraic move notation (precomputed)
     move_text = algebraic_from_piece_square(piece, square);
-    
-    // Capture piece(s) on destination square. Multiple pieces
-    // are supported here, but not elsewhere in the code (yet). Might be
-    // an interesting variation to have multiple pieces occupy same square.
-    while (square.firstChild) {
-        capture_piece(square.firstChild);
-        square.removeChild(square.firstChild);
+
+    if (!piece.virtual) { 
+        // Capture piece(s) on destination square. Multiple pieces
+        // are supported here, but not elsewhere in the code (yet). Might be
+        // an interesting variation to have multiple pieces occupy same square.
+        while (square.firstChild) {
+            capture_piece(square.firstChild);
+            square.removeChild(square.firstChild);
+        }
     }
 
     // Special case: en passant captures to an empty square
@@ -2552,10 +2559,19 @@ function move_piece_to_square(piece, square, is_hypothetical)
         square.y === GAME_STATE.ep_target[1]) {
 
         var forward = forwards_vector(GAME_STATE.active_color);
-        var dead_pawn_square = SQUARES[square.x][square.y - forward];
+        var dead_pawn_square;
+        
+        if (piece.virtual) {
+            dead_pawn_square = VBOARD[square.x][square.y - forward];
 
-        capture_piece(piece_at(dead_pawn_square));
-        dead_pawn_square.removeChild(dead_pawn_square.firstChild);
+            capture_piece(piece_at(dead_pawn_square));
+            dead_pawn_square.piece = null;
+        } else {
+            dead_pawn_square = SQUARES[square.x][square.y - forward];
+
+            capture_piece(piece_at(dead_pawn_square));
+            dead_pawn_square.removeChild(dead_pawn_square.firstChild);
+        }
     }
 
     // If double pawn move, this creates an en passant target square
@@ -2567,12 +2583,18 @@ function move_piece_to_square(piece, square, is_hypothetical)
         GAME_STATE.ep_target = null;
     }
 
-    // Move to new square
-    if (piece.square) {
-        piece.square.removeChild(piece);
+    if (piece.virtual) { 
+        piece.square.piece = null;  // Clear from
+        square.piece = piece;       // Set to
+        piece.square = square;      // Link piece to destination square
+    } else {
+        // Move to new square
+        if (piece.square) {
+            piece.square.removeChild(piece);
+        }
+        square.appendChild(piece);
+        piece.square = square;
     }
-    square.appendChild(piece);
-    piece.square = square;
 
     if (should_promote(piece)) {
         promote(piece);
