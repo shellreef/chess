@@ -1349,42 +1349,33 @@ function calculate_moves(color, is_hypothetical)
     }
 
     // Look at all the active pieces
-    //$$("img." + color).each(function(piece) { 
-    for (var x = 1; x <= FILE_MAX; x += 1) {
-        for (var y = 1; y <= RANK_MAX; y += 1) {
-            var starting_filerank, square_from, moves, piece;
+    $$("img." + color).each(function(piece) { 
+        var starting_filerank, square_from, moves;
 
-            //square_from = piece_location(piece);
-            square_from = VBOARD[x][y];
-            piece = piece_at(square_from);
- 
-            // Skip blank squares and inactive pieces
-            if (!piece || piece.color !== color) {
-                continue;
-            }
+        moves = filtered_moves(piece, color, is_hypothetical);
+        square_from = piece_location(piece);
 
-          
-            moves = filtered_moves(piece, color, is_hypothetical);
-
-            // Convert xy to filerank notation (a string), so it can be easily used
-            // as a hash key, class name for droppables, and also for notations.
-            starting_filerank = square_from.filerank;
-
-            if (!is_hypothetical) {
-                // Fills in possible_notations with possibly-ambiguous move notations in each system
-                var real_piece = piece_at(SQUARES[x][y]);
-                calculate_notations(color, real_piece, moves, starting_filerank, possible_notations, square_from);
-            }
-
-            // Store valid moves for mouseovers etc.
-            if (moves.length !== 0) {
-                valid_moves.set(starting_filerank, moves);
-            }
-
-            //console.log(starting_filerank, moves);
-        //});
+        if (!square_from) {
+            // Piece was hypothetically captured
+            return;
         }
-    }
+
+        // Convert xy to filerank notation (a string), so it can be easily used
+        // as a hash key, class name for droppables, and also for notations.
+        starting_filerank = square_from.filerank;
+
+        if (!is_hypothetical) {
+            // Fills in possible_notations with possibly-ambiguous move notations in each system
+            calculate_notations(color, piece, moves, starting_filerank, possible_notations, square_from);
+        }
+
+        // Store valid moves for mouseovers etc.
+        if (moves.length !== 0) {
+            valid_moves.set(starting_filerank, moves);
+        }
+
+        //console.log(starting_filerank, moves);
+    });
 
 
     // Gather all the notations, disambiguate and apply
@@ -1796,6 +1787,8 @@ function filtered_moves(piece, color, is_hypothetical)
         //   b. capture with another piece
         //   c. block with another piece
         if (!is_hypothetical && would_check(piece, abs_move, color)) { 
+            //XYZ
+            if (piece.type==="king")console.log("would_check",piece,xy2filerank([abs_move.x, abs_move.y]));
             continue; 
         }
 
