@@ -2310,7 +2310,7 @@ function make_vboard()
 
             if (piece) {
                 // TODO: Store arbitrary parameters?
-                VBOARD[x][y].piece = {color:piece.color, type:piece.type};
+                VBOARD[x][y].piece = {color:piece.color, type:piece.type, square:VBOARD[x][y]};
             } else {
                 VBOARD[x][y].piece = null;
             }
