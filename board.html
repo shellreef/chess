@@ -1321,43 +1321,45 @@ function disambiguate_notations(notations)
     return [canonical_notations, synonymous_notations];
 }
 
-// Make the drop targets for a piece and its moves.
-function make_droppables(real_piece, moves)
+// Make the drop targets for all valid moves.
+function make_droppables()
 {
-    assert(!real_piece.virtual, "make_droppables(" + real_piece + ", " + moves + "): called with virtual piece");
+    VALID_MOVES.each(function(starting_filerank_moves) {
+        var starting_filerank = starting_filerank_moves[0];
+        var moves = starting_filerank_moves[1];
+        var real_piece = pc(starting_filerank);
 
-    //var real_piece = piece_at(SQUARES[x][y]);
-    var starting_filerank = real_piece.square.filerank;
-    
-    // Create drop targets for the valid destinations, linking
-    // the draggables to droppables using piece- + source square.
-    real_piece.addClassName("piece-" + starting_filerank);
-    real_piece.prior_position = starting_filerank;    // for removal
+        // Create drop targets for the valid destinations, linking
+        // the draggables to droppables using piece- + source square.
+        real_piece.addClassName("piece-" + starting_filerank);
+        real_piece.prior_position = starting_filerank;    // for removal
 
-    // TODO: droppable on original square, if dropped there, then retain
-    // move highlighting, but allow clicking/tapping to move to destination.
-    /*
-    Droppables.add(square_from, {
-        accept: "piece-" + starting_filerank,
-        onDrop: function() { alert(1); },
-        // No hoverclass
-        });
-    ALL_DROP_TARGETS.push(square_from);
-    */
-   
-    moves.each(function(move) {
-            var square = SQUARES[move.x][move.y];
-
-            // For removal
-            ALL_DROP_TARGETS.push(square);
-
-            // You can drop here
-            Droppables.add(square, {
-                accept: "piece-" + starting_filerank,
-                onDrop: move_dropped_piece,
-                hoverclass: 'hover'});
+        // TODO: droppable on original square, if dropped there, then retain
+        // move highlighting, but allow clicking/tapping to move to destination.
+        /*
+        Droppables.add(square_from, {
+            accept: "piece-" + starting_filerank,
+            onDrop: function() { alert(1); },
+            // No hoverclass
             });
+        ALL_DROP_TARGETS.push(square_from);
+        */
+       
+        moves.each(function(move) {
+                var square = SQUARES[move.x][move.y];
+
+                // For removal
+                ALL_DROP_TARGETS.push(square);
+
+                // You can drop here
+                Droppables.add(square, {
+                    accept: "piece-" + starting_filerank,
+                    onDrop: move_dropped_piece,
+                    hoverclass: 'hover'});
+            });
+    });
 }
+
 
 // After the board changes and it is the next person's turn, calculate 
 // what the next possible allowable moves are, and update the globals with this information.
@@ -1366,6 +1368,7 @@ function make_droppables(real_piece, moves)
 // check (useful for attacks, see is_hypothetical elsewhere).
 //
 // This operates on VBOARD only, for speed. Use make_vboard() before if needed.
+// Call make_droppables() after if UI drag-and-drop is desirable.
 function calculate_moves(color, is_hypothetical)
 {
     var valid_moves = new Hash();
@@ -1411,11 +1414,6 @@ function calculate_moves(color, is_hypothetical)
             if (!is_hypothetical) {
                 // Fills in possible_notations with possibly-ambiguous move notations in each system
                 calculate_notations(color, piece, moves, starting_filerank, possible_notations, square_from);
-
-
-                // TODO: get out of this function, since it might be virtual (but not hypothetical) and this is unneeded
-                var real_piece = piece_at(SQUARES[x][y]);
-                make_droppables(real_piece, moves);
             }
 
             // Store valid moves for mouseovers etc.
@@ -2243,6 +2241,7 @@ function set_turn(color, historical)
     // gone through the endeffect? This is called in onDrop.
     // TODO: find out how to run something *after* the endeffect, for smoother UI.
     calculate_moves(GAME_STATE.active_color);
+    make_droppables();
 
     // Zero mobility? For detecting stalemate, checkmate.
     no_moves = VALID_MOVES.keys().length === 0;
