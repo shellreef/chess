@@ -2476,9 +2476,8 @@ function notation_from_piece_square(piece, square)
             var this_piece = alg_piece_square[1][0];
             var this_square = alg_piece_square[1][1];
 
-            //XXX
             if (this_square.x === square.x && this_square.y === square.y && 
-                this_piece === piece) {
+                this_piece.unique_id === piece.unique_id) {
                 ret = alg;
                 throw $break;
             }
