@@ -598,6 +598,7 @@ function load_pgn(pgn)
         //console.log(ply, move);
         mv(move, true);
     }
+    realize_vboard();
 }
 
 // Parse PGN into a dictionary
@@ -1404,13 +1405,11 @@ function calculate_moves(color, is_hypothetical)
                 continue;
             }
 
-          
-            moves = filtered_moves(piece, color, is_hypothetical);
-
             // Convert xy to filerank notation (a string), so it can be easily used
             // as a hash key, class name for droppables, and also for notations.
             starting_filerank = square_from.filerank;
 
+            moves = filtered_moves(piece, color, is_hypothetical);
             if (!is_hypothetical) {
                 // Fills in possible_notations with possibly-ambiguous move notations in each system
                 calculate_notations(color, piece, moves, starting_filerank, possible_notations, square_from);
@@ -1698,6 +1697,7 @@ function filtered_moves(piece, color, is_hypothetical)
             continue;
         }
 
+        // TODO: Does piece_moved() need to be virtualized?
         if (flags.initial_only && piece_moved(piece)) {
             continue;
         }
@@ -1712,21 +1712,21 @@ function filtered_moves(piece, color, is_hypothetical)
             // piece there but it wasn't a valid move. For example, elephant (2X)
             // can be blocked, since it is not a leaper (sticking the elephant's eye),
             // non-hippogonal rider.
-            if (blocked[key] || pc_or_offboard(if_unblocked_dx + start_x, if_unblocked_dy + start_y)) {
+            if (blocked[key] || pc_or_offboard(if_unblocked_dx + start_x, if_unblocked_dy + start_y, true)) {
                 blocked[rel_x + "," + rel_y] = true;
                 continue;
             }
         }
         if (if_unblocked2_dy !== undefined) {
             key = if_unblocked2_dx + "," + if_unblocked2_dy;
-            if (blocked[key] || pc_or_offboard(if_unblocked2_dx + start_x, if_unblocked2_dy + start_y)) {
+            if (blocked[key] || pc_or_offboard(if_unblocked2_dx + start_x, if_unblocked2_dy + start_y, true)) {
                 blocked[rel_x + "," + rel_y] = true;
                 continue;
             }
         }
         if (if_unblocked3_dy !== undefined) {
             key = if_unblocked3_dx + "," + if_unblocked3_dy;
-            if (blocked[key] || pc_or_offboard(if_unblocked3_dx + start_x, if_unblocked3_dy + start_y)) {
+            if (blocked[key] || pc_or_offboard(if_unblocked3_dx + start_x, if_unblocked3_dy + start_y, true)) {
                 blocked[rel_x + "," + rel_y] = true;
                 continue;
             }
@@ -2555,11 +2555,11 @@ function move_piece_to_square(piece, square, is_hypothetical)
                 // TODO: actually calculate square moved over, then move rook there
                 // (instead of hardcoding). Short.
                 // TODO: test virtual
-                move_piece_to_square(pc(8, first_rank), piece.virtual ? VBOARD[6][first_rank] : SQUARES[6][first_rank], true);
+                move_piece_to_square(pc(8, first_rank, piece.virtual), piece.virtual ? VBOARD[6][first_rank] : SQUARES[6][first_rank], true);
                 castle_move_text = "O-O";
             } else if (square.x === 3) {
                 // Castle long.
-                move_piece_to_square(pc(1, first_rank), piece.virtual ? VBOARD[4][first_rank] : SQUARES[4][first_rank], true);
+                move_piece_to_square(pc(1, first_rank, piece.virtual), piece.virtual ? VBOARD[4][first_rank] : SQUARES[4][first_rank], true);
                 castle_move_text = "O-O-O";
             }
         }
@@ -3074,20 +3074,22 @@ function figurine_piece_prefix(color, piece)
 }
 
 // Return a piece at (x,y), or "offboard" if the coordinates are out of range.
-function pc_or_offboard(x, y)
+// If virtual, operates on VBOARD, otherwise on SQUARES.
+// TODO TODO: Make it only operate on virtual?
+function pc_or_offboard(x, y, virtual)
 {
     if (x < 1 || y < 1 || x > FILE_MAX || y > RANK_MAX) {
         return "offboard";
     }
 
-    return pc(x, y);
+    return pc(x, y, virtual);
 }
 
 // Return an existing piece somewhere (or a false value), given:
 // - (x,y) coordinates, like (8,1)
 // - location in filerank notation, like "a8"
 // To get piece from a square, use piece_at()
-function pc(x, y)
+function pc(x, y, virtual)
 {
     if (x.charAt) {
         var xy = filerank2xy(x);
@@ -3098,8 +3100,7 @@ function pc(x, y)
     assert(x >= 1 && x <= FILE_MAX, "pc(" + x + ", " + y + "): bad x: " + x);
     assert(y >= 1 && y <= RANK_MAX, "pc(" + x + ", " + y + "): bad y: " + y);
 
-
-    return piece_at(SQUARES[x][y]);
+    return piece_at(virtual ? VBOARD[x][y] : SQUARES[x][y]);
 }
 
 // Return the piece at the given square, or null.
