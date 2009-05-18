@@ -443,7 +443,7 @@ google.setOnLoadCallback(function() {
      /* Note: chessos generates PGNs with minimal algebraic notation, sometimes, 
       * not always standard algebraic. 4. ... Bb4 should be Bxb4. Need synonym 
       * support in order to read this, or MAN support. 
-      */
+      *
 pgn = load_pgn(
 "[Event \"ChesSOS Game\"]\n" + 
 "[Site \"http://www.chessos.com\"]\n" + 
@@ -460,7 +460,7 @@ pgn = load_pgn(
 "7. e3 Nc6 8. a4 Qd6 9. Ba3 Qd8 10. g4 g5 11. h4 gxh4 12. Rh4 \n" + 
 "Ne4 13. fxe4 Qh4 14. Ke2 Bg4 15. Nf3 Qh2 16. Kd3 dxe4 17. Ke4 \n" + 
 "f5 18. Kd5 Rad8 19. Ke6 Qh6 \n" + 
-"0-1");
+"0-1");*/
 
      /* TODO: support 1.move in addition to 1. move 
      pgn = load_pgn("[Event \"Berlin\"]\n" + 
@@ -566,6 +566,7 @@ function load_pgn(pgn)
 {
     var game = parse_pgn(pgn);
     var tags = ["White", "WhiteElo", "Black", "BlackElo", "Event", "Round", "Site", "Date", "Time"];
+    var time_started = new Date().getTime();
 
     // Header
     for (var i = 0; i < tags.length; i += 1) {
@@ -599,6 +600,11 @@ function load_pgn(pgn)
         mv(move, true);
     }
     realize_vboard();
+
+    var time_took = new Date().getTime() - time_started;
+    if (window.console) {
+        console.log("load_pgn time: ", time_took);
+    }
 }
 
 // Parse PGN into a dictionary
@@ -955,11 +961,6 @@ function in_check(victim_color, all_moves)
     var attacked = false;
     var virtual = true;
 
-    assert(victim_color === "black" || victim_color === "white",
-            "in_check(" + victim_color + ", " + all_moves + "): color not given");
-    assert(all_moves, "in_check(" + victim_color + ", " + all_moves +
-            "): all_moves is false");
-     
     // Pieces that can't be captured and need to move if attacked
     if (virtual) { 
         royals = [];
@@ -1375,9 +1376,6 @@ function calculate_moves(color, is_hypothetical)
     var valid_moves = new Hash();
     var possible_notations, notation;
 
-    assert(color === "black" || color === "white",
-            "calculate_moves(" + color + "): bad color or no color given");
-
     if (!is_hypothetical) { 
         // Values are [ [ [piece, square ], [possible move names] ], ... ]
         // Instead of a hash or assocative array, because I couldn't use
@@ -1442,9 +1440,6 @@ function calculate_moves(color, is_hypothetical)
 
         // For reals.
         VALID_MOVES = valid_moves;
-
-        populate_make_a_move_list();
-
     }
     
     return valid_moves;
@@ -1538,9 +1533,6 @@ function would_check(piece, move, color)
     var from_square = piece_location(piece);
     var to_square = VBOARD[move.x][move.y];
     var checked, all_moves;
-
-    assert(piece, "would_check(" + piece + ", " + move + ", " + color +"): piece false");
-
 
     HYPOTHETICAL_PIECE = piece;
     HYPOTHETICAL_CAPTURED = piece_at(to_square);
@@ -2199,11 +2191,7 @@ function without_dupes(a)
 
 function opposite_color(color)
 {
-    var opposite = {white: "black", black: "white"}[color];
-
-    assert(opposite === "black" || opposite === "white", "opposite_color(" + color + "): bad color");
-
-    return opposite;
+    return {white: "black", black: "white"}[color];
 }
 
 // Set the active color to white or black, or go to the next color (toggling).
@@ -2214,14 +2202,14 @@ function set_turn(color, historical, virtual)
 {
     var new_color, checked, no_moves, text_move, text_end, old_color, old_fullmove, repeats;
 
-    assert(color === "white" || color === "black" || color === "next", "set_turn(" + color + "): invalid color");
-
     old_color = GAME_STATE.active_color;
 
     if (color === "next") {
         new_color = opposite_color(GAME_STATE.active_color);
-    } else {
+    } else if (color === "black" || color === "white") {
         new_color = color;
+    } else {
+        assert(false, "set_turn(" + color + "): invalid color");
     }
 
     $("status").innerHTML = ucfirst(new_color) + "'s Turn";
@@ -2244,6 +2232,7 @@ function set_turn(color, historical, virtual)
     calculate_moves(GAME_STATE.active_color);
     if (!virtual) {
         make_droppables();
+        populate_make_a_move_list();
     }
 
     // Zero mobility? For detecting stalemate, checkmate.
@@ -2459,8 +2448,6 @@ function init_board()
 // does all the DOM manipulation. 
 function capture_piece(piece)
 {
-    assert(piece, "capture_piece(" + piece + "): piece is false");
-
     // If rook captured, remove castling privileges
     if (piece.type === "rook") {
         // Note that this is the first rank of the *other* player
@@ -2511,11 +2498,9 @@ function forwards_vector(color)
 {
     if (color === "white") {
         return 1;
-    } else if (color === "black") {
+    } else { 
         return -1;
-    } else {
-        assert(false, "forwards_vector(" + color+ "): bad active color");
-    }
+    } 
 }
 
 
@@ -2528,9 +2513,6 @@ function forwards_vector(color)
 function move_piece_to_square(piece, square, is_hypothetical)
 {
     var from_square, move_text, castle_move_text, filerank, only_move;
-
-    assert(piece, "move_piece_to_square(" + piece + ", " + square + "): piece is false");
-    assert(square, "move_piece_to_square(" + piece + ", " + square + "): square is false");
 
     from_square = piece_location(piece);
 
@@ -2931,7 +2913,7 @@ function load_starting_position(fen, replay)
         } else if (code === " ") {
             break;
         } else {
-            assert("load_starting_position(" + fen + "): unknown code: " + code);
+            assert(false, "load_starting_position(" + fen + "): unknown code: " + code);
         }
     }
 
@@ -3098,8 +3080,8 @@ function pc(x, y, virtual)
         y = xy[1];
     }
 
-    assert(x >= 1 && x <= FILE_MAX, "pc(" + x + ", " + y + "): bad x: " + x);
-    assert(y >= 1 && y <= RANK_MAX, "pc(" + x + ", " + y + "): bad y: " + y);
+    //assert(x >= 1 && x <= FILE_MAX, "pc(" + x + ", " + y + "): bad x: " + x);
+    //assert(y >= 1 && y <= RANK_MAX, "pc(" + x + ", " + y + "): bad y: " + y);
 
     return piece_at(virtual ? VBOARD[x][y] : SQUARES[x][y]);
 }
@@ -3128,8 +3110,6 @@ function piece_at(square)
 // Get the square of a piece, or null if it is offboard.
 function piece_location(piece)
 {
-    assert(piece, "piece_location(" + piece + "): piece is false");
-
     // If the piece would have moved.. 
     if (HYPOTHETICAL_PIECE === piece) {
         return HYPOTHETICAL_TO;
@@ -3184,7 +3164,7 @@ function decode_piece_letter(name)
     } else if (/^[a-z]/.test(name)) {
         color = "black";
     } else {
-        assert("create_piece_by_letter(" + name + "): not a letter");
+        assert(false, "create_piece_by_letter(" + name + "): not a letter");
     }
     letter = name.toLowerCase();
 
@@ -3352,15 +3332,11 @@ function unhighlight_all()
 // square is labeled a8. The bottom-right square (8,1) is filerank's h1.
 function filerank2xy(code)
 {
-    assert(code, "filerank2xy(" + code + "): is false");
-    assert(code.charCodeAt, "filerank2xy(" + code +"): is missing charCodeAt, is it a string?" +
-            " code.className=" + code.className);
-
     var x = code.charCodeAt(0) - "a".charCodeAt(0) + 1; // corresponds to file (horizontal)
     var y = code.charCodeAt(1) - "1".charCodeAt(0) + 1; // corresponds to rank (vertical)
 
-    assert(x >= 1 && x <= FILE_MAX, "filerank2xy(" + code + "): bad x: " + x);
-    assert(y >= 1 && y <= RANK_MAX, "filerank2xy(" + code + "): bad y: " + y);
+    //assert(x >= 1 && x <= FILE_MAX, "filerank2xy(" + code + "): bad x: " + x);
+    //assert(y >= 1 && y <= RANK_MAX, "filerank2xy(" + code + "): bad y: " + y);
 
     return [x, y];
 }
@@ -3379,8 +3355,8 @@ function xy2filerank(x, y)
         x = x[0];
     }
 
-    assert(x >= 1 && x <= FILE_MAX, "xy2filerank(" + x + ", " + y + "): bad x: " + x);
-    assert(y === "" || (y >= 1 && y <= RANK_MAX), "xy2filerank(" + x + ", " + y + "): bad y: " + y);
+    //assert(x >= 1 && x <= FILE_MAX, "xy2filerank(" + x + ", " + y + "): bad x: " + x);
+    //assert(y === "" || (y >= 1 && y <= RANK_MAX), "xy2filerank(" + x + ", " + y + "): bad y: " + y);
 
     filerank = String.fromCharCode(x + "a".charCodeAt(0) - 1);
     if (y !== "") {
@@ -3457,8 +3433,8 @@ function sq(code, extra)
 {
     var x, y, xy;
 
-    assert(code !== undefined, "sq(" + code + ", " + extra + "): code is undefined");
-    assert(code !== null, "sq(" + code + ", " + extra + "): code is null");
+    //assert(code !== undefined, "sq(" + code + ", " + extra + "): code is undefined");
+    //assert(code !== null, "sq(" + code + ", " + extra + "): code is null");
 
     // Is it x,y passed as separate parameters?
     if (extra !== undefined) {
@@ -3475,8 +3451,8 @@ function sq(code, extra)
         assert(false, "sq(" + code + ", " + extra + "): couldn't find out what I was given");
     }
 
-    assert(x >= 1 && x <= FILE_MAX && y >= 1 && y <= RANK_MAX, "sq(" + code + ", " + extra + 
-        "): out of range (" + x + ", " + y + ")");
+    /*assert(x >= 1 && x <= FILE_MAX && y >= 1 && y <= RANK_MAX, "sq(" + code + ", " + extra + 
+        "): out of range (" + x + ", " + y + ")");*/
 
     return SQUARES[x][y];
 }
