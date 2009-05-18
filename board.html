@@ -435,7 +435,7 @@ google.setOnLoadCallback(function() {
     // http://www.xs4all.nl/~timkr/records/records.htm and http://www.xs4all.nl/~timkr/ChessTutor/pgnview.htm
 
     // test PGN embedded notes
-    pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
+    //pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
     
     //pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
     
@@ -443,7 +443,7 @@ google.setOnLoadCallback(function() {
      /* Note: chessos generates PGNs with minimal algebraic notation, sometimes, 
       * not always standard algebraic. 4. ... Bb4 should be Bxb4. Need synonym 
       * support in order to read this, or MAN support. 
-      *
+      */
 pgn = load_pgn(
 "[Event \"ChesSOS Game\"]\n" + 
 "[Site \"http://www.chessos.com\"]\n" + 
@@ -460,7 +460,7 @@ pgn = load_pgn(
 "7. e3 Nc6 8. a4 Qd6 9. Ba3 Qd8 10. g4 g5 11. h4 gxh4 12. Rh4 \n" + 
 "Ne4 13. fxe4 Qh4 14. Ke2 Bg4 15. Nf3 Qh2 16. Kd3 dxe4 17. Ke4 \n" + 
 "f5 18. Kd5 Rad8 19. Ke6 Qh6 \n" + 
-"0-1");*/
+"0-1");
 
      /* TODO: support 1.move in addition to 1. move 
      pgn = load_pgn("[Event \"Berlin\"]\n" + 
@@ -2270,7 +2270,7 @@ function set_turn(color, historical, virtual)
         set_check_message("");
     }
 
-    var new_state = save_fen();
+    var new_state = save_fen(false, true);
     var ply = encode_ply(old_color, old_fullmove);
 
     if (!old_color) {
@@ -2300,9 +2300,10 @@ function set_check_message(msg)
 }
 
 // Check for three-move repetition
+// Uses virtual board. TODO: check for real board too!
 function check_repetition(ply)
 {
-    var new_state = save_fen(true);
+    var new_state = save_fen(true, true);
     var reps;
 
     // Save new board state for three-move repetition
@@ -2762,8 +2763,8 @@ function move_dropped_piece(piece, square, event)
 }
 
 // Generate FEN from board state. If strip_moves, does not
-// include move count.
-function save_fen(strip_moves)
+// include move count. If virtual, uses virtual board.
+function save_fen(strip_moves, virtual)
 {
     var fen = "", castles;
 
@@ -2771,7 +2772,7 @@ function save_fen(strip_moves)
     for (var y = RANK_MAX; y > 0; y -= 1) {
         var blanks = 0;
         for (var x = 1; x <= FILE_MAX; x += 1) {
-            var piece = pc(x, y);
+            var piece = pc(x, y, virtual);
             var letter;
 
             if (piece) {
