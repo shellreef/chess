@@ -2395,7 +2395,9 @@ function init_board()
             square.x = x;
             square.y = y;
             square.filerank = xy2filerank(x, y);
-            square.color = square.hasClassName("white") ? "white" : "black";
+            // MSIE doesn't allow Prototype to extend Element properly, can't use it here
+            //square.color = square.hasClassName("white") ? "white" : "black";
+            square.color = square.className.indexOf("white") !== -1 ? "white" : "black";
 
             square.descriptive = {};
             square.descriptive.white = xy2descriptive("white", [x, y]);
