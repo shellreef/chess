@@ -359,7 +359,7 @@ var HYPOTHETICAL_CAPTURED = null;
 
 /* Global functions for jslint to recognize. TODO: make this in objects */
 
-/*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved unfiltered_moves filtered_moves relative_decode_direction parse_flags nested_flags decode_relative_raw_move relative_decode_parlett without_dupes opposite_color set_turn set_check_message check_repetition init_board capture_piece notation_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc piece_location image_path_for create_piece highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection make_move_by_menu populate_make_a_move_list*/
+/*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved unfiltered_moves filtered_moves relative_decode_direction parse_flags nested_flags decode_relative_raw_move relative_decode_parlett without_dupes opposite_color set_turn set_check_message check_repetition load_notations capture_piece notation_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position init_board name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc piece_location image_path_for create_piece create_piece_by_letter highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection make_move_by_menu populate_make_a_move_list make_vboard realize_vboard piece_at*/
  
 
 google.setOnLoadCallback(function() {
@@ -436,7 +436,7 @@ google.setOnLoadCallback(function() {
     // http://www.xs4all.nl/~timkr/records/records.htm and http://www.xs4all.nl/~timkr/ChessTutor/pgnview.htm
 
     // test PGN embedded notes
-    pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
+    //pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
     
     //pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
     
@@ -492,7 +492,7 @@ pgn = load_pgn(
 // Load the chess notations into the input/output notation select boxes
 function load_notations()
 {
-    for (notation in AVAILABLE_NOTATIONS) {
+    for (var notation in AVAILABLE_NOTATIONS) {
         if (AVAILABLE_NOTATIONS.hasOwnProperty(notation)) {
             var name = AVAILABLE_NOTATIONS[notation];
 
@@ -532,6 +532,7 @@ function save_pgn()
    
     dict = {};
     for (var i = 0; i < tags.length; i += 1) {
+        // jslint thinks this is unused, wonder why
         var tag = tags[i];
 
         dict[tag] = $(tag).innerHTML;
@@ -982,7 +983,7 @@ function in_check(victim_color, all_moves)
 
     // Attack the royal pieces?
     all_moves.each(function(pair) { 
-        var filerank = pair.key;
+        //var filerank = pair.key;
         var moves = pair.value;
 
         moves.each(function(move) {
@@ -1025,8 +1026,8 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
         var descriptive_dest_rank = descriptive_dest.substr(descriptive_dest.length - 1);           //  4
         var descriptive_origin_file = descriptive_origin.substr(0, descriptive_origin.length - 1);  // K
         var descriptive_origin_rank = descriptive_dest.substr(descriptive_dest.length - 1);         //  4
-        var adescriptive_dest_file = adescriptive_dest.substr(0, 1);                                // e
-        var adescriptive_dest_rank = adescriptive_dest.substr(1, 1);                                //  4
+        //var adescriptive_dest_file = adescriptive_dest.substr(0, 1);                                // e
+        //var adescriptive_dest_rank = adescriptive_dest.substr(1, 1);                                //  4
         var adescriptive_origin_file = adescriptive_origin.substr(0, 1);                            // e
         var adescriptive_origin_rank = adescriptive_dest.substr(1, 1);                              //  4
 
@@ -1281,7 +1282,7 @@ function disambiguate_notations(notations)
 
     // Delete ambiguous moves (or actually, replace with 'undefined')
     freq_count.each(function(pair) {
-        var notation = pair[0];
+        //var notation = pair[0];
         var locations = pair[1];
 
         if (locations.length > 1) {
@@ -1384,7 +1385,7 @@ function calculate_moves(color, is_hypothetical)
         // http://www.tutorials4html.com/2009/02/06/true-javascript-hash-table/
         // but instead, using an array with linear lookup.
         possible_notations = {};
-        for (var notation in AVAILABLE_NOTATIONS) {
+        for (notation in AVAILABLE_NOTATIONS) {
             if (AVAILABLE_NOTATIONS.hasOwnProperty(notation)) {
                 possible_notations[notation] = [];
             }
@@ -1429,7 +1430,7 @@ function calculate_moves(color, is_hypothetical)
         var notations = possible_notations;
         VALID_MOVE_NOTATIONS = {};
         ALT_MOVE_NOTATIONS = {};
-        for (var notation in AVAILABLE_NOTATIONS) {
+        for (notation in AVAILABLE_NOTATIONS) {
             if (AVAILABLE_NOTATIONS.hasOwnProperty(notation)) {
                 var canonical_and_synonyms;
 
@@ -1612,7 +1613,7 @@ function unfiltered_moves(parlett)
 function filtered_moves(piece, color, is_hypothetical)
 {
     var parlett, rel_moves, moves, start, blocked;
-    var blocked, start_x, start_y;
+    var start_x, start_y;
 
     start = piece_location(piece);
     if (!start) {
@@ -1640,7 +1641,7 @@ function filtered_moves(piece, color, is_hypothetical)
         var if_unblocked_dx = flags.if_unblocked_dx, if_unblocked_dy = flags.if_unblocked_dy;
         var if_unblocked2_dx = flags.if_unblocked2_dx, if_unblocked2_dy = flags.if_unblocked2_dy;
         var if_unblocked3_dx = flags.if_unblocked3_dx, if_unblocked3_dy = flags.if_unblocked3_dy;
-        var capture_at_dx = flags.capture_at_dx, capture_at_dy = flags.capture_at_dy;
+        //var capture_at_dx = flags.capture_at_dx, capture_at_dy = flags.capture_at_dy;
         var mark_ep_target_dx = flags.mark_ep_target_dx, mark_ep_target_dy = flags.mark_ep_target_dy;
 
         // Positive is forwards, so mirror for black.
@@ -1650,7 +1651,7 @@ function filtered_moves(piece, color, is_hypothetical)
             if (if_unblocked_dy) { if_unblocked_dy = -if_unblocked_dy; }
             if (if_unblocked2_dy) { if_unblocked2_dy = -if_unblocked2_dy; }
             if (if_unblocked3_dy) { if_unblocked3_dy = -if_unblocked3_dy; }
-            if (capture_at_dy) { capture_at_dy = -capture_at_dy; }
+            //if (capture_at_dy) { capture_at_dy = -capture_at_dy; }
             if (mark_ep_target_dy) { mark_ep_target_dy = -mark_ep_target_dy; }
         }
 
@@ -1923,7 +1924,7 @@ function parse_flags(text, flags)
     // Semicolon-separated flags
     for (var i = 0; i < flags_text.length; i += 1) {
         var flag_text = flags_text[i];
-        var key, value;
+        var value;
        
         // Allow if_unblocked=0,1, etc.
         if (flag_text.indexOf("=") !== -1) { 
@@ -3097,8 +3098,8 @@ function piece_at(square)
     if (HYPOTHETICAL_TO && square.x === HYPOTHETICAL_TO.x && square.y === HYPOTHETICAL_TO.y) {
         // As if it moved here
         return HYPOTHETICAL_PIECE;
-    } else if (HYPOTHETICAL_FROM && square.x === HYPOTHETICAL_FROM.x 
-            && square.y === HYPOTHETICAL_FROM.y) {
+    } else if (HYPOTHETICAL_FROM && square.x === HYPOTHETICAL_FROM.x && 
+            square.y === HYPOTHETICAL_FROM.y) {
         // As if it moved off of here, so empty
         return null;
     }
@@ -3169,14 +3170,14 @@ function decode_piece_letter(name)
     } else {
         assert(false, "create_piece_by_letter(" + name + "): not a letter");
     }
-    letter = name.toLowerCase();
+    name = name.toLowerCase();
 
     // x(name) or X(name) is explicit name, otherwise, is a letter
-    if (/\(/.test(letter)) {
-        var ary = /^[xX]\(([^)]+)/.exec(letter);
+    if (/\(/.test(name)) {
+        var ary = /^[xX]\(([^)]+)/.exec(name);
         type = ary[1];
     } else {
-        type = piece_letter2name(letter);
+        type = piece_letter2name(name);
     }
 
     return {color: color, type: type};
@@ -3247,7 +3248,6 @@ function create_piece(color, type)
     // does this too. reverteffect defaults to Effect.Move, and it reverts back to *something*,
     // figure this point.
 
-    // Note: http://www.jslint.com/ stops here for some reason
     var drag = new Draggable(piece, { 
         revert: true, 
         starteffect: undefined, 
@@ -3257,7 +3257,7 @@ function create_piece(color, type)
         // TODO: figure out why on IE7, dragged pieces are below the highlighted squares!
         // even with zindex: 1001
      });
-
+    // unused: drag
 
     return piece;
 }
@@ -3652,6 +3652,7 @@ function enable_document_selection(enable) {
  </p>
 
 
+ <!-- TODO: disclosure triangles -->
  <p><a href="#" onclick="javascript:new Effect.toggle('controls', 'slide', { duration: 0.1 })">advanced</a>
  
  <div id="controls" style="xdisplay: none; border-left: 2px solid blue">
