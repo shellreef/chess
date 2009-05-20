@@ -423,7 +423,7 @@ SAVED_BOARDS = {
 
 /* Global functions for jslint to recognize. TODO: move to objects? */
 
-/*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved unfiltered_moves filtered_moves relative_decode_direction parse_flags nested_flags decode_relative_raw_move relative_decode_parlett without_dupes opposite_color set_turn set_check_message check_repetition load_notations capture_piece notation_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position init_board name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc piece_location image_path_for create_piece create_piece_by_letter highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection make_move_by_menu populate_make_a_move_list make_vboard realize_vboard piece_at*/
+/*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved unfiltered_moves filtered_moves relative_decode_direction parse_flags nested_flags decode_relative_raw_move relative_decode_parlett without_dupes opposite_color set_turn set_check_message check_repetition load_notations capture_piece notation_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position init_board name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc piece_location image_path_for create_piece create_piece_by_letter highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection make_move_by_menu populate_make_a_move_list make_vboard realize_vboard*/
  
 
 google.setOnLoadCallback(function() {
@@ -887,7 +887,7 @@ function mv(alg_move, virtual)
         move_piece_to_square(piece, square);
     } else {
         // Move the real piece and square
-        var real_piece = piece_at(SQUARES[piece.square.x][piece.square.y]);
+        var real_piece = SQUARES[piece.square.x][piece.square.y].childNodes[0];
         var real_square = SQUARES[square.x][square.y];
 
         move_piece_to_square(real_piece, real_square);
@@ -968,7 +968,7 @@ function in_check(victim_color, all_moves)
             for (var y = 1; y <= RANK_MAX; y += 1) {
                 var piece;
 
-                piece = piece_at(VBOARD[x][y]);
+                piece = VBOARD[x][y].piece;
 
                 if (piece && PIECE_TYPES[piece.type].royal) {
                     royals.push(piece);
@@ -1396,7 +1396,7 @@ function calculate_moves(color, is_hypothetical)
             var starting_filerank, square_from, moves, piece;
 
             square_from = VBOARD[x][y];
-            piece = piece_at(square_from);
+            piece = square_from.piece;
  
             // Skip blank squares and inactive pieces
             if (!piece || piece.color !== color) {
@@ -1537,7 +1537,7 @@ function would_check(piece, move, color)
 
     // Hypothetical move, with possible capture
     // TODO: use move_piece_to_square(), so castle and _en passant_ capture is correct!
-    var captured = piece_at(to_square);
+    var captured = to_square.piece;
     piece.square = VBOARD[move.x][move.y];
     VBOARD[move.x][move.y].piece = piece;
 
@@ -1678,7 +1678,7 @@ function filtered_moves(piece, color, is_hypothetical)
         }
 
         var dest_square = VBOARD[x][y];
-        var capture_piece = piece_at(dest_square);
+        var capture_piece = dest_square.piece;
 
         // If there is any piece there, it may block other moves
         if (capture_piece) {
@@ -1828,7 +1828,7 @@ function filtered_moves(piece, color, is_hypothetical)
                continue;
            }
 
-           var capture = piece_at(VBOARD[cx][cy]);
+           var capture = VBOARD[cx][cy].piece;
            console.log("C",xy2filerank([cx,cy]));
            if (capture) {
                abs_move.capture = capture;
@@ -2599,12 +2599,12 @@ function move_piece_to_square(piece, square, is_hypothetical)
         if (piece.virtual) {
             dead_pawn_square = VBOARD[square.x][square.y - forward];
 
-            capture_piece(piece_at(dead_pawn_square));
+            capture_piece(dead_pawn_square.piece);
             dead_pawn_square.piece = null;
         } else {
             dead_pawn_square = SQUARES[square.x][square.y - forward];
 
-            capture_piece(piece_at(dead_pawn_square));
+            capture_piece(dead_pawn_square.piece);
             dead_pawn_square.removeChild(dead_pawn_square.firstChild);
         }
     }
@@ -2750,7 +2750,7 @@ function move_dropped_piece(piece, square, event)
     // TODO: do some cool effects when a piece is captured, but not too cool
     // Any way to finish running the code AFTER the effect finishes? New effect?
     //if (square.firstChild) {
-    //   new Effect.Squish(piece_at(square));
+    //   new Effect.Squish(square.virtual ? square.piece : square.childNodes[0]);
     //}
 
     // Can't drop this piece anywhere anymore.
@@ -3098,7 +3098,7 @@ function pc_or_offboard(x, y, virtual)
 // Return an existing piece somewhere (or a false value), given:
 // - (x,y) coordinates, like (8,1)
 // - location in filerank notation, like "a8"
-// To get piece from a square, use piece_at()
+// To get piece from a square, use .piece if virtual, or .childNodes[0] if not
 function pc(x, y, virtual)
 {
     if (x.charAt) {
@@ -3110,18 +3110,7 @@ function pc(x, y, virtual)
     //assert(x >= 1 && x <= FILE_MAX, "pc(" + x + ", " + y + "): bad x: " + x);
     //assert(y >= 1 && y <= RANK_MAX, "pc(" + x + ", " + y + "): bad y: " + y);
 
-    return piece_at(virtual ? VBOARD[x][y] : SQUARES[x][y]);
-}
-
-// Return the piece at the given square, or null.
-// Accepts virtual or real squares, and takes hypothetical moves into account.
-function piece_at(square)
-{
-    if (square.virtual) {
-        return square.piece;
-    } else {
-        return square.childNodes[0];
-    }
+    return virtual ? VBOARD[x][y].piece : SQUARES[x][y].childNodes[0];
 }
 
 // Get the square of a piece, or null if it is offboard.
