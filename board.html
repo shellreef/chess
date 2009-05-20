@@ -1536,27 +1536,25 @@ function would_check(piece, move, color)
     var to_square = VBOARD[move.x][move.y];
     var checked, all_moves;
 
+    /*
     HYPOTHETICAL_PIECE = piece;
     HYPOTHETICAL_CAPTURED = piece_at(to_square);
     HYPOTHETICAL_FROM = from_square;
     HYPOTHETICAL_TO = to_square;
+    */
 
-    /*
     var captured = piece_at(to_square);
     VBOARD[move.x][move.y].piece = piece;
     VBOARD[from_square.x][from_square.y].piece = null;
-    */
 
     // TODO: This is a lot of calculation to do, see if can speed it up
     all_moves = calculate_moves(opposite_color(color), true);
     checked = in_check(color, all_moves);
 
-    HYPOTHETICAL_FROM = HYPOTHETICAL_PIECE = HYPOTHETICAL_TO = HYPOTHETICAL_CAPTURED = null;
+    //HYPOTHETICAL_FROM = HYPOTHETICAL_PIECE = HYPOTHETICAL_TO = HYPOTHETICAL_CAPTURED = null;
 
-    /*
     VBOARD[move.x][move.y].piece = captured;
     VBOARD[from_square.x][from_square.y].piece = piece;
-    */
 
     return checked;
 }
