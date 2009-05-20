@@ -100,7 +100,6 @@ td.hover
 td.white { background-color: #ffce9e; }
 td.black { background-color: #d18b47; }
 
-/* TODO: check out what colors Chess with Friends uses */
 td.legal-move-white { background-color: #cf9e6e; }
 td.legal-move-black { background-color: #a15b17; }
 
@@ -121,7 +120,7 @@ if (!window.google) {
 }
 
 /* TODO: why aren't these miniifed? http://code.google.com/apis/ajaxlibs/documentation/index.html#prototype has
- * direct paths but neither prototype nor scriptaculous are minified.. others are though. */
+ * direct paths but neither prototype nor scriptaculous are minified.. others are though. Maybe just use raw JS. */
 /* TODO: http://compressorrater.thruhere.net/ */
 google.load("prototype", "1.6.0.3");
 google.load("scriptaculous", "1.8.2");
@@ -140,7 +139,6 @@ var PREFS = {
 
 // Chess movement notations, in descending precedence. 
 // For more info see http://en.wikipedia.org/wiki/Chess_notation
-// TODO: make an assocative array, map to description, for output_notation selection
 var AVAILABLE_NOTATIONS = {
     SAN:  "Standard Algebraic Notation",//              Bxc6        e5
     LAN:  "Long Algebraic Notation",//                  Bb5xc6      e7-e5
@@ -192,10 +190,6 @@ var VBOARD = null;                // Virtual in-memory board
 
 // Movement of pieces in extended Parlett notation
 var PIECE_TYPES = {
-// TODO: make this into a proper class/hash, where pieces have not only movements
-// but HTML code to represent black and white (img, or Unicode character) pieces,
-// and codes for FEN notation of initial board positions, also black and white
-
     // Keys:
     // parlett: movement of piece in extended Parlett notation
     // letter: uppercase character representing the piece in FEN
@@ -297,14 +291,10 @@ var PIECE_TYPES = {
     dragon_king: {parlett: "n+, 1X", royal: true},  // rook + king
     fad: {parlett: "1X, ~2/2, ~2/0"},       // ferz + alfil + dababa
     general: {parlett: "1X", royal: true},  // royal ferz
-    kangaroo: {parlett: "~1/2, ~2/2"},      // knight + alfil       TODO: image:
-    waffle: {parlett: "1+, ~2/2"},          // wazir + alfil wazir + alfil
+    kangaroo: {parlett: "~1/2, ~2/2"},      // knight + alfil       TODO: image
+    waffle: {parlett: "1+, ~2/2"},          // wazir + alfil wazir + alfil  TODO: image of a waffle!
     wizard: {parlett: "~1/3, 1X"},          // camel + fers
 
-    // TODO: support two-letter expanded FEN codes (my invention), since A-Z leaves
-    // only 26 possibilities, X indicates another letter follows, so XA-XZ are available,
-    // and XXA-XXZ, X++ to infinity, if needed. Straightforward FEN extension.
- 
     // More complex fairy / non-intl chess pieces
     // See http://en.wikipedia.org/wiki/Fairy_chess_piece#Notable_examples
     // and even better, Piecelopedia
@@ -315,10 +305,11 @@ var PIECE_TYPES = {
     lion: {parlett: "~n*", letter: "XL"},
     berolina_pawn: {parlett: "o1X>, c1>, io2X>", letter: "XB"},
     superpawn: {parlett: "on>, cnX>", letter: "XP"},
-    elephant: {parlett: "2X", letter: "E"}, // TODO: not a leaper, needs to be blocked
+    elephant: {parlett: "2X", letter: "E"},         // Not a leaper, path can be blocked (unlike alfil, ~2X)
     khohn: {parlett: "1X, 1>", letter: "XK"},
     fers: {parlett: "1X", letter: "XF"},
     wazir: {parlett: "1+", letter: "I"},
+    // TODO: support ~0/0 for "null move" (---), but don't let drop to null, instead show a button
     kraken: {parlett: "~n/m ~0/0"},     // any square, not realistic since always checkmates!
     squid: {parlett: "o~n/m ~0/0", letter: "XD"}, // any square but can't capture, much less powerful
     universal_leaper: {parlett: "~n/m"},// like kraken, but can't go to square it is on (like a zero)
@@ -395,6 +386,8 @@ SAVED_BOARDS = {
 
 // Openings
 // TODO: invert hash, and automatically lookup and display known chess openings w/ ECO code and name? 
+//  Recognize various ECO codes, see http://scid.sourceforge.net/help/ECO.html
+//  and http://scid.sourceforge.net/help/EPD.html
 "Sicilian Defense":     "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2",
 "Sicilian Defense Main Line":     "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2",
 "Sicilian Defense Nimzowitsch Variation":     "rnbqkb1r/pp1ppppp/5n2/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 3",
@@ -428,7 +421,7 @@ SAVED_BOARDS = {
 // http://www.xs4all.nl/~timkr/records/records.htm and http://www.xs4all.nl/~timkr/ChessTutor/pgnview.htm
 
 
-/* Global functions for jslint to recognize. TODO: make this in objects */
+/* Global functions for jslint to recognize. TODO: move to objects? */
 
 /*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved unfiltered_moves filtered_moves relative_decode_direction parse_flags nested_flags decode_relative_raw_move relative_decode_parlett without_dupes opposite_color set_turn set_check_message check_repetition load_notations capture_piece notation_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position init_board name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc piece_location image_path_for create_piece create_piece_by_letter highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection make_move_by_menu populate_make_a_move_list make_vboard realize_vboard piece_at*/
  
@@ -442,7 +435,7 @@ google.setOnLoadCallback(function() {
     load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
 
     // test PGN embedded notes
-    //pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
+    pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
     
     //pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
     
@@ -469,7 +462,9 @@ pgn = load_pgn(
 "f5 18. Kd5 Rad8 19. Ke6 Qh6 \n" + 
 "0-1");*/
 
-     /* TODO: support 1.move in addition to 1. move 
+     /* TODO: support 1.move in addition to 1. move  */
+     /* TODO: support [White "Foo"][Black "Bar"], without newlines. Ignore whitespace. */
+     /*
      pgn = load_pgn("[Event \"Berlin\"]\n" + 
 "[Site \"?\"]\n" + 
 "[Date \"1842\"]\n" + 
@@ -549,7 +544,7 @@ function save_pgn()
 
     pgn = output_pgn_dict(dict);
 
-    // TODO: save moves
+    // TODO: save moves!
     pgn += "\n";
     
     return pgn;
@@ -565,9 +560,6 @@ function reload_pgn()
     load_pgn(pgn);
 }
 
-// Load a game in Portable Game Notation (PGN) format
-//  TODO: recognize various ECO codes, see http://scid.sourceforge.net/help/ECO.html
-//  and http://scid.sourceforge.net/help/EPD.html
 // TODO: support any base 10 number, and asterisks for filling remainder of rank with empty
 // spaces, and {} for labels, see http://play.chessvariants.org/pbm/devguide.html
 function load_pgn(pgn)
@@ -1717,7 +1709,7 @@ function filtered_moves(piece, color, is_hypothetical)
         }
 
         // Blocked by an obstruction. Can check for up to three spaces. To check
-        // more, chain the moves. TODO: fix bug where riders aren't blocked sometimes!
+        // more, chain the moves. 
         var key;
         if (if_unblocked_dy !== undefined) {
             key = if_unblocked_dx + "," + if_unblocked_dy;
@@ -2850,7 +2842,7 @@ function save_fen(strip_moves, virtual)
     return fen;
 }
 
-// Load board state. If replay is true, this is reloading an 
+// Load board state in Forsyth-Edwards Notation. If replay is true, this is reloading an 
 // existing position, not loading a new game.
 function load_fen(fen, replay)
 {
@@ -2916,6 +2908,7 @@ function load_starting_position(fen, replay)
             i += 1;
             code += fen.charAt(i);
 
+            // Expanded FEN codes
             if (code === "X(" || code === "x(") {
                 // Read until closing paren
                 var ch;
@@ -2927,7 +2920,6 @@ function load_starting_position(fen, replay)
                     i += 1;
                 }
             }
-            // TODO: extended extended codes, multiple x's? or just use names?
 
             SQUARES[x][y].appendChild(create_piece_by_letter(code));
             SQUARES[x][y].childNodes[0].square = SQUARES[x][y];
@@ -3156,12 +3148,13 @@ function image_path_for(type, color)
         base = type;
     }
 
-    // TODO: pngs
-    // TODO: even better, use Unicode characters in a span!! How cool would that be? Infinite resolution.
-    // See for example http://en.wikipedia.org/wiki/Knight_(chess)
-    // Unfortunately, MSIE doesn't seem to support it, though it should..different font?
-    // TODO: use web fonts! Supported on Firefox 3.1+, Opera 10+, Safari 3.1+, IE4+
-    // See http://fonts.philip.html5.org/
+    // Rejected TODOs, lack support:
+    // - pngs
+    // - use Unicode characters in a span!! How cool would that be? Infinite resolution.
+    //   See for example http://en.wikipedia.org/wiki/Knight_(chess)
+    //   Unfortunately, MSIE doesn't seem to support it, though it should..different font?
+    // - Web fonts! Supported on Firefox 3.1+, Opera 10+, Safari 3.1+, IE4+
+    //   See http://fonts.philip.html5.org/
     
     return "images/" + PREFS.IMAGE_SET + "/" + {white:"w", black:"b"}[color] + base + ".gif";
 }
@@ -3252,12 +3245,6 @@ function create_piece(color, type)
     // as ghosts, which is cool, but instead: now pieces can only be dropped anywhere
     // if they are the active colors move. The player can drag the opponent's pieces
     // around but not drop anywhere.
-
-    // TODO: instead of reverting, check if valid move
-    // TODO: Figure out how to fix how the draggable jumps, by the amount it moved,
-    // when being dropped. http://www.tutorialspoint.com/cgi-bin/practice.cgi?file=scriptaculous_12 
-    // does this too. reverteffect defaults to Effect.Move, and it reverts back to *something*,
-    // figure this point.
 
     var drag = new Draggable(piece, { 
         revert: true, 
@@ -3634,9 +3621,6 @@ function enable_document_selection(enable) {
  <div id="game_ui">
 
  <!-- Header elements, game metadata. Hidden/shown as needed. -->
-  <!-- TODO: click header to edit as PGN, instead of FEN. Overlay header and
-    move text with a text field, output PGN, then when saved, load PGN and
-    with new header and move text -->
  <p id="header" style="xdisplay: none; text-align: center" 
   onclick="javascript:edit_pgn()">
   <span class="players">
