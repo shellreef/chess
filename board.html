@@ -353,7 +353,10 @@ var PIECE_TYPES = {
 
 // Saved board setups in FEN
 SAVED_BOARDS = {
-// Standard chess and variants
+// Standard chess and variants. 
+// Sources:
+// http://www.pathguy.com/chess/ChessVar.htm
+// http://www.chessclub.com/helpcenter/tips/wild.html
 "International Western Chess": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
 "Church Chess":         "bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1",
 "Advance Chess":        "rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq - 0 1",
@@ -370,17 +373,25 @@ SAVED_BOARDS = {
 "Pawn Massacre Chess": "RNBQKBNR/pppppppp/8/8/8/8/PPPPPPPP/rnbqkbnr w KQkq - 0 1",
 "Pawnless Chess":      "rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w KQkq - 0 1",
 "Peasant Revolt Chess":"1nn1k1n1/4p3/8/8/8/8/PPPPPPPP/4K3 w - - 0 1",
-"Power Chess":         "qqqqkqqq/pppppppp/8/8/8/8/PPPPPPPP/QQQQKQQQ w - - 0 1",
+"Power Chess / Wild 18":"qqqqkqqq/pppppppp/8/8/8/8/PPPPPPPP/QQQQKQQQ w - - 0 1",
+"Wild 19 Chess":        "8/6k1/4p3/4N3/8/6K1/7N/8 w - - 0 1",
 "Power Chess II":       "rrbqkbrr/bbnnnnbb/pppppppp/8/8/PPPPPPPP/BBNNNNBB/RRBQKBRR w - - 0 1",
 "Reverso Chess":        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBKQBNR w KQkq - 0 1",
 "Royal Stables Chess":  "nnnnknnn/pppppppp/8/8/8/8/PPPPPPPP/NNNNKNNN w - - 0 1",
 "Seven Knights Chess":  "nnnnknnn/pppppppp/2p2p2/1pppppp1/8/8/PPPPPPPP/RNBQKBNR w - - 0 1",
 "Twin Chess":           "rbqkkqbr/pppppppp/n6n/8/8/N6N/PPPPPPPP/RBQKKQBR w - - 0 1",
 "Twin Chess B":         "nkbqqbkn/r2pp2r/pppppppp/8/8/PPPPPPPP/R2PP2R/NKBQQBKN w - - 0 1",
-"Upside-Down Chess":    "RNBQKBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbqkbnr w KQkq - 0 1",
+"Upside-Down Chess / Wild 5":    "RNBQKBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbqkbnr w KQkq - 0 1",
 "Wild Chess 7 ":        "4k3/5ppp/8/8/8/8/PPP5/3K4 w - - 0 1",
 "Wild Chess 8":         "rnbqkbnr/8/8/pppppppp/PPPPPPPP/8/8/RNBQKBNR w KQkq - 0 1",
 "No Royalty Chess":     "rnbqmbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQMBNR w KQkq - 0 1",
+// Shatranj, except the following rules are NOT implemented:
+// 1. Pawns can't make double moves
+// 2. Pawn only promotes to fers
+// 3. Stalemating your opponent wins
+// 4. Taking the last piece of your opponent wins, unless your opponent
+//    can take your last non-king piece too, in which case the game is drawn
+//"Semi-Shatranj":        "rnykxfynr/pppppppp/8/8/8/8/PPPPPPPP/RNYKXFYNR w - 0 1",
 
 // Openings
 // TODO: invert hash, and automatically lookup and display known chess openings w/ ECO code and name? 
