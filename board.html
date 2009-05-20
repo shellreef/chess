@@ -423,7 +423,7 @@ SAVED_BOARDS = {
 
 /* Global functions for jslint to recognize. TODO: move to objects? */
 
-/*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved unfiltered_moves filtered_moves relative_decode_direction parse_flags nested_flags decode_relative_raw_move relative_decode_parlett without_dupes opposite_color set_turn set_check_message check_repetition load_notations capture_piece notation_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position init_board name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc piece_location image_path_for create_piece create_piece_by_letter highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection make_move_by_menu populate_make_a_move_list make_vboard realize_vboard*/
+/*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved unfiltered_moves filtered_moves relative_decode_direction parse_flags nested_flags decode_relative_raw_move relative_decode_parlett without_dupes opposite_color set_turn set_check_message check_repetition load_notations capture_piece notation_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position init_board name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc image_path_for create_piece create_piece_by_letter highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection make_move_by_menu populate_make_a_move_list make_vboard realize_vboard*/
  
 
 google.setOnLoadCallback(function() {
@@ -906,7 +906,7 @@ function should_promote(piece)
         return false;
     }
 
-    square = piece_location(piece);
+    square = piece.square;
 
     // Is it on the last rank?
     if (GAME_STATE.active_color === "white") {
@@ -986,9 +986,7 @@ function in_check(victim_color, all_moves)
 
         moves.each(function(move) {
             royals.each(function(royal) {
-                // Note that piece_location() will return the hypothetical location of the piece,
-                // if any.
-                var square = piece_location(royal);
+                var square = royal.square;
 
                 if (move.x === square.x && move.y === square.y) { 
                     // Being attacked!
@@ -1530,7 +1528,7 @@ function computer_move_if_applicable()
 // this move didn't take them out. Either way, its illegal.
 function would_check(piece, move, color)
 {
-    var from_square = piece_location(piece);
+    var from_square = piece.square;
     var to_square = VBOARD[move.x][move.y];
     var checked, all_moves;
 
@@ -1577,7 +1575,7 @@ function piece_moved(piece)
 
     assert(piece.type === "pawn", "piece_moved(" + piece + "): can only tell if pawns moved, not " + piece.type);
 
-    var square = piece_location(piece);
+    var square = piece.square;
 
     if (piece.color === "white") {
         return square.y !== 2;    // 2nd rank
@@ -1627,7 +1625,7 @@ function filtered_moves(piece, color, is_hypothetical)
     var parlett, rel_moves, moves, start, blocked;
     var start_x, start_y;
 
-    start = piece_location(piece);
+    start = piece.square;
     if (!start) {
         return [];
     }
@@ -2480,7 +2478,7 @@ function capture_piece(piece)
         // Note that this is the first rank of the *other* player
         var opponent = opposite_color(GAME_STATE.active_color);
         var first_rank = opponent === "white" ? 1 : 8;
-        var square = piece_location(piece);
+        var square = piece.square;
         
         // TODO: really would like to not have to hardcode this
         if (square.y === first_rank) {
@@ -2541,7 +2539,7 @@ function move_piece_to_square(piece, square, is_hypothetical)
 {
     var from_square, move_text, castle_move_text, filerank, only_move;
 
-    from_square = piece_location(piece);
+    from_square = piece.square;
 
     // Moving king makes it ineligible for castling
     if (PIECE_TYPES[piece.type].castles_with) {
@@ -3113,16 +3111,6 @@ function pc(x, y, virtual)
     return virtual ? VBOARD[x][y].piece : SQUARES[x][y].childNodes[0];
 }
 
-// Get the square of a piece, or null if it is offboard.
-function piece_location(piece)
-{
-    if (!piece.square) { 
-        return null;
-    }
-
-    return piece.square;
-}
-
 // Return the path to an image for the piece of that color
 function image_path_for(type, color)
 {
@@ -3265,7 +3253,7 @@ function highlight_moves(piece, enable)
         return [];
     }
 
-    from_square = piece_location(piece);
+    from_square = piece.square;
 
     if (!from_square) {
         // Could not find a square for the piece, it no longer exists,
@@ -3416,9 +3404,9 @@ function short_descriptive(descriptive_file)
 // Get a square cell, given location in either
 // - filerank notation (example: "a8", one argument), or
 // - x,y coordinates, (equivalent example: 1,8)
-// To get the square of a piece, use piece_location()
-// Note: code should use SQUARES[x][y] or piece_location(). This is 
-// only for user convenience.
+// To get the square of a piece, use .square
+// Note: code should use SQUARES[x][y] or .square. This is 
+// only for user convenience (console) and debugging.
 function sq(code, extra)
 {
     var x, y, xy;
