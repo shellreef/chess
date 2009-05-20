@@ -351,6 +351,71 @@ var PIECE_TYPES = {
     // TODO: compound pieces from http://www.chessvariants.com/graphics.dir/alfaerie/
 };
 
+// Saved board setups in FEN
+SAVED_BOARDS = {
+// Standard chess and variants
+"International Western Chess": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+"Church Chess":         "bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1",
+"Advance Chess":        "rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq - 0 1",
+"Corner Chess":         "4rbqk/4rb1q/4r1bb/5rrr/RRR5/BB1R4/Q1BR4/KQBR4 w - - 0 1",
+"Corner Chess II":      "kbp2pbq/nrp2prn/pp4pp/8/8/PP4PP/NRP2PRN/QBP2PBK w - - 0 1",
+"Corridor Chess":       "1nrqkrn1/2b2b2/1pppppp1/8/8/1PPPPPP1/2B2B2/1NRQKRN1 w - - 0 1",
+"Eight Kings Chess":    "kkkkkkkk/pppppppp/8/8/8/8/PPPPPPPP/KKKKKKKK w - - 0 1",
+"Fianchetto Chess":     "bnrqkrnb/pppppppp/8/8/8/8/PPPPPPPP/BNRQKRNB w KQkq - 0 1",
+"Knight Odds Chess":   "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R1BQKBNR w KQkq - 0 1",
+"Pawn Odds Chess":     "RNBQKBNR/pppppppp/8/8/8/8/PPPPP1PP/rnbqkbnr w KQkq - 0 1",
+"Queen Odds Chess":    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNB1KBNR w KQkq - 0 1",
+"Rook Odds Chess":     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/1NBQKBNR w KQkq - 0 1",
+"Mongredian Chess":    "rbbqknnr/pppppppp/8/8/8/8/PPPPPPPP/RBBQKNNR w - - 0 1",
+"Pawn Massacre Chess": "RNBQKBNR/pppppppp/8/8/8/8/PPPPPPPP/rnbqkbnr w KQkq - 0 1",
+"Pawnless Chess":      "rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w KQkq - 0 1",
+"Peasant Revolt Chess":"1nn1k1n1/4p3/8/8/8/8/PPPPPPPP/4K3 w - - 0 1",
+"Power Chess":         "qqqqkqqq/pppppppp/8/8/8/8/PPPPPPPP/QQQQKQQQ w - - 0 1",
+"Power Chess II":       "rrbqkbrr/bbnnnnbb/pppppppp/8/8/PPPPPPPP/BBNNNNBB/RRBQKBRR w - - 0 1",
+"Reverso Chess":        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBKQBNR w KQkq - 0 1",
+"Royal Stables Chess":  "nnnnknnn/pppppppp/8/8/8/8/PPPPPPPP/NNNNKNNN w - - 0 1",
+"Seven Knights Chess":  "nnnnknnn/pppppppp/2p2p2/1pppppp1/8/8/PPPPPPPP/RNBQKBNR w - - 0 1",
+"Twin Chess":           "rbqkkqbr/pppppppp/n6n/8/8/N6N/PPPPPPPP/RBQKKQBR w - - 0 1",
+"Twin Chess B":         "nkbqqbkn/r2pp2r/pppppppp/8/8/PPPPPPPP/R2PP2R/NKBQQBKN w - - 0 1",
+"Upside-Down Chess":    "RNBQKBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbqkbnr w KQkq - 0 1",
+"Wild Chess 7 ":        "4k3/5ppp/8/8/8/8/PPP5/3K4 w - - 0 1",
+"Wild Chess 8":         "rnbqkbnr/8/8/pppppppp/PPPPPPPP/8/8/RNBQKBNR w KQkq - 0 1",
+"No Royalty Chess":     "rnbqmbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQMBNR w KQkq - 0 1",
+
+// Openings
+// TODO: invert hash, and automatically lookup and display known chess openings w/ ECO code and name? 
+"Sicilian Defense":     "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2",
+"Sicilian Defense Main Line":     "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2",
+"Sicilian Defense Nimzowitsch Variation":     "rnbqkb1r/pp1ppppp/5n2/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 3",
+"King's Pawn Game": "rnbqkbnr/pppppppp/9/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1",
+
+// Test cases
+"Test Stalemate":     "k7/8/8/8/8/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5",
+"Test Remove Check by Capture":     "4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5",
+"Test Promotion":     "k1K5/8/8/8/8/8/p/8 b - - 0 5",
+"Test En Passant (alone)":     "8/8/8/3pP3/8/8/8/8 w - d6 0 5",
+"Test En Passant":     "rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5",
+"Test K + K":     "k7/8/K7/8/8/8/8/8 b - - 0 30",
+"Test K + KQ":     "k7/8/8/8/8/8/8/5KQ1 w - d6 0 50",
+"Test K + KR":     "k7/8/8/8/8/8/8/5KR1 w - d6 0 50",
+"Test Castling out of Check":     "4r3/8/8/8/8/8/8/R3K2R w KQkq - 0 1",
+"Test Castling through Check":     "1k3r2/8/8/8/8/7Q/8/R3K2R w KQkq - 0 1",
+"Test Castling w/ Intervening Pieces":     "1k/8/8/8/8/8/8/R3KQ1R w KQ - 0 1",
+"Test Only Move ":     "rnbqkbnr/ppp2ppp/8/8/8/8/PPP2PPP/RNBQKBNR w KQkq - 0 1",
+"Test Disambiguation by File":     "k7/8/8/8/8/8/3N4/6N1 w - - 0 1",
+"Test Disambiguation by Rank":     "k7/8/8/6N1/8/8/8/6N1 w - - 0 1",
+"Test Disambiguation by File+Rank":     "k7/8/8/4N1N1/3N3N/8/3N3N/4N1N1 w - - 0 1",
+"Test Disambiguation w/ 8 Queens": "3Q4/6q1/2Q5/7q/1Q6/4q3/7Q/5q2 w - - 0 1",
+"Test vboard Check-Checking": "8/8/R2k2p1/3n1bp1/1p6/1P3P1P/5KP1/8 b - - 0 36",
+"Test Getting out of Check": "rnbqkbnr/ppp1p1pp/4P3/3p3Q/5p2/8/PPPP1PPP/RNB1KBNR b KQkq - 0 4",
+"Test Check Checking": "rnbQ1bnr/ppp1kppp/8/4p3/7q/8/PPPP1PPP/RNBQKBNR b KQ - 0 5",
+"Test Parlett Move Interference": "r/8/8/1N3b2/3PP3/1P1BBN/8/8 w - - 0 17",
+"Test Fairy Pieces": "8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1",
+"Test Lone King": "K w KQkq - 0 1"
+};    
+// TODO: library of interesting games, in PGN format. See
+// http://www.xs4all.nl/~timkr/records/records.htm and http://www.xs4all.nl/~timkr/ChessTutor/pgnview.htm
+
 
 /* Global functions for jslint to recognize. TODO: make this in objects */
 
@@ -363,76 +428,10 @@ google.setOnLoadCallback(function() {
     init_board();
     load_notations();
 
-    //load_fen("8/8/R2k2p1/3n1bp1/1p6/1P3P1P/5KP1/8 b - - 0 36") // test vboard check checking
-    //load_fen("rnbqkbnr/ppp1p1pp/4P3/3p3Q/5p2/8/PPPP1PPP/RNB1KBNR b KQkq - 0 4"); // get out of check
-    //load_fen("rnbQ1bnr/ppp1kppp/8/4p3/7q/8/PPPP1PPP/RNBQKBNR b KQ - 0 5"); // check checking
-    //load_fen("r/8/8/1N3b2/3PP3/1P1BBN/8/8 w - - 0 17"); // test that Parlett moves are being cloned
-    //load_fen("8/8/8/5b2/3PP3/1P2B/8/8 w - - 0 17"); 
-    //load_fen("8/8/8/5b2/3PP3/1P2B/8/8 w - - 0 17"); 
-    //load_fen("8/8/8/8/3PP3/1P2B/8/8 w - - 0 17"); 
-    //load_fen("rnbqkbnr/pppppppp/9/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"); // 1. P-K4
-    //load_fen("8/8/8/3x(test)X(test)3/8/8/8/8 w - d6 0 5"); 
-    //load_fen("8/4x(test)X(test)/x(test)4X(test)/8/2x(test)1DDE/2x(test)x(test)X(test)/1X(test)X(test) w KQkq - 0 1");
-    //load_fen("8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1"); // test fairy pieces
-    //load_fen("rnbqmbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQMBNR w KQkq - 0 1");   // no royal pieces
-    //load_fen("K w KQkq - 0 1");   // one lone king, for testing valid moves
-    
-    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
-    //load_fen("bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1");    // Church Chess
-    //load_fen("rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq - 0 1"); // Advance Chess
-    //load_fen("4rbqk/4rb1q/4r1bb/5rrr/RRR5/BB1R4/Q1BR4/KQBR4 w - - 0 1");    // Corner Chess
-    //load_fen("kbp2pbq/nrp2prn/pp4pp/8/8/PP4PP/NRP2PRN/QBP2PBK w - - 0 1");  // Corner Chess II
-    //load_fen("r6r/1nbqkbn1/pppppppp/8/8/PPPPPPPP/1NBQKBN1/R6R w - - 0 1"); // Corner Rooks Skirmish
-    //load_fen("1nrqkrn1/2b2b2/1pppppp1/8/8/1PPPPPP1/2B2B2/1NRQKRN1 w - - 0 1"); // Corridor Chess
-    //load_fen("kkkkkkkk/pppppppp/8/8/8/8/PPPPPPPP/KKKKKKKK w - - 0 1");  // Eight Kings Chess
-    //load_fen("bnrqkrnb/pppppppp/8/8/8/8/PPPPPPPP/BNRQKRNB w KQkq - 0 1"); // Fianchetto Chess
-    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R1BQKBNR w KQkq - 0 1"); // Knight Odds Chess
-    //load_fen("RNBQKBNR/pppppppp/8/8/8/8/PPPPP1PP/rnbqkbnr w KQkq - 0 1"); // Pawn Odds Chess
-    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNB1KBNR w KQkq - 0 1"); // Queen Odds Chess
-    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/1NBQKBNR w KQkq - 0 1"); // Rook Odds Chess
-    //load_fen("rbbqknnr/pppppppp/8/8/8/8/PPPPPPPP/RBBQKNNR w - - 0 1"); // Mongredian Chess
-    //load_fen("RNBQKBNR/pppppppp/8/8/8/8/PPPPPPPP/rnbqkbnr w KQkq - 0 1"); // Pawn Massacre Chess
-    //load_fen("rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w KQkq - 0 1"); // Pawnless Chess
-    //load_fen("1nn1k1n1/4p3/8/8/8/8/PPPPPPPP/4K3 w - - 0 1"); // Peasant Revolt Chess
-    //load_fen("qqqqkqqq/pppppppp/8/8/8/8/PPPPPPPP/QQQQKQQQ w - - 0 1"); // Power Chess
-    //load_fen("rrbqkbrr/bbnnnnbb/pppppppp/8/8/PPPPPPPP/BBNNNNBB/RRBQKBRR w - - 0 1");    // Power Chess II
-    //load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBKQBNR w KQkq - 0 1"); // Reverso Chess
-    //load_fen("nnnnknnn/pppppppp/8/8/8/8/PPPPPPPP/NNNNKNNN w - - 0 1"); // Royal Stables Chess
-    //load_fen("nnnnknnn/pppppppp/2p2p2/1pppppp1/8/8/PPPPPPPP/RNBQKBNR w - - 0 1");// Seven Knights Chess
-    //load_fen("rbqkkqbr/pppppppp/n6n/8/8/N6N/PPPPPPPP/RBQKKQBR w - - 0 1"); // Twin Chess
-    //load_fen("nkbqqbkn/r2pp2r/pppppppp/8/8/PPPPPPPP/R2PP2R/NKBQQBKN w - - 0 1"); // Twin Chess B
-    //load_fen("RNBQKBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbqkbnr w KQkq - 0 1"); // Upside-Down Chess
-    //load_fen("4k3/5ppp/8/8/8/8/PPP5/3K4 w - - 0 1"); // Wild Chess 7 
-    //load_fen("rnbqkbnr/8/8/pppppppp/PPPPPPPP/8/8/RNBQKBNR w KQkq - 0 1"); // Wild Chess 8
-    
-    //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2");
-    //load_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
-    //load_fen("rnbqkb1r/pp1ppppp/5n2/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 3");
-    //load_fen("7K/8/k1P5/7p/8/8/8/8 w KQkq - 42 42");
-    //load_fen("r1bqkb1r/pp1ppppp/2n2n2/2p5/2B2P3/5N2/PPPP1PPP/RN1QK2R w KQkq - 1 3");
-    //load_fen("k7/8/8/8/8/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); // test draw
-    //load_fen("k7/8/K7/8/8/8/8/8 b - - 0 30"); // K against K
-    //load_fen("4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5"); // remove check by capture
-    //load_fen("k1K5/8/8/8/8/8/p/88888888 b - - 0 5"); // pawn promotion
-    //load_fen("8/8/8/3pP3/8/8/8/8 w - d6 0 5"); // en passant
-    //load_fen("rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5"); 
-    //load_fen("k7/8/8/8/8/8/8/5KQ1 w - d6 0 50");  // K + KQ
-    //load_fen("k7/8/8/8/8/8/8/5KR1 w - d6 0 50");  // K + KR
-    //load_fen("4r3/8/8/8/8/8/8/R3K2R w KQkq - 0 1"); // can't castle out of check
-    //load_fen("1k3r2/8/8/8/8/7Q/8/R3K2R w KQkq - 0 1"); // can't castle through check
-    //load_fen("1k/8/8/8/8/8/8/R3KQ1R w KQ - 0 1"); // can't castle with intervening pieces
-    //load_fen("rnbqkbnr/ppp2ppp/8/8/8/8/PPP2PPP/RNBQKBNR w KQkq - 0 1"); // to test "only move" 
-    
-    //load_fen("k7/8/8/8/8/8/3N4/6N1 w - - 0 1"); // disambiguate moves by file (Ngf3, Ndf3)
-    //load_fen("k7/8/8/6N1/8/8/8/6N1 w - - 0 1"); // disambiguate moves by rank (N5f3, N1f3)
-    //load_fen("k7/8/8/4N1N1/3N3N/8/3N3N/4N1N1 w - - 0 1"); // disambiguate both (Ne5f3, Nd4f3, Ng5f3, Nh4f3, Nh2f3, Ng1f3, Ne1f3, Nd2f3)
-    //load_fen("3Q4/6q1/2Q5/7q/1Q6/4q3/7Q/5q2 w - - 0 1"); // an eight queens solution, but with black+white queens. test disambig.
-
-    // TODO: library of interesting games, see
-    // http://www.xs4all.nl/~timkr/records/records.htm and http://www.xs4all.nl/~timkr/ChessTutor/pgnview.htm
+    load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
 
     // test PGN embedded notes
-    pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
+    //pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
     
     //pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
     
@@ -2456,6 +2455,17 @@ function init_board()
                 alert("TODO: easter egg");
             }
         };
+
+    var board_menu = $("saved_board_menu");
+
+    board_menu.appendChild(Builder.node("option", {value: ""}, "Load board..."));
+
+    for (var board_name in SAVED_BOARDS) {
+        if (SAVED_BOARDS.hasOwnProperty(board_name)) {
+            var fen = SAVED_BOARDS[board_name];
+            board_menu.appendChild(Builder.node("option", {value: fen}, board_name));
+        }
+    }
 }
 
 // Acknowledge that a piece was captured. Called by move_piece_to_square(), which
@@ -3658,6 +3668,8 @@ function enable_document_selection(enable) {
  <p><select id="output_notation" name="output_notation"></select>
 
  <p><a href="#" onclick="edit_pgn()">edit PGN</a>
+
+ <p><select id="saved_board_menu" onchange="load_fen(this.value)"></select>
  </div>
  </div>
 
