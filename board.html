@@ -2458,7 +2458,7 @@ function init_board()
 
     var board_menu = $("saved_board_menu");
 
-    board_menu.appendChild(Builder.node("option", {value: ""}, "Load board..."));
+    board_menu.appendChild(Builder.node("option", {value: "", selected: "selected"}, "Load board..."));
 
     for (var board_name in SAVED_BOARDS) {
         if (SAVED_BOARDS.hasOwnProperty(board_name)) {
