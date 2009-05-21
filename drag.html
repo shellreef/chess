@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-<meta name="viewport" content="width = 320">
+<meta name="viewport" content="width=device-width; user-scalable=no">
 <title>Drag and Drop</title>
 <style>
 .draggable { position: relative; cursor: move; }
@@ -41,6 +41,7 @@ function init_dnd()
 {
     document.onmousedown = on_down;
     document.onmouseup = on_up;
+    document.ontouchmove = on_move;
 }
 
 function on_down(event)
@@ -103,7 +104,7 @@ function on_up()
 
 </script>
 </body>
-<p><div class="draggable" style="background-color: blue; width: 50px; height: 50px"></div>
-<p><div class="draggable" style="background-color: red; width: 50px; height: 50px"></div>
-<p><div class="draggable" style="background-color: red; width: 50px; height: 50px"></div>
+<p><div class="draggable" style="background-color: blue; width: 10px; height: 10px"></div>
+<p><div class="draggable" style="background-color: red; width: 10px; height: 10px"></div>
+<p><div class="draggable" style="background-color: red; width: 10px; height: 10px"></div>
 </html>
