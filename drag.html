@@ -47,11 +47,11 @@ function on_down(event)
 {
     var target;
 
-    if (event === null) {
+    if (event === undefined) {
         event = window.event;
     }
 
-    target = event.target !== null ? event.target : srcElement;
+    target = event.target !== undefined ? event.target : event.srcElement;
 
     // Mouse position
     DRAG.start_x = event.clientX;
@@ -78,7 +78,7 @@ function on_down(event)
 
 function on_move(event)
 {
-    if (event === null) {
+    if (event === undefined) {
         event = window.event;
     }
 
