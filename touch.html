@@ -25,49 +25,12 @@
 				top: 80px;
 			}
 
-			#green, #blue, #red {
-				left: 10px;
-			}
-			#green {
-				background-color: green;
-				top: 10px;
-			}
-			#blue {
-				background-color: blue;
-				top: 90px;
-			}
-			#red {
-				background-color: red;
-				top: 170px;
-			}
-
-			#solid, #dashed, #dotted {
-				right: 10px;
-				height: 46px;
-				width: 46px;
-				border-size: 2px;
-				border-color: black;
-			}
-			#solid {
-				border-style: solid;
-				top: 10px;
-			}
-			#dashed {
-				border-style: dashed;
-				top: 90px;
-			}
-			#dotted {
-				border-style: dotted;
-				top: 170px;
-			}
 		</style>
 		<script type="text/javascript" charset="utf-8" src="http://o.aolcdn.com/dojo/1.1.1/dojo/dojo.xd.js"></script>
 		<script type="text/javascript" charset="utf-8">
 			dojo.addOnLoad(function(){
 				var nodes = [];
-				dojo.query("div").forEach(function(node){
-					nodes[node.id] = node;
-				});
+                                nodes.item = document.getElementById("item");
 
 				var dragging = false;
 
@@ -125,12 +88,5 @@
 	</head>
 	<body>
 		<div id="item"></div>
-		<div id="green"></div>
-		<div id="blue"></div>
-		<div id="red"></div>
-		<div id="solid"></div>
-		<div id="dashed"></div>
-		<div id="dotted"></div>
-		<p>Demo is for <a href="https://www.sitepen.com/blog/?p=432">this SitePen article</a></p>
 	</body>
 </html>
