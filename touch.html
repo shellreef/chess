@@ -78,9 +78,9 @@
                                         }
                                 }
 
-				dojo.connect(dojo.doc, "ontouchstart", touch);
-				dojo.query("div").connect("ontouchmove", touchmove);
-				dojo.connect(dojo.doc, "ontouchend", touchend);
+				document.ontouchstart = touch;
+				nodes.item.ontouchmove = touchmove;
+				document.ontouchend = touchend;
 			});
 		</script>
 	</head>
