@@ -40,7 +40,6 @@ init_dnd();
 function init_dnd()
 {
     document.onmousedown = on_down;
-    document.onmouseup = on_up;
     document.ontouchmove = on_move;
 }
 
@@ -48,9 +47,7 @@ function on_down(event)
 {
     var target;
 
-    if (event === undefined) {
-        event = window.event;
-    }
+    event = event || window.event;
 
     target = event.target !== undefined ? event.target : event.srcElement;
 
@@ -69,6 +66,7 @@ function on_down(event)
     // Capture mouse
     DRAG.element = target;
     document.onmousemove = on_move;
+    document.onmouseup = on_up;
 
     // Prevent text selection
     document.body.focus();
@@ -79,13 +77,31 @@ function on_down(event)
 
 function on_move(event)
 {
-    if (event === undefined) {
-        event = window.event;
+    var element, new_x, new_y;
+        
+    event = event || window.event;
+
+    if (event.touches) {
+        if (event.touches.length !== 1) {
+            // No multi-touch
+            alert(event.touches.length);
+            return;
+        }
+        var touch = event.touches[0];
+
+        element = touth.target;
+        new_x = touch.pageX;
+        new_y = touch.pageY;
+    } else {
+        element = DRAG.element;
+
+        new_x = DRAG.offset_x + event.clientX - DRAG.start_x;
+        new_y = DRAG.offset_y + event.clientY - DRAG.start_y;
     }
 
     // Drag
-    DRAG.element.style.left = (DRAG.offset_x + event.clientX - DRAG.start_x) + "px";
-    DRAG.element.style.top = (DRAG.offset_y + event.clientY - DRAG.start_y) + "px";
+    element.style.left = new_x + "px";
+    element.style.top = new_y + "px";
 }
 
 function on_up()
@@ -106,5 +122,5 @@ function on_up()
 </body>
 <p><div class="draggable" style="background-color: blue; width: 10px; height: 10px"></div>
 <p><div class="draggable" style="background-color: red; width: 10px; height: 10px"></div>
-<p><div class="draggable" style="background-color: red; width: 10px; height: 10px"></div>
+<div class="draggable" style="background-color: yellow; width: 10px; height: 10px"></div>
 </html>
