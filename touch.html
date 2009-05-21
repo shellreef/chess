@@ -1,70 +1,70 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-	"http://www.w3.org/TR/html4/loose.dtd">
+    "http://www.w3.org/TR/html4/loose.dtd">
         <!-- from http://www.sitepen.com/labs/code/iphone/events.html -->
         <!-- tinyurl.com/sp-iphone -->
 <html>
-	<head>
-		<meta name="viewport" content="width=device-width, user-scalable=no">
-		<style type="text/css" media="screen">
-			div {
-				position: absolute;
-				width: 50px;
-				height: 50px;
-			}
-			p {
-				position: absolute;
-				left: 10px;
-				bottom: 10px;
-			}
+    <head>
+        <meta name="viewport" content="width=device-width, user-scalable=no">
+        <style type="text/css" media="screen">
+            div {
+                position: absolute;
+                width: 50px;
+                height: 50px;
+            }
+            p {
+                position: absolute;
+                left: 10px;
+                bottom: 10px;
+            }
 
-			#item {
-				background-color: grey;
-				width: 150px;
-				height: 150px;
-				left: 80px;
-				top: 80px;
-			}
+            #item {
+                background-color: grey;
+                width: 150px;
+                height: 150px;
+                left: 80px;
+                top: 80px;
+            }
 
-		</style>
-		<script type="text/javascript" charset="utf-8" src="http://o.aolcdn.com/dojo/1.1.1/dojo/dojo.xd.js"></script>
-		<script type="text/javascript" charset="utf-8">
-			dojo.addOnLoad(function(){
-				var nodes = [];
+        </style>
+        <script type="text/javascript" charset="utf-8" src="http://o.aolcdn.com/dojo/1.1.1/dojo/dojo.xd.js"></script>
+        <script type="text/javascript" charset="utf-8">
+            dojo.addOnLoad(function(){
+                var nodes = [];
                                 nodes.item = document.getElementById("item");
 
-				var dragging = false;
+                var dragging = false;
 
-				function touch(e){
-					dojo.forEach(e.changedTouches, function(e){
-						var color, border;
-						var target = e.target;
+                function touch(e){
+                    dojo.forEach(e.changedTouches, function(e){
+                        var color, border;
+                        var target = e.target;
 
-						if(target == nodes.item && !dragging){
-							// Save the offset of the touch within the current note
-							dragging = [e.pageX - dojo.style(nodes.item, "left"), e.pageY - dojo.style(nodes.item, "top")];
-						}
-					});
-				}
+                        if(target == nodes.item && !dragging){
+                            // Save the offset of the touch within the current note
+                            dragging = [e.pageX - dojo.style(nodes.item, "left"), e.pageY - dojo.style(nodes.item, "top")];
+                        }
+                    });
+                }
 
-				function touchend(evt){
-					dojo.forEach(evt.changedTouches, function(e){
-						// Check to see if we've gone from a gesture back down to a touch
-						if(e.target == nodes.item){
-							if(evt.targetTouches.length == 1){
-								// If there was rotation, this number needs to be reset
-								dragging = [evt.targetTouches[0].pageX - dojo.style(nodes.item, "left"), evt.targetTouches[0].pageY - dojo.style(nodes.item, "top")];
-							}else if(!evt.targetTouches.length){
-								// Great use of e.targeTouches, since releasing on finger that's part
-								// of a gesture over this node would trigger a touchend even though
-								// it could keep going
-								dragging = false;
-							}
-						}
-					});
-				}
+                function touchend(evt){
+                    dojo.forEach(evt.changedTouches, function(e){
+                        // Check to see if we've gone from a gesture back down to a touch
+                        if(e.target == nodes.item){
+                            if(evt.targetTouches.length == 1){
+                                // If there was rotation, this number needs to be reset
+                                dragging = [evt.targetTouches[0].pageX - dojo.style(nodes.item, "left"), evt.targetTouches[0].pageY - dojo.style(nodes.item, "top")];
+                            }else if(!evt.targetTouches.length){
+                                // Great use of e.targeTouches, since releasing on finger that's part
+                                // of a gesture over this node would trigger a touchend even though
+                                // it could keep going
+                                dragging = false;
+                            }
+                        }
+                    });
+                }
 
-				function touchmove(evt){
-					evt.preventDefault();
+                function touchmove(evt){
+                    evt.preventDefault();
                                         if (evt.changedTouches.length !== 1) {
                                             // No multi-touch 
                                             return;
@@ -78,13 +78,13 @@
                                         }
                                 }
 
-				document.ontouchstart = touch;
-				nodes.item.ontouchmove = touchmove;
-				document.ontouchend = touchend;
-			});
-		</script>
-	</head>
-	<body>
-		<div id="item"></div>
-	</body>
+                document.ontouchstart = touch;
+                nodes.item.ontouchmove = touchmove;
+                document.ontouchend = touchend;
+            });
+        </script>
+    </head>
+    <body>
+        <div id="item"></div>
+    </body>
 </html>
