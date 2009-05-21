@@ -71,12 +71,10 @@
                                         }
 
                                         var e = evt.changedTouches[0];
-                                        if(dragging && e.target == nodes.item){
+                                        if (dragging && e.target == nodes.item){
                                                 // Move the node if we're in a state of dragging, but not resizing
-                                                dojo.style(nodes.item, {
-                                                        left: e.pageX - dragging[0] + "px",
-                                                        top: e.pageY - dragging[1] + "px"
-                                                });
+                                                nodes.item.style.left = e.pageX - dragging[0] + "px";
+                                                nodes.item.style.top = e.pageY - dragging[1] + "px";
                                         }
                                 }
 
