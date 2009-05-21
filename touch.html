@@ -144,35 +144,9 @@
 					});
 				}
 
-				function gesture(e){
-					var node = e.target;
-					// Save the original size (since we'll be getting a multiplier later)
-					sizing = [dojo.style(node, "width"), dojo.style(node, "height")];
-				}
-
-				function gesturechange(e){
-					if(sizing){
-						var node = e.target;
-						// Change size and rotation using the scale and rotating properties
-						dojo.style(node, {
-							width: Math.min(sizing[0] * e.scale, 300) + "px",
-							height: Math.min(sizing[1] * e.scale, 300) + "px",
-							webkitTransform: "rotate(" + ((rotating + e.rotation) % 360) + "deg)"
-						});
-					}
-				}
-
-				function gestureend(e){
-					sizing = false;
-					rotating = (rotating + e.rotation) % 360;
-				}
-
 				dojo.connect(dojo.doc, "ontouchstart", touch);
 				dojo.query("div").connect("ontouchmove", touchmove);
 				dojo.connect(dojo.doc, "ontouchend", touchend);
-				dojo.connect(nodes.item, "ongesturestart", gesture);
-				dojo.connect(nodes.item, "ongesturechange", gesturechange);
-				dojo.connect(nodes.item, "ongestureend", gestureend);
 			});
 		</script>
 	</head>
