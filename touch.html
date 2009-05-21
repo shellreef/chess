@@ -70,29 +70,15 @@
 				});
 
 				var dragging = false;
-				var sizing = false;
-				var rotating = 0;
 
 				function touch(e){
 					dojo.forEach(e.changedTouches, function(e){
 						var color, border;
 						var target = e.target;
-						if(target == nodes.green || target == nodes.blue || target == nodes.red){
-							// Change the color based on whatever's been changed in the touch start
-							color = target.id;
-						}else if(target == nodes.solid || target == nodes.dashed || target == nodes.dotted){
-							// Change the border based on whatever's been changed in the touch start
-							border = target.id;
-						}else if(target == nodes.item && !dragging){
+
+						if(target == nodes.item && !dragging){
 							// Save the offset of the touch within the current note
 							dragging = [e.pageX - dojo.style(nodes.item, "left"), e.pageY - dojo.style(nodes.item, "top")];
-						}
-
-						if(color){
-							dojo.style(nodes.item, "backgroundColor", color);
-						}else if(border){
-							dojo.style(nodes.item, "border", "3px " + border + " black");
-							dojo.style(nodes.item, "border"); // Random Safari bug where I have to read style for it to "take"
 						}
 					});
 				}
@@ -112,23 +98,6 @@
 							}
 						}
 					});
-
-					var color = "grey", border = "none";
-					dojo.forEach(evt.touches, function(e){
-						// If when a finger is removed, if there's another finger down
-						// then we'll use that value to override the defaults
-						var target = e.target;
-						if(target == nodes.green || target == nodes.blue || target == nodes.red){
-							color = target.id;
-						}else if(target == nodes.solid || target == nodes.dashed || target == nodes.dotted){
-							border = target.id;
-						}
-					});
-
-					dojo.style(nodes.item, {
-						backgroundColor: color,
-						border: "3px " + border + " black"
-					});
 				}
 
 				function touchmove(evt){
@@ -139,7 +108,7 @@
                                         }
 
                                         var e = evt.changedTouches[0];
-                                        if(dragging && !sizing && e.target == nodes.item){
+                                        if(dragging && e.target == nodes.item){
                                                 // Move the node if we're in a state of dragging, but not resizing
                                                 dojo.style(nodes.item, {
                                                         left: e.pageX - dragging[0] + "px",
