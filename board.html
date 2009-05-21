@@ -1683,6 +1683,11 @@ function filtered_moves(piece, color, is_hypothetical)
         if (capture_piece) {
             blocked[rel_x + "," + rel_y] = true;
 
+            // TODO: get this working
+            /*if (flags.if_blocked_skip) {
+                i += flags.if_blocked_skip;
+            }*/
+
             // Can't move to self-occupied square
             if (capture_piece.color === color) {
                 continue;
@@ -2135,7 +2140,9 @@ function relative_decode_parlett(parlett)
             prev_rel_x = null;
             prev_rel_y = null;
 
-            for (var j = 1; j < Math.max(RANK_MAX, FILE_MAX); j += 1) {
+            var max = Math.max(RANK_MAX, FILE_MAX);
+
+            for (var j = 1; j < max; j += 1) {
                 var these_flags = {};
 
                 // Riders get blocked. Note that you can have a non-hippogonal leaper.
@@ -2145,6 +2152,9 @@ function relative_decode_parlett(parlett)
                     // TODO: skip all remaining in this group, instead of chaining
                     these_flags.if_unblocked_dx = prev_rel_x;
                     these_flags.if_unblocked_dy = prev_rel_y;
+
+                    // TODO: give an accurate count
+                    //these_flags.if_blocked_skip = max - j;
                 } 
 
                 rel_x += dir[0];
