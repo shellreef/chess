@@ -133,16 +133,20 @@
 
 				function touchmove(evt){
 					evt.preventDefault();
-					dojo.forEach(evt.changedTouches, function(e){
-						if(dragging && !sizing && e.target == nodes.item){
-							// Move the node if we're in a state of dragging, but not resizing
-							dojo.style(nodes.item, {
-								left: e.pageX - dragging[0] + "px",
-								top: e.pageY - dragging[1] + "px"
-							});
-						}
-					});
-				}
+                                        if (evt.changedTouches.length !== 1) {
+                                            // No multi-touch 
+                                            return;
+                                        }
+
+                                        var e = evt.changedTouches[0];
+                                        if(dragging && !sizing && e.target == nodes.item){
+                                                // Move the node if we're in a state of dragging, but not resizing
+                                                dojo.style(nodes.item, {
+                                                        left: e.pageX - dragging[0] + "px",
+                                                        top: e.pageY - dragging[1] + "px"
+                                                });
+                                        }
+                                }
 
 				dojo.connect(dojo.doc, "ontouchstart", touch);
 				dojo.query("div").connect("ontouchmove", touchmove);
