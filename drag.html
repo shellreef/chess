@@ -120,61 +120,61 @@ function on_up()
 }
 
 
-            dojo.addOnLoad(function(){
-                var nodes = {item: document.getElementById("item")};
+dojo.addOnLoad(function(){
+    var nodes = {item: document.getElementById("item")};
 
-                var dragging = false;
+    var dragging = false;
 
-                function touch(evt){
-                    for (var i = 0; i < evt.changedTouches.length; ++i) {
-                        var e = evt.changedTouches[i]; 
+    function touch(evt){
+        for (var i = 0; i < evt.changedTouches.length; ++i) {
+            var e = evt.changedTouches[i]; 
 
-                        var color, border;
-                        var target = e.target;
+            var color, border;
+            var target = e.target;
 
-                        if(target == nodes.item && !dragging){
-                            // Save the offset of the touch within the current note
-                            dragging = [e.pageX - dojo.style(nodes.item, "left"), e.pageY - dojo.style(nodes.item, "top")];
-                        }
-                    }
+            if(target == nodes.item && !dragging){
+                // Save the offset of the touch within the current note
+                dragging = [e.pageX - dojo.style(nodes.item, "left"), e.pageY - dojo.style(nodes.item, "top")];
+            }
+        }
+    }
+
+    function touchend(evt){
+        for (var i = 0; i < evt.changedTouches.length; ++i) {
+            var e = evt.changedTouches[i];
+
+            // Check to see if we've gone from a gesture back down to a touch
+            if(e.target == nodes.item){
+                if(evt.targetTouches.length == 1){
+                    // If there was rotation, this number needs to be reset
+                    dragging = [evt.targetTouches[0].pageX - dojo.style(nodes.item, "left"), evt.targetTouches[0].pageY - dojo.style(nodes.item, "top")];
+                }else if(!evt.targetTouches.length){
+                    // Great use of e.targeTouches, since releasing on finger that's part
+                    // of a gesture over this node would trigger a touchend even though
+                    // it could keep going
+                    dragging = false;
                 }
+            }
+        }
+    }
 
-                function touchend(evt){
-                    for (var i = 0; i < evt.changedTouches.length; ++i) {
-                        var e = evt.changedTouches[i];
+    function touchmove(evt){
+        evt.preventDefault();
+        for (var i = 0; i < evt.changedTouches.length; ++i) {
+            var e = evt.changedTouches[i];
 
-                        // Check to see if we've gone from a gesture back down to a touch
-                        if(e.target == nodes.item){
-                            if(evt.targetTouches.length == 1){
-                                // If there was rotation, this number needs to be reset
-                                dragging = [evt.targetTouches[0].pageX - dojo.style(nodes.item, "left"), evt.targetTouches[0].pageY - dojo.style(nodes.item, "top")];
-                            }else if(!evt.targetTouches.length){
-                                // Great use of e.targeTouches, since releasing on finger that's part
-                                // of a gesture over this node would trigger a touchend even though
-                                // it could keep going
-                                dragging = false;
-                            }
-                        }
-                    }
-                }
+            if (dragging && e.target == nodes.item){
+                    // Move the node if we're in a state of dragging, but not resizing
+                    nodes.item.style.left = e.pageX - dragging[0] + "px";
+                    nodes.item.style.top = e.pageY - dragging[1] + "px";
+            }
+        }
+    };
 
-                function touchmove(evt){
-                    evt.preventDefault();
-                    for (var i = 0; i < evt.changedTouches.length; ++i) {
-                        var e = evt.changedTouches[i];
-
-                        if (dragging && e.target == nodes.item){
-                                // Move the node if we're in a state of dragging, but not resizing
-                                nodes.item.style.left = e.pageX - dragging[0] + "px";
-                                nodes.item.style.top = e.pageY - dragging[1] + "px";
-                        }
-                    }
-                };
-
-                document.ontouchstart = touch;
-                nodes.item.ontouchmove = touchmove;
-                document.ontouchend = touchend;
-            });
+    document.ontouchstart = touch;
+    nodes.item.ontouchmove = touchmove;
+    document.ontouchend = touchend;
+});
 </script>
 </body>
 <p><div class="draggable" style="background-color: blue; width: 10px; height: 10px; top: 0px; left: 0px"></div>
