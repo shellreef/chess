@@ -275,7 +275,7 @@ var PIECE_TYPES = {
     amazon: {parlett: "n*, ~1/2", letter: "XV"},     
 
     maharajah: {parlett: "n*, ~1/2", letter: "XJ", royal: true},   // Q+N+K, Maharajah chess
-    royal_knight: {parlett: "~1/2", letter: "XR", royal: true},  // Knightmate chess (for king, use a man)
+    royal_knight: {parlett: "~1/2", letter: "XR", royal: true, image:"knight"},  // Knightmate chess TODO: crown on knight
     royal_queen: {parlet: "n*", royal: true},               // queen but can't be captured
     dragon: {parlett: "o1>, P, c1X>, oi2>eE, oi1>e, ~1/2"}, // pawn + knight
 
@@ -304,7 +304,7 @@ var PIECE_TYPES = {
     colonel: {parlett: "n>, n=, 2/1>, 1*", letter: "XC"}, 
     murray_lion: {parlett: "~0/2, ~2/2, c1*", letter: "XM"},
     lion: {parlett: "~n*", letter: "XL"},
-    berolina_pawn: {parlett: "o1X>, c1>, io2X>", letter: "XB"},
+    berolina_pawn: {parlett: "o1X>, c1>, io2X>", letter: "XB", image:"berolinapawn"},
     superpawn: {parlett: "on>, cnX>", letter: "XP"},
     elephant: {parlett: "2X", letter: "E"},         // Not a leaper, path can be blocked (unlike alfil, ~2X)
     khohn: {parlett: "1X, 1>", letter: "XK"},
@@ -350,17 +350,25 @@ SAVED_BOARDS = {
 // http://www.pathguy.com/chess/ChessVar.htm
 // http://www.chessclub.com/helpcenter/tips/wild.html
 "International Western Chess": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-"Church Chess":         "bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1",
 "Advance Chess":        "rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq - 0 1",
+"Amazon Chess":         "rnbxvkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBXVKBNR w KQkq - 0 1",
+"Berolina Chess": "rnbqkbnr/xbxbxbxbxbxbxbxb/8/8/8/8/XBXBXBXBXBXBXBXB/RNBQKBNR w KQkq - 0 1",
+"Church Chess":         "bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1",
 "Corner Chess":         "4rbqk/4rb1q/4r1bb/5rrr/RRR5/BB1R4/Q1BR4/KQBR4 w - - 0 1",
 "Corner Chess II":      "kbp2pbq/nrp2prn/pp4pp/8/8/PP4PP/NRP2PRN/QBP2PBK w - - 0 1",
 "Corridor Chess":       "1nrqkrn1/2b2b2/1pppppp1/8/8/1PPPPPP1/2B2B2/1NRQKRN1 w - - 0 1",
 "Eight Kings Chess":    "kkkkkkkk/pppppppp/8/8/8/8/PPPPPPPP/KKKKKKKK w - - 0 1",
 "Fianchetto Chess":     "bnrqkrnb/pppppppp/8/8/8/8/PPPPPPPP/BNRQKRNB w KQkq - 0 1",
+"Fortress Chess":       "rnbqkbnr/pppppppp/ppp4/8/8/5PPP/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+// TODO: White wins if captures all black's pieces
+"Horde Chess":          "ppp2ppp/pppppppp/pppppppp/pppppppp/3pp3/8/PPPPPPPP/RNBQKBNR w KQ - 0 1",
 "Knight Odds Chess":   "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R1BQKBNR w KQkq - 0 1",
+"Knightmate Chess":    "rmbqxrbmr/pppppppp/8/8/8/8/PPPPPPPP/RMBQXRBMR w KQkq - 0 1",
 "Pawn Odds Chess":     "RNBQKBNR/pppppppp/8/8/8/8/PPPPP1PP/rnbqkbnr w KQkq - 0 1",
 "Queen Odds Chess":    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNB1KBNR w KQkq - 0 1",
 "Rook Odds Chess":     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/1NBQKBNR w KQkq - 0 1",
+// TODO: No black pawn promotion
+"Maharajah Chess":     "rnbqkbnr/pppppppp/8/8/8/8/8/4XJ3 w kq - 0 1",
 "Mongredian Chess":    "rbbqknnr/pppppppp/8/8/8/8/PPPPPPPP/RBBQKNNR w - - 0 1",
 "Pawn Massacre Chess": "RNBQKBNR/pppppppp/8/8/8/8/PPPPPPPP/rnbqkbnr w KQkq - 0 1",
 "Pawnless Chess":      "rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w KQkq - 0 1",
@@ -383,7 +391,7 @@ SAVED_BOARDS = {
 // 3. Stalemating your opponent wins
 // 4. Taking the last piece of your opponent wins, unless your opponent
 //    can take your last non-king piece too, in which case the game is drawn
-//"Semi-Shatranj":        "rnykxfynr/pppppppp/8/8/8/8/PPPPPPPP/RNYKXFYNR w - 0 1",
+//"Not Quite Shatranj":        "rnykxfynr/pppppppp/8/8/8/8/PPPPPPPP/RNYKXFYNR w - 0 1",
 
 // Openings
 // TODO: invert hash, and automatically lookup and display known chess openings w/ ECO code and name? 
@@ -436,7 +444,7 @@ google.setOnLoadCallback(function() {
     load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
 
     // test PGN embedded notes
-    pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
+    //pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
     
     //pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
     
@@ -1574,7 +1582,7 @@ function piece_moved(piece)
         return false;
     }
 
-    assert(piece.type === "pawn", "piece_moved(" + piece + "): can only tell if pawns moved, not " + piece.type);
+    assert(piece.type === "pawn" || piece.type === "berolina_pawn", "piece_moved(" + piece + "): can only tell if pawns moved, not " + piece.type);
 
     var square = piece.square;
 
@@ -2313,7 +2321,6 @@ function set_turn(color, historical, virtual)
 
 function set_check_message(msg)
 {
-    return;
     $("check").innerHTML = msg;
     if (msg) {
         $("dash").show();
@@ -3651,7 +3658,7 @@ function enable_document_selection(enable) {
  <!-- TODO: disclosure triangles -->
  <p><a href="#" onclick="javascript:new Effect.toggle('controls', 'slide', { duration: 0.1 })">advanced</a>
  
- <div id="controls" style="display: none; border-left: 2px solid blue">
+ <div id="controls" style="display: visible; border-left: 2px solid blue">
  <div>
 
  <p><select id="make_move_menu" onchange="make_move_by_menu(this)"></select>
