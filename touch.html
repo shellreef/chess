@@ -29,13 +29,14 @@
         <script type="text/javascript" charset="utf-8" src="http://o.aolcdn.com/dojo/1.1.1/dojo/dojo.xd.js"></script>
         <script type="text/javascript" charset="utf-8">
             dojo.addOnLoad(function(){
-                var nodes = [];
-                                nodes.item = document.getElementById("item");
+                var nodes = {item: document.getElementById("item")};
 
                 var dragging = false;
 
-                function touch(e){
-                    dojo.forEach(e.changedTouches, function(e){
+                function touch(evt){
+                    for (var i = 0; i < evt.changedTouches.length; ++i) {
+                        var e = evt.changedTouches[i]; 
+
                         var color, border;
                         var target = e.target;
 
@@ -43,11 +44,13 @@
                             // Save the offset of the touch within the current note
                             dragging = [e.pageX - dojo.style(nodes.item, "left"), e.pageY - dojo.style(nodes.item, "top")];
                         }
-                    });
+                    }
                 }
 
                 function touchend(evt){
-                    dojo.forEach(evt.changedTouches, function(e){
+                    for (var i = 0; i < evt.changedTouches.length; ++i) {
+                        var e = evt.changedTouches[i];
+
                         // Check to see if we've gone from a gesture back down to a touch
                         if(e.target == nodes.item){
                             if(evt.targetTouches.length == 1){
@@ -60,23 +63,21 @@
                                 dragging = false;
                             }
                         }
-                    });
+                    }
                 }
 
                 function touchmove(evt){
                     evt.preventDefault();
-                                        if (evt.changedTouches.length !== 1) {
-                                            // No multi-touch 
-                                            return;
-                                        }
+                    for (var i = 0; i < evt.changedTouches.length; ++i) {
+                        var e = evt.changedTouches[i];
 
-                                        var e = evt.changedTouches[0];
-                                        if (dragging && e.target == nodes.item){
-                                                // Move the node if we're in a state of dragging, but not resizing
-                                                nodes.item.style.left = e.pageX - dragging[0] + "px";
-                                                nodes.item.style.top = e.pageY - dragging[1] + "px";
-                                        }
-                                }
+                        if (dragging && e.target == nodes.item){
+                                // Move the node if we're in a state of dragging, but not resizing
+                                nodes.item.style.left = e.pageX - dragging[0] + "px";
+                                nodes.item.style.top = e.pageY - dragging[1] + "px";
+                        }
+                    }
+                };
 
                 document.ontouchstart = touch;
                 nodes.item.ontouchmove = touchmove;
