@@ -80,7 +80,7 @@ dojo.addOnLoad(function(){
         element = DRAG.element;
 
         // Must have draggable class
-        if (element.className.indexOf("draggable") == -1) {
+        if (element.className.indexOf("draggable") === -1) {
             return;
         }
 
@@ -116,9 +116,9 @@ dojo.addOnLoad(function(){
             var color, border;
             var target = e.target;
 
-            if(target == nodes.item && !DRAG.ing){
+            if (target.className.indexOf("draggable") !== -1 && !DRAG.ing) {
                 // Save the offset of the touch within the current note
-                DRAG.ing = [e.pageX - dojo.style(nodes.item, "left"), e.pageY - dojo.style(nodes.item, "top")];
+                DRAG.ing = [e.pageX - dojo.style(target, "left"), e.pageY - dojo.style(target, "top")];
             }
         }
     }
@@ -128,11 +128,11 @@ dojo.addOnLoad(function(){
             var e = evt.changedTouches[i];
 
             // Check to see if we've gone from a gesture back down to a touch
-            if(e.target == nodes.item){
-                if(evt.targetTouches.length == 1){
+            if (e.target == nodes.item) {
+                if (evt.targetTouches.length == 1) {
                     // If there was rotation, this number needs to be reset
                     DRAG.ing = [evt.targetTouches[0].pageX - dojo.style(nodes.item, "left"), evt.targetTouches[0].pageY - dojo.style(nodes.item, "top")];
-                }else if(!evt.targetTouches.length){
+                } else if(!evt.targetTouches.length) {
                     // Great use of e.targeTouches, since releasing on finger that's part
                     // of a gesture over this node would trigger a touchend even though
                     // it could keep going
@@ -147,7 +147,7 @@ dojo.addOnLoad(function(){
         for (var i = 0; i < evt.changedTouches.length; ++i) {
             var e = evt.changedTouches[i];
 
-            if (DRAG.ing && e.target == nodes.item){
+            if (DRAG.ing && e.target == nodes.item) {
                     // Move the node if we're in a state of dragging, but not resizing
                     nodes.item.style.left = e.pageX - DRAG.ing[0] + "px";
                     nodes.item.style.top = e.pageY - DRAG.ing[1] + "px";
