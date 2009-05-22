@@ -27,98 +27,87 @@
  * http://www.sitepen.com/labs/code/iphone/events.html
  */
 
-var DRAG = 
-{
-    start_x: 0,
-    start_y: 0,
-    offset_x: 0,
-    offset_y: 0,
-    element: null,
-    old_zindex: 0
-};
-
-init_dnd();
-
-function init_dnd()
-{
-    document.onmousedown = on_down;
-    document.ontouchmove = on_move;
-}
-
-function on_down(event)
-{
-    var target;
-
-    event = event || window.event;
-
-    target = event.target !== undefined ? event.target : event.srcElement;
-
-    DRAG.initial_x = event.clientX;
-    DRAG.initial_y = event.clientY;
-
-    DRAG.start_x = target.offsetLeft;
-    DRAG.start_y = target.offsetTop;
-
-    // Bring to front
-    DRAG.old_zindex = target.style.zIndex;
-    target.style.zIndex = 10000;
-
-    // Capture mouse
-    DRAG.element = target;
-    document.onmousemove = on_move;
-    document.onmouseup = on_up;
-
-    // Prevent text selection
-    document.body.focus();
-    document.onselectstart = function() { return false; };
-    target.ondragstart = function() { return false; };
-    return false;
-}
-
-function on_move(event)
-{
-    var element, new_x, new_y;
-        
-    event = event || window.event;
-
-    element = DRAG.element;
-
-    // Must have draggable class
-    if (element.className.indexOf("draggable") == -1) {
-        return;
-    }
-
-    //new_x = DRAG.offset_x + event.clientX - DRAG.start_x;
-    //new_y = DRAG.offset_y + event.clientY - DRAG.start_y;
-    new_x = event.clientX - DRAG.initial_x + DRAG.start_x;
-    new_y = event.clientY - DRAG.initial_y + DRAG.start_y;
-
-    // Drag
-    element.style.left = new_x + "px";
-    element.style.top = new_y + "px";
-
-    return false;
-}
-
-function on_up()
-{
-    if (DRAG.element === null) {
-        return;
-    }
-
-    DRAG.element.style.zIndex = DRAG.old_zindex;
-    document.onmousemove = null;
-    document.onselectstart = null;
-    DRAG.element.ondragstart = null;
-
-    DRAG.element = null;
-}
-
 
 dojo.addOnLoad(function(){
     var nodes = {item: document.getElementById("item")};
+    var DRAG = 
+    {
+        start_x: 0,
+        start_y: 0,
+        offset_x: 0,
+        offset_y: 0,
+        element: null,
+        old_zindex: 0,
+        ing: false  
+    };
 
-    var dragging = false;
+    function on_down(event)
+    {
+        var target;
+
+        event = event || window.event;
+
+        target = event.target !== undefined ? event.target : event.srcElement;
+
+        DRAG.initial_x = event.clientX;
+        DRAG.initial_y = event.clientY;
+
+        DRAG.start_x = target.offsetLeft;
+        DRAG.start_y = target.offsetTop;
+
+        // Bring to front
+        DRAG.old_zindex = target.style.zIndex;
+        target.style.zIndex = 10000;
+
+        // Capture mouse
+        DRAG.element = target;
+        document.onmousemove = on_move;
+        document.onmouseup = on_up;
+
+        // Prevent text selection
+        document.body.focus();
+        document.onselectstart = function() { return false; };
+        target.ondragstart = function() { return false; };
+        return false;
+    }
+
+    function on_move(event)
+    {
+        var element, new_x, new_y;
+            
+        event = event || window.event;
+
+        element = DRAG.element;
+
+        // Must have draggable class
+        if (element.className.indexOf("draggable") == -1) {
+            return;
+        }
+
+        new_x = event.clientX - DRAG.initial_x + DRAG.start_x;
+        new_y = event.clientY - DRAG.initial_y + DRAG.start_y;
+
+        // Drag
+        element.style.left = new_x + "px";
+        element.style.top = new_y + "px";
+
+        return false;
+    }
+
+    function on_up()
+    {
+        if (DRAG.element === null) {
+            return;
+        }
+
+        DRAG.element.style.zIndex = DRAG.old_zindex;
+        document.onmousemove = null;
+        document.onselectstart = null;
+        DRAG.element.ondragstart = null;
+
+        DRAG.element = null;
+    }
+
 
     function touch(evt){
         for (var i = 0; i < evt.changedTouches.length; ++i) {
@@ -127,9 +116,9 @@ dojo.addOnLoad(function(){
             var color, border;
             var target = e.target;
 
-            if(target == nodes.item && !dragging){
+            if(target == nodes.item && !DRAG.ing){
                 // Save the offset of the touch within the current note
-                dragging = [e.pageX - dojo.style(nodes.item, "left"), e.pageY - dojo.style(nodes.item, "top")];
+                DRAG.ing = [e.pageX - dojo.style(nodes.item, "left"), e.pageY - dojo.style(nodes.item, "top")];
             }
         }
     }
@@ -142,12 +131,12 @@ dojo.addOnLoad(function(){
             if(e.target == nodes.item){
                 if(evt.targetTouches.length == 1){
                     // If there was rotation, this number needs to be reset
-                    dragging = [evt.targetTouches[0].pageX - dojo.style(nodes.item, "left"), evt.targetTouches[0].pageY - dojo.style(nodes.item, "top")];
+                    DRAG.ing = [evt.targetTouches[0].pageX - dojo.style(nodes.item, "left"), evt.targetTouches[0].pageY - dojo.style(nodes.item, "top")];
                 }else if(!evt.targetTouches.length){
                     // Great use of e.targeTouches, since releasing on finger that's part
                     // of a gesture over this node would trigger a touchend even though
                     // it could keep going
-                    dragging = false;
+                    DRAG.ing = false;
                 }
             }
         }
@@ -158,13 +147,16 @@ dojo.addOnLoad(function(){
         for (var i = 0; i < evt.changedTouches.length; ++i) {
             var e = evt.changedTouches[i];
 
-            if (dragging && e.target == nodes.item){
+            if (DRAG.ing && e.target == nodes.item){
                     // Move the node if we're in a state of dragging, but not resizing
-                    nodes.item.style.left = e.pageX - dragging[0] + "px";
-                    nodes.item.style.top = e.pageY - dragging[1] + "px";
+                    nodes.item.style.left = e.pageX - DRAG.ing[0] + "px";
+                    nodes.item.style.top = e.pageY - DRAG.ing[1] + "px";
             }
         }
     };
+
+    document.onmousedown = on_down;
+    document.ontouchmove = on_move;
 
     document.ontouchstart = touch;
     nodes.item.ontouchmove = touchmove;
@@ -182,6 +174,6 @@ dojo.addOnLoad(function(){
     left: 40px;
     top: 40px;"
 id="item"></div>
-<div class="draggable" style="background-color: black; width: 10px; height: 10px; left: 20px; position: absolute"></div>
+<div style="background-color: black; width: 10px; height: 10px; left: 20px; position: absolute"></div>
 </body>
 </html>
