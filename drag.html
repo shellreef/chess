@@ -41,7 +41,7 @@ dojo.addOnLoad(function(){
         ing: false  
     };
 
-    function on_down(event)
+    function mousedown(event)
     {
         var target;
 
@@ -61,8 +61,8 @@ dojo.addOnLoad(function(){
 
         // Capture mouse
         DRAG.element = target;
-        document.onmousemove = on_move;
-        document.onmouseup = on_up;
+        document.onmousemove = mousemove;
+        document.onmouseup = mouseup;
 
         // Prevent text selection
         document.body.focus();
@@ -71,7 +71,7 @@ dojo.addOnLoad(function(){
         return false;
     }
 
-    function on_move(event)
+    function mousemove(event)
     {
         var element, new_x, new_y;
             
@@ -94,7 +94,7 @@ dojo.addOnLoad(function(){
         return false;
     }
 
-    function on_up()
+    function mouseup()
     {
         if (DRAG.element === null) {
             return;
@@ -155,8 +155,8 @@ dojo.addOnLoad(function(){
         }
     };
 
-    document.onmousedown = on_down;
-    document.ontouchmove = on_move;
+    document.onmousedown = mousedown;
+    document.ontouchmove = mousemove;
 
     document.ontouchstart = touch;
     nodes.item.ontouchmove = touchmove;
