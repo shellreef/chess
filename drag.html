@@ -128,10 +128,10 @@ dojo.addOnLoad(function(){
             var e = evt.changedTouches[i];
 
             // Check to see if we've gone from a gesture back down to a touch
-            if (e.target == nodes.item) {
+            if (e.target.className.indexOf("draggable") !== -1) {
                 if (evt.targetTouches.length == 1) {
                     // If there was rotation, this number needs to be reset
-                    DRAG.ing = [evt.targetTouches[0].pageX - dojo.style(nodes.item, "left"), evt.targetTouches[0].pageY - dojo.style(nodes.item, "top")];
+                    DRAG.ing = [evt.targetTouches[0].pageX - dojo.style(e.target, "left"), evt.targetTouches[0].pageY - dojo.style(e.target, "top")];
                 } else if(!evt.targetTouches.length) {
                     // Great use of e.targeTouches, since releasing on finger that's part
                     // of a gesture over this node would trigger a touchend even though
@@ -147,10 +147,10 @@ dojo.addOnLoad(function(){
         for (var i = 0; i < evt.changedTouches.length; ++i) {
             var e = evt.changedTouches[i];
 
-            if (DRAG.ing && e.target == nodes.item) {
+            if (DRAG.ing && e.target.className.indexOf("draggable") !== -1) {
                     // Move the node if we're in a state of dragging, but not resizing
-                    nodes.item.style.left = e.pageX - DRAG.ing[0] + "px";
-                    nodes.item.style.top = e.pageY - DRAG.ing[1] + "px";
+                    e.target.style.left = e.pageX - DRAG.ing[0] + "px";
+                    e.target.style.top = e.pageY - DRAG.ing[1] + "px";
             }
         }
     };
