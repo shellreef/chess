@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width; user-scalable=no">
 <title>Drag and Drop</title>
 <style>
-.draggable { position: relative; cursor: move; }
+.draggable { position: absolute; cursor: move; }
 
 #item {
     position: absolute;
@@ -63,13 +63,11 @@ function on_down(event)
 
     target = event.target !== undefined ? event.target : event.srcElement;
 
-    // Mouse position
-    DRAG.start_x = event.clientX;
-    DRAG.start_y = event.clientY;
+    DRAG.initial_x = event.clientX;
+    DRAG.initial_y = event.clientY;
 
-    // Clicked element's position
-    DRAG.offset_x = parseInt(target.style.left) || 0;
-    DRAG.offset_y = parseInt(target.style.top) || 0;
+    DRAG.start_x = target.offsetLeft;
+    DRAG.start_y = target.offsetTop;
 
     // Bring to front
     DRAG.old_zindex = target.style.zIndex;
@@ -93,23 +91,12 @@ function on_move(event)
         
     event = event || window.event;
 
-    if (event.touches) {
-        if (event.touches.length !== 1) {
-            // No multi-touch
-            alert(event.touches.length);
-            return;
-        }
-        var touch = event.touches[0];
+    element = DRAG.element;
 
-        element = touth.target;
-        new_x = touch.pageX;
-        new_y = touch.pageY;
-    } else {
-        element = DRAG.element;
-
-        new_x = DRAG.offset_x + event.clientX - DRAG.start_x;
-        new_y = DRAG.offset_y + event.clientY - DRAG.start_y;
-    }
+    //new_x = DRAG.offset_x + event.clientX - DRAG.start_x;
+    //new_y = DRAG.offset_y + event.clientY - DRAG.start_y;
+    new_x = event.clientX - DRAG.initial_x + DRAG.start_x;
+    new_y = event.clientY - DRAG.initial_y + DRAG.start_y;
 
     // Drag
     element.style.left = new_x + "px";
@@ -190,8 +177,8 @@ function on_up()
             });
 </script>
 </body>
-<p><div class="draggable" style="background-color: blue; width: 10px; height: 10px"></div>
-<p><div class="draggable" style="background-color: red; width: 10px; height: 10px"></div>
+<p><div class="draggable" style="background-color: blue; width: 10px; height: 10px; top: 0px; left: 0px"></div>
+<p><div class="draggable" style="background-color: red; width: 10px; height: 10px; top: 0px; left: 20px"></div>
 <div class="draggable" style="background-color: yellow; width: 10px; height: 10px"></div>
 <div id="item"></div>
 </html>
