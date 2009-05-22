@@ -142,7 +142,7 @@ dojo.addOnLoad(function(){
         }
     }
 
-    function touchmove(evt){
+    function touchmove(evt) {
         evt.preventDefault();
         for (var i = 0; i < evt.changedTouches.length; ++i) {
             var e = evt.changedTouches[i];
@@ -153,27 +153,27 @@ dojo.addOnLoad(function(){
                     e.target.style.top = e.pageY - DRAG.ing[1] + "px";
             }
         }
-    };
+    }
 
-    document.onmousedown = mousedown;
-    document.ontouchmove = mousemove;
+    function init_dnd() {
+        document.onmousedown = mousedown;
+        document.ontouchmove = mousemove;
 
-    document.ontouchstart = touch;
-    nodes.item.ontouchmove = touchmove;
-    document.ontouchend = touchend;
+        document.ontouchstart = touch;
+        dojo.query(".draggable").forEach(function(e) {
+                e.ontouchmove = touchmove;
+            });
+        document.ontouchend = touchend;
+    }
+
+    init_dnd();
 });
 </script>
 </body>
-<p><div class="draggable" style="background-color: blue; width: 10px; height: 10px; top: 0px; left: 0px"></div>
-<p><div class="draggable" style="background-color: red; width: 10px; height: 10px; top: 0px; left: 20px"></div>
-<div class="draggable" style="background-color: yellow; width: 10px; height: 10px"></div>
-<div class="draggable" 
-    style="background-color: grey;
-    width: 15px;
-    height: 15px;
-    left: 40px;
-    top: 40px;"
-id="item"></div>
-<div style="background-color: black; width: 10px; height: 10px; left: 20px; position: absolute"></div>
+<p><div class="draggable" style="background-color: blue; width: 10px; height: 10px; top: 0px; left: 0px;"></div>
+<p><div class="draggable" style="background-color: red; width: 10px; height: 10px; top: 0px; left: 20px;"></div>
+<div class="draggable" style="background-color: yellow; width: 10px; height: 10px; top: 20px; left: 0px;"></div>
+<div class="draggable" style="background-color: grey; width: 15px; height: 15px; left: 40px; top: 40px;" id="item"></div>
+<div style="background-color: black; width: 10px; height: 10px; left: 20px; position: absolute;"></div> <!-- not draggable -->
 </body>
 </html>
