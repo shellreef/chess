@@ -93,6 +93,11 @@ function on_move(event)
 
     element = DRAG.element;
 
+    // Must have draggable class
+    if (element.className.indexOf("draggable") == -1) {
+        return;
+    }
+
     //new_x = DRAG.offset_x + event.clientX - DRAG.start_x;
     //new_y = DRAG.offset_y + event.clientY - DRAG.start_y;
     new_x = event.clientX - DRAG.initial_x + DRAG.start_x;
@@ -181,4 +186,6 @@ dojo.addOnLoad(function(){
 <p><div class="draggable" style="background-color: red; width: 10px; height: 10px; top: 0px; left: 20px"></div>
 <div class="draggable" style="background-color: yellow; width: 10px; height: 10px"></div>
 <div id="item"></div>
+<div style="background-color: black; width: 10px; height: 10px; left: 20px; position: absolute"></div>
+</body>
 </html>
