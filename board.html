@@ -2442,9 +2442,9 @@ function init_board()
             square.x = x;
             square.y = y;
             square.filerank = xy2filerank(x, y);
-            // MSIE doesn't allow Prototype to extend Element properly, can't use it here
-            //square.color = square.hasClassName("white") ? "white" : "black";
-            square.color = square.className.indexOf("white") !== -1 ? "white" : "black";
+            // Store the square color here once, so can always lookup .color, 
+            // never have to check the white/black class name again.
+            square.color = dojo.hasClass(square, "white") ? "white" : "black";
 
             square.descriptive = {};
             square.descriptive.white = xy2descriptive("white", [x, y]);
@@ -3227,8 +3227,11 @@ function create_piece(color, type)
 
 
     // CSS classes, can use with $$ and also shown in toString (useful 
-    // for debugging), however, note that Prototype hasClassName/addClassName
-    // are slow! because they use RegExp to parse the space-joined class list.
+    // for debugging), however, note that code should not use this, because
+    // all the classes are in a space-separated string, .className, according to
+    // the DOM, and Prototype's hasClassName uses a slow RegExp to parse it,
+    // and dojo's hasClass uses indexOf so its faster, but it still involves
+    // parsing, and it is ugly. Probably a design flaw, oh well.
     // Use .type and .piece (set below) instead of classes for speed.
     classes = ["piece", color, type].join(" ");
 
