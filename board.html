@@ -768,22 +768,20 @@ function load_ply(ply)
 // Setup accesskeys for next and back given the current ply.
 function set_next_back_accesskeys(ply)
 {
-    return;
+    dojo.query("a.accessible_move").forEach(function(x) {
+            dojo.removeClass(x, "accessible_move");
+            x.removeAttribute("accesskey");
+        });
 
-    //IE7 chokes
-    var a;
+    dojo.query("a#ply_" + (ply + 1)).forEach(function(x) {
+            x.setAttribute("accesskey", ".");       // ctrl+option+.
+            dojo.addClass(x, "accessible_move");
+        });
     
-    a = $$("a.accessible_move");
-    a.invoke("removeClassName", "accessible_move");
-    a.invoke("removeAttribute", "accesskey");
-
-    a = $$("a#ply_" + (ply + 1));
-    a.invoke("setAttribute", "accesskey", "."); // ctrl+option+.
-    a.invoke("addClassName", "accessible_moves");
-
-    a = $$("a#ply_" + (ply - 1));
-    a.invoke("setAttribute", "accesskey", ",");   // ctrl+option+,
-    a.invoke("addClassName", "accessible_move");
+    dojo.query("a#ply_" + (ply - 1)).forEach(function(x) {
+            x.setAttribute("accesskey", ",");       // ctrl+option+,
+            dojo.addClass(x, "accessible_move");
+        });
 }
 
 // Make a link to a move, click it and it loads the board after it.
