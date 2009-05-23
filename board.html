@@ -837,7 +837,6 @@ function encode_ply(color, fullmove_number)
 // JavaScript console (Develop -> Show Error Console in Safari) if you want
 // a command-line instead of a GUI. Computer move also uses this function, but it is
 // not used for drag-and-drop.
-// TODO: Support multiple moves
 function mv(alg_move, virtual)
 {
     var piece_square, piece, square;
@@ -1584,20 +1583,16 @@ function computer_move_if_applicable()
     mv(alg_move);
 }
 
-// Return whether moving piece to move would mean that
-// color is in check. Note, that doesn't mean that the move
-// *caused* the check, they could have already been in check and
-// this move didn't take them out. Either way, its illegal.
-function would_check(piece, move, color)
+// Make a move in the VBOARD, which can be undone. Only makes the move.
+// TODO: replace partially move_piece_to_square()
+function do_virtual_move(piece, move)
 {
-    var from_square = piece.square;
-    var to_square = VBOARD[move.x][move.y];
-    var checked, all_moves;
+    var captured, from_square, to_square;
+   
+    from_square = piece.square;
+    to_square = VBOARD[move.x][move.y];
+    captured = to_square.piece;
 
-
-    // Hypothetical move, with possible capture
-    // TODO: use move_piece_to_square(), so castle and _en passant_ capture is correct!
-    var captured = to_square.piece;
     piece.square = VBOARD[move.x][move.y];
     VBOARD[move.x][move.y].piece = piece;
 
@@ -1606,18 +1601,46 @@ function would_check(piece, move, color)
     }
     VBOARD[from_square.x][from_square.y].piece = null;
 
+
+    // TODO: en passant, castling
+
+    return {captured: captured, from_square: from_square, piece: piece, move: move, to_square: to_square};
+}
+
+// Undo a move given the result of do_virtual_move().
+function undo_virtual_move(did)
+{
+    // Restore move
+    if (did.captured) {
+        did.captured.square = VBOARD[did.move.x][did.move.y];
+    }
+    VBOARD[did.move.x][did.move.y].piece = did.captured;
+
+    did.piece.square = VBOARD[did.from_square.x][did.from_square.y];
+    VBOARD[did.from_square.x][did.from_square.y].piece = did.piece;
+}
+
+
+// Return whether moving piece to move would mean that
+// color is in check. Note, that doesn't mean that the move
+// *caused* the check, they could have already been in check and
+// this move didn't take them out. Either way, its illegal.
+function would_check(piece, move, color)
+{
+    var from_square = piece.square;
+    var to_square = VBOARD[move.x][move.y];
+    var checked, all_moves, did;
+
+
+    // Hypothetical move, with possible capture
+    did = do_virtual_move(piece, move);
+
     // TODO: This is a lot of calculation to do, see if can speed it up
     all_moves = calculate_moves(opposite_color(color), true);
     checked = in_check(color, all_moves);
 
     // Restore move
-    if (captured) {
-        captured.square = VBOARD[move.x][move.y];
-    }
-    VBOARD[move.x][move.y].piece = captured;
-
-    piece.square = VBOARD[from_square.x][from_square.y];
-    VBOARD[from_square.x][from_square.y].piece = piece;
+    undo_virtual_move(did); 
 
     return checked;
 }
