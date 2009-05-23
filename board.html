@@ -2680,7 +2680,9 @@ function move_piece_to_square(piece, square, is_hypothetical)
         } else {
             dead_pawn_square = SQUARES[square.x][square.y - forward];
 
-            capture_piece(dead_pawn_square.piece);
+            assert(dead_pawn_square.firstChild, "en passant capture, could not find pawn to take!");
+
+            capture_piece(dead_pawn_square.firstChild);
             dead_pawn_square.removeChild(dead_pawn_square.firstChild);
         }
     }
