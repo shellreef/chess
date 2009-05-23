@@ -110,6 +110,8 @@ td.legal-move-black { background-color: #a15b17; }
  *td:nth-child(2n) { background-color: green } */
 
 </style>
+<script type='text/javascript' 
+        src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'></script>
 <script src="http://o.aolcdn.com/dojo/1.3.1/dojo/dojo.xd.js"></script>
 <script src="http://www.google.com/jsapi"></script>
 <script type="text/javascript">
@@ -448,6 +450,8 @@ google.setOnLoadCallback(function() {
     // test PGN embedded notes
     //pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
     
+    QUUX = ('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
+
     //pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
     
 
@@ -521,13 +525,13 @@ function edit_pgn()
 
     // TODO: build dynamically using Builder.node, but it gives me a 
     // builder.js this.NODEMAP undefined error.
-    $("game_ui").innerHTML = "<textarea id='pgn' cols='80' rows='35'>" + save_pgn().escapeHTML() + 
+    $("game_ui").innerHTML = "<textarea id='edited_pgn' name='edited_pgn' cols='80' rows='35'>" + save_pgn().escapeHTML() + 
         "<\/textarea>" + 
         "<button type='button' name='ok' accesskey='o' " + 
         "onclick='javascript:reload_pgn()'>OK<\/button>" +
         "<button type='button' name='cancel' onclick='restore_edit()' accesskey='x'>Cancel<\/button>";
 
-    $("pgn").focus();
+    $("edited_pgn").focus();
 }
 
 // Restore the game interface, removing the edit area.
@@ -564,7 +568,7 @@ function save_pgn()
 // Reload PGN after editing it.
 function reload_pgn()
 {
-    var pgn = $F("pgn");
+    var pgn = $F("edited_pgn");
 
     restore_edit();
 
@@ -2478,8 +2482,12 @@ function init_board()
 
     // Konami code
     // TODO: type to move, match anything
+    /*
     KEYS_PRESSED = [];
     document.onkeydown = function(event) {
+            if (!event.keyCode) { 
+                return;
+            }
             KEYS_PRESSED.push(event.keyCode);
             if (KEYS_PRESSED.length > 11) {
                 KEYS_PRESSED.shift();
@@ -2488,6 +2496,7 @@ function init_board()
                 alert("TODO: easter egg");
             }
         };
+    */
 
     var board_menu = $("saved_board_menu");
 
