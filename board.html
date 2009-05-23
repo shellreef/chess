@@ -345,7 +345,7 @@ var PIECE_TYPES = {
 };
 
 // Saved board setups in FEN
-SAVED_BOARDS = {
+var SAVED_BOARDS = {
 // Standard chess and variants. 
 // Sources:
 // http://www.pathguy.com/chess/ChessVar.htm
@@ -427,6 +427,7 @@ SAVED_BOARDS = {
 "Test Fairy Pieces": "8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1",
 "Test Lone King": "K w KQkq - 0 1"
 };    
+
 // TODO: library of interesting games, in PGN format. See
 // http://www.xs4all.nl/~timkr/records/records.htm and http://www.xs4all.nl/~timkr/ChessTutor/pgnview.htm
 
@@ -546,7 +547,7 @@ function save_pgn()
         // jslint thinks this is unused, wonder why
         var tag = tags[i];
 
-        dict[tag] = $(tag).innerHTML;
+        dict[tag] = $("PGN_" + tag).innerHTML;
     }
 
     // Non-standard. The standard tags are FEN and SetUp, for starting position only.
@@ -581,20 +582,20 @@ function load_pgn(pgn)
     // Header
     for (var i = 0; i < tags.length; i += 1) {
         var tag = tags[i];
-        var node = $(tag);
+        var node = $("PGN_" + tag);
 
         assert(node, "load_pgn(" + pgn + "): no element for tag " + tag);
 
         if (game[tag] && game[tag].substr(0, 1) !== "?") {
             var value = game[tag];
 
-            $(tag).show();
+            node.show();
 
-            $(tag).innerHTML = value;
+            node.innerHTML = value;
 
             $$(".show_" + tag).invoke("show");
         } else {
-            $(tag).hide();
+            node.hide();
             $$(".show_" + tag).invoke("hide");
         }
     }
@@ -709,9 +710,10 @@ function parse_pgn(pgn)
             } 
         }
     }
+
     dict.outcome = outcome;
     dict.moves = moves;
-        
+
     // TODO: parse more than one game per file, return in array, 
     // then show drop-down list to select game from library.
 
@@ -2714,11 +2716,11 @@ function move_piece_to_square(piece, square, is_hypothetical)
 
         // PERFORMANCE: This takes 4% of load_pgn, 576 ms on a 14.456 s load. 
         // TODO: Instead of concatenating incrementally, gather it up, load all at once.
-        $("moves").innerHTML += alg_move;
+        $("move_history").innerHTML += alg_move;
 
         // End-text, not a move. Terminates the game.
         if (turn_info.text_end) {
-            $("moves").innerHTML += "\n" + turn_info.text_end;
+            $("move_history").innerHTML += "\n" + turn_info.text_end;
         }
 
         // If there was a repetition, it occurred on this move. Indicate the moves.
@@ -3631,22 +3633,22 @@ function enable_document_selection(enable) {
 
  <!-- Header elements, game metadata. Hidden/shown as needed. -->
  <p id="header" style="display: none; text-align: center" 
-  onclick="javascript:edit_pgn()">
+  onclick="javascript:edit_pgn()" class="show_White">
   <span class="players">
-   <span id="White" class="player_name" style="display: none">White</span>
-   <span class="player_elo"><span style="display: none" class="show_WhiteElo">(</span><span id="WhiteElo" style="display: none">1500</span><span class="show_WhiteElo" style="display: none">)</span></span>
+   <span id="PGN_White" class="player_name" style="display: none">White</span>
+   <span class="player_elo"><span style="display: none" class="show_WhiteElo">(</span><span id="PGN_WhiteElo" style="display: none">1500</span><span class="show_WhiteElo" style="display: none">)</span></span>
     <span id="vs" style="display: none" class="show_White">vs.</span>
-   <span id="Black" class="player_name" style="display: none">Black</span>
-   <span class="player_elo"><span style="display: none" class="show_BlackElo">(</span><span id="BlackElo" style="display: none">1500</span><span class="show_BlackElo" style="display: none">)</span></span>
+   <span id="PGN_Black" class="player_name" style="display: none">Black</span>
+   <span class="player_elo"><span style="display: none" class="show_BlackElo">(</span><span id="PGN_BlackElo" style="display: none">1500</span><span class="show_BlackElo" style="display: none">)</span></span>
   </span>
    <br class="show_White" style="display: none">
 
-   <span id="Event" style="display: none">Event</span>
-   <span style="display: none" class="show_Round">(</span><span id="Round" style="display: none">Round</span><span style="display: none" class="show_Round">)</span>
-   <span id="Site" style="display: none">Site</span><br class="show_Event" style="display: none">
+   <span id="PGN_Event" style="display: none">Event</span>
+   <span style="display: none" class="show_Round">(</span><span id="PGN_Round" style="display: none">Round</span><span style="display: none" class="show_PNG_Round">)</span>
+   <span id="PGN_Site" style="display: none">Site</span><br class="show_PNG_Event" style="display: none">
 
-   <span id="Date" style="display: none">Date</span>
-   <span id="Time" style="display: none">Time</span>
+   <span id="PGN_Date" style="display: none">Date</span>
+   <span id="PGN_Time" style="display: none">Time</span>
  </p> 
 
  <p>
@@ -3679,7 +3681,7 @@ function enable_document_selection(enable) {
 
   <div id="moves_container" style="width: 500px; text-align: justify">
   <!-- TODO: scrollbar, http://livepipe.net/control/scrollbar -->
-  <p id="moves"></p>
+  <p id="move_history"></p>
   </div>
 </div>
 
