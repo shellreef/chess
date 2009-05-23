@@ -162,7 +162,7 @@ var GAME_STATE = {
     active_color: '',
     
     // Castling privileges
-    can_castle: {white: {short: true, long: true}, black: {short: true, long: true}},
+    can_castle: {white: {cshort: true, clong: true}, black: {cshort: true, clong: true}},
 
     ep_target: null,
 
@@ -1784,7 +1784,7 @@ function filtered_moves(piece, color, is_hypothetical)
         // Castling moves
         if (flags.if_can_castle_short) {
             // Moved and lost castling privileges
-            if (!GAME_STATE.can_castle[color].short) {
+            if (!GAME_STATE.can_castle[color].cshort) {
                 continue;
             }
 
@@ -1813,7 +1813,7 @@ function filtered_moves(piece, color, is_hypothetical)
         }
 
         if (flags.if_can_castle_long) {
-            if (!GAME_STATE.can_castle[color].long) {
+            if (!GAME_STATE.can_castle[color].clong) {
                 continue;
             }
             if (GAME_STATE.active_in_check) {
@@ -2524,10 +2524,10 @@ function capture_piece(piece)
         // TODO: really would like to not have to hardcode this
         if (square.y === first_rank) {
             if (square.x === 1) {
-                GAME_STATE.can_castle[opponent].long = false;
+                GAME_STATE.can_castle[opponent].clong = false;
                 //console.log("no more long");
             } else if (square.x === 8) {
-                GAME_STATE.can_castle[opponent].short = false;
+                GAME_STATE.can_castle[opponent].cshort = false;
                 //console.log("no more short");
             }
         }
@@ -2584,15 +2584,15 @@ function move_piece_to_square(piece, square, is_hypothetical)
 
     // Moving king makes it ineligible for castling
     if (PIECE_TYPES[piece.type].castles_with) {
-        GAME_STATE.can_castle[GAME_STATE.active_color].short = false;
-        GAME_STATE.can_castle[GAME_STATE.active_color].long = false;
+        GAME_STATE.can_castle[GAME_STATE.active_color].cshort = false;
+        GAME_STATE.can_castle[GAME_STATE.active_color].clong = false;
     } else if (PIECE_TYPES[piece.type].castle) {
         // TODO: More generic, so will work with chess960 or 480
         // If moved either rook, can't castle on that side.
         if (from_square.x === 8) {
-            GAME_STATE.can_castle[GAME_STATE.active_color].short = false;
+            GAME_STATE.can_castle[GAME_STATE.active_color].cshort = false;
         } else if (from_square.x === 1) {
-            GAME_STATE.can_castle[GAME_STATE.active_color].long = false;
+            GAME_STATE.can_castle[GAME_STATE.active_color].clong = false;
         }
     }
 
@@ -2861,10 +2861,10 @@ function save_fen(strip_moves, virtual)
     // Castling availability
     fen += " ";
     castles = false;
-    if (GAME_STATE.can_castle.white.short) { fen += "K"; castles = true; }
-    if (GAME_STATE.can_castle.white.long)  { fen += "Q"; castles = true; }
-    if (GAME_STATE.can_castle.black.short) { fen += "k"; castles = true; }
-    if (GAME_STATE.can_castle.black.long)  { fen += "q"; castles = true; }
+    if (GAME_STATE.can_castle.white.cshort) { fen += "K"; castles = true; }
+    if (GAME_STATE.can_castle.white.clong)  { fen += "Q"; castles = true; }
+    if (GAME_STATE.can_castle.black.cshort) { fen += "k"; castles = true; }
+    if (GAME_STATE.can_castle.black.clong)  { fen += "q"; castles = true; }
     if (!castles) { fen += "-"; }
 
     // En passant target square
@@ -2895,10 +2895,10 @@ function load_fen(fen, replay)
     assert(/^[wb]$/.test(parts[1]), "load_fen(" + fen + "): bad active color: " + parts[1]);
 
     castling = parts[2];
-    GAME_STATE.can_castle.white.short = /K/.test(castling);
-    GAME_STATE.can_castle.white.long  = /Q/.test(castling);
-    GAME_STATE.can_castle.black.short = /k/.test(castling);
-    GAME_STATE.can_castle.black.long  = /q/.test(castling);
+    GAME_STATE.can_castle.white.cshort = /K/.test(castling);
+    GAME_STATE.can_castle.white.clong  = /Q/.test(castling);
+    GAME_STATE.can_castle.black.cshort = /k/.test(castling);
+    GAME_STATE.can_castle.black.clong  = /q/.test(castling);
 
     if (parts[3] === "-") {
         GAME_STATE.ep_target = null;
