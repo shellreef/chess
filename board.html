@@ -452,7 +452,7 @@ google.setOnLoadCallback(function() {
     load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
 
     // test PGN embedded notes
-    pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
+    //pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
     
     //pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
     
@@ -904,15 +904,14 @@ function mv(alg_move, virtual)
     // TODO: do some Effect.Move animation, optionally (make two functions)
     //new Effect.Move(piece, { x: 10, y: 20, mode: 'relative' });
     
+    move_piece_to_square(piece, square);
 
-    if (virtual) {
-        move_piece_to_square(piece, square);
-    } else {
-        // Move the real piece and square
-        var real_piece = SQUARES[piece.square.x][piece.square.y].firstChild;
-        var real_square = SQUARES[square.x][square.y];
+    if (!virtual) {
+        realize_vboard();
 
-        move_piece_to_square(real_piece, real_square);
+        make_droppables();
+        populate_make_a_move_list();
+        computer_move_if_applicable();
     }
 }
 
@@ -1560,10 +1559,18 @@ function make_move_by_menu(menu)
     mv(choice);
 }
 
+// AI - artificial intelligence 
+// Do this after a delay, so that when playing computer vs. computer, you can
+// see the move, since they are not animated (Effect.Move) yet.
+function computer_move_if_applicable()
+{
+    setTimeout(computer_move, 1);
+}
+
 // Make a move as the computer, if we're supposed to.
 // TODO: also get moves from network via Ajax, maybe a third-party 
 // chess engine, or a real live human, remotely
-function computer_move_if_applicable()
+function computer_move()
 {
     if (!$F(GAME_STATE.active_color + "_computer")) {
         return;
@@ -1587,10 +1594,24 @@ function computer_move_if_applicable()
 // TODO: replace partially move_piece_to_square()
 function do_virtual_move(piece, move)
 {
-    var captured, from_square, to_square;
-   
+    var captured, from_square, to_square, capture_square;
+ 
     from_square = piece.square;
     to_square = VBOARD[move.x][move.y];
+   
+    // Special case: en passant captures to an empty square
+    if (0 && GAME_STATE.ep_target &&
+        to_square.x === GAME_STATE.ep_target[0] && 
+        to_square.y === GAME_STATE.ep_target[1]) {
+
+        var forward = forwards_vector(GAME_STATE.active_color);
+        
+        capture_square = VBOARD[to_square.x][to_square.y - forward];
+
+    } else {
+        capture_square = to_square;
+    }
+
     captured = to_square.piece;
 
     piece.square = VBOARD[move.x][move.y];
@@ -1604,7 +1625,7 @@ function do_virtual_move(piece, move)
 
     // TODO: en passant, castling
 
-    return {captured: captured, from_square: from_square, piece: piece, move: move, to_square: to_square};
+    return {captured: captured, capture_square: capture_square, from_square: from_square, piece: piece, move: move, to_square: to_square};
 }
 
 // Undo a move given the result of do_virtual_move().
@@ -2314,8 +2335,7 @@ function opposite_color(color)
 // Set the active color to white or black, or go to the next color (toggling).
 // Returns a character for algebraic notation, + = check, etc., if applicable
 // If historical, do not check for threefold repetition.
-// If virtual, do not make droppables.
-function set_turn(color, historical, virtual)
+function set_turn(color, historical)
 {
     var new_color, checked, no_moves, text_move, text_end, old_color, old_fullmove, repeats;
 
@@ -2347,10 +2367,6 @@ function set_turn(color, historical, virtual)
     // gone through the endeffect? This is called in onDrop.
     // TODO: find out how to run something *after* the endeffect, for smoother UI.
     calculate_moves(GAME_STATE.active_color);
-    if (!virtual) {
-        make_droppables();
-        populate_make_a_move_list();
-    }
 
     // Zero mobility? For detecting stalemate, checkmate.
     no_moves = own_property_count(VALID_MOVES) === 0;
@@ -2666,15 +2682,19 @@ function forwards_vector(color)
 
 
 
-// Manipulate the DOM nodes to move the piece to its new location,
-// and advance to the next move. Does not do anything graphical
-// with dragging.
+// Make a move on the virtual board.
 // If is_hypothetical is true, this is an internal move part of another move
 // (castling) so it shouldn't be logged.
 function move_piece_to_square(piece, square, is_hypothetical)
 {
     var from_square, move_text, castle_move_text, filerank, only_move;
 
+    // TODO: Always pass virtual
+    if (!square.virtual) {
+        square = VBOARD[square.x][square.y];
+        piece = VBOARD[piece.square.x][piece.square.y].piece;
+    }
+        
     from_square = piece.square;
 
     if (!is_hypothetical) {
@@ -2701,23 +2721,13 @@ function move_piece_to_square(piece, square, is_hypothetical)
                 // TODO: actually calculate square moved over, then move rook there
                 // (instead of hardcoding). Short.
                 // TODO: test virtual
-                move_piece_to_square(pc(8, first_rank, piece.virtual), piece.virtual ? VBOARD[6][first_rank] : SQUARES[6][first_rank], true);
+                move_piece_to_square(pc(8, first_rank, piece.virtual), VBOARD[6][first_rank], true);
                 castle_move_text = "O-O";
             } else if (square.x === 3) {
                 // Castle long.
-                move_piece_to_square(pc(1, first_rank, piece.virtual), piece.virtual ? VBOARD[4][first_rank] : SQUARES[4][first_rank], true);
+                move_piece_to_square(pc(1, first_rank, piece.virtual), VBOARD[4][first_rank], true);
                 castle_move_text = "O-O-O";
             }
-        }
-    }
-
-    if (!piece.virtual) { 
-        // Capture piece(s) on destination square. Multiple pieces
-        // are supported here, but not elsewhere in the code (yet). Might be
-        // an interesting variation to have multiple pieces occupy same square.
-        while (square.firstChild) {
-            capture_piece(square.firstChild);
-            square.removeChild(square.firstChild);
         }
     }
 
@@ -2729,19 +2739,10 @@ function move_piece_to_square(piece, square, is_hypothetical)
         var forward = forwards_vector(GAME_STATE.active_color);
         var dead_pawn_square;
         
-        if (piece.virtual) {
-            dead_pawn_square = VBOARD[square.x][square.y - forward];
+        dead_pawn_square = VBOARD[square.x][square.y - forward];
 
-            capture_piece(dead_pawn_square.piece);
-            dead_pawn_square.piece = null;
-        } else {
-            dead_pawn_square = SQUARES[square.x][square.y - forward];
-
-            assert(dead_pawn_square.firstChild, "en passant capture, could not find pawn to take!");
-
-            capture_piece(dead_pawn_square.firstChild);
-            dead_pawn_square.removeChild(dead_pawn_square.firstChild);
-        }
+        capture_piece(dead_pawn_square.piece);
+        dead_pawn_square.piece = null;
     }
 
     if (!is_hypothetical) {
@@ -2756,18 +2757,9 @@ function move_piece_to_square(piece, square, is_hypothetical)
     }
 
 
-    if (piece.virtual) { 
-        piece.square.piece = null;  // Clear from
-        square.piece = piece;       // Set to
-        piece.square = square;      // Link piece to new destination square
-    } else {
-        // Move to new square
-        if (piece.square) {
-            piece.square.removeChild(piece);
-        }
-        square.appendChild(piece);
-        piece.square = square;
-    }
+    piece.square.piece = null;  // Clear from
+    square.piece = piece;       // Set to
+    piece.square = square;      // Link piece to new destination square
 
     if (should_promote(piece)) {
         promote(piece); // TODO: allow virtual?
@@ -2803,10 +2795,8 @@ function move_piece_to_square(piece, square, is_hypothetical)
 
         only_move = own_property_count(VALID_MOVE_NOTATIONS.SAN) === 1;
 
-        if (!piece.virtual) {
-            make_vboard();
-        }
-        turn_info = set_turn("next", false, piece.virtual);
+        turn_info = set_turn("next", false);
+
         if (turn_info.text_move) {
             move_text += turn_info.text_move;
         }
@@ -2840,14 +2830,6 @@ function move_piece_to_square(piece, square, is_hypothetical)
         }
     }
 
-    if (!piece.virtual) { 
-        // AI - artificial intelligence 
-        // Do this after a delay, so that when playing computer vs. computer, you can
-        // see the move, since they are not animated (Effect.Move) yet.
-        setTimeout(function() { 
-                computer_move_if_applicable();
-                }, 1);
-    }
 }
 
 // Visually indicate the moves which after threefold repetition
@@ -2904,13 +2886,19 @@ function move_dropped_piece(piece, square, event)
 
     unhighlight_all();
 
+    make_vboard();
     move_piece_to_square(piece, square);
+    realize_vboard();
 
     // Scriptaculous requires position:relative; with static, you can drag it
     // but it won't move with the cursor, so set it and crucially, reset the
     // relative position so that it won' be misaligned.
     piece.style.position = "relative";
     piece.style.left = piece.style.right = piece.style.top = piece.style.bottom = 0;
+
+    make_droppables();
+    populate_make_a_move_list();
+    computer_move_if_applicable();
 }
 
 // Generate FEN from board state. If strip_moves, does not
@@ -3016,6 +3004,8 @@ function load_fen(fen, replay)
     // Now that everything is loaded, set the turn.
     make_vboard();
     set_turn({w:"white", b:"black"}[parts[1]], replay);
+    make_droppables();
+    populate_make_a_move_list();
 }
 
 // Remove all pieces from the board.
