@@ -903,7 +903,7 @@ function mv(alg_move, virtual)
         move_piece_to_square(piece, square);
     } else {
         // Move the real piece and square
-        var real_piece = SQUARES[piece.square.x][piece.square.y].childNodes[0];
+        var real_piece = SQUARES[piece.square.x][piece.square.y].firstChild;
         var real_square = SQUARES[square.x][square.y];
 
         move_piece_to_square(real_piece, real_square);
@@ -2446,7 +2446,7 @@ function make_vboard()
     for (var x = 1; x <= FILE_MAX; x += 1) {
         for (var y = 1; y <= RANK_MAX; y += 1) {
             var square = SQUARES[x][y];
-            var piece = square.childNodes[0];
+            var piece = square.firstChild;
 
             if (piece) {
                 // TODO: Store arbitrary parameters?
@@ -2830,7 +2830,7 @@ function move_dropped_piece(piece, square, event)
     // TODO: do some cool effects when a piece is captured, but not too cool
     // Any way to finish running the code AFTER the effect finishes? New effect?
     //if (square.firstChild) {
-    //   new Effect.Squish(square.virtual ? square.piece : square.childNodes[0]);
+    //   new Effect.Squish(square.virtual ? square.piece : square.firstChild);
     //}
 
     // Can't drop this piece anywhere anymore.
@@ -3002,13 +3002,13 @@ function load_starting_position(fen, replay)
             }
 
             SQUARES[x][y].appendChild(create_piece_by_letter(code));
-            SQUARES[x][y].childNodes[0].square = SQUARES[x][y];
+            SQUARES[x][y].firstChild.square = SQUARES[x][y];
             //VBOARD[x][y].piece = decode_piece_letter(code);
             //VBOARD[x][y].piece.square = VBOARD[x][y];
             x += 1;
         } else if (/[a-zA-Z]/.test(code)) {
             SQUARES[x][y].appendChild(create_piece_by_letter(code));
-            SQUARES[x][y].childNodes[0].square = SQUARES[x][y];
+            SQUARES[x][y].firstChild.square = SQUARES[x][y];
             //VBOARD[x][y].piece = decode_piece_letter(code);
             //VBOARD[x][y].piece.square = VBOARD[x][y];
             x += 1;
@@ -3178,7 +3178,7 @@ function pc_or_offboard(x, y, virtual)
 // Return an existing piece somewhere (or a false value), given:
 // - (x,y) coordinates, like (8,1)
 // - location in filerank notation, like "a8"
-// To get piece from a square, use .piece if virtual, or .childNodes[0] if not
+// To get piece from a square, use .piece if virtual, or .firstChild if not
 function pc(x, y, virtual)
 {
     if (x.charAt) {
@@ -3190,7 +3190,7 @@ function pc(x, y, virtual)
     //assert(x >= 1 && x <= FILE_MAX, "pc(" + x + ", " + y + "): bad x: " + x);
     //assert(y >= 1 && y <= RANK_MAX, "pc(" + x + ", " + y + "): bad y: " + y);
 
-    return virtual ? VBOARD[x][y].piece : SQUARES[x][y].childNodes[0];
+    return virtual ? VBOARD[x][y].piece : SQUARES[x][y].firstChild;
 }
 
 // Return the path to an image for the piece of that color
