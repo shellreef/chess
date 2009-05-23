@@ -768,6 +768,9 @@ function load_ply(ply)
 // Setup accesskeys for next and back given the current ply.
 function set_next_back_accesskeys(ply)
 {
+    return;
+
+    //IE7 chokes
     var a;
     
     a = $$("a.accessible_move");
@@ -3670,7 +3673,7 @@ function enable_document_selection(enable) {
  <!-- TODO: disclosure triangles -->
  <p><a href="#" onclick="javascript:new Effect.toggle('controls', 'slide', { duration: 0.1 })">advanced</a>
  
- <div id="controls" style="display: visible; border-left: 2px solid blue">
+ <div id="controls" style="display: block; border-left: 2px solid blue">
  <div>
 
  <p><select id="make_move_menu" onchange="make_move_by_menu(this)"></select>
