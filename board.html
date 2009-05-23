@@ -347,6 +347,7 @@ var PIECE_TYPES = {
 
 // Saved board setups in FEN
 var SAVED_BOARDS = {
+    "Chess & Variants": {
 // Standard chess and variants. 
 // Sources:
 // http://www.pathguy.com/chess/ChessVar.htm
@@ -393,18 +394,20 @@ var SAVED_BOARDS = {
 "Upside-Down Chess / Wild 5":    "RNBQKBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbqkbnr w KQkq - 0 1",
 "Wild Chess 7 ":        "4k3/5ppp/8/8/8/8/PPP5/3K4 w - - 0 1",
 "Wild Chess 8":         "rnbqkbnr/8/8/pppppppp/PPPPPPPP/8/8/RNBQKBNR w KQkq - 0 1",
-"Wild Chess 19":        "8/6k1/4p3/4N3/8/6K1/7N/8 w - - 0 1",
+"Wild Chess 19":        "8/6k1/4p3/4N3/8/6K1/7N/8 w - - 0 1"
+    },
 
-// Openings
+    "Chess Openings": {
 // TODO: invert hash, and automatically lookup and display known chess openings w/ ECO code and name? 
 //  Recognize various ECO codes, see http://scid.sourceforge.net/help/ECO.html
 //  and http://scid.sourceforge.net/help/EPD.html
 "Sicilian Defense":     "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2",
 "Sicilian Defense Main Line":     "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2",
 "Sicilian Defense Nimzowitsch Variation":     "rnbqkb1r/pp1ppppp/5n2/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 3",
-"King's Pawn Game": "rnbqkbnr/pppppppp/9/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1",
+"King's Pawn Game": "rnbqkbnr/pppppppp/9/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"
+    },
 
-// Test cases
+    "Test Cases": {
 "Test Stalemate":     "k7/8/8/8/8/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5",
 "Test Remove Check by Capture":     "4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5",
 "Test Promotion":     "k1K5/8/8/8/8/8/p/8 b - - 0 5",
@@ -427,7 +430,8 @@ var SAVED_BOARDS = {
 "Test Parlett Move Interference": "r/8/8/1N3b2/3PP3/1P1BBN/8/8 w - - 0 17",
 "Test Fairy Pieces": "8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1",
 "Test Lone King": "K w KQkq - 0 1"
-};    
+    }
+};
 
 // TODO: library of interesting games, in PGN format. See
 // http://www.xs4all.nl/~timkr/records/records.htm and http://www.xs4all.nl/~timkr/ChessTutor/pgnview.htm
@@ -2538,10 +2542,19 @@ function init_board()
 
     board_menu.appendChild(Builder.node("option", {value: "", selected: "selected"}, "Load board..."));
 
-    for (var board_name in SAVED_BOARDS) {
-        if (SAVED_BOARDS.hasOwnProperty(board_name)) {
-            var fen = SAVED_BOARDS[board_name];
-            board_menu.appendChild(Builder.node("option", {value: fen}, board_name));
+    for (var group_name in SAVED_BOARDS) {
+        if (SAVED_BOARDS.hasOwnProperty(group_name)) {
+            var members = SAVED_BOARDS[group_name];
+
+            var group = Builder.node("optgroup", {label:group_name});
+            board_menu.appendChild(group);
+
+            for (var board_name in members) {
+                if (members.hasOwnProperty(board_name)) {
+                    var fen = members[board_name];
+                    group.appendChild(Builder.node("option", {value: fen}, board_name));
+                }
+            }
         }
     }
 }
