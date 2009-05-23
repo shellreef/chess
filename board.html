@@ -511,13 +511,17 @@ pgn = load_pgn(
 // Load the chess notations into the input/output notation select boxes
 function load_notations()
 {
+    var menu = $("output_notation");
+
     for (var notation in AVAILABLE_NOTATIONS) {
         if (AVAILABLE_NOTATIONS.hasOwnProperty(notation)) {
             var name = AVAILABLE_NOTATIONS[notation];
 
-            $("output_notation").appendChild(Builder.node("option", {value: notation}, name));
+            menu.appendChild(Builder.node("option", {value: notation}, name));
         }
     }
+
+    menu.selectedIndex = 0;
 }
 
 // Make the PGN content editable (not to be confused with edible).
@@ -1503,21 +1507,22 @@ function own_properties(obj)
 function populate_make_a_move_list()
 {
     var active_name = AVAILABLE_NOTATIONS[PREFS.INPUT_NOTATION];
-    var move_group, change_group, count;
+    var move_group, change_group, count, menu;
 
-    $("make_move_menu").innerHTML = "";
+    menu = $("make_move_menu");
+    menu.innerHTML = "";
 
     count = own_property_count(VALID_MOVE_NOTATIONS[PREFS.INPUT_NOTATION]);
     if (count === 0) {
-        $("make_move_menu").appendChild(Builder.node("option", {value:""}, "No legal moves"));
+        menu.appendChild(Builder.node("option", {value:""}, "No legal moves"));
         return;
     }
 
-    $("make_move_menu").appendChild(Builder.node("option", {value:""}, "Make a move... (" + count + ")"));
+    menu.appendChild(Builder.node("option", {value:""}, "Make a move... (" + count + ")"));
    
     // Moves in active input notation.
     move_group = Builder.node("optgroup", {label:active_name});
-    $("make_move_menu").appendChild(move_group);
+    menu.appendChild(move_group);
 
     for (var notation in VALID_MOVE_NOTATIONS[PREFS.INPUT_NOTATION]) {
         if (VALID_MOVE_NOTATIONS[PREFS.INPUT_NOTATION].hasOwnProperty(notation)) {
@@ -1527,7 +1532,7 @@ function populate_make_a_move_list()
 
     // Change the input notation.
     change_group = Builder.node("optgroup", {label:"Other notation..."});
-    $("make_move_menu").appendChild(change_group);
+    menu.appendChild(change_group);
 
     for (var n in AVAILABLE_NOTATIONS) {
         if (AVAILABLE_NOTATIONS.hasOwnProperty(n) && n !== PREFS.INPUT_NOTATION) {
@@ -1535,6 +1540,8 @@ function populate_make_a_move_list()
             change_group.appendChild(Builder.node("option", {value: "change_" + n}, name));
         }
     }
+
+    menu.selectedIndex = 0;
 }
 
 // Called when the make a move menu is changed, either to change the
@@ -2557,6 +2564,8 @@ function init_board()
             }
         }
     }
+
+    board_menu.selectedIndex = 0;
 }
 
 // Acknowledge that a piece was captured. Called by move_piece_to_square(), which
