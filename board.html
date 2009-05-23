@@ -837,7 +837,7 @@ function mv(alg_move, virtual)
 
     if (!alg_move) {
         assert(VALID_MOVE_NOTATIONS, "mv(" + alg_move + "): called with VALID_MOVE_NOTATINS false");
-        return VALID_MOVE_NOTATIONS[PREFS.INPUT_NOTATION].keys();
+        return own_properties(VALID_MOVE_NOTATIONS[PREFS.INPUT_NOTATION]);
     }
 
     // Accept digits, but prefer the letter oh.
@@ -853,7 +853,7 @@ function mv(alg_move, virtual)
                 alg_move = alg_move.replace(/Kt/g, "N");
             }
 
-            piece_square = VALID_MOVE_NOTATIONS[notation].get(alg_move);
+            piece_square = VALID_MOVE_NOTATIONS[notation][alg_move];
 
             if (piece_square) {
                 // Found one.
@@ -875,7 +875,7 @@ function mv(alg_move, virtual)
                     alg_move = alg_move.replace(/Kt/g, "N");
                 }
 
-                piece_square = ALT_MOVE_NOTATIONS[notation].get(alg_move);
+                piece_square = ALT_MOVE_NOTATIONS[notation][alg_move];
 
                 if (piece_square) {
                     //console.log("Warning: non-canonical move notation: ", notation);
@@ -996,22 +996,23 @@ function in_check(victim_color, all_moves)
     }
 
     // Attack the royal pieces?
-    all_moves.each(function(pair) { 
-        //var filerank = pair.key;
-        var moves = pair.value;
+    for (var filerank in all_moves) {
+        if (all_moves.hasOwnProperty(filerank)) {
+            var moves = all_moves[filerank];
 
-        moves.each(function(move) {
-            royals.each(function(royal) {
-                var square = royal.square;
+            moves.each(function(move) {
+                royals.each(function(royal) {
+                    var square = royal.square;
 
-                if (move.x === square.x && move.y === square.y) { 
-                    // Being attacked!
-                    //console.log("CHECKED BY",piece,filerank,xy2filerank(move.x, move.y));
-                    attacked = true;
-                }
+                    if (move.x === square.x && move.y === square.y) { 
+                        // Being attacked!
+                        //console.log("CHECKED BY",piece,filerank,xy2filerank(move.x, move.y));
+                        attacked = true;
+                    }
+                });
             });
-        });
-    });
+        }
+    }
 
     return attacked;
 }
@@ -1264,9 +1265,9 @@ function by_length(x, y)
 // or N1f3 is not ambiguous).
 function disambiguate_notations(notations)
 {
-    var freq_count = new Hash();
-    var canonical_notations = new Hash();
-    var synonymous_notations = new Hash();
+    var freq_count = {};
+    var canonical_notations = {};
+    var synonymous_notations = {};
     var piece, square;
 
     for (var i = 0; i < notations.length; i += 1) {
@@ -1283,27 +1284,28 @@ function disambiguate_notations(notations)
         for (var j = 0; j < moves.length; j += 1) {
             var move = moves[j];
 
-            if (!freq_count.get(move)) {
+            if (!freq_count[move]) {
                 // Store index so can delete if is a dupe
-                freq_count.set(move, [[i, j]]);
+                freq_count[move] = [[i, j]];
             } else {
-                freq_count.get(move).push([i, j]);
+                freq_count[move].push([i, j]);
             }
         }
     }
 
     // Delete ambiguous moves (or actually, replace with 'undefined')
-    freq_count.each(function(pair) {
-        //var notation = pair[0];
-        var locations = pair[1];
+    for (notation in freq_count) {
+        if (freq_count.hasOwnProperty(notation)) {
+            var locations = freq_count[notation];
 
-        if (locations.length > 1) {
-            for (var k = 0; k < locations.length; k += 1) { 
-                var i = locations[k][0], j = locations[k][1];
-                delete notations[i][2][j];
+            if (locations.length > 1) {
+                for (var k = 0; k < locations.length; k += 1) { 
+                    var i = locations[k][0], j = locations[k][1];
+                    delete notations[i][2][j];
+                }
             }
         }
-    });
+    }
 
     for (i = 0; i < notations.length; i += 1) {
         piece = notations[i][0];
@@ -1324,10 +1326,10 @@ function disambiguate_notations(notations)
         shortest = same_moves.shift();
         synonyms = same_moves;
 
-        canonical_notations.set(shortest, [piece, square]);
+        canonical_notations[shortest] = [piece, square];
 
         for (j = 0; j < synonyms.length; j += 1) {
-            synonymous_notations.set(synonyms[j], [piece, square]);
+            synonymous_notations[synonyms[j]] = [piece, square];
         }
     }
 
@@ -1340,40 +1342,42 @@ function disambiguate_notations(notations)
 // Make the drop targets for all valid moves.
 function make_droppables()
 {
-    VALID_MOVES.each(function(starting_filerank_moves) {
-        var starting_filerank = starting_filerank_moves[0];
-        var moves = starting_filerank_moves[1];
-        var real_piece = pc(starting_filerank);
+    for (var starting_filerank in VALID_MOVES) {
+        if (VALID_MOVES.hasOwnProperty(starting_filerank)) {
+            var moves = VALID_MOVES[starting_filerank];
 
-        // Create drop targets for the valid destinations, linking
-        // the draggables to droppables using piece- + source square.
-        real_piece.addClassName("piece-" + starting_filerank);
-        real_piece.prior_position = starting_filerank;    // for removal
+            var real_piece = pc(starting_filerank);
 
-        // TODO: droppable on original square, if dropped there, then retain
-        // move highlighting, but allow clicking/tapping to move to destination.
-        /*
-        Droppables.add(square_from, {
-            accept: "piece-" + starting_filerank,
-            onDrop: function() { alert(1); },
-            // No hoverclass
-            });
-        ALL_DROP_TARGETS.push(square_from);
-        */
-       
-        moves.each(function(move) {
-                var square = SQUARES[move.x][move.y];
+            // Create drop targets for the valid destinations, linking
+            // the draggables to droppables using piece- + source square.
+            real_piece.addClassName("piece-" + starting_filerank);
+            real_piece.prior_position = starting_filerank;    // for removal
 
-                // For removal
-                ALL_DROP_TARGETS.push(square);
+            // TODO: droppable on original square, if dropped there, then retain
+            // move highlighting, but allow clicking/tapping to move to destination.
+            /*
+            Droppables.add(square_from, {
+                accept: "piece-" + starting_filerank,
+                onDrop: function() { alert(1); },
+                // No hoverclass
+                });
+            ALL_DROP_TARGETS.push(square_from);
+            */
+           
+            moves.each(function(move) {
+                    var square = SQUARES[move.x][move.y];
 
-                // You can drop here
-                Droppables.add(square, {
-                    accept: "piece-" + starting_filerank,
-                    onDrop: move_dropped_piece,
-                    hoverclass: 'hover'});
-            });
-    });
+                    // For removal
+                    ALL_DROP_TARGETS.push(square);
+
+                    // You can drop here
+                    Droppables.add(square, {
+                        accept: "piece-" + starting_filerank,
+                        onDrop: move_dropped_piece,
+                        hoverclass: 'hover'});
+                });
+        }
+    }
 }
 
 
@@ -1387,7 +1391,7 @@ function make_droppables()
 // Call make_droppables() after if UI drag-and-drop is desirable.
 function calculate_moves(color, is_hypothetical)
 {
-    var valid_moves = new Hash();
+    var valid_moves = {};
     var possible_notations, notation;
 
     if (!is_hypothetical) { 
@@ -1429,7 +1433,7 @@ function calculate_moves(color, is_hypothetical)
 
             // Store valid moves for mouseovers etc.
             if (moves.length !== 0) {
-                valid_moves.set(starting_filerank, moves);
+                valid_moves[starting_filerank] = moves;
             }
 
             //console.log(starting_filerank, moves);
@@ -1459,6 +1463,37 @@ function calculate_moves(color, is_hypothetical)
     return valid_moves;
 }
 
+// Get the number of properties an object has on its own.
+// Conceptually, the "size" of an "associative array"
+function own_property_count(obj)
+{
+    var count = 0;
+
+    for (var prop in obj) {
+        if (obj.hasOwnProperty(prop)) {
+            count += 1;
+        }
+    }
+
+    return count;
+}
+
+// Get the properties of an object as an array
+function own_properties(obj)
+{
+    var props = [];
+
+    for (var prop in obj) {
+        if (obj.hasOwnProperty(prop)) {
+            props.push(prop);
+        }
+    }
+
+    return props;
+}
+
+
+
 // Populate the menu of valid moves, where you can make a move
 // by selection instead of moving a piece with your mouse.
 function populate_make_a_move_list()
@@ -1468,7 +1503,7 @@ function populate_make_a_move_list()
 
     $("make_move_menu").innerHTML = "";
 
-    count = VALID_MOVE_NOTATIONS[PREFS.INPUT_NOTATION].keys().length;
+    count = own_property_count(VALID_MOVE_NOTATIONS[PREFS.INPUT_NOTATION]);
     if (count === 0) {
         $("make_move_menu").appendChild(Builder.node("option", {value:""}, "No legal moves"));
         return;
@@ -1480,10 +1515,11 @@ function populate_make_a_move_list()
     move_group = Builder.node("optgroup", {label:active_name});
     $("make_move_menu").appendChild(move_group);
 
-    VALID_MOVE_NOTATIONS[PREFS.INPUT_NOTATION].each(function(move) {
-            var notation = move[0];
+    for (var notation in VALID_MOVE_NOTATIONS[PREFS.INPUT_NOTATION]) {
+        if (VALID_MOVE_NOTATIONS[PREFS.INPUT_NOTATION].hasOwnProperty(notation)) {
             move_group.appendChild(Builder.node("option", {value: notation}, notation));
-        });
+        }
+    }
 
     // Change the input notation.
     change_group = Builder.node("optgroup", {label:"Other notation..."});
@@ -1528,11 +1564,11 @@ function computer_move_if_applicable()
     // TODO: weak AI, take most valuable piece, checkmate if can, check if can,
     //     fork if can.. something to entertain a beginner. Or better yet,
     // plugin to a remote network server.
-    var keys = VALID_MOVE_NOTATIONS.SAN.keys();
+    var keys = own_properties(VALID_MOVE_NOTATIONS.SAN);
     var alg_move = keys[randint(0, keys.length - 1)];
     //var alg_move = keys[0];
 
-    //var piece_square = VALID_MOVE_NOTATIONS.SAN.get(alg_move);
+    //var piece_square = VALID_MOVE_NOTATIONS.SAN[alg_move];
 
     // TODO: do some animation when moving, Effect.Move, to slow it down so we can see it.
     mv(alg_move);
@@ -2217,19 +2253,19 @@ function relative_decode_parlett(parlett)
 // Note: flags also differentiate a move.
 function without_dupes(a)
 {
-    var hash = new Hash();
+    var hash = {};
     var result = [];
 
     for (var i = 0; i < a.length; i += 1) {
         // Add if not a dupe
-        if (!hash.get(Object.toJSON(a[i]))) {
+        if (!hash[Object.toJSON(a[i])]) {
             result.push(a[i]);
         }
 
         // Record that this element was added. Converts to a string,
-        // unfortunately, so can't just use hash.keys() after filling 
+        // unfortunately, so can't just use own_properties() after filling 
         // in the hash.
-        hash.set(Object.toJSON(a[i]), true);
+        hash[Object.toJSON(a[i])] = true;
     }
 
     return result;
@@ -2284,7 +2320,7 @@ function set_turn(color, historical, virtual)
     }
 
     // Zero mobility? For detecting stalemate, checkmate.
-    no_moves = VALID_MOVES.keys().length === 0;
+    no_moves = own_property_count(VALID_MOVES) === 0;
 
     // Results. 
     if (checked && !no_moves) {
@@ -2543,20 +2579,21 @@ function notation_from_piece_square(piece, square)
 {
     var ret;
 
+    var notations = VALID_MOVE_NOTATIONS[$F("output_notation")];
+
     // TODO: better data structure, inverted hash table lookup
-    VALID_MOVE_NOTATIONS[$F("output_notation")].each(function(alg_piece_square) {
-            var alg = alg_piece_square[0];
-            var this_piece = alg_piece_square[1][0];
-            var this_square = alg_piece_square[1][1];
+    for (var notation in notations) {
+        if (notations.hasOwnProperty(notation)) {
+            var this_piece = notations[notation][0];
+            var this_square = notations[notation][1];
 
             if (this_square.x === square.x && this_square.y === square.y && 
                 this_piece.unique_id === piece.unique_id) {
-                ret = alg;
-                throw $break;
-            }
-        });
 
-    return ret;
+                return notation;
+            }
+        }
+    }
 }
 
 // Get the direction vector (y component only) that is "forward" for the given color
@@ -2700,7 +2737,7 @@ function move_piece_to_square(piece, square, is_hypothetical)
 
         ply = encode_ply(GAME_STATE.active_color, GAME_STATE.fullmove_number);
 
-        only_move = VALID_MOVE_NOTATIONS.SAN.keys().length === 1;
+        only_move = own_property_count(VALID_MOVE_NOTATIONS.SAN) === 1;
 
         if (!piece.virtual) {
             make_vboard();
@@ -3070,22 +3107,22 @@ function piece_letter2name(letter)
     letter = letter.toUpperCase();
 
     if (!cache_letter2name) {
-        cache_letter2name = new Hash();
+        cache_letter2name = {};
 
         for (var name in PIECE_TYPES) {
             if (PIECE_TYPES.hasOwnProperty(name)) {
                 var info = PIECE_TYPES[name];
 
                 if (info.letter !== undefined) {
-                    cache_letter2name.set(info.letter, name);
+                    cache_letter2name[info.letter] = name;
                 } else if (info.alg_letter !== undefined) {
-                    cache_letter2name.set(info.alg_letter, name);
+                    cache_letter2name[info.alg_letter] = name;
                 }
             }
         }
     }
 
-    return cache_letter2name.get(letter.toUpperCase());
+    return cache_letter2name[letter.toUpperCase()];
 }
 
 // Return the full piece prefix, succiently indicating the piece type.
@@ -3308,7 +3345,7 @@ function highlight_moves(piece, enable)
     }
 
     //console.log(from_square.filerank);
-    moves = VALID_MOVES.get(from_square.filerank);
+    moves = VALID_MOVES[from_square.filerank];
     //console.log(moves);
     if (!moves) {
         return;    
