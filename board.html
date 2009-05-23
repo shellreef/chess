@@ -413,6 +413,7 @@ var SAVED_BOARDS = {
 "Test Promotion":     "k1K5/8/8/8/8/8/p/8 b - - 0 5",
 "Test En Passant (alone)":     "8/8/8/3pP3/8/8/8/8 w - d6 0 5",
 "Test En Passant":     "rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5",
+"Test En Passant into Check": "qk6/8/8/3pP3/8/8/8/7K w - d6 0 5",
 "Test K + K":     "k7/8/K7/8/8/8/8/8 b - - 0 30",
 "Test K + KQ":     "k7/8/8/8/8/8/8/5KQ1 w - d6 0 50",
 "Test K + KR":     "k7/8/8/8/8/8/8/5KR1 w - d6 0 50",
@@ -451,10 +452,8 @@ google.setOnLoadCallback(function() {
     load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
 
     // test PGN embedded notes
-    //pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
+    pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
     
-    QUUX = ('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
-
     //pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
     
 
@@ -2655,17 +2654,19 @@ function move_piece_to_square(piece, square, is_hypothetical)
 
     from_square = piece.square;
 
-    // Moving king makes it ineligible for castling
-    if (PIECE_TYPES[piece.type].castles_with) {
-        GAME_STATE.can_castle[GAME_STATE.active_color].cshort = false;
-        GAME_STATE.can_castle[GAME_STATE.active_color].clong = false;
-    } else if (PIECE_TYPES[piece.type].castle) {
-        // TODO: More generic, so will work with chess960 or 480
-        // If moved either rook, can't castle on that side.
-        if (from_square.x === 8) {
+    if (!is_hypothetical) {
+        // Moving king makes it ineligible for castling
+        if (PIECE_TYPES[piece.type].castles_with) {
             GAME_STATE.can_castle[GAME_STATE.active_color].cshort = false;
-        } else if (from_square.x === 1) {
             GAME_STATE.can_castle[GAME_STATE.active_color].clong = false;
+        } else if (PIECE_TYPES[piece.type].castle) {
+            // TODO: More generic, so will work with chess960 or 480
+            // If moved either rook, can't castle on that side.
+            if (from_square.x === 8) {
+                GAME_STATE.can_castle[GAME_STATE.active_color].cshort = false;
+            } else if (from_square.x === 1) {
+                GAME_STATE.can_castle[GAME_STATE.active_color].clong = false;
+            }
         }
     }
 
@@ -2686,9 +2687,6 @@ function move_piece_to_square(piece, square, is_hypothetical)
             }
         }
     }
-
-    // Lookup standard algebraic move notation (precomputed)
-    move_text = notation_from_piece_square(piece, square);
 
     if (!piece.virtual) { 
         // Capture piece(s) on destination square. Multiple pieces
@@ -2723,14 +2721,17 @@ function move_piece_to_square(piece, square, is_hypothetical)
         }
     }
 
-    // If double pawn move, this creates an en passant target square
-    filerank = xy2filerank([square.x, square.y]);
-    if (POSSIBLE_EP_TARGETS[filerank]) {
-        GAME_STATE.ep_target = POSSIBLE_EP_TARGETS[filerank];
-    } else {
-        // En passant possibility disappears immediately after any other move
-        GAME_STATE.ep_target = null;
+    if (!is_hypothetical) {
+        // If double pawn move, this creates an en passant target square
+        filerank = xy2filerank([square.x, square.y]);
+        if (POSSIBLE_EP_TARGETS[filerank]) {
+            GAME_STATE.ep_target = POSSIBLE_EP_TARGETS[filerank];
+        } else {
+            // En passant possibility disappears immediately after any other move
+            GAME_STATE.ep_target = null;
+        }
     }
+
 
     if (piece.virtual) { 
         piece.square.piece = null;  // Clear from
@@ -2746,17 +2747,19 @@ function move_piece_to_square(piece, square, is_hypothetical)
     }
 
     if (should_promote(piece)) {
-        promote(piece); // TODO: allow virtual
+        promote(piece); // TODO: allow virtual?
 
         move_text += "=Q";  // TODO: get return value from promote(), different values. Maybe need a callback, user interaction.
     }
 
-    if (castle_move_text) {
-        move_text = castle_move_text;
-    }
-
     // If not a multi-move (moving rook in castling), log and go to next turn
     if (!is_hypothetical) {
+        if (castle_move_text) {
+            move_text = castle_move_text;
+        } else {
+            move_text = notation_from_piece_square(piece, square);
+        }
+
         // TODO: ellipsis if black is first recorded move, or intervening commentary
         var alg_move, ply, turn_info;
        
