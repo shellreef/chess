@@ -2568,6 +2568,20 @@ function init_board()
     board_menu.selectedIndex = 0;
 }
 
+// Load a board from the drop down menu of SAVED_BOARDS.
+function change_loaded_board(menu)
+{
+    if (!menu.value) {
+        return;
+    }
+
+    load_fen(menu.value);
+
+    menu[0].innerText = "Loaded: " + menu[menu.selectedIndex].innerText;
+    // Reset index to zero so can reload same board by selecting same drop down
+    menu.selectedIndex = 0;
+}
+
 // Acknowledge that a piece was captured. Called by move_piece_to_square(), which
 // does all the DOM manipulation. 
 function capture_piece(piece)
@@ -3748,7 +3762,7 @@ function enable_document_selection(enable) {
 
  <p><a href="#" onclick="edit_pgn()">edit PGN</a>
 
- <p><select id="saved_board_menu" onchange="if (this.value) { load_fen(this.value); }"></select>
+ <p><select id="saved_board_menu" onchange="change_loaded_board(this)"></select>
  </div>
  </div>
 
