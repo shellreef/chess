@@ -2436,7 +2436,6 @@ function set_check_message(msg)
 }
 
 // Check for three-move repetition
-// Uses virtual board. TODO: check for real board too!
 function check_repetition(ply)
 {
     var new_state = save_fen(true, true);
@@ -3002,7 +3001,7 @@ function load_fen(fen, replay)
     GAME_STATE.fullmove_number = parseInt(parts[5], 10);
 
     if (!replay) { GAME_STATE.position_moves = {}; }
-    if (!replay) { GAME_STATE.position_after = {}; }
+    if (!replay) { GAME_STATE.position_after = [fen]; }
    
     // Now that everything is loaded, set the turn.
     make_vboard();
