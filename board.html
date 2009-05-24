@@ -2886,8 +2886,10 @@ function move_dropped_piece(piece, square, event)
 
     unhighlight_all();
 
-    make_vboard();
-    move_piece_to_square(piece, square);
+    var virtual_square = VBOARD[square.x][square.y];
+    var virtual_piece = VBOARD[piece.square.x][piece.square.y].piece;
+ 
+    move_piece_to_square(virtual_piece, virtual_square);
     realize_vboard();
 
     // Scriptaculous requires position:relative; with static, you can drag it
