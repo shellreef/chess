@@ -1729,7 +1729,7 @@ function unfiltered_moves(parlett)
 function filtered_moves(piece, color, is_hypothetical)
 {
     var parlett, rel_moves, moves, start, blocked;
-    var start_x, start_y;
+    var start_x, start_y, piece_info;
 
     start = piece.square;
     if (!start) {
@@ -1739,7 +1739,8 @@ function filtered_moves(piece, color, is_hypothetical)
     start_x = start.x;
     start_y = start.y;
 
-    parlett = PIECE_TYPES[piece.type].parlett;
+    piece_info = PIECE_TYPES[piece.type];
+    parlett = piece_info.parlett;
 
     rel_moves = unfiltered_moves(parlett);
 
@@ -1945,6 +1946,12 @@ function filtered_moves(piece, color, is_hypothetical)
                continue;
            }
         }*/
+
+        if (piece_info.castles_with) {
+            // If this piece castles with another piece, moving it clears that ability.
+            abs_move.clear_castle_short = true;
+            abs_move.clear_castle_long = true;
+        }
 
         // TODO: faster check checking? maybe split into:
         // 1. if not in check, can't move into
@@ -2703,12 +2710,17 @@ function move_piece_to_square(piece, square, is_hypothetical)
         console.log(move_text, move);
 
         // Moving king makes it ineligible for castling
-        if (PIECE_TYPES[piece.type].castles_with) {
+        if (move.clear_castle_short) {
             GAME_STATE.can_castle[GAME_STATE.active_color].cshort = false;
+        }
+
+        if (move.clear_castle_long) {
             GAME_STATE.can_castle[GAME_STATE.active_color].clong = false;
-        } else if (PIECE_TYPES[piece.type].castle) {
+        }
+
+        // If moved either rook, can't castle on that side.
+        if (PIECE_TYPES[piece.type].castle) {
             // TODO: More generic, so will work with chess960 or 480
-            // If moved either rook, can't castle on that side.
             if (from_square.x === 8) {
                 GAME_STATE.can_castle[GAME_STATE.active_color].cshort = false;
             } else if (from_square.x === 1) {
