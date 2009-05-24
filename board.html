@@ -419,6 +419,7 @@ var SAVED_BOARDS = {
 "Test K + KR":     "k7/8/8/8/8/8/8/5KR1 w - d6 0 50",
 "Test Castling out of Check":     "4r3/8/8/8/8/8/8/R3K2R w KQkq - 0 1",
 "Test Castling through Check":     "1k3r2/8/8/8/8/7Q/8/R3K2R w KQkq - 0 1",
+"Test Castling through Check (pawn)": "rnbqkbnr/pppp2pp/8/6N1/4p3/3B4/PPPP2pP/RNBQK2R w KQkq - 0 7",
 "Test Castling w/ Intervening Pieces":     "1k/8/8/8/8/8/8/R3KQ1R w KQ - 0 1",
 "Test Only Move ":     "rnbqkbnr/ppp2ppp/8/8/8/8/PPP2PPP/RNBQKBNR w KQkq - 0 1",
 "Test Disambiguation by File":     "k7/8/8/8/8/8/3N4/6N1 w - - 0 1",
@@ -2628,15 +2629,14 @@ function change_loaded_board(menu)
 }
 
 // Acknowledge that a piece was captured. Called by move_piece_to_square(), which
-// does all the DOM manipulation. 
-function capture_piece(piece)
+// does all the board manipulation. 
+function piece_was_captured(piece, square)
 {
     // If rook captured, remove castling privileges
     if (piece.type === "rook") {
         // Note that this is the first rank of the *other* player
         var opponent = opposite_color(GAME_STATE.active_color);
         var first_rank = opponent === "white" ? 1 : 8;
-        var square = piece.square;
         
         // TODO: really would like to not have to hardcode this
         if (square.y === first_rank) {
@@ -2744,6 +2744,7 @@ function move_piece_to_square(piece, square, is_hypothetical)
     }
 
     // Special case: en passant captures to an empty square
+    // TODO: move to do_virtual_move
     if (GAME_STATE.ep_target &&
         square.x === GAME_STATE.ep_target[0] && 
         square.y === GAME_STATE.ep_target[1]) {
@@ -2753,7 +2754,7 @@ function move_piece_to_square(piece, square, is_hypothetical)
         
         dead_pawn_square = VBOARD[square.x][square.y - forward];
 
-        capture_piece(dead_pawn_square.piece);
+        piece_was_captured(dead_pawn_square.piece, dead_pawn_square);
         dead_pawn_square.piece = null;
     }
 
@@ -2770,7 +2771,9 @@ function move_piece_to_square(piece, square, is_hypothetical)
 
 
     did = do_virtual_move(piece, move);
-
+    if (did.captured) {
+        piece_was_captured(did.captured, did.capture_square);
+    }
 
     if (should_promote(piece)) {
         promote(piece); // TODO: allow virtual?
