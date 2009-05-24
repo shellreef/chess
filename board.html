@@ -451,7 +451,6 @@ google.setOnLoadCallback(function() {
     load_notations();
 
     load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
-    load_fen("rnbqkbnr/pppp2pp/8/6N1/4p3/3B4/PPPP2pP/RNBQK2R w KQkq - 0 7");
 
     // test PGN embedded notes
     //pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
@@ -1591,53 +1590,60 @@ function computer_move()
 }
 
 // Make a move in the VBOARD, which can be undone. Only makes the move.
-// TODO: replace partially move_piece_to_square()
 function do_virtual_move(piece, move)
 {
-    var captured, from_square, to_square, capture_square;
+    var captured, from_square, to_square, capture_square, piece_moved_over;
  
     from_square = piece.square;
     to_square = VBOARD[move.x][move.y];
-   
+  
     // Special case: en passant captures to an empty square
-    // XXX TODO
-    if (0 && GAME_STATE.ep_target &&
+    if (GAME_STATE.ep_target &&
         to_square.x === GAME_STATE.ep_target[0] && 
         to_square.y === GAME_STATE.ep_target[1]) {
 
-        var forward = forwards_vector(GAME_STATE.active_color);
-        
-        capture_square = VBOARD[to_square.x][to_square.y - forward];
+        // TODO: use move instead of comparing location to find if ep
 
+        var forward = forwards_vector(GAME_STATE.active_color);
+
+        capture_square = VBOARD[to_square.x][to_square.y - forward];
     } else {
         capture_square = to_square;
     }
 
-    captured = to_square.piece;
+    // The piece that was captured, not always where the piece moved to.
+    captured = capture_square.piece;
+
+    // Piece that was on destination square, if any. For restoring old piece.
+    piece_moved_over = to_square.piece;
+
+    if (captured) { 
+        VBOARD[capture_square.x][capture_square.y].piece = null;
+        captured.square = null;
+    }
 
     piece.square = VBOARD[move.x][move.y];
     VBOARD[move.x][move.y].piece = piece;
-
-    if (captured) { 
-        captured.square = null;
-    }
     VBOARD[from_square.x][from_square.y].piece = null;
 
-
-    // TODO: en passant, castling
-
-    return {captured: captured, capture_square: capture_square, from_square: from_square, piece: piece, move: move, to_square: to_square};
+    return {captured: captured, capture_square: capture_square, 
+        from_square: from_square, piece: piece, move: move, to_square: to_square,
+        piece_moved_over: piece_moved_over};
 }
 
 // Undo a move given the result of do_virtual_move().
 function undo_virtual_move(did)
 {
-    // Restore move
+    // Restore captured piece
     if (did.captured) {
-        did.captured.square = VBOARD[did.move.x][did.move.y];
+        did.captured.square = VBOARD[did.capture_square.x][did.capture_square.y];
+        did.captured.square.piece = did.captured;
     }
-    VBOARD[did.move.x][did.move.y].piece = did.captured;
 
+    // Piece that was clobbered by the move
+    VBOARD[did.move.x][did.move.y].piece = did.piece_moved_over;
+
+    // Move piece back
     did.piece.square = VBOARD[did.from_square.x][did.from_square.y];
     VBOARD[did.from_square.x][did.from_square.y].piece = did.piece;
 }
@@ -1895,7 +1901,6 @@ function filtered_moves(piece, color, is_hypothetical)
                     break;
                 }
             }
-            console.log(moves);
             if (!found) {
                 continue;
             }
@@ -2744,19 +2749,9 @@ function move_piece_to_square(piece, square, is_hypothetical)
         }
     }
 
-    // Special case: en passant captures to an empty square
-    // TODO: move to do_virtual_move
-    if (GAME_STATE.ep_target &&
-        square.x === GAME_STATE.ep_target[0] && 
-        square.y === GAME_STATE.ep_target[1]) {
-
-        var forward = forwards_vector(GAME_STATE.active_color);
-        var dead_pawn_square;
-        
-        dead_pawn_square = VBOARD[square.x][square.y - forward];
-
-        piece_was_captured(dead_pawn_square.piece, dead_pawn_square);
-        dead_pawn_square.piece = null;
+    did = do_virtual_move(piece, move);
+    if (did.captured) {
+        piece_was_captured(did.captured, did.capture_square);
     }
 
     if (!is_hypothetical) {
@@ -2770,11 +2765,6 @@ function move_piece_to_square(piece, square, is_hypothetical)
         }
     }
 
-
-    did = do_virtual_move(piece, move);
-    if (did.captured) {
-        piece_was_captured(did.captured, did.capture_square);
-    }
 
     if (should_promote(piece)) {
         promote(piece); // TODO: allow virtual?
