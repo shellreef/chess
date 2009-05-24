@@ -1078,13 +1078,13 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
         if (move.notation_override) {
             // Override notation; used for special moves (castling)
             // Note: not all notations have special notation for castling.
-            ps.SAN.push([piece, square, [move.notation_override]]);
-            ps.LAN.push([piece, square, [move.notation_override]]);
-            ps.MAN.push([piece, square, [move.notation_override]]);
-            ps.RAN.push([piece, square, [move.notation_override]]);
-            ps.CRAN.push([piece, square, [move.notation_override]]);
-            ps.descr.push([piece, square, [move.notation_override]]);
-            ps.adesc.push([piece, square, [move.notation_override]]);
+            ps.SAN.push([piece, square, [move.notation_override], move]);
+            ps.LAN.push([piece, square, [move.notation_override], move]);
+            ps.MAN.push([piece, square, [move.notation_override], move]);
+            ps.RAN.push([piece, square, [move.notation_override], move]);
+            ps.CRAN.push([piece, square, [move.notation_override], move]);
+            ps.descr.push([piece, square, [move.notation_override], move]);
+            ps.adesc.push([piece, square, [move.notation_override], move]);
         } else {
             var algs, figurine_prefix, algebraic_prefix, piece_letter, minimal_algs;
 
@@ -1104,8 +1104,8 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
             algebraic_prefix = algebraic_piece_prefix(piece);      // blank, N, etc.
             figurine_prefix = figurine_piece_prefix(color, piece); // ♟, ♞, ♙, ♘, etc.
 
-            ps.SAN.push([piece, square, algs.map(function(a) { return algebraic_prefix + a; })]);  // N??
-            ps.FAN.push([piece, square, algs.map(function(a) { return figurine_prefix + a; })]);   // ♘??
+            ps.SAN.push([piece, square, algs.map(function(a) { return algebraic_prefix + a; }), move]);  // N??
+            ps.FAN.push([piece, square, algs.map(function(a) { return figurine_prefix + a; }), move]);   // ♘??
 
             // Minimal notation, supposedly used in Informant
             minimal_algs = [
@@ -1113,12 +1113,12 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
                 algebraic_prefix + starting_file + dest_filerank,      // ?gf3
                 algebraic_prefix + starting_rank + dest_filerank,      // ?1f3
                 algebraic_prefix + starting_filerank + dest_filerank]; // ?g1f3
-            ps.MAN.push([piece, square, minimal_algs]);
+            ps.MAN.push([piece, square, minimal_algs, move]);
 
-            ps.LAN.push([piece, square, [algebraic_prefix + starting_filerank + capture_or_dash + dest_filerank]]);
+            ps.LAN.push([piece, square, [algebraic_prefix + starting_filerank + capture_or_dash + dest_filerank], move]);
 
             ps.RAN.push([piece, square, [algebraic_prefix + starting_filerank + capture_or_dash + 
-                captured_letter + dest_filerank]]);
+                captured_letter + dest_filerank], move]);
 
             // Best online documentation I could find on CRAN: 
             //  http://main.uschess.org/forums/viewtopic.php?f=2&t=1428&start=30
@@ -1130,7 +1130,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
                 algebraic_prefix + starting_filerank + captured_colon_letter + dest_filerank,  // Rd3:d7
                 algebraic_prefix + starting_filerank + captured_colon_letter + dest_file,      // Rd3:7
                 algebraic_prefix + starting_filerank + captured_colon_letter + dest_rank       // Rd3:e
-                ]]);
+                ], move]);
 
             // English descriptive notation
             // TODO: 
@@ -1173,7 +1173,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
                 // in the list above, and disambiguate_moves() will delete both since it'll think they
                 // are ambiguous. This would have occurred when piece_name === short_piece_name, that is,
                 // for KP, QP, K, and Q. 
-                ].uniq()]);
+                ].uniq(), move]);
 
 
                 ps.adesc.push([piece, square, [
@@ -1182,7 +1182,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
                     piece_letter + "(" + adescriptive_origin + ")" + capture_or_dash + adescriptive_dest,       // P(c2)-c4
                     piece_letter + "(" + adescriptive_origin_rank + ")" + capture_or_dash + adescriptive_dest,  // P(2)-c4
                     piece_letter + "(" + adescriptive_origin_file + ")" + capture_or_dash + adescriptive_dest   // P(c)-c4
-                ].uniq()]);
+                ].uniq(), move]);
             } else if (capture_or_dash === "x") {
                 var captured_name = captured_piece.descriptive_name;
                 var short_captured_name = short_descriptive(captured_name);
@@ -1206,7 +1206,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
                     piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + captured_letter,  // P(K4)xP
                     piece_letter + capture_or_dash + captured_letter + "(" + descriptive_dest + ")",    // PxP(Q4)
                     piece_name + capture_or_dash + captured_letter + "(" + descriptive_dest + ")"       // KPxP(Q4)
-                ].uniq()]);
+                ].uniq(), move]);
 
                 ps.adesc.push([piece, square, [
                     piece_letter + capture_or_dash + captured_letter,           // PxP
@@ -1218,20 +1218,20 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
                     piece_letter + "(" + adescriptive_origin + ")" + capture_or_dash + captured_letter, // P(b4)xP
                     piece_letter + capture_or_dash + captured_letter + "(" + adescriptive_dest + ")",   // PxP(c5)
                     piece_aname + capture_or_dash + captured_letter + "(" + adescriptive_dest + ")"     // bPxP(c5)
-                ].uniq()]);
+                ].uniq(), move]);
             } else {
                 assert(false, "calculate_notations: " + capture_or_dash + " is not - or x");
             }
         }
 
         // Coordinate notation - least descriptive notation possible
-        ps.coord.push([piece, square, [starting_filerank.toUpperCase() + "-" + dest_filerank.toUpperCase()]]);
+        ps.coord.push([piece, square, [starting_filerank.toUpperCase() + "-" + dest_filerank.toUpperCase()], move]);
 
         // ICCF numeric notation
         // TODO: promotion number, 1234 = QRBN
         var starting_xy = filerank2xy(starting_filerank);
         var starting_x = starting_xy[0], starting_y = starting_xy[1];
-        ps.ICCF.push([piece, square, [starting_x + "" + starting_y + "" + move.x + "" + move.y]]);
+        ps.ICCF.push([piece, square, [starting_x + "" + starting_y + "" + move.x + "" + move.y], move]);
 
         // Smith notation, reversible, non-ambiguous: https://www.chessclub.com/chessviewer/smith.html
         var smith_capture_letter;
@@ -1247,7 +1247,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
         } else {
             smith_capture_letter = "";
         }
-        ps.smith.push([piece, square, [starting_filerank + dest_filerank + smith_capture_letter]]);
+        ps.smith.push([piece, square, [starting_filerank + dest_filerank + smith_capture_letter], move]);
         
         // TODO: support promotation in all notations, make separate moves (a8=Q, a8=N, etc.)
 
@@ -1600,6 +1600,7 @@ function do_virtual_move(piece, move)
     to_square = VBOARD[move.x][move.y];
    
     // Special case: en passant captures to an empty square
+    // XXX TODO
     if (0 && GAME_STATE.ep_target &&
         to_square.x === GAME_STATE.ep_target[0] && 
         to_square.y === GAME_STATE.ep_target[1]) {
@@ -2689,12 +2690,6 @@ function move_piece_to_square(piece, square, is_hypothetical)
 {
     var from_square, move_text, castle_move_text, filerank, only_move;
 
-    // TODO: Always pass virtual
-    if (!square.virtual) {
-        square = VBOARD[square.x][square.y];
-        piece = VBOARD[piece.square.x][piece.square.y].piece;
-    }
-        
     from_square = piece.square;
 
     if (!is_hypothetical) {
