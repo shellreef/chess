@@ -450,6 +450,7 @@ google.setOnLoadCallback(function() {
     load_notations();
 
     load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // standard
+    load_fen("1k3r2/8/8/8/8/7Q/8/R3K2R w KQkq - 0 1");
 
     // test PGN embedded notes
     //pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
@@ -2647,7 +2648,6 @@ function capture_piece(piece)
 
 // Find precomputed algebraic notation for this move. Called when
 // user drags a piece to a square and we don't know what move it is.
-// TODO: Also allow getting the original abs_move, so can perform multimoves generically.
 function notation_from_piece_square(piece, square)
 {
     var ret;
@@ -2659,11 +2659,13 @@ function notation_from_piece_square(piece, square)
         if (notations.hasOwnProperty(notation)) {
             var this_piece = notations[notation].piece;
             var this_square = notations[notation].square;
+            var this_move = notations[notation].move;
 
             if (this_square.x === square.x && this_square.y === square.y && 
                 this_piece.unique_id === piece.unique_id) {
 
-                return notation;
+                notation.move = this_move;
+                return {notation:notation, move:this_move};
             }
         }
     }
@@ -2686,11 +2688,20 @@ function forwards_vector(color)
 // (castling) so it shouldn't be logged.
 function move_piece_to_square(piece, square, is_hypothetical)
 {
-    var from_square, move_text, castle_move_text, filerank, only_move;
+    var from_square, move_text, filerank, only_move, move, tieback;
 
     from_square = piece.square;
 
+    // Find out what move this was.
+    tieback = notation_from_piece_square(piece, square);
+    move = tieback.move;
+
+
     if (!is_hypothetical) {
+        move_text = tieback.notation;
+
+        console.log(move_text, move);
+
         // Moving king makes it ineligible for castling
         if (PIECE_TYPES[piece.type].castles_with) {
             GAME_STATE.can_castle[GAME_STATE.active_color].cshort = false;
@@ -2715,11 +2726,9 @@ function move_piece_to_square(piece, square, is_hypothetical)
                 // (instead of hardcoding). Short.
                 // TODO: test virtual
                 move_piece_to_square(pc(8, first_rank, piece.virtual), VBOARD[6][first_rank], true);
-                castle_move_text = "O-O";
             } else if (square.x === 3) {
                 // Castle long.
                 move_piece_to_square(pc(1, first_rank, piece.virtual), VBOARD[4][first_rank], true);
-                castle_move_text = "O-O-O";
             }
         }
     }
@@ -2762,12 +2771,6 @@ function move_piece_to_square(piece, square, is_hypothetical)
 
     // If not a multi-move (moving rook in castling), log and go to next turn
     if (!is_hypothetical) {
-        if (castle_move_text) {
-            move_text = castle_move_text;
-        } else {
-            move_text = notation_from_piece_square(piece, square);
-        }
-
         // TODO: ellipsis if black is first recorded move, or intervening commentary
         var alg_move, ply, turn_info;
        
