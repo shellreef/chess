@@ -898,8 +898,8 @@ function mv(alg_move, virtual)
 
     assert(piece_square, "mv(" + alg_move + "): illegal move");
 
-    piece = piece_square[0];
-    square = piece_square[1];
+    piece = piece_square.piece;
+    square = piece_square.square;
 
     // TODO: do some Effect.Move animation, optionally (make two functions)
     //new Effect.Move(piece, { x: 10, y: 20, mode: 'relative' });
@@ -1273,21 +1273,17 @@ function disambiguate_notations(notations)
     var freq_count = {};
     var canonical_notations = {};
     var synonymous_notations = {};
-    var piece, square;
+    var piece, square, same_moves, abs_move;
 
+    // Count occurrences of each notation text, so know if is ambiguous.
     for (var i = 0; i < notations.length; i += 1) {
-        var moves;
-
         piece = notations[i][0];
         square = notations[i][1];
-        moves = notations[i][2];
+        same_moves = notations[i][2];
+        abs_move = notations[i][3];
 
-        if (!moves) {
-            //console.log(notations[i]);
-        }
-
-        for (var j = 0; j < moves.length; j += 1) {
-            var move = moves[j];
+        for (var j = 0; j < same_moves.length; j += 1) {
+            var move = same_moves[j];
 
             if (!freq_count[move]) {
                 // Store index so can delete if is a dupe
@@ -1312,10 +1308,12 @@ function disambiguate_notations(notations)
         }
     }
 
+    // Find shortest notation text
     for (i = 0; i < notations.length; i += 1) {
         piece = notations[i][0];
         square = notations[i][1];
-        var same_moves = notations[i][2];
+        same_moves = notations[i][2];
+        abs_move = notations[i][3];
         var shortest, synonyms;
 
         // Remove undefined elements
@@ -1331,10 +1329,10 @@ function disambiguate_notations(notations)
         shortest = same_moves.shift();
         synonyms = same_moves;
 
-        canonical_notations[shortest] = [piece, square];
+        canonical_notations[shortest] = {piece:piece, square:square, move:abs_move};
 
         for (j = 0; j < synonyms.length; j += 1) {
-            synonymous_notations[synonyms[j]] = [piece, square];
+            synonymous_notations[synonyms[j]] = {piece:piece, square:square, move:abs_move};
         }
     }
 
@@ -2659,8 +2657,8 @@ function notation_from_piece_square(piece, square)
     // TODO: better data structure, inverted hash table lookup
     for (var notation in notations) {
         if (notations.hasOwnProperty(notation)) {
-            var this_piece = notations[notation][0];
-            var this_square = notations[notation][1];
+            var this_piece = notations[notation].piece;
+            var this_square = notations[notation].square;
 
             if (this_square.x === square.x && this_square.y === square.y && 
                 this_piece.unique_id === piece.unique_id) {
