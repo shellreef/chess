@@ -988,15 +988,7 @@ function mv(alg_move, virtual)
     // TODO: do some Effect.Move animation, optionally (make two functions)
     //new Effect.Move(piece, { x: 10, y: 20, mode: 'relative' });
     
-    move_piece_to_square(piece, square);
-
-    if (!virtual) {
-        realize_vboard();
-
-        make_droppables();
-        populate_make_a_move_list();
-        computer_move_if_applicable();
-    }
+    move_piece_to_square(piece, square, false, true);
 }
 
 //// SPECIAL MOVE FUNCTIONS
@@ -1024,7 +1016,7 @@ function should_promote(piece)
 }
 
 // Change a piece to whatever it promotes to.
-function promote(piece)
+function ask_to_promote(piece)
 {
     var promotes_to, element, container;
 
@@ -2958,7 +2950,7 @@ function forwards_vector(color)
 // Make a move on the virtual board.
 // If is_hypothetical is true, this is an internal move part of another move
 // (castling) so it shouldn't be logged.
-function move_piece_to_square(piece, square, is_hypothetical)
+function move_piece_to_square(piece, square, is_hypothetical, is_real)
 {
     var from_square, move_text, filerank, only_move, move, tieback, did;
 
@@ -3007,10 +2999,10 @@ function move_piece_to_square(piece, square, is_hypothetical)
                 // TODO: actually calculate square moved over, then move rook there
                 // (instead of hardcoding). Short.
                 // TODO: test virtual
-                move_piece_to_square(pc(8, first_rank, piece.virtual), VBOARD[6][first_rank], true);
+                move_piece_to_square(pc(8, first_rank, piece.virtual), VBOARD[6][first_rank], true, true);
             } else if (square.x === 3) {
                 // Castle long.
-                move_piece_to_square(pc(1, first_rank, piece.virtual), VBOARD[4][first_rank], true);
+                move_piece_to_square(pc(1, first_rank, piece.virtual), VBOARD[4][first_rank], true, true);
             }
         }
     }
@@ -3033,24 +3025,24 @@ function move_piece_to_square(piece, square, is_hypothetical)
 
 
     if (should_promote(piece)) {
-        promote(piece); // TODO: allow virtual?
+        ask_to_promote(piece);
 
         move_text += "=Q";  // TODO: get return value from promote(), different values. Maybe need a callback, user interaction.
     }
 
     // If not a multi-move (moving rook in castling), log and go to next turn
     if (!is_hypothetical) {
-        finish_up_move(tieback);
+        setTimeout(function(){finish_up_move(tieback, is_real)}, 1000);
     }
 
     // TODO: return from finish_up_move, deferred? promotions..
     // To allow undo_virtual_move
-    return did;
+    //return did;
 }
 
 // Perform bookkeeping on the move after it has been actually made, 
 // in move_piece_to_square().
-function finish_up_move(tieback)
+function finish_up_move(tieback, is_real)
 {
     var alg_move, ply, turn_info, move_text;
 
@@ -3113,6 +3105,16 @@ function finish_up_move(tieback)
         $("opening_name").innerHTML = opening;
     }
     // If not recognized, do not clear it -- keep up opening during the game
+
+
+
+    if (is_real) {
+        realize_vboard();
+
+        make_droppables();
+        populate_make_a_move_list();
+        computer_move_if_applicable();
+    }
 }
 
 // Visually indicate the moves which after threefold repetition
@@ -3172,18 +3174,13 @@ function move_dropped_piece(piece, square, event)
     var virtual_square = VBOARD[square.x][square.y];
     var virtual_piece = VBOARD[piece.square.x][piece.square.y].piece;
  
-    move_piece_to_square(virtual_piece, virtual_square);
-    realize_vboard();
+    move_piece_to_square(virtual_piece, virtual_square, false, true);
 
     // Scriptaculous requires position:relative; with static, you can drag it
     // but it won't move with the cursor, so set it and crucially, reset the
     // relative position so that it won' be misaligned.
     piece.style.position = "relative";
     piece.style.left = piece.style.right = piece.style.top = piece.style.bottom = 0;
-
-    make_droppables();
-    populate_make_a_move_list();
-    computer_move_if_applicable();
 }
 
 // Get the representation of the active board state in FEN.
