@@ -77,6 +77,11 @@ sub compute
 
     if ($output =~ m/(illegal position.*)/) {
         $error = ucfirst($1);
+    } elsif ($output =~ m/Illegal position/) {
+        $error = "Illegal position";
+        if ($output =~ m/ERROR(.*)/) {
+            $error .= ": $1";
+        } 
     } elsif ($output =~ m/usage: /) {
         $error = "Bad usage";
     }
