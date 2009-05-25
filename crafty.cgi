@@ -8,6 +8,7 @@ use warnings;
 
 use CGI qw/:standard/;
 use IPC::Open2;
+use  JSON;  # http://search.cpan.org/dist/JSON/lib/JSON.pm
 
 warn "crafty.pl @{[ scalar localtime ]} $ENV{REMOTE_ADDR}\n";
 
@@ -34,21 +35,11 @@ if (!$error) {
 warn "Error: $error\n" if defined($error);
 warn "OK" if !defined($error);
 
-$output =~ tr/'/"/ if defined($output);
-
-print "{";
-print "next_move:'$move', " if defined($move);
-print "score:$score, " if defined($score);
-#print "output: '$output', ";
-
-if ($error) {
-    print "error:'$error'";
-} else {
-    print "error:false";
-}
-
-print "}\n";
-
+print to_json({
+    next_move => $move,
+    score => $score,
+    #output => $output,
+    error => $error});
 
 sub compute
 {
@@ -88,6 +79,8 @@ sub compute
     # Move is highlighted with ANSI escape code in reverse video
     ($move) = $output =~ m/\c[[^:]+: (\S+)/;
     ($score) = $output =~ m/total[.]+\s*(\S+)/;
+
+    $score += 0;
 
     $error = "Error reading output" if !$move || !$score;
 

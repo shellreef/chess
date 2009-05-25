@@ -133,10 +133,13 @@ google.load("scriptaculous", "1.8.2");
 var PREFS = {
     INPUT_NOTATION: "SAN",
 
-    // What piece images to use                     
-    IMAGE_SET: "alfaerie"   // http://www.chessvariants.org/graphics.dir/alfaerie/index.html
+    // What piece images to use  - TODO: option to change
+    IMAGE_SET: "alfaerie",   // http://www.chessvariants.org/graphics.dir/alfaerie/index.html
     //IMAGE_SET: "ariel"    // based on Ariel Unicode MS
     //IMAGE_SET: "chessos"
+    
+    ENGINE: "http://jeff.tk:81/crafty.cgi",
+    SKILL: 1
 };
 
 // Chess movement notations, in descending precedence. 
@@ -1599,22 +1602,21 @@ function make_move_by_menu(menu)
 // see the move, since they are not animated (Effect.Move) yet.
 function computer_move_if_applicable()
 {
-    setTimeout(computer_move, 1);
-}
-
-// Make a move as the computer, if we're supposed to.
-// TODO: also get moves from network via Ajax, maybe a third-party 
-// chess engine, or a real live human, remotely
-function computer_move()
-{
     if (!$F(GAME_STATE.active_color + "_computer")) {
         return;
     }
 
+    if (PREFS.SKILL === 0) {
+        setTimeout(random_move, 1);
+    } else {
+        schedule_engine_move(PREFS.SKILL);
+    }
+}
+
+// Make a random move with equal probability. No intelligence.
+function random_move()
+{
     // simply choose a random move
-    // TODO: weak AI, take most valuable piece, checkmate if can, check if can,
-    //     fork if can.. something to entertain a beginner. Or better yet,
-    // plugin to a remote network server.
     var keys = own_properties(VALID_MOVE_NOTATIONS.SAN);
     var alg_move = keys[randint(0, keys.length - 1)];
     //var alg_move = keys[0];
@@ -1623,6 +1625,37 @@ function computer_move()
 
     // TODO: do some animation when moving, Effect.Move, to slow it down so we can see it.
     mv(alg_move);
+}
+
+// Ask a chess engine, via Ajax, for its move and the board score.
+// TODO: also allow remote human moves, for realtime games?
+function schedule_engine_move(skill)
+{
+    var query;
+
+    // TODO: pass skill, too.
+    
+    query = "?fen=" + encodeURIComponent(save_fen());
+
+    dojo.xhrGet({
+        url: PREFS.ENGINE + query,
+        handleAs: "json",
+        load: got_engine_move
+        });
+
+    // TODO: show thinking
+}
+
+// Callback for when the chess engine Ajax request move is received.
+function got_engine_move(response)
+{
+    if (!response.error) {
+        mv(response.next_move);
+        // TODO: show a meter for the board position
+        //$("score") = response.score;
+    } else {
+        alert("Chess engine error: " + response.error);
+    }
 }
 
 // Make a move in the VBOARD, which can be undone. Only makes the move.
