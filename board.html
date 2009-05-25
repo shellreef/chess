@@ -307,7 +307,7 @@ var PIECE_TYPES = {
     colonel: {parlett: "n>, n=, 2/1>, 1*", letter: "XC"}, 
     murray_lion: {parlett: "~0/2, ~2/2, c1*", letter: "XM"},
     lion: {parlett: "~n*", letter: "XL"},
-    berolina_pawn: {parlett: "o1X>, c1>, io2X>", letter: "XB", image:"berolinapawn"},
+    berolina_pawn: {parlett: "o1X>, c1>, io2X>", letter: "XB", image:"berolinapawn", resets_50move: true},
     superpawn: {parlett: "on>, cnX>", letter: "XP"},
     elephant: {parlett: "2X", letter: "E"},         // Not a leaper, path can be blocked (unlike alfil, ~2X)
     khohn: {parlett: "1X, 1>", letter: "XK"},
@@ -2402,7 +2402,7 @@ function set_turn(color, historical)
         // TODO: detect double-check, allow ++ for descriptive/algebraic descriptive, but not algebraic
     } else if (!checked && no_moves) {
         set_check_message("Draw (stalemate)");
-        text_end = "1/2-1/2";
+        text_end = "&frac12;-&frac12;";
     } else if (checked && no_moves) {
         set_check_message("Checkmate.");
         if (new_color === "white") { 
@@ -2414,7 +2414,7 @@ function set_turn(color, historical)
         }
     } else if (check_insufficient_material()) {
         set_check_message("Draw (material)");
-        text_end = "1/2-1/2";
+        text_end = "&frac12;-&frac12;";
     } else if (GAME_STATE.halfmove_clock >= 50) {
         set_check_message("Draw (fifty move) claimable");
     } else {
