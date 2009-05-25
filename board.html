@@ -1042,6 +1042,8 @@ function ask_to_promote(piece, tieback, is_immediate)
 {
     var promotes_to, element, container, choice;
 
+    realize_vboard();
+
     //console.log("promotion");
 
     // TODO: give option to what to promote to, if more than one.
@@ -1058,7 +1060,6 @@ function ask_to_promote(piece, tieback, is_immediate)
         container.removeChild(container.firstChild);
     }
 
-
     // Creation promotion elements
     for (var i = 0; i < promotes_to.length; i += 1) {
         choice = promotes_to[i];
@@ -1066,6 +1067,7 @@ function ask_to_promote(piece, tieback, is_immediate)
         //element = create_piece(GAME_STATE.active_color, choice);
         element = Builder.node("img", {src:image_path_for(choice, piece.color), piece_type:choice});
         element.onclick = function() {
+            // Finishes up the move
             promote(piece, dojo.attr(this, "piece_type"), tieback, is_immediate);
         };
         container.appendChild(element);
