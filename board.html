@@ -356,6 +356,7 @@ var SAVED_BOARDS = {
 "International Western Chess": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
 "Advance Chess":        "rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq - 0 1",
 "Amazon Chess":         "rnbxvkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBXVKBNR w KQkq - 0 1",
+"Atheist Chess": "rn1qk1nr/pppppppp/8/8/8/8/PPPPPPPP/RN1QK1NR w KQkq - 0 1",
 "Berolina Chess": "rnbqkbnr/xbxbxbxbxbxbxbxb/8/8/8/8/XBXBXBXBXBXBXBXB/RNBQKBNR w KQkq - 0 1",
 "Church Chess":         "bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1",
 "Corner Chess":         "4rbqk/4rb1q/4r1bb/5rrr/RRR5/BB1R4/Q1BR4/KQBR4 w - - 0 1",
@@ -371,18 +372,22 @@ var SAVED_BOARDS = {
 "Knightmate Chess":    "rmbqxrbmr/pppppppp/8/8/8/8/PPPPPPPP/RMBQXRBMR w KQkq - 0 1",
 // TODO: No black pawn promotion
 "Maharajah Chess":     "rnbqkbnr/pppppppp/8/8/8/8/8/4XJ3 w kq - 0 1",
+"Marxist Chess":       "8/pppppppp/8/8/8/8/8/PPPPPPPP/8 w - - 0 1",
 "Mongredian Chess":    "rbbqknnr/pppppppp/8/8/8/8/PPPPPPPP/RBBQKNNR w - - 0 1",
+"Pawn's Game Chess": "rnbqkbnr/pppppppp/8/8/2PPPP2/1PP2PP1/PPPPPPPP/RNB1KBNR w KQkq - 0 1",
 "Pawn Massacre Chess": "RNBQKBNR/pppppppp/8/8/8/8/PPPPPPPP/rnbqkbnr w KQkq - 0 1",
 "Pawn Odds Chess":     "rnbqkbnr/pppppppp/8/8/8/8/PPPPP1PP/RNBQKBNR w KQkq - 0 1",
 "Pawnless Chess":      "rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w KQkq - 0 1",
-"Peasant Revolt Chess":"1nn1k1n1/4p3/8/8/8/8/PPPPPPPP/4K3 w - - 0 1",
+"Peasant's Revolt Chess I":"1nn1knn1/4p3/8/8/8/8/PPPPPPPP/4K3 w - - 0 1",
+"Peasant's Revolt Chess II":"1nn1k1n1/4p3/8/8/8/8/PPPPPPPP/4K3 w - - 0 1",
+"Peasant's Revolt Chess III":"1n2k1n1/2p1p3/8/8/8/8/PPPPPPPP/4K3 w - - 0 1",
 "Power Chess / Wild 18":"qqqqkqqq/pppppppp/8/8/8/8/PPPPPPPP/QQQQKQQQ w - - 0 1",
 "Power Chess II":       "rrbqkbrr/bbnnnnbb/pppppppp/8/8/PPPPPPPP/BBNNNNBB/RRBQKBRR w - - 0 1",
 "Queen Odds Chess":    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNB1KBNR w KQkq - 0 1",
 "Reverso Chess":        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBKQBNR w KQkq - 0 1",
+"Republican Chess": "rnb2bnr/pppppppp/8/8/8/8/PPPPPPPP/RNB2BNR w - - 0 1",
 "Rook Odds Chess":     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/1NBQKBNR w KQkq - 0 1",
 "Royal Stables Chess":  "nnnnknnn/pppppppp/8/8/8/8/PPPPPPPP/NNNNKNNN w - - 0 1",
-"Seven Knights Chess":  "nnnnknnn/pppppppp/2p2p2/1pppppp1/8/8/PPPPPPPP/RNBQKBNR w - - 0 1",
 // Shatranj, except the following rules are NOT implemented:
 // 1. Pawns can't make double moves
 // 2. Pawn only promotes to fers
@@ -393,6 +398,7 @@ var SAVED_BOARDS = {
 "Twin Chess":           "rbqkkqbr/pppppppp/n6n/8/8/N6N/PPPPPPPP/RBQKKQBR w - - 0 1",
 "Twin Chess B":         "nkbqqbkn/r2pp2r/pppppppp/8/8/PPPPPPPP/R2PP2R/NKBQQBKN w - - 0 1",
 "Upside-Down Chess / Wild 5":    "RNBQKBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbqkbnr w KQkq - 0 1",
+"Weak! / Seven Knights Chess":  "nnnnknnn/pppppppp/2p2p2/1pppppp1/8/8/PPPPPPPP/RNBQKBNR w - - 0 1",
 "Wild Chess 7 ":        "4k3/5ppp/8/8/8/8/PPP5/3K4 w - - 0 1",
 "Wild Chess 8":         "rnbqkbnr/8/8/pppppppp/PPPPPPPP/8/8/RNBQKBNR w KQkq - 0 1",
 "Wild Chess 19":        "8/6k1/4p3/4N3/8/6K1/7N/8 w - - 0 1"
@@ -412,7 +418,8 @@ var SAVED_BOARDS = {
 "Test Stalemate":     "k7/8/8/8/8/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5",
 "Test Remove Check by Capture":     "4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5",
 "Test Promotion":     "k1K5/8/8/8/8/8/p/8 b - - 0 5",
-"Test Promotion Stalemate": "K7/pP3rq1/6k1/8/8/8/8/8 w KQkq - 0 1",
+"Test Promotion to Rook": "8/k1P5/p7/P3K3/8/8/8/8 w - - 0 53", // from http://chessteacher.110mb.com/2008/10/22/minor-promotion/
+"Test Promotion to Bishop": "8/5P1k/5K1p/7P/8/8/8/8 w - - 0 51",
 "Test En Passant (alone)":     "8/8/8/3pP3/8/8/8/8 w - d6 0 5",
 "Test En Passant":     "rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5",
 "Test En Passant into Check": "qk6/8/8/3pP3/8/8/8/7K w - d6 0 5",
