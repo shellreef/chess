@@ -131,15 +131,15 @@ google.load("scriptaculous", "1.8.2");
 
 // Preferences, not game state.
 var PREFS = {
-    INPUT_NOTATION: "SAN",
+    input_notation: "SAN",
 
     // What piece images to use  - TODO: option to change
-    IMAGE_SET: "alfaerie",   // http://www.chessvariants.org/graphics.dir/alfaerie/index.html
-    //IMAGE_SET: "ariel"    // based on Ariel Unicode MS
-    //IMAGE_SET: "chessos"
+    image_set: "alfaerie",   // http://www.chessvariants.org/graphics.dir/alfaerie/index.html
+    //image_set: "ariel"    // based on Ariel Unicode MS
+    //image_set: "chessos"
     
-    ENGINE: "http://jeff.tk:81/crafty.cgi",
-    SKILL: 1                // engine strength, 0-100
+    engine: "http://jeff.tk:81/crafty.cgi",
+    skill: 1                // engine strength, 0-100
 };
 
 // Chess movement notations, in descending precedence. 
@@ -883,7 +883,7 @@ function mv(alg_move, virtual)
 
     if (!alg_move) {
         assert(VALID_MOVE_NOTATIONS, "mv(" + alg_move + "): called with VALID_MOVE_NOTATINS false");
-        return own_properties(VALID_MOVE_NOTATIONS[PREFS.INPUT_NOTATION]);
+        return own_properties(VALID_MOVE_NOTATIONS[PREFS.input_notation]);
     }
 
     // Accept digits, but prefer the letter oh.
@@ -1541,13 +1541,13 @@ function own_properties(obj)
 // by selection instead of moving a piece with your mouse.
 function populate_make_a_move_list()
 {
-    var active_name = AVAILABLE_NOTATIONS[PREFS.INPUT_NOTATION];
+    var active_name = AVAILABLE_NOTATIONS[PREFS.input_notation];
     var move_group, change_group, count, menu;
 
     menu = $("make_move_menu");
     menu.innerHTML = "";
 
-    count = own_property_count(VALID_MOVE_NOTATIONS[PREFS.INPUT_NOTATION]);
+    count = own_property_count(VALID_MOVE_NOTATIONS[PREFS.input_notation]);
     if (count === 0) {
         menu.appendChild(Builder.node("option", {value:""}, "No legal moves"));
         return;
@@ -1559,8 +1559,8 @@ function populate_make_a_move_list()
     move_group = Builder.node("optgroup", {label:active_name});
     menu.appendChild(move_group);
 
-    for (var notation in VALID_MOVE_NOTATIONS[PREFS.INPUT_NOTATION]) {
-        if (VALID_MOVE_NOTATIONS[PREFS.INPUT_NOTATION].hasOwnProperty(notation)) {
+    for (var notation in VALID_MOVE_NOTATIONS[PREFS.input_notation]) {
+        if (VALID_MOVE_NOTATIONS[PREFS.input_notation].hasOwnProperty(notation)) {
             move_group.appendChild(Builder.node("option", {value: notation}, notation));
         }
     }
@@ -1570,7 +1570,7 @@ function populate_make_a_move_list()
     menu.appendChild(change_group);
 
     for (var n in AVAILABLE_NOTATIONS) {
-        if (AVAILABLE_NOTATIONS.hasOwnProperty(n) && n !== PREFS.INPUT_NOTATION) {
+        if (AVAILABLE_NOTATIONS.hasOwnProperty(n) && n !== PREFS.input_notation) {
             var name = AVAILABLE_NOTATIONS[n];
             change_group.appendChild(Builder.node("option", {value: "change_" + n}, name));
         }
@@ -1589,7 +1589,7 @@ function make_move_by_menu(menu)
     if (choice.indexOf("change_") === 0) {
         var new_notation = choice.substring("change_".length);
    
-        PREFS.INPUT_NOTATION = new_notation;
+        PREFS.input_notation = new_notation;
         populate_make_a_move_list();
         return;
     }
@@ -1608,10 +1608,10 @@ function computer_move_if_applicable()
 
     // TODO: if in checkmate, it is not applicable!
 
-    if (PREFS.SKILL === 0) {
+    if (PREFS.skill === 0) {
         setTimeout(random_move, 1);
     } else {
-        schedule_engine_move(PREFS.SKILL);
+        schedule_engine_move(PREFS.skill);
     }
 }
 
@@ -1640,7 +1640,7 @@ function schedule_engine_move(skill)
     query = "?skill=" + skill + ";fen=" + encodeURIComponent(save_fen());
 
     dojo.xhrGet({
-        url: PREFS.ENGINE + query,
+        url: PREFS.engine + query,
         handleAs: "json",
         load: got_engine_move
         });
@@ -1658,7 +1658,7 @@ function got_engine_move(response)
         $("score").innerHTML = "Score: " + response.score;
     } else {
         $("engine_status").innerHTML = "Engine error: " + response.error;
-        PREFS.SKILL = 0;
+        PREFS.skill = 0;
         random_move();
     }
 }
@@ -3427,7 +3427,7 @@ function image_path_for(type, color)
     // - Web fonts! Supported on Firefox 3.1+, Opera 10+, Safari 3.1+, IE4+
     //   See http://fonts.philip.html5.org/
     
-    return "images/" + PREFS.IMAGE_SET + "/" + {white:"w", black:"b"}[color] + base + ".gif";
+    return "images/" + PREFS.image_set + "/" + {white:"w", black:"b"}[color] + base + ".gif";
 }
 
 // Decode Forsyth-Edwards Notation piece code, for example:
