@@ -139,7 +139,7 @@ var PREFS = {
     //image_set: "chessos"
     
     engine: "http://jeff.tk:81/crafty.cgi",
-    skill: 1                // engine strength, 0-100
+    skill: 100                // engine strength, 0-100
 };
 
 // Chess movement notations, in descending precedence. 
@@ -1601,8 +1601,17 @@ function make_move_by_menu(menu)
 // AI - artificial intelligence 
 // Do this after a delay, so that when playing computer vs. computer, you can
 // see the move, since they are not animated (Effect.Move) yet.
-function computer_move_if_applicable()
+function computer_move_if_applicable(clicked)
 {
+    if (clicked) {
+        if ($F("black_computer") || $F("white_computer")) {
+            $("skill_level").value = PREFS.skill;
+            $("show_skill").show();
+        } else {
+            $("show_skill").hide();
+        }
+    }
+
     if (!$F(GAME_STATE.active_color + "_computer")) {
         return;
     }
@@ -1614,13 +1623,27 @@ function computer_move_if_applicable()
         return;
     }
 
-    // TODO: if in checkmate, it is not applicable!
-
     if (PREFS.skill === 0) {
         setTimeout(random_move, 1);
     } else {
         schedule_engine_move(PREFS.skill);
     }
+}
+
+// Update the skill level when the user changes the form field.
+function update_skill(element)
+{
+    var skill = element.value;
+
+    if (skill < 0) {
+        skill = 0;
+    }  else if (skill > 100) {
+        skill = 100;
+    }
+
+    element.value = skill;
+
+    PREFS.skill = skill;
 }
 
 // Make a random move with equal probability. No intelligence.
@@ -1676,6 +1699,8 @@ function got_engine_move(response)
         //
         $("engine_status").innerHTML = "Engine error: " + response.error;
         PREFS.skill = 0;
+        $("skill_level").value = PREFS.skill;
+        $("skill_level").title = "Reset because of engine error: " + response.error;
         random_move();
     }
 }
@@ -3962,11 +3987,14 @@ function enable_document_selection(enable) {
 
  <!-- TODO: hide all this, since the purpose of this app is
  not to implement chess AI. But having automatic moves is useful for testing. -->
- <p><label for="white_computer">White PC<input type="checkbox" id="white_computer" name="white_computer" onclick="computer_move_if_applicable()"></label> 
- <label for="black_computer">Black PC<input type="checkbox" id="black_computer" name="black_computer" onclick="computer_move_if_applicable()"></label>
+ <p><label for="white_computer">White PC<input type="checkbox" id="white_computer" name="white_computer" onclick="computer_move_if_applicable(this)"></label> 
+ <label for="black_computer">Black PC<input type="checkbox" id="black_computer" name="black_computer" onclick="computer_move_if_applicable(this)"></label>
 
  <span id="score"></span><br>
  <span id="engine_status"></span>
+
+ <div id="show_skill" style="display: none"><p>Skill Level: 
+  <input type="text" size="3" maxlength="3" id="skill_level" onchange="update_skill(this)"></div>
 
  <p><select id="output_notation" name="output_notation"></select>
 
