@@ -436,7 +436,7 @@ var SAVED_BOARDS = {
     },
 
     "Test Cases": {
-"Test Checkmate": "r1bknbrN/pppppppp/8/8/8/8/PPPPPPPP/nRBNKB1R b KQ - 0 1",
+"Test Checkmate": "r1bknbrN/pppppppp/8/8/8/8/PPPPPPPP/nRBNKB1R b - - 0 1",
 "Test Stalemate":     "k7/8/8/8/8/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5",
 "Test Remove Check by Capture":     "4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5",
 "Test Promotion":     "k1K5/8/8/8/8/8/p/8 b - - 0 5",
@@ -1607,6 +1607,13 @@ function computer_move_if_applicable()
         return;
     }
 
+    // TODO: better variables
+    if ($("check").innerHTML.indexOf("Checkmate") !== -1 ||
+        $("check").innerHTML.indexOf("Draw") !== -1) {
+        // Game is completed, don't bug the computer
+        return;
+    }
+
     // TODO: if in checkmate, it is not applicable!
 
     if (PREFS.skill === 0) {
@@ -1658,6 +1665,15 @@ function got_engine_move(response)
         // TODO: show a meter for the board position
         $("score").innerHTML = "Score: " + response.score;
     } else {
+        // How to explain this? Occurs frequently:
+        //
+        // Crafty v23.0 (2 cpus)
+        //
+        // White(1): setboard rn1qkbnr/pp2pppp/2p5/3pPb2/3P4/8/PPP2PPP/RNBQKBNR w KQkq f6 1 4
+        // enpassant status is bad (must be on 3rd/6th rank only.
+        // bad string = "rn1qkbnr/pp2pppp/2p5/3pPb2/3P4/8/PPP2PPP/RNBQKBNR"
+        // Illegal position, using normal initial chess position
+        //
         $("engine_status").innerHTML = "Engine error: " + response.error;
         PREFS.skill = 0;
         random_move();

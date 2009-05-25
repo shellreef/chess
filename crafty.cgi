@@ -32,6 +32,9 @@ if ($skill < 1 || $skill > 100) {
     $error = "Skill out of range";
 }
 
+warn "board: $board\n";
+warn "skill: $skill\n";
+
 if (!$error) {
     ($move, $score, $output, $error) = compute($board, $skill);
 }
@@ -81,7 +84,9 @@ sub compute
         $error = "Illegal position";
         if ($output =~ m/ERROR(.*)/) {
             $error .= ": $1";
-        } 
+        } elsif ($output =~ m/(enpassant status is bad.*)/) {
+            $error .= ": $1)";
+        }
     } elsif ($output =~ m/usage: /) {
         $error = "Bad usage";
     }
