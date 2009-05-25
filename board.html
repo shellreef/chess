@@ -602,7 +602,7 @@ function save_pgn()
     }
 
     // Non-standard. The standard tags are FEN and SetUp, for starting position only.
-    dict.CurrentFEN = save_fen();
+    dict.CurrentFEN = active_fen();
 
     pgn = output_pgn_dict(dict);
 
@@ -1645,7 +1645,7 @@ function schedule_engine_move(skill)
 
     // TODO: pass skill, too.
     
-    query = "?skill=" + skill + ";fen=" + encodeURIComponent(save_fen());
+    query = "?skill=" + skill + ";fen=" + encodeURIComponent(active_fen());
 
     dojo.xhrGet({
         url: PREFS.engine + query,
@@ -2525,7 +2525,7 @@ function set_turn(color, historical)
         set_check_message("");
     }
 
-    var new_state = save_fen(false);
+    var new_state = save_fen();
     var ply = encode_ply(old_color, old_fullmove);
 
     if (!old_color) {
@@ -2606,7 +2606,7 @@ function check_insufficient_material()
 // Check for three-move repetition, which allows a draw to be claimed (not compulsory)
 function check_repetition(ply)
 {
-    var new_state = save_fen(true);
+    var new_state = active_fen(true);
     var reps;
 
     // Save new board state for three-move repetition
