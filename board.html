@@ -436,7 +436,7 @@ var SAVED_BOARDS = {
 "Test Checkmate": "r1bknbrN/pppppppp/8/8/8/8/PPPPPPPP/nRBNKB1R b - - 0 1",
 "Test Stalemate":     "k7/8/8/8/8/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5",
 "Test Remove Check by Capture":     "4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5",
-"Test Promotion":     "k1K5/8/8/8/8/8/p/8 b - - 0 5",
+"Test Promotion":     "8/PPPPPPPP/8/k1K5/8/8/pppppppp/8 b - - 0 5",
 "Test Promotion to Rook": "8/k1P5/p7/P3K3/8/8/8/8 w - - 0 53", // from http://chessteacher.110mb.com/2008/10/22/minor-promotion/
 "Test Promotion to Bishop": "8/5P1k/5K1p/7P/8/8/8/8 w - - 0 51",
 "Test En Passant (alone)":     "8/8/8/3pP3/8/8/8/8 w - d6 0 5",
@@ -1026,7 +1026,7 @@ function should_promote(piece)
 // Change a piece to whatever it promotes to.
 function promote(piece)
 {
-    var promotes_to;
+    var promotes_to, element, container;
 
     //console.log("promotion");
 
@@ -1036,7 +1036,22 @@ function promote(piece)
     // sometimes a queen promotion can lead to a stalemate, or a 
     // knight promotion etc. might actually be a better move.
     // TODO: would also need to codify this in algebraic move, =Q, etc.
-    promotes_to = PIECE_TYPES[piece.type].promote[0];
+    promotes_to = PIECE_TYPES[piece.type].promote;
+
+    var container = $("promote_container");
+
+    while(container.firstChild) {
+        container.removeChild(container.firstChild);
+    }
+
+    for (var i = 0; i < promotes_to.length; i += 1) {
+        var choice = promotes_to[i];
+
+        element = create_piece(GAME_STATE.active_color, choice);
+        container.appendChild(element);
+    }
+
+    container.show();
 
     // TODO: Puff out, or fade in from new to old piece. Is there an
     // effect that can fade from one image to another? LikE IE page transitions.
@@ -1048,10 +1063,9 @@ function promote(piece)
     // or TODO: create another img, same place same time, change opacity to reveal it
     // but this leaves the old image behind..
     
-    piece.src = image_path_for(promotes_to, piece.color);
+    piece.src = image_path_for(promotes_to[0], piece.color);
 
-
-    piece.type = promotes_to;
+    piece.type = promotes_to[0];
 }
 
 //// VALID MOVE FUNCTIONS
@@ -4035,7 +4049,7 @@ function enable_document_selection(enable) {
   <span id="dash" style="display: none">&mdash;</span>
   <span id="check"></span>
   <br>
-  <span id="promotion_selection"></span>
+  <span id="promote_container"></span>
  </p>
 
 
