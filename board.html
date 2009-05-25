@@ -3078,6 +3078,20 @@ function move_dropped_piece(piece, square, event)
     computer_move_if_applicable();
 }
 
+// Get the representation of the active board state in FEN.
+// If strip_moves, return time-independent representation.
+function active_fen(strip_moves)
+{
+    var fen = GAME_STATE.position_after.slice(-1)[0];
+
+    if (strip_moves) {
+        // Remove last two fields, move counts.
+        fen = fen.split(" ").slice(0, -2).join(" ");
+    } 
+
+    return fen;
+}
+
 // Generate FEN from board state. If strip_moves, does not
 // include move count. If virtual, uses virtual board.
 function save_fen(strip_moves, virtual)
