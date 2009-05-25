@@ -2195,7 +2195,12 @@ function decode_one_parlett(parlett)
             flags.no_capture = true;
 
         // Extended Parlett
-        
+       
+        } else if (ch === "#") {
+            var type = parlett.substr(i + 1);
+            assert(PIECE_TYPES[type], "in Parlett #include, piece name not found: " + type);
+            return unfiltered_moves(PIECE_TYPES[type].parlett);
+
         // Direct move text: [rel_x,rel_y;flag1;flag2;...] 
         } else if (ch === "[") {
             var text_move = "";
@@ -2212,6 +2217,7 @@ function decode_one_parlett(parlett)
             }
             rel_moves.push(decode_relative_raw_move(text_move, flags));
 
+        // Nested flags: {oi2>, asdf.. ;flag1;flag2;flag3...}
         } else if (ch === "{") {
             var inner, nest;
             
@@ -2228,7 +2234,6 @@ function decode_one_parlett(parlett)
                 inner += cho;
             }
 
-            // {oi2>, asdf.. ;flag1;flag2;flag3...]
             return nested_flags(inner);
 
         // Standard Parlett
