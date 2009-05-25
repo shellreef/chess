@@ -246,7 +246,7 @@ var PIECE_TYPES = {
     // Other hippogonals, good for testing
     zero: {parlett: "~0/0", letter: "O"},
     man: {parlett: "1*", letter: "M"},    // same as king, but not royale (also known as commoner)
-    warmachine: {parlett: "~2+", letter: "D", image: "warmachine"},  // or ~2/0
+    warmachine: {parlett: "~2+", letter: "D"},  // or ~2/0
     alfil: {parlett: "~2X", letter: "Y"},    // TODO: image          or ~2/2
     alibaba: {parlett: "~2/0, ~2X", letter: "L"},   // TODO: image
     squirrel: {parlett: "~0/2, ~1/2, ~2/2", letter: "S"},
@@ -259,12 +259,12 @@ var PIECE_TYPES = {
     flamingo: {parlett: "~1/6"}, 
 
     // Amphibians (combined leapers)
-    frog: {parlett: "~1/1, ~0/3", letter: "F"},     // TODO: image
-    bison: {parlett: "~1/3, ~2/3"},                 // TODO: image
-    gnus: {parlett: "~1/2, ~1/3"},                  // TODO: image
-    root_fifty_leaper: {parlett: "~5/5, ~7/1"},     // TODO: image
+    frog: {parlett: "~1/1, ~0/3", letter: "F"},     
+    bison: {parlett: "~1/3, ~2/3"},                 
+    gnu: {parlett: "~1/2, ~1/3"},                  
+    root_fifty_leaper: {parlett: "~5/5, ~7/1"},     
     // TODO: root-65 leaper, bat, see http://members.shaw.ca/quadibloc/chess/ch03.htm
-    buffalo: {parlett: "~1/2, ~1/3, ~2/3"},         // TODO: image
+    buffalo: {parlett: "~1/2, ~1/3, ~2/3"},         
 
     maharajah: {parlett: "#amazon", letter: "XJ", royal: true},   // Q+N+K, Maharajah chess
     royal_knight: {parlett: "#knight", letter: "XR", royal: true, image:"knight"},  // Knightmate chess TODO: crown on knight
@@ -280,15 +280,20 @@ var PIECE_TYPES = {
     archbishop: {parlett: "#bishop, #knight", letter: "A", image: "cardinal"}, // B+N, aka cardinal, princess, janus (Capablanca, X-FEN standard)
     dragon: {parlett: "#pawn, #knight", image: "pawnknight"},
     caliph: {parlett: "#camel, #bishop", image: "camelbishop"},
-
     pope: {parlett: "#king, #bishop", image:"kingbishop"},  // http://www.chessvariants.com/difftaking.dir/thunder.html 
     dragon_king: {parlett: "#king, #rook", royal: true},  
+
     knightcamel: {parlett: "#knight, #camel"},
     elephantwarmachine: {parlett: "#elephant, #warmachine"},
     bishoppawn: {parlett: "#bishop, #pawn"},
     rookpawn: {parlett: "#rook, #pawn"},
     knightfers: {parlett: "#knight, #ferz", image: "knightferz"},
     knightwazir: {parlett: "#knight, #wazir"},
+    bishopwarmachine: {parlett: "#bishop, #warmachine"},
+    elephantwazir: {parlett: "#elephant, #wazir"},
+    elephantferzwarmachine: {parlett: "#elephant, #ferz, #warmachine"},
+    warmachinewazir: {parlett: "#warmachine, #wazir"},
+
 
     walker: {parlett: "o#wazir, c#ferz"},
     tiger: {parlett: "o#bishop, c#knight"},
@@ -459,7 +464,7 @@ var SAVED_BOARDS = {
 "Test Getting out of Check": "rnbqkbnr/ppp1p1pp/4P3/3p3Q/5p2/8/PPPP1PPP/RNB1KBNR b KQkq - 0 4",
 "Test Check Checking": "rnbQ1bnr/ppp1kppp/8/4p3/7q/8/PPPP1PPP/RNBQKBNR b KQ - 0 5",
 "Test Parlett Move Interference": "r/8/8/1N3b2/3PP3/1P1BBN/8/8 w - - 0 17",
-"Test Fairy Pieces": "X(airplane)x(airplane)/4x(caliph)/8/8/8/8/mSwZ/AcDeIJvT w - - 0 1",
+"Test Fairy Pieces": "X(airplane)x(airplane)/4x(caliph)x(pope)X(elephantwarmachine)/8/8/8/8/mSwZ/AcDeIJvT w - - 0 1",
     }
 };
 
