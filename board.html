@@ -1657,8 +1657,9 @@ function got_engine_move(response)
         // TODO: show a meter for the board position
         $("score").innerHTML = "Score: " + response.score;
     } else {
-        alert("Chess engine error: " + response.error);
-        set_check_message("Engine error: " + response.error);
+        $("engine_status").innerHTML = "Engine error: " + response.error;
+        PREFS.SKILL = 0;
+        random_move();
     }
 }
 
@@ -3933,7 +3934,8 @@ function enable_document_selection(enable) {
  <p><label for="white_computer">White PC<input type="checkbox" id="white_computer" name="white_computer" onclick="computer_move_if_applicable()"></label> 
  <label for="black_computer">Black PC<input type="checkbox" id="black_computer" name="black_computer" onclick="computer_move_if_applicable()"></label>
 
- <span id="score"></span>
+ <span id="score"></span><br>
+ <span id="engine_status"></span>
 
  <p><select id="output_notation" name="output_notation"></select>
 
