@@ -26,6 +26,7 @@ span.player_name { font-weight: bold; }
 span.player_elo { font-size: small; }
 
 span#status { font-weight: bold; }
+span#opening_name { font-size: small; }
 
 /* PGN */
 span.fullmove_number { font-weight: bold; }
@@ -427,9 +428,6 @@ var SAVED_BOARDS = {
     },
 
     "Chess Openings": {
-// TODO: invert hash, and automatically lookup and display known chess openings w/ ECO code and name? 
-//  Recognize various ECO codes, see http://scid.sourceforge.net/help/ECO.html
-//  and http://scid.sourceforge.net/help/EPD.html
 "Sicilian Defense":     "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2",
 "Sicilian Defense Main Line":     "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2",
 "Sicilian Defense Nimzowitsch Variation":     "rnbqkb1r/pp1ppppp/5n2/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 3",
@@ -472,6 +470,43 @@ var SAVED_BOARDS = {
 "Test Fairy Pieces": "X(airplane)x(airplane)/4x(caliph)x(pope)X(elephantwarmachine)/8/8/8/8/mSwZ/AcDeIJvT w - - 0 1",
     }
 };
+
+// Opening positions along with extended ECO codes and common names
+// Extended ECO codes are from scid.eco, see http://scid.sourceforge.net/help/ECO.html
+//  and http://scid.sourceforge.net/help/EPD.html
+// These are listed keyed by FEN without move information, so they can be recognized
+// directly from the board position, rather than the move history, allowing for easier
+// transposition.
+var OPENINGS = {
+    // 0th level
+    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -": "A00a Standard Start Position",
+
+    // 1st level
+    "rnbqkbnr/pppppppp/8/8/8/P7/1PPPPPPP/RNBQKBNR b KQkq -": "A00f Anderssen Opening",
+    "rnbqkbnr/pppppppp/8/8/P7/8/1PPPPPPP/RNBQKBNR b KQkq a3": "A00e Ware Opening / Meadow Hay",
+    "rnbqkbnr/pppppppp/8/8/8/N7/PPPPPPPP/R1BQKBNR b KQkq -": "A00h Durkin Opening / Sodium Attack",
+    "rnbqkbnr/pppppppp/8/8/8/2N5/PPPPPPPP/R1BQKBNR b KQkq -": "A00l Van Geet (Dunst) Opening",
+    "rnbqkbnr/pppppppp/8/8/8/1P6/P1PPPPPP/RNBQKBNR b KQkq -": "A01 Nimzowitsch-Larsen Attack",
+    "rnbqkbnr/pppppppp/8/8/1P6/8/P1PPPPPP/RNBQKBNR b KQkq b3": "A00p Polish Opening / Sokolsky / Orangutan)",
+    "rnbqkbnr/pppppppp/8/8/8/2P5/PP1PPPPP/RNBQKBNR b KQkq -": "A00i Saragossa Opening / Hempel's",
+    "rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR b KQkq c3": "A10 English Opening",
+    "rnbqkbnr/pppppppp/8/8/8/3P4/PPP1PPPP/RNBQKBNR b KQkq -": "A00j Mieses Opening",
+    "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3": "A40a Queen's Pawn Game",
+    "rnbqkbnr/pppppppp/8/8/8/4P3/PPPP1PPP/RNBQKBNR b KQkq -": "A00k Van 't Kruijis Opening",
+    "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3": "B00a King's Pawn Game",
+    "rnbqkbnr/pppppppp/8/8/8/5P2/PPPPP1PP/RNBQKBNR b KQkq -": "A00b Barnes Opening / Gedult's",
+    "rnbqkbnr/pppppppp/8/8/5P2/8/PPPPP1PP/RNBQKBNR b KQkq f3": "A02 Bird's Opening / Dutch Attacak",
+    "rnbqkbnr/pppppppp/8/8/8/5N2/PPPPPPPP/RNBQKB1R b KQkq -": "A04 R\u00e9ti Opening",
+    "rnbqkbnr/pppppppp/8/8/8/7N/PPPPPPPP/RNBQKB1R b KQkq -": "A00g Amar Opening / Paris / Drunken Knights / Ammonia",
+    "rnbqkbnr/pppppppp/8/8/8/6P1/PPPPPP1P/RNBQKBNR b KQkq -": "A00t Benko's Opening / Hungarian / Barczay / Bilek",
+    "rnbqkbnr/pppppppp/8/8/6P1/8/PPPPPP1P/RNBQKBNR b KQkq g3": "A00n Grob's Attack",
+    "rnbqkbnr/pppppppp/8/8/8/7P/PPPPPPP1/RNBQKBNR b KQkq -": "A00d Clemenz Opening",
+    "rnbqkbnr/pppppppp/8/8/7P/8/PPPPPPP1/RNBQKBNR b KQkq h3": "A00c Desprez Opening / Kadas / Samurai / Reagen's"
+
+    // TODO: Ajax to load scid.eco from a server optionally, to get deeper into the
+    // openings. scid.eco has 20K+ lines, not practical to load into this file.
+};
+
 
 // TODO: library of interesting games, in PGN format. See
 // http://www.xs4all.nl/~timkr/records/records.htm and http://www.xs4all.nl/~timkr/ChessTutor/pgnview.htm
@@ -3032,6 +3067,12 @@ function move_piece_to_square(piece, square, is_hypothetical)
             turn_info.repeats.push(ply);
             mark_repeated_moves(turn_info.repeats);
         }
+
+        var opening = OPENINGS[active_fen(true)];
+        if (opening) {
+            $("opening_name").innerHTML = opening;
+        }
+        // If not recognized, do not clear it -- keep up opening during the game
     }
 
     // To allow undo_virtual_move
@@ -3993,6 +4034,8 @@ function enable_document_selection(enable) {
  <div>
 
  <p><select id="make_move_menu" onchange="make_move_by_menu(this)"></select>
+
+ <p><span id="opening_name"></span>
 
  <!-- TODO: hide all this, since the purpose of this app is
  not to implement chess AI. But having automatic moves is useful for testing. -->
