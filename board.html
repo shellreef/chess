@@ -269,18 +269,18 @@ var PIECE_TYPES = {
     // Combined pieces of International Chess
    
     // B+N, aka cardinal, princess, janus (Capablanca, X-FEN standard)
-    archbishop: {parlett: "nX, ~1/2", letter: "A", image: "cardinal"}, 
+    archbishop: {parlett: "#bishop, #knight", letter: "A", image: "cardinal"}, 
 
     // R+N, aka empress, marshal (Capablanca, X-FEN standard)
-    chancellor: {parlett: "n+, ~1/2", letter: "C"}, 
+    chancellor: {parlett: "#rook, #knight", letter: "C"}, 
 
     // Q+N, aka superqueen
-    amazon: {parlett: "n*, ~1/2", letter: "XV"},     
+    amazon: {parlett: "#queen, #knight", letter: "XV"},     
 
-    maharajah: {parlett: "n*, ~1/2", letter: "XJ", royal: true},   // Q+N+K, Maharajah chess
-    royal_knight: {parlett: "~1/2", letter: "XR", royal: true, image:"knight"},  // Knightmate chess TODO: crown on knight
-    royal_queen: {parlet: "n*", royal: true},               // queen but can't be captured
-    dragon: {parlett: "o1>, P, c1X>, oi2>eE, oi1>e, ~1/2"}, // pawn + knight
+    maharajah: {parlett: "#amazon", letter: "XJ", royal: true},   // Q+N+K, Maharajah chess
+    royal_knight: {parlett: "#knight", letter: "XR", royal: true, image:"knight"},  // Knightmate chess TODO: crown on knight
+    royal_queen: {parlet: "#queen", royal: true}, 
+    dragon: {parlett: "#pawn, #knight"},
 
     // More combined pieces
     // From piecelopedia or http://members.shaw.ca/quadibloc/chess/ch03.htm or 
@@ -2195,11 +2195,18 @@ function decode_one_parlett(parlett)
             flags.no_capture = true;
 
         // Extended Parlett
-       
+      
+        // Include an existing piece movement, possibly with flags
         } else if (ch === "#") {
             var type = parlett.substr(i + 1);
             assert(PIECE_TYPES[type], "in Parlett #include, piece name not found: " + type);
-            return unfiltered_moves(PIECE_TYPES[type].parlett);
+            var included = dojo.clone(unfiltered_moves(PIECE_TYPES[type].parlett));
+
+            for (i = 0; i < included.length; i += 1) {
+                Object.extend(included[i][2], flags);
+            }
+
+            return included;
 
         // Direct move text: [rel_x,rel_y;flag1;flag2;...] 
         } else if (ch === "[") {
