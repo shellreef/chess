@@ -139,7 +139,7 @@ var PREFS = {
     //IMAGE_SET: "chessos"
     
     ENGINE: "http://jeff.tk:81/crafty.cgi",
-    SKILL: 1
+    SKILL: 1                // engine strength, 0-100
 };
 
 // Chess movement notations, in descending precedence. 
@@ -1606,6 +1606,8 @@ function computer_move_if_applicable()
         return;
     }
 
+    // TODO: if in checkmate, it is not applicable!
+
     if (PREFS.SKILL === 0) {
         setTimeout(random_move, 1);
     } else {
@@ -1635,7 +1637,7 @@ function schedule_engine_move(skill)
 
     // TODO: pass skill, too.
     
-    query = "?fen=" + encodeURIComponent(save_fen());
+    query = "?skill=" + skill + ";fen=" + encodeURIComponent(save_fen());
 
     dojo.xhrGet({
         url: PREFS.ENGINE + query,
@@ -1643,18 +1645,20 @@ function schedule_engine_move(skill)
         load: got_engine_move
         });
 
-    // TODO: show thinking
+    set_check_message("Analyzing...");
 }
 
 // Callback for when the chess engine Ajax request move is received.
 function got_engine_move(response)
 {
     if (!response.error) {
+        set_check_message("");
         mv(response.next_move);
         // TODO: show a meter for the board position
-        //$("score") = response.score;
+        $("score").innerHTML = "Score: " + response.score;
     } else {
         alert("Chess engine error: " + response.error);
+        set_check_message("Engine error: " + response.error);
     }
 }
 
@@ -3927,7 +3931,9 @@ function enable_document_selection(enable) {
  <!-- TODO: hide all this, since the purpose of this app is
  not to implement chess AI. But having automatic moves is useful for testing. -->
  <p><label for="white_computer">White PC<input type="checkbox" id="white_computer" name="white_computer" onclick="computer_move_if_applicable()"></label> 
- <label for="black_computer">Black PC<input type="checkbox" id="black_computer" name="black_computer" onclick="computer_move_if_applicable()"></label><br>
+ <label for="black_computer">Black PC<input type="checkbox" id="black_computer" name="black_computer" onclick="computer_move_if_applicable()"></label>
+
+ <span id="score"></span>
 
  <p><select id="output_notation" name="output_notation"></select>
 

@@ -14,9 +14,10 @@ warn "crafty.pl @{[ scalar localtime ]} $ENV{REMOTE_ADDR}\n";
 
 print header(-type => "application/json");;
 
-my ($move, $score, $output, $error, $board);
+my ($move, $score, $output, $error, $board, $skill);
 
 $board = param("fen");
+$skill = param("skill") + 0 || 1;
 if (!$board) {
     $error = "No board given";
 } else {
@@ -27,9 +28,12 @@ if (!$board) {
         $error = "Invalid board";
     }
 }
+if ($skill < 1 || $skill > 100) {
+    $error = "Skill out of range";
+}
 
 if (!$error) {
-    ($move, $score, $output, $error) = compute($board);
+    ($move, $score, $output, $error) = compute($board, $skill);
 }
 
 warn "Error: $error\n" if defined($error);
@@ -43,7 +47,7 @@ print to_json({
 
 sub compute
 {
-    my ($board) = @_;
+    my ($board, $skill) = @_;
     my ($pid, $in, $out, $output, @cmds, $move, $score, $error);
 
     $|++;
@@ -55,6 +59,7 @@ sub compute
         "st 1",
         "ponder off",
 
+        "skill $skill",
         "setboard $board",
         "go",
         "score",
