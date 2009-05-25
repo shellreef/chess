@@ -287,21 +287,21 @@ var PIECE_TYPES = {
     elephantwarmachine: {parlett: "#elephant, #dabbaba"},
     bishoppawn: {parlett: "#bishop, #pawn"},
     rookpawn: {parlett: "#rook, #pawn"},
-    knightfers: {parlett: "#knight, #fers", image: "knightferz"},
+    knightfers: {parlett: "#knight, #ferz", image: "knightferz"},
     knightwazir: {parlett: "#knight, #wazir"},
 
-    walker: {parlett: "o#wazir, c#fers"},
+    walker: {parlett: "o#wazir, c#ferz"},
     tiger: {parlett: "o#bishop, c#knight"},
     bd: {parlett: "#dabbaba, #bishop"},
     canvasser: {parlett: "#camel, #rook"},
     carpenter: {parlett: "#knight, #dabbaba"},
     champion: {parlett: "#wazir, #alfil, #dabbaba"},
-    crowned_rook: {parlett: "#rook, #fers"},      
-    fad: {parlett: "#fers, #alfil, #dabbaba"},       
-    general: {parlett: "#fers", royal: true}, 
+    crowned_rook: {parlett: "#rook, #ferz"},      
+    fad: {parlett: "#ferz, #alfil, #dabbaba"},       
+    general: {parlett: "#ferz", royal: true}, 
     kangaroo: {parlett: "#knight, #alfil"},  
     waffle: {parlett: "#wazir, #alfil"},          // TODO: image of a waffle!
-    wizard: {parlett: "#camel, #fers"},
+    wizard: {parlett: "#camel, #ferz"},
 
     // More complex fairy / non-intl chess pieces
     // See http://en.wikipedia.org/wiki/Fairy_chess_piece#Notable_examples
@@ -314,7 +314,7 @@ var PIECE_TYPES = {
     superpawn: {parlett: "on>, cnX>", letter: "XP"},
     elephant: {parlett: "2X", letter: "E"},         // Not a leaper, path can be blocked (unlike alfil, ~2X)
     khohn: {parlett: "1X, 1>", letter: "XK"},
-    fers: {parlett: "1X", letter: "XF", image: "ferz"},
+    ferz: {parlett: "1X", letter: "XF"},
     wazir: {parlett: "1+", letter: "I"},
     // TODO: support ~0/0 for "null move" (---), but don't let drop to null, instead show a button
     kraken: {parlett: "~n/m ~0/0"},     // any square, not realistic since always checkmates!
@@ -401,7 +401,7 @@ var SAVED_BOARDS = {
 "Royal Stables Chess":  "nnnnknnn/pppppppp/8/8/8/8/PPPPPPPP/NNNNKNNN w - - 0 1",
 // Shatranj, except the following rules are NOT implemented:
 // 1. Pawns can't make double moves
-// 2. Pawn only promotes to fers
+// 2. Pawn only promotes to ferz
 // 3. Stalemating your opponent wins
 // 4. Taking the last piece of your opponent wins, unless your opponent
 //    can take your last non-king piece too, in which case the game is drawn
