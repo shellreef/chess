@@ -2525,7 +2525,7 @@ function set_turn(color, historical)
         set_check_message("");
     }
 
-    var new_state = save_fen(false, true);
+    var new_state = save_fen(false);
     var ply = encode_ply(old_color, old_fullmove);
 
     if (!old_color) {
@@ -2606,7 +2606,7 @@ function check_insufficient_material()
 // Check for three-move repetition, which allows a draw to be claimed (not compulsory)
 function check_repetition(ply)
 {
-    var new_state = save_fen(true, true);
+    var new_state = save_fen(true);
     var reps;
 
     // Save new board state for three-move repetition
@@ -3093,8 +3093,8 @@ function active_fen(strip_moves)
 }
 
 // Generate FEN from board state. If strip_moves, does not
-// include move count. If virtual, uses virtual board.
-function save_fen(strip_moves, virtual)
+// include move count. Operates on virtual board.
+function save_fen(strip_moves)
 {
     var fen = "", castles;
 
@@ -3102,7 +3102,7 @@ function save_fen(strip_moves, virtual)
     for (var y = RANK_MAX; y > 0; y -= 1) {
         var blanks = 0;
         for (var x = 1; x <= FILE_MAX; x += 1) {
-            var piece = pc(x, y, virtual);
+            var piece = VBOARD[x][y].piece;
             var letter;
 
             if (piece) {
