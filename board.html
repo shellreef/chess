@@ -457,8 +457,7 @@ var SAVED_BOARDS = {
 "Test Getting out of Check": "rnbqkbnr/ppp1p1pp/4P3/3p3Q/5p2/8/PPPP1PPP/RNB1KBNR b KQkq - 0 4",
 "Test Check Checking": "rnbQ1bnr/ppp1kppp/8/4p3/7q/8/PPPP1PPP/RNBQKBNR b KQ - 0 5",
 "Test Parlett Move Interference": "r/8/8/1N3b2/3PP3/1P1BBN/8/8 w - - 0 17",
-"Test Fairy Pieces": "8/8/8/8/8/8/mSwZ/AcDeIJvT w - - 0 1",
-"Test Fairy Pieces II": "X(airplane) w - - 0 1"
+"Test Fairy Pieces": "X(airplane)x(airplane)/8/8/8/8/8/mSwZ/AcDeIJvT w - - 0 1",
     }
 };
 
@@ -2259,17 +2258,28 @@ function decode_one_parlett(parlett)
         assert(distances.length === 2, "relative_parlett(" + parlett + "): for hippogonal, expected exactly two distances");
         var a = distances[0], b = distances[1];
 
-        rel_moves.push.apply(rel_moves, without_dupes([
-            [-a, -b, flags],
-            [-a, +b, flags],
-            [+a, -b, flags],
-            [+a, +b, flags],
+        if (a !== Infinity && b !== Infinity) {
+            // Hippogonals in all directions
+            // TODO: support direction modifiers, vector
+            rel_moves.push.apply(rel_moves, without_dupes([
+                [-a, -b, flags],
+                [-a, +b, flags],
+                [+a, -b, flags],
+                [+a, +b, flags],
 
-            [-b, -a, flags],
-            [-b, +a, flags],
-            [+b, -a, flags],
-            [+b, +a, flags]
-            ]));
+                [-b, -a, flags],
+                [-b, +a, flags],
+                [+b, -a, flags],
+                [+b, +a, flags]
+                ]));
+        } else {
+            // ~n/m, any square on board. Remember, these are relative moves.
+            for (var x = -FILE_MAX; x <= +FILE_MAX; x += 1) {
+                for (var y = -RANK_MAX; y <= +RANK_MAX; y += 1) {
+                    rel_moves.push([x, y, flags]);
+                }
+            }
+        }
     } else if (directions) {
         for (i = 0; i < directions.length; i += 1) {
             var dir = directions[i];
