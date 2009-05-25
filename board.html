@@ -315,9 +315,9 @@ var PIECE_TYPES = {
     wazir: {parlett: "1+", letter: "I"},
     // TODO: support ~0/0 for "null move" (---), but don't let drop to null, instead show a button
     kraken: {parlett: "~n/m ~0/0"},     // any square, not realistic since always checkmates!
-    squid: {parlett: "o~n/m ~0/0", letter: "XD"}, // any square but can't capture, much less powerful
+    octopus: {parlett: "o~n/m ~0/0", letter: "XD"}, // any square (8x8, octo, get it?) but can't capture, much less powerful
     universal_leaper: {parlett: "~n/m"},// like kraken, but can't go to square it is on (like a zero)
-    octopus: {parlett: "o~n/m", letter: "U"},   // TODO: image
+    airplane: {parlett: "o~n/m", letter: "U", image:"plane"},
 
     // Pieces from chess-3
     // http://www.chessbase.com/newsdetail.asp?newsid=4553
@@ -358,12 +358,16 @@ var SAVED_BOARDS = {
 "Amazon Chess":         "rnbxvkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBXVKBNR w KQkq - 0 1",
 "Atheist Chess": "rn1qk1nr/pppppppp/8/8/8/8/PPPPPPPP/RN1QK1NR w KQkq - 0 1",
 "Berolina Chess": "rnbqkbnr/xbxbxbxbxbxbxbxb/8/8/8/8/XBXBXBXBXBXBXBXB/RNBQKBNR w KQkq - 0 1",
+// TODO: win if promote (kraken?), allow diagonal even if not capture
+// http://en.wikipedia.org/wiki/Breakthrough_(board_game)
+//"Breakthrough": "pppppppp/pppppppp/8/8/8/8/PPPPPPPP/PPPPPPPP w - - 0 1",
 "Church Chess":         "bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1",
 "Corner Chess":         "4rbqk/4rb1q/4r1bb/5rrr/RRR5/BB1R4/Q1BR4/KQBR4 w - - 0 1",
 "Corner Chess II":      "kbp2pbq/nrp2prn/pp4pp/8/8/PP4PP/NRP2PRN/QBP2PBK w - - 0 1",
 "Corridor Chess":       "1nrqkrn1/2b2b2/1pppppp1/8/8/1PPPPPP1/2B2B2/1NRQKRN1 w - - 0 1",
 "Commoner Chess":     "rnbqmbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQMBNR w KQkq - 0 1",
 "Desegregated Chess": "RNbqKBnr/ppPpPPPp/8/8/8/8/PPpppPpP/rnBQkBnr w KQkq - 0 1",
+"Dunsany's Chess": "rnbqkbnr/pppppppp/8/8/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq - 0 1",
 "Eight Kings Chess":    "kkkkkkkk/pppppppp/8/8/8/8/PPPPPPPP/KKKKKKKK w - - 0 1",
 "Fianchetto Chess":     "bnrqkrnb/pppppppp/8/8/8/8/PPPPPPPP/BNRQKRNB w KQkq - 0 1",
 "Fortress Chess":       "rnbqkbnr/pppppppp/ppp4/8/8/5PPP/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
@@ -375,6 +379,7 @@ var SAVED_BOARDS = {
 "Maharajah Chess":     "rnbqkbnr/pppppppp/8/8/8/8/8/4XJ3 w kq - 0 1",
 "Marxist Chess (DLS-CSB)":       "8/pppppppp/8/8/8/8/8/PPPPPPPP/8 w - - 0 1",
 "Missioner Chess": "pppppppp/ppppqppp/8/8/4K3 w - - 0 1",
+"Mind Chess": "8/8/8/8/8/8/8/8 w - - 0 1",
 "Mongredian Chess":    "rbbqknnr/pppppppp/8/8/8/8/PPPPPPPP/RBBQKNNR w - - 0 1",
 "Obama Chess": "rnbqKbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQkBNR b KQkq - 0 1",
 "Pawn's Game Chess": "rnbqkbnr/pppppppp/8/8/2PPPP2/1PP2PP1/PPPPPPPP/RNB1KBNR w KQkq - 0 1",
@@ -429,6 +434,7 @@ var SAVED_BOARDS = {
 "Test En Passant (alone)":     "8/8/8/3pP3/8/8/8/8 w - d6 0 5",
 "Test En Passant":     "rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5",
 "Test En Passant into Check": "qk6/8/8/3pP3/8/8/8/7K w - d6 0 5",
+"Test Lone King": "K w KQkq - 0 1",
 "Test K + K":     "k7/8/K7/8/8/8/8/8 b - - 0 30",
 "Test K + KQ":     "k7/8/8/8/8/8/8/5KQ1 w - d6 0 50",
 "Test K + KR":     "k7/8/8/8/8/8/8/5KR1 w - d6 0 50",
@@ -451,8 +457,8 @@ var SAVED_BOARDS = {
 "Test Getting out of Check": "rnbqkbnr/ppp1p1pp/4P3/3p3Q/5p2/8/PPPP1PPP/RNB1KBNR b KQkq - 0 4",
 "Test Check Checking": "rnbQ1bnr/ppp1kppp/8/4p3/7q/8/PPPP1PPP/RNBQKBNR b KQ - 0 5",
 "Test Parlett Move Interference": "r/8/8/1N3b2/3PP3/1P1BBN/8/8 w - - 0 17",
-"Test Fairy Pieces": "8/8/8/8/8/8/mSwZ/AcDeIJvT w KQkq - 0 1",
-"Test Lone King": "K w KQkq - 0 1"
+"Test Fairy Pieces": "8/8/8/8/8/8/mSwZ/AcDeIJvT w - - 0 1",
+"Test Fairy Pieces II": "X(airplane) w - - 0 1"
     }
 };
 
@@ -1098,7 +1104,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
 
 
         // Compute notations: SAN, FAN, MAN, LAN, RAN, CRAN and also descriptive.
-        // But first check if the move text was overridden in decode_one_parlett(), for the
+        // But first check if the move text was overridden in relative_decode_parlett(), for the
         // notations where it can be overridden. Not all have special notation for castling.
         if (move.notation_override) {
             // Override notation; used for special moves (castling)
