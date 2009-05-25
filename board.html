@@ -135,8 +135,8 @@ var PREFS = {
 
     // What piece images to use  - TODO: option to change
     image_set: "alfaerie",   // http://www.chessvariants.org/graphics.dir/alfaerie/index.html
-    //image_set: "ariel"    // based on Ariel Unicode MS
-    //image_set: "chessos"
+    //image_set: "ariel",    // based on Ariel Unicode MS
+    //image_set: "chessos",
     
     engine: "http://jeff.tk:81/crafty.cgi",
     skill: 100                // engine strength, 0-100
@@ -169,14 +169,15 @@ var GAME_STATE = {
 
     ep_target: null,
 
-    halfmove_clock: 0,    // Ply since last pawn advance / capture
-    fullmove_number: 0,   // Increment after black moves
+    halfmove_clock: 0,          // Ply since last pawn advance / capture
+    fullmove_number: 0,         // Increment after black moves
 
     // Not game state, but other globals
     dragging: false,
-    position_moves: {},        // Board position -> move IDs, for 3n move repetition
-    position_after: {},           // Board positions at each move, for playback
-    active_in_check: false
+    position_moves: {},         // Board position -> move IDs, for 3n move repetition
+    position_after: {},         // Board positions at each move, for playback
+    active_in_check: false,
+    ended: false                // Game is done (drawn, won)
 };    
 
 // Moves that can be made right now, for each active piece.
@@ -387,7 +388,7 @@ var SAVED_BOARDS = {
 "Knightmate Chess":    "rmbqxrbmr/pppppppp/8/8/8/8/PPPPPPPP/RMBQXRBMR w KQkq - 0 1",
 // TODO: No black pawn promotion
 "Maharajah Chess":     "rnbqkbnr/pppppppp/8/8/8/8/8/4XJ3 w kq - 0 1",
-"Marxist Chess (DLS-CSB)":       "8/pppppppp/8/8/8/8/8/PPPPPPPP/8 w - - 0 1",
+"Marxist Chess (DLS-CSB)":       "8/pppppppp/8/8/8/8/PPPPPPPP/8 w - - 0 1",
 "Missioner Chess": "pppppppp/ppppqppp/8/8/4K3 w - - 0 1",
 "Mind Chess": "8/8/8/8/8/8/8/8 w - - 0 1",
 "Mongredian Chess":    "rbbqknnr/pppppppp/8/8/8/8/PPPPPPPP/RBBQKNNR w - - 0 1",
@@ -2550,6 +2551,11 @@ function set_turn(color, historical)
         set_check_message("");
     }
 
+    if (text_end) {
+        // So can programmatically tell the game is finished.
+        GAME_STATE.ended = text_end;
+    }
+
     var new_state = save_fen();
     var ply = encode_ply(old_color, old_fullmove);
 
@@ -3214,8 +3220,11 @@ function load_fen(fen, replay)
     GAME_STATE.halfmove_clock = parseInt(parts[4], 10);
     GAME_STATE.fullmove_number = parseInt(parts[5], 10);
 
-    if (!replay) { GAME_STATE.position_moves = {}; }
-    if (!replay) { GAME_STATE.position_after = [fen]; }
+    if (!replay) { 
+        GAME_STATE.position_moves = {}; 
+        GAME_STATE.position_after = [fen];  // 0th ply = initial state
+        GAME_STATE.ended = null; 
+    }
    
     // Now that everything is loaded, set the turn.
     make_vboard();
