@@ -2950,7 +2950,7 @@ function forwards_vector(color)
 // Make a move on the virtual board.
 // If is_hypothetical is true, this is an internal move part of another move
 // (castling) so it shouldn't be logged.
-function move_piece_to_square(piece, square, is_hypothetical, is_real)
+function move_piece_to_square(piece, square, is_hypothetical, is_immediate)
 {
     var from_square, move_text, filerank, only_move, move, tieback, did;
 
@@ -3027,12 +3027,18 @@ function move_piece_to_square(piece, square, is_hypothetical, is_real)
     if (should_promote(piece)) {
         ask_to_promote(piece);
 
-        move_text += "=Q";  // TODO: get return value from promote(), different values. Maybe need a callback, user interaction.
-    }
+        tieback.notation += "=Q";  // TODO: get return value from promote(), different values. Maybe need a callback, user interaction.
 
-    // If not a multi-move (moving rook in castling), log and go to next turn
-    if (!is_hypothetical) {
-        setTimeout(function(){finish_up_move(tieback, is_real)}, 1000);
+        if (!is_hypothetical) {
+            finish_up_move(tieback, is_immediate);
+        }
+        // TODO XXX: callback
+
+    } else {
+        // If not a multi-move (moving rook in castling), log and go to next turn
+        if (!is_hypothetical) {
+            finish_up_move(tieback, is_immediate);
+        }
     }
 
     // TODO: return from finish_up_move, deferred? promotions..
@@ -3042,7 +3048,7 @@ function move_piece_to_square(piece, square, is_hypothetical, is_real)
 
 // Perform bookkeeping on the move after it has been actually made, 
 // in move_piece_to_square().
-function finish_up_move(tieback, is_real)
+function finish_up_move(tieback, is_immediate)
 {
     var alg_move, ply, turn_info, move_text;
 
@@ -3108,7 +3114,7 @@ function finish_up_move(tieback, is_real)
 
 
 
-    if (is_real) {
+    if (is_immediate) {
         realize_vboard();
 
         make_droppables();
