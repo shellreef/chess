@@ -31,12 +31,14 @@ if (!$error) {
     ($move, $score, $output, $error) = compute($board);
 }
 
-warn "Result: $error\n";
+warn "Error: $error\n" if defined($error);
+warn "OK" if !defined($error);
 
-$output =~ tr/'/"/;
+$output =~ tr/'/"/ if defined($output);
 
-print "{next_move:'$move', ";
-print "score:$score, ";
+print "{";
+print "next_move:'$move', " if defined($move);
+print "score:$score, " if defined($score);
 #print "output: '$output', ";
 
 if ($error) {
