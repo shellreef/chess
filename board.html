@@ -246,7 +246,7 @@ var PIECE_TYPES = {
     // Other hippogonals, good for testing
     zero: {parlett: "~0/0", letter: "O"},
     man: {parlett: "1*", letter: "M"},    // same as king, but not royale (also known as commoner)
-    dabbaba: {parlett: "~2+", letter: "D", image: "warmachine"},  // or ~2/0
+    warmachine: {parlett: "~2+", letter: "D", image: "warmachine"},  // or ~2/0
     alfil: {parlett: "~2X", letter: "Y"},    // TODO: image          or ~2/2
     alibaba: {parlett: "~2/0, ~2X", letter: "L"},   // TODO: image
     squirrel: {parlett: "~0/2, ~1/2, ~2/2", letter: "S"},
@@ -284,7 +284,7 @@ var PIECE_TYPES = {
     pope: {parlett: "#king, #bishop", image:"kingbishop"},  // http://www.chessvariants.com/difftaking.dir/thunder.html 
     dragon_king: {parlett: "#king, #rook", royal: true},  
     knightcamel: {parlett: "#knight, #camel"},
-    elephantwarmachine: {parlett: "#elephant, #dabbaba"},
+    elephantwarmachine: {parlett: "#elephant, #warmachine"},
     bishoppawn: {parlett: "#bishop, #pawn"},
     rookpawn: {parlett: "#rook, #pawn"},
     knightfers: {parlett: "#knight, #ferz", image: "knightferz"},
@@ -292,12 +292,12 @@ var PIECE_TYPES = {
 
     walker: {parlett: "o#wazir, c#ferz"},
     tiger: {parlett: "o#bishop, c#knight"},
-    bd: {parlett: "#dabbaba, #bishop"},
+    bd: {parlett: "#warmachine, #bishop"},
     canvasser: {parlett: "#camel, #rook"},
-    carpenter: {parlett: "#knight, #dabbaba"},
-    champion: {parlett: "#wazir, #alfil, #dabbaba"},
+    carpenter: {parlett: "#knight, #warmachine"},
+    champion: {parlett: "#wazir, #alfil, #warmachine"},
     crowned_rook: {parlett: "#rook, #ferz"},      
-    fad: {parlett: "#ferz, #alfil, #dabbaba"},       
+    fad: {parlett: "#ferz, #alfil, #warmachine"},       
     general: {parlett: "#ferz", royal: true}, 
     kangaroo: {parlett: "#knight, #alfil"},  
     waffle: {parlett: "#wazir, #alfil"},          // TODO: image of a waffle!
