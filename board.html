@@ -1015,10 +1015,32 @@ function should_promote(piece)
     }
 }
 
-// Change a piece to whatever it promotes to.
-function ask_to_promote(piece)
+// Finish up a promotion move.
+function promote(piece, type, tieback, is_immediate)
 {
-    var promotes_to, element, container;
+    tieback.notation += "=Q";  // TODO: get return value from promote(), different values. Maybe need a callback, user interaction.
+
+    // TODO: Puff out, or fade in from new to old piece. Is there an
+    // effect that can fade from one image to another? LikE IE page transitions.
+    // http://sachiniscool.blogspot.com/2006/01/implementing-page-transitions-in.html
+    // ... except when changing images. Safari has CSS animations.
+    // new Effect.Puff(piece);
+    // or try CSS transitions, see CSS at the top of this document.
+    //piece.style.background = image_path_for(promotes_to, piece.color);
+    // or TODO: create another img, same place same time, change opacity to reveal it
+    // but this leaves the old image behind..
+    piece.src = image_path_for(type, piece.color);
+    piece.type = type;
+
+    $("promote_container").hide();
+
+    finish_up_move(tieback, is_immediate);
+}
+
+// Change a piece to whatever it promotes to.
+function ask_to_promote(piece, tieback, is_immediate)
+{
+    var promotes_to, element, container, choice;
 
     //console.log("promotion");
 
@@ -1036,30 +1058,21 @@ function ask_to_promote(piece)
         container.removeChild(container.firstChild);
     }
 
+
+    // Creation promotion elements
     for (var i = 0; i < promotes_to.length; i += 1) {
-        var choice = promotes_to[i];
+        choice = promotes_to[i];
 
         //element = create_piece(GAME_STATE.active_color, choice);
         element = Builder.node("img", {src:image_path_for(choice, piece.color)});
-        element.onclick=function(x){alert(x);};
+        element.onclick = function() {
+            promote(piece, choice, tieback, is_immediate);
+        };
         container.appendChild(element);
     }
 
     container.show();
 
-    // TODO: Puff out, or fade in from new to old piece. Is there an
-    // effect that can fade from one image to another? LikE IE page transitions.
-    // http://sachiniscool.blogspot.com/2006/01/implementing-page-transitions-in.html
-    // ... except when changing images. Safari has CSS animations.
-    // new Effect.Puff(piece);
-    // or try CSS transitions, see CSS at the top of this document.
-    //piece.style.background = image_path_for(promotes_to, piece.color);
-    // or TODO: create another img, same place same time, change opacity to reveal it
-    // but this leaves the old image behind..
-    
-    piece.src = image_path_for(promotes_to[0], piece.color);
-
-    piece.type = promotes_to[0];
 }
 
 //// VALID MOVE FUNCTIONS
@@ -3025,15 +3038,7 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate)
 
 
     if (should_promote(piece)) {
-        ask_to_promote(piece);
-
-        tieback.notation += "=Q";  // TODO: get return value from promote(), different values. Maybe need a callback, user interaction.
-
-        if (!is_hypothetical) {
-            finish_up_move(tieback, is_immediate);
-        }
-        // TODO XXX: callback
-
+        ask_to_promote(piece, tieback, is_immediate);
     } else {
         // If not a multi-move (moving rook in castling), log and go to next turn
         if (!is_hypothetical) {
