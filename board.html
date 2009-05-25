@@ -468,7 +468,7 @@ var SAVED_BOARDS = {
 
 /* Global functions for jslint to recognize. TODO: move to objects? */
 
-/*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved unfiltered_moves filtered_moves relative_decode_direction parse_flags nested_flags decode_relative_raw_move relative_decode_parlett without_dupes opposite_color set_turn set_check_message check_repetition load_notations capture_piece notation_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position init_board name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc image_path_for create_piece create_piece_by_letter highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection make_move_by_menu populate_make_a_move_list make_vboard realize_vboard*/
+/*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved unfiltered_moves filtered_moves relative_decode_direction parse_flags nested_flags decode_relative_raw_move decode_one_parlett without_dupes opposite_color set_turn set_check_message check_repetition load_notations capture_piece notation_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position init_board name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc image_path_for create_piece create_piece_by_letter highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection make_move_by_menu populate_make_a_move_list make_vboard realize_vboard*/
  
 
 google.setOnLoadCallback(function() {
@@ -1104,7 +1104,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
 
 
         // Compute notations: SAN, FAN, MAN, LAN, RAN, CRAN and also descriptive.
-        // But first check if the move text was overridden in relative_decode_parlett(), for the
+        // But first check if the move text was overridden in decode_one_parlett(), for the
         // notations where it can be overridden. Not all have special notation for castling.
         if (move.notation_override) {
             // Override notation; used for special moves (castling)
@@ -1752,7 +1752,7 @@ function unfiltered_moves(parlett)
     for (var i = 0; i < choice_groups.length; i += 1) {
             // For each group, gather the move options. 
             // (Would be nice if JavaScript arrays had a Python-like .extend)
-            rel_moves.push.apply(rel_moves, relative_decode_parlett(choice_groups[i]));
+            rel_moves.push.apply(rel_moves, decode_one_parlett(choice_groups[i]));
     }   
     rel_moves = without_dupes(rel_moves);
 
@@ -2149,7 +2149,7 @@ function decode_relative_raw_move(text_move, existing_flags)
         x = parseInt(xy[0], 10);
         y = parseInt(xy[1], 10);
     } else {
-        // TODO: call relative_decode_parlett, to allow
+        // TODO: call decode_one_parlett, to allow
         // [oi2>;flags] or oi[2>;flags], etc.
         assert(false, "decode_relative_raw_move(" + text_move + ", " + existing_flags + "): not [x,y;flags], missing comma");
     }
@@ -2164,7 +2164,7 @@ function decode_relative_raw_move(text_move, existing_flags)
 // under what conditions the move can be made. + is forward, - is backwards,
 // from the perspective of the active color. Has no knowledge of board state.
 // The moves must be filtered to determine their validity.
-function relative_decode_parlett(parlett)
+function decode_one_parlett(parlett)
 {
     var distances, directions, flags, movement, rel_moves;
     var hippogonal = false;
