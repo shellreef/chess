@@ -436,7 +436,7 @@ var SAVED_BOARDS = {
 "Test Checkmate": "r1bknbrN/pppppppp/8/8/8/8/PPPPPPPP/nRBNKB1R b - - 0 1",
 "Test Stalemate":     "k7/8/8/8/8/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5",
 "Test Remove Check by Capture":     "4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5",
-"Test Promotion":     "8/PPPPPPPP/8/k1K5/8/8/pppppppp/8 b - - 0 5",
+"Test Promotion":     "K/PPPPPPPP/8/8/8/8/pppppppp/7k b - - 0 5",
 "Test Promotion to Rook": "8/k1P5/p7/P3K3/8/8/8/8 w - - 0 53", // from http://chessteacher.110mb.com/2008/10/22/minor-promotion/
 "Test Promotion to Bishop": "8/5P1k/5K1p/7P/8/8/8/8 w - - 0 51",
 "Test En Passant (alone)":     "8/8/8/3pP3/8/8/8/8 w - d6 0 5",
@@ -3040,7 +3040,7 @@ function move_piece_to_square(piece, square, is_hypothetical)
 
     // If not a multi-move (moving rook in castling), log and go to next turn
     if (!is_hypothetical) {
-        finish_up_move(move_text);
+        finish_up_move(tieback);
     }
 
     // TODO: return from finish_up_move, deferred? promotions..
@@ -3048,10 +3048,13 @@ function move_piece_to_square(piece, square, is_hypothetical)
     return did;
 }
 
-// Perform bookkeeping on the move after it has been actually made.
-function finish_up_move(move_text)
+// Perform bookkeeping on the move after it has been actually made, 
+// in move_piece_to_square().
+function finish_up_move(tieback)
 {
-    var alg_move, ply, turn_info;
+    var alg_move, ply, turn_info, move_text;
+
+    move_text = tieback.notation;
    
     // TODO: ellipsis if black is first recorded move, or intervening commentary
     if (GAME_STATE.active_color === "white") {
@@ -3197,9 +3200,9 @@ function active_fen(strip_moves)
     return fen;
 }
 
-// Generate FEN from board state. If strip_moves, does not
-// include move count. Operates on virtual board.
-function save_fen(strip_moves)
+// Generate FEN from board state. Use active_fen() to get
+// this if it already been calculated.
+function save_fen()
 {
     var fen = "", castles;
 
@@ -3260,10 +3263,8 @@ function save_fen(strip_moves)
         fen += "-";
     }
 
-    if (!strip_moves) {
-        fen += " " + GAME_STATE.halfmove_clock;
-        fen += " " + GAME_STATE.fullmove_number;
-    }
+    fen += " " + GAME_STATE.halfmove_clock;
+    fen += " " + GAME_STATE.fullmove_number;
 
     return fen;
 }
