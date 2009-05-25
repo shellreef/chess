@@ -284,21 +284,21 @@ var PIECE_TYPES = {
 
     // More combined pieces
     // From piecelopedia or http://members.shaw.ca/quadibloc/chess/ch03.htm or 
-    walker: {parlett: "o1+, c1X"},          // wazir move, fers capture
-    tiger: {parlett: "onX, c~1/2"},         // bishop move, knight capture
-    bd: {parlett: "~2/0, nX"},              // dabbaba + bishop
-    caliph: {parlett: "~1/3, nX"},          // camel + bishop
-    canvasser: {parlett: "~1/3, n+"},       // camel + rook
-    carpenter: {parlett: "~1/2, ~2/0"},     // knight + dabbaba
-    centaur: {parlett: "~1/2, 1*"},         // knight + man (aka crowned knight)
-    champion: {parlett: "1+, ~2/2, ~2/0"},  // wazir + alfil + dabbaba
-    crowned_rook: {parlett: "n+, 1X"},      // rook + ferz / rook + man
-    dragon_king: {parlett: "n+, 1X", royal: true},  // rook + king
-    fad: {parlett: "1X, ~2/2, ~2/0"},       // ferz + alfil + dababa
-    general: {parlett: "1X", royal: true},  // royal ferz
-    kangaroo: {parlett: "~1/2, ~2/2"},      // knight + alfil       TODO: image
-    waffle: {parlett: "1+, ~2/2"},          // wazir + alfil wazir + alfil  TODO: image of a waffle!
-    wizard: {parlett: "~1/3, 1X"},          // camel + fers
+    walker: {parlett: "o#wazir, c#fers"},
+    tiger: {parlett: "o#bishop, c#knight"},
+    bd: {parlett: "#dabbaba, #bishop"},
+    caliph: {parlett: "#camel, #bishop"},
+    canvasser: {parlett: "#camel, #rook"},
+    carpenter: {parlett: "#knight, #dabbaba"},
+    centaur: {parlett: "#knight, #man"},         // aka crowned knight
+    champion: {parlett: "#wazir, #alfil, #dabbaba"},
+    crowned_rook: {parlett: "#rook, #fers"},      
+    dragon_king: {parlett: "#rook, #king", royal: true},  
+    fad: {parlett: "#fers, #alfil, #dabbaba"},       
+    general: {parlett: "#fers", royal: true}, 
+    kangaroo: {parlett: "#knight, #alfil"},  
+    waffle: {parlett: "#wazir, #alfil"},          // TODO: image of a waffle!
+    wizard: {parlett: "#camel, #fers"},
 
     // More complex fairy / non-intl chess pieces
     // See http://en.wikipedia.org/wiki/Fairy_chess_piece#Notable_examples
@@ -326,20 +326,20 @@ var PIECE_TYPES = {
     // frookbbishop, knightwazir?
     
     // rook + can move (not capture) like bishop
-    tower: {parlett: "n+, onX", castle: true, letter: "T", image: "rookinv"},  
+    tower: {parlett: "#rook, o#bishop", castle: true, letter: "T", image: "rookinv"},  
 
     // knight + can move (not capture!) like wazir
-    jous: {parlett: "~1/2, o1+", letter: "J", image: "knightwazir"}, 
+    jous: {parlett: "#knight, o#wazir", letter: "J", image: "knightwazir"}, 
 
     // bishop + can move (not capture) 1 or 2 squares orthogonally
-    vicar: {parlett: "nX, o2+", letter: "V", image: "bishopinv"},  
+    vicar: {parlett: "#bishop, o2+", letter: "V", image: "bishopinv"},  
 
     // Pieces that probably won't be supported without significant coding
-    leo: {parlett: "on*, c^" + AMP, letter:"XO"},        // no &amp; support, whatever that is
-    knightrider: {parlett: "n(1/2)", letter:"XN"},  // no grouping support, sadly
-    checker: {parlett: "cn(^2X>), o1X>", promote: "checker_kinged", letter:"XY"},  // no grouping
-    checker_kinged: {parlett: "cn(^2X), o1x", letter:"XZ"},
-    spy: {parlett: "2>, 2=, (1/1)>", letter:"XS"}  // no grouping
+    //leo: {parlett: "on*, c^" + AMP, letter:"XO"},        // no &amp; support, whatever that is
+    //knightrider: {parlett: "n(1/2)", letter:"XN"},  // no grouping support, sadly
+    //checker: {parlett: "cn(^2X>), o1X>", promote: "checker_kinged", letter:"XY"},  // no grouping
+    //checker_kinged: {parlett: "cn(^2X), o1x", letter:"XZ"},
+    //spy: {parlett: "2>, 2=, (1/1)>", letter:"XS"}  // no grouping
     // pieces with no notation. WinChloe supports 1400 pieces.
     //
     // TODO: pieces from http://members.shaw.ca/quadibloc/chess/ch04.htm
