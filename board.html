@@ -1064,9 +1064,9 @@ function ask_to_promote(piece, tieback, is_immediate)
         choice = promotes_to[i];
 
         //element = create_piece(GAME_STATE.active_color, choice);
-        element = Builder.node("img", {src:image_path_for(choice, piece.color)});
+        element = Builder.node("img", {src:image_path_for(choice, piece.color), piece_type:choice});
         element.onclick = function() {
-            promote(piece, choice, tieback, is_immediate);
+            promote(piece, dojo.attr(this, "piece_type"), tieback, is_immediate);
         };
         container.appendChild(element);
     }
