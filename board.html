@@ -936,6 +936,9 @@ function mv(alg_move, virtual)
     // Check/mate indicators not part of move.
     alg_move = alg_move.replace("+", "").replace("#", "");
 
+    // Promotions, e1=Q, not needed, e1Q is fine
+    alg_move = alg_move.replace("=", "")
+
     // Prefer these move notations, in this order.
     for (var notation in AVAILABLE_NOTATIONS) {
         if (AVAILABLE_NOTATIONS.hasOwnProperty(notation)) {
@@ -1137,7 +1140,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
         var square = VBOARD[move.x][move.y];
 
         // Building blocks
-        var dest_filerank = xy2filerank(move.x, move.y);      // e4
+        var dest_filerank = xy2filerank(move.x, move.y);        // e4
         var dest_file = dest_filerank.substr(0, 1);             // e
         var dest_rank = dest_filerank.substr(1, 1);             // 4
         // starting_filerank (passed in as parameter)           // e2
@@ -1151,8 +1154,8 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
         var descriptive_dest_rank = descriptive_dest.substr(descriptive_dest.length - 1);           //  4
         var descriptive_origin_file = descriptive_origin.substr(0, descriptive_origin.length - 1);  // K
         var descriptive_origin_rank = descriptive_dest.substr(descriptive_dest.length - 1);         //  4
-        //var adescriptive_dest_file = adescriptive_dest.substr(0, 1);                                // e
-        //var adescriptive_dest_rank = adescriptive_dest.substr(1, 1);                                //  4
+        //var adescriptive_dest_file = adescriptive_dest.substr(0, 1);                              // e
+        //var adescriptive_dest_rank = adescriptive_dest.substr(1, 1);                              //  4
         var adescriptive_origin_file = adescriptive_origin.substr(0, 1);                            // e
         var adescriptive_origin_rank = adescriptive_dest.substr(1, 1);                              //  4
 
@@ -1165,17 +1168,16 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
 
         var promote_or_blank = "";      // Q/blank
         var promote_figurine = "";      // ♕/blank
-        var promote_paren = "";         // (Q)/blank
         var promote_iccf = "";          // 1/blank
-
+        var promote_paren = "";         // (Q)/blank
 
         if (move.promote_to) {
             var promote_piece = {type:move.promote_to};
 
             promote_or_blank = full_piece_prefix(promote_piece);
             promote_figurine = figurine_piece_prefix(GAME_STATE.active_color, promote_piece);
-            promote_paren = "(" + promote_or_blank + ")";
             promote_iccf = PIECE_TYPES[move.promote_to].iccf_number;
+            promote_paren = "(" + promote_or_blank + ")";
         }
 
         if (captured_piece) {
