@@ -1164,6 +1164,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
         var captured_piece = move.capture; 
 
         var promote_or_blank = move.promote_letter || "";                           // Q/blank
+        var promote_figurine = move.promote_figurine || "";                         // ♕/blank
         var promote_paren = promote_or_blank ? "(" + promote_or_blank + ")" : "";   // (Q)/blank
         var promote_iccf = move.promote_iccf_number || "";                          // 1/blank
 
@@ -1203,10 +1204,10 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
                 algs = [starting_file + capture_x + dest_filerank + promote_or_blank]; // ?xd5
             } else {
                 algs = [
-                    capture_x + dest_filerank + promote_or_blank,                      // ?f3
-                    starting_file + capture_x + dest_filerank + promote_or_blank,      // ?gf3
-                    starting_rank + capture_x + dest_filerank + promote_or_blank,      // ?1f3
-                    starting_filerank + capture_x + dest_filerank + promote_or_blank   // ?g1f3
+                    capture_x + dest_filerank,                      // ?f3
+                    starting_file + capture_x + dest_filerank,      // ?gf3
+                    starting_rank + capture_x + dest_filerank,      // ?1f3
+                    starting_filerank + capture_x + dest_filerank   // ?g1f3
                 ];
             }
 
@@ -1214,8 +1215,8 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
             algebraic_prefix = algebraic_piece_prefix(piece);      // blank, N, etc.
             figurine_prefix = figurine_piece_prefix(color, piece); // ♟, ♞, ♙, ♘, etc.
 
-            ps.SAN.push([piece, square, algs.map(function(a) { return algebraic_prefix + a; }), move]);  // N??
-            ps.FAN.push([piece, square, algs.map(function(a) { return figurine_prefix + a; }), move]);   // ♘??
+            ps.SAN.push([piece, square, algs.map(function(a) { return algebraic_prefix + a + promote_or_blank; }), move]);  // N??
+            ps.FAN.push([piece, square, algs.map(function(a) { return figurine_prefix + a + promote_figurine; }), move]);   // ♘??
 
             // Minimal notation, supposedly used in Informant
             minimal_algs = [
@@ -2164,8 +2165,10 @@ function filtered_moves(piece, color, is_hypothetical)
                 var option = piece_info.promote[j];
                 var option_letter = full_piece_prefix({type:option});
                 var option_iccf = PIECE_TYPES[option].iccf_number;
+                var option_figurine = figurine_piece_prefix(GAME_STATE.active_color, {type:option});
 
-                var prom_move = {promote_to: option, promote_letter: option_letter, promote_iccf_number: option_iccf};
+                var prom_move = {promote_to: option, promote_letter: option_letter, promote_iccf_number: option_iccf, 
+                    promote_figurine:option_figurine};
                 Object.extend(prom_move, abs_move);
                
                 moves.push(prom_move);
