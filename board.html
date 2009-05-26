@@ -991,7 +991,7 @@ function mv(alg_move, virtual)
     // TODO: do some Effect.Move animation, optionally (make two functions)
     //new Effect.Move(piece, { x: 10, y: 20, mode: 'relative' });
     
-    move_piece_to_square(piece, square, false, true);
+    move_piece_to_square(piece, square, false, true, alg_move);
 }
 
 //// SPECIAL MOVE FUNCTIONS
@@ -2180,6 +2180,9 @@ function filtered_moves(piece, color, is_hypothetical)
                
                 moves.push(prom_move);
             }
+            // TODO: make a "pseudo-move" for moving without promoting, which
+            // can be found by drag and drop, that gives list of moves to choose
+            // from in graphical interface?
         } else {
             // Just one move
             moves.push(abs_move);
@@ -2955,7 +2958,7 @@ function piece_was_captured(piece, square)
 
 // Find precomputed algebraic notation for this move. Called when
 // user drags a piece to a square and we don't know what move it is.
-function notation_from_piece_square(piece, square)
+function notation_from_piece_square(piece, square, text_input)
 {
     var ret;
 
@@ -2969,7 +2972,9 @@ function notation_from_piece_square(piece, square)
             var this_move = notations[notation].move;
 
             if (this_square.x === square.x && this_square.y === square.y && 
-                this_piece.unique_id === piece.unique_id) {
+                this_piece.unique_id === piece.unique_id &&
+                // TODO: if given text_input, lookup more directly
+                (!text_input || text_input === notation)) {
 
                 notation.move = this_move;
                 return {notation:notation, move:this_move};
@@ -2993,16 +2998,16 @@ function forwards_vector(color)
 // Make a move on the virtual board.
 // If is_hypothetical is true, this is an internal move part of another move
 // (castling) so it shouldn't be logged.
-function move_piece_to_square(piece, square, is_hypothetical, is_immediate)
+function move_piece_to_square(piece, square, is_hypothetical, is_immediate, text_input)
 {
     var from_square, move_text, filerank, only_move, move, tieback, did;
 
     from_square = piece.square;
 
     // Find out what move this was.
-    tieback = notation_from_piece_square(piece, square);
+    tieback = notation_from_piece_square(piece, square, text_input);
+    tieback.text_input = text_input;
     move = tieback.move;
-
 
     if (!is_hypothetical) {
         move_text = tieback.notation;
@@ -3066,9 +3071,13 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate)
         }
     }
 
-
     if (should_promote(piece)) {
-        ask_to_promote(piece, tieback, is_immediate);
+        if (tieback.move.promote_to) {
+            promote(piece, tieback.move.promote_to, tieback, is_immediate);
+        } else {
+            // TODO: for drag and drop moves, ask!
+            ask_to_promote(piece, tieback, is_immediate);
+        }
     } else {
         // If not a multi-move (moving rook in castling), log and go to next turn
         if (!is_hypothetical) {
