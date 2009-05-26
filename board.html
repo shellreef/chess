@@ -1163,10 +1163,20 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
         var captured_colon_letter = ""; // colon if captured, then piece letter if not pawn
         var captured_piece = move.capture; 
 
-        var promote_or_blank = move.promote_letter || "";                           // Q/blank
-        var promote_figurine = move.promote_figurine || "";                         // ♕/blank
-        var promote_paren = promote_or_blank ? "(" + promote_or_blank + ")" : "";   // (Q)/blank
-        var promote_iccf = move.promote_iccf_number || "";                          // 1/blank
+        var promote_or_blank = "";      // Q/blank
+        var promote_figurine = "";      // ♕/blank
+        var promote_paren = "";         // (Q)/blank
+        var promote_iccf = "";          // 1/blank
+
+
+        if (move.promote_to) {
+            var promote_piece = {type:move.promote_to};
+
+            promote_or_blank = full_piece_prefix(promote_piece);
+            promote_figurine = figurine_piece_prefix(GAME_STATE.active_color, promote_piece);
+            promote_paren = "(" + promote_or_blank + ")";
+            promote_iccf = PIECE_TYPES[move.promote_to].iccf_number;
+        }
 
         if (captured_piece) {
             capture_x = "x";
@@ -2162,13 +2172,8 @@ function filtered_moves(piece, color, is_hypothetical)
         if (piece_info.promote) {
             // Expand promotions; make a move for each piece you can promote to
             for (var j = 0; j < piece_info.promote.length; j += 1) {
-                var option = piece_info.promote[j];
-                var option_letter = full_piece_prefix({type:option});
-                var option_iccf = PIECE_TYPES[option].iccf_number;
-                var option_figurine = figurine_piece_prefix(GAME_STATE.active_color, {type:option});
+                var prom_move = {promote_to: piece_info.promote[j]};
 
-                var prom_move = {promote_to: option, promote_letter: option_letter, promote_iccf_number: option_iccf, 
-                    promote_figurine:option_figurine};
                 Object.extend(prom_move, abs_move);
                
                 moves.push(prom_move);
