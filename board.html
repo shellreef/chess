@@ -101,8 +101,16 @@ td.hover
 td.white { background-color: #ffce9e; }
 td.black { background-color: #d18b47; }
 
+/* Highlights */
 td.legal-move-white { background-color: #cf9e6e; }
 td.legal-move-black { background-color: #a15b17; }
+
+/* TODO:
+ * yellow - piece to promote
+ * green - move just made
+ * blue - move opponent just made
+ * red - destination square if capture move
+ */
 
 
 /* Would be cool to use CSS3 expressions to make the pattern, but they're not in
@@ -426,10 +434,6 @@ var SAVED_BOARDS = {
     },
 
     "Chess Openings": {
-"Sicilian Defense":     "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2",
-"Sicilian Defense Main Line":     "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2",
-"Sicilian Defense Nimzowitsch Variation":     "rnbqkb1r/pp1ppppp/5n2/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 3",
-"King's Pawn Game": "rnbqkbnr/pppppppp/9/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"
     },
 
     "Test Cases": {
@@ -499,7 +503,16 @@ var OPENINGS = {
     "rnbqkbnr/pppppppp/8/8/8/6P1/PPPPPP1P/RNBQKBNR b KQkq -": "A00t Benko's Opening / Hungarian / Barczay / Bilek",
     "rnbqkbnr/pppppppp/8/8/6P1/8/PPPPPP1P/RNBQKBNR b KQkq g3": "A00n Grob's Attack",
     "rnbqkbnr/pppppppp/8/8/8/7P/PPPPPPP1/RNBQKBNR b KQkq -": "A00d Clemenz Opening",
-    "rnbqkbnr/pppppppp/8/8/7P/8/PPPPPPP1/RNBQKBNR b KQkq h3": "A00c Desprez Opening / Kadas / Samurai / Reagen's"
+    "rnbqkbnr/pppppppp/8/8/7P/8/PPPPPPP1/RNBQKBNR b KQkq h3": "A00c Desprez Opening / Kadas / Samurai / Reagen's",
+
+    // A few common 2nd level responses - not comprehensive! Keep this short.
+    "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6": "B20 Sicilian Defense",
+    "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -": "B27a Sicilian Defense Main Line",
+    "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6": "C20 Open Game / Mutual King's Pawn",
+    "rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq d6": "B01a Scandinavian Centre Counter Game",
+    "r1bqkbnr/pppppppp/2n5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -": "B00l Nimzowitsch Defense",
+    "rnbqkb1r/pppppppp/5n2/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -": "B02a Alekhine Defense",
+    "rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -": "B10a Caro-Kann Defense"
 
     // TODO: Ajax to load scid.eco from a server optionally, to get deeper into the
     // openings. scid.eco has 20K+ lines, not practical to load into this file.
@@ -2908,6 +2921,19 @@ function init_board()
 
     board_menu.appendChild(Builder.node("option", {value: "", selected: "selected"}, "Load board..."));
 
+
+    // Create saved boards for openings, since they are stored by
+    // board position rather than name.
+    SAVED_BOARDS["Chess Openings"] = {};
+    for (var opening_board in OPENINGS) {
+        if (OPENINGS.hasOwnProperty(opening_board)) {
+            var opening_name = OPENINGS[opening_board];
+
+            SAVED_BOARDS["Chess Openings"][opening_name] = opening_board;
+        }
+    }
+
+    // Saved boards by group
     for (var group_name in SAVED_BOARDS) {
         if (SAVED_BOARDS.hasOwnProperty(group_name)) {
             var members = SAVED_BOARDS[group_name];
