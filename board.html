@@ -145,7 +145,7 @@ var PREFS = {
     //image_set: "ariel",    // based on Ariel Unicode MS
     //image_set: "chessos",
     
-    engine: "http://jeff.tk:81/crafty.cgi",
+    engine: "http://jeff.tk:81/chess/crafty.cgi",
     skill: 100                // engine strength, 0-100
 };
 
@@ -1783,7 +1783,8 @@ function schedule_engine_move(skill)
     dojo.xhrGet({
         url: PREFS.engine + query,
         handleAs: "json",
-        load: got_engine_move
+        load: got_engine_move,
+        error: got_engine_error
         });
 
     set_check_message("Analyzing...");
@@ -1806,13 +1807,26 @@ function got_engine_move(response)
         // enpassant status is bad (must be on 3rd/6th rank only.
         // bad string = "rn1qkbnr/pp2pppp/2p5/3pPb2/3P4/8/PPP2PPP/RNBQKBNR"
         // Illegal position, using normal initial chess position
-        //
-        $("engine_status").innerHTML = "Engine error: " + response.error;
-        PREFS.skill = 0;
-        $("skill_level").value = PREFS.skill;
-        $("skill_level").title = "Reset because of engine error: " + response.error;
-        random_move();
+        disable_engine("Engine error: " + response.error);
     }
+}
+
+// Called when the Ajax request fails
+function got_engine_error(response)
+{
+    disable_engine("Engine unavailable: " + response);
+}
+
+// Disable the external chess engine usage and make a random move in its place.
+function disable_engine(why)
+{
+    $("engine_status").innerHTML = why;
+    PREFS.skill = 0;
+    $("skill_level").value = PREFS.skill;
+    $("skill_level").title = "Reset because of: " + why;
+
+    // It'll have to do
+    random_move();
 }
 
 // Make a move in the VBOARD, which can be undone. Only makes the move.
