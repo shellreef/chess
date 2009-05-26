@@ -1019,10 +1019,8 @@ function should_promote(piece)
 }
 
 // Finish up a promotion move.
-function promote(piece, type, tieback, is_immediate)
+function promote(piece, type, notation, is_immediate)
 {
-    tieback.notation += "=Q";  // TODO: get return value from promote(), different values. Maybe need a callback, user interaction.
-
     // TODO: Puff out, or fade in from new to old piece. Is there an
     // effect that can fade from one image to another? LikE IE page transitions.
     // http://sachiniscool.blogspot.com/2006/01/implementing-page-transitions-in.html
@@ -1037,7 +1035,7 @@ function promote(piece, type, tieback, is_immediate)
 
     $("promote_container").hide();
 
-    finish_up_move(tieback, is_immediate);
+    finish_up_move(notation, is_immediate);
 }
 
 // Change a piece to whatever it promotes to.
@@ -1057,13 +1055,17 @@ function ask_to_promote(piece, tieback, is_immediate)
     // Create clickable promotion pieces
     for (var choice in tieback.choices) {
         if (tieback.choices.hasOwnProperty(choice)) {
-            var type = tieback.choices[choice].move.promote_to;
+            // The move the user selected that will be made
+            var real_move = tieback.choices[choice];
+
+            var type = real_move.move.promote_to;
+            var notation = real_move.notation;
 
             //element = create_piece(GAME_STATE.active_color, type);
-            element = Builder.node("img", {src:image_path_for(type, piece.color), piece_type:type});
+            element = Builder.node("img", {src:image_path_for(type, piece.color), piece_type:type, notation:notation});
             element.onclick = function() {
                 // Finishes up the move
-                promote(piece, dojo.attr(this, "piece_type"), tieback, is_immediate);
+                promote(piece, dojo.attr(this, "piece_type"), dojo.attr(this, "notation"), is_immediate);
             };
             container.appendChild(element);
         }
@@ -3083,14 +3085,17 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate, text
 
     if (should_promote(piece)) {
         if (tieback.multiple) {
+            // Piece+square move, need input from user: what piece 
             ask_to_promote(piece, tieback, is_immediate);
         } else {
-            promote(piece, tieback.move.promote_to, tieback, is_immediate);
+            // Piece+square+piece to promote have been given (probably from mv())
+            promote(piece, tieback.move.promote_to, tieback.notation, is_immediate);
         }
     } else {
         // If not a multi-move (moving rook in castling), log and go to next turn
         if (!is_hypothetical) {
-            finish_up_move(tieback, is_immediate);
+            console.log(tieback);
+            finish_up_move(tieback.notation, is_immediate);
         }
     }
 
@@ -3101,12 +3106,10 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate, text
 
 // Perform bookkeeping on the move after it has been actually made, 
 // in move_piece_to_square().
-function finish_up_move(tieback, is_immediate)
+function finish_up_move(move_text, is_immediate)
 {
     var alg_move, ply, turn_info, move_text;
 
-    move_text = tieback.notation;
-   
     // TODO: ellipsis if black is first recorded move, or intervening commentary
     if (GAME_STATE.active_color === "white") {
         alg_move = '<span class="fullmove_number">' + GAME_STATE.fullmove_number + '<\/span>';
