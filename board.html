@@ -105,6 +105,9 @@ td.black { background-color: #d18b47; }
 td.legal-move-white { background-color: #cf9e6e; }
 td.legal-move-black { background-color: #a15b17; }
 
+td.recent-move-white { background-color: #0066ff; }
+td.recent-move-black { background-color: #0099ff; }
+
 /* TODO:
  * yellow - piece to promote
  * green - move just made
@@ -184,7 +187,9 @@ var GAME_STATE = {
     position_moves: {},         // Board position -> move IDs, for 3n move repetition
     position_after: {},         // Board positions at each move, for playback
     active_in_check: false,
-    ended: false                // Game is done (drawn, won)
+    ended: false,               // Game is done (drawn, won)
+    recent_piece: null,         // Recently moved piece
+    recent_square: null         // Recently moved from square
 };    
 
 // Moves that can be made right now, for each active piece.
@@ -2834,7 +2839,8 @@ function realize_vboard()
         }
     }
 
-    //TODOcalculate_moves(GAME_STATE.active_color);
+    // TODO: Find a better way to do this. Highlight when start dragging?
+    //dojo.addClass(SQUARES[GAME_STATE.recent_square.x][GAME_STATE.recent_square.y], "recent-move-" + GAME_STATE.recent_square.color);
 }
 
 // Save the current displayed board state to VBOARD.
@@ -3081,6 +3087,10 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate, text
     move = tieback.move;
 
     if (!is_hypothetical) {
+        // For highlighting recent move on board
+        GAME_STATE.recent_square = from_square;
+        GAME_STATE.recent_piece = piece;
+
         move_text = tieback.notation;
 
         // Moving king makes it ineligible for castling
