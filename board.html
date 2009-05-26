@@ -2180,9 +2180,6 @@ function filtered_moves(piece, color, is_hypothetical)
                
                 moves.push(prom_move);
             }
-            // TODO: make a "pseudo-move" for moving without promoting, which
-            // can be found by drag and drop, that gives list of moves to choose
-            // from in graphical interface?
         } else {
             // Just one move
             moves.push(abs_move);
@@ -2960,9 +2957,8 @@ function piece_was_captured(piece, square)
 // user drags a piece to a square and we don't know what move it is.
 function notation_from_piece_square(piece, square, text_input)
 {
-    var ret;
-
     var notations = VALID_MOVE_NOTATIONS[$F("output_notation")];
+    var finds = {}, find_count = 0, one;
 
     // TODO: better data structure, inverted hash table lookup
     for (var notation in notations) {
@@ -2977,9 +2973,30 @@ function notation_from_piece_square(piece, square, text_input)
                 (!text_input || text_input === notation)) {
 
                 notation.move = this_move;
-                return {notation:notation, move:this_move};
+
+                one = {notation:notation, move:this_move};
+                finds[notation] = one;
+                find_count += 1;
+
+                if (!this_move.promote_to) {
+                    // Speed hack: no-promotion moves are unique by pc+sq
+                    break;
+                }
             }
         }
+    }
+
+    if (find_count === 0) {
+        return null;
+    } else if (find_count === 1) {
+        return one;
+    } else {
+        // When player drags a pawn to the last rank to be promoted,
+        // four moves will be found, and they'll have to choose. Make this appear
+        // to be the last found promotion option, since they all have the same
+        // location, and the piece will be able to move into place before the 
+        // user piece selection is made.
+        return Object.extend(one, {multiple:true, choices:finds});
     }
 }
 
@@ -3072,11 +3089,10 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate, text
     }
 
     if (should_promote(piece)) {
-        if (tieback.move.promote_to) {
-            promote(piece, tieback.move.promote_to, tieback, is_immediate);
-        } else {
-            // TODO: for drag and drop moves, ask!
+        if (tieback.multiple) {
             ask_to_promote(piece, tieback, is_immediate);
+        } else {
+            promote(piece, tieback.move.promote_to, tieback, is_immediate);
         }
     } else {
         // If not a multi-move (moving rook in castling), log and go to next turn
