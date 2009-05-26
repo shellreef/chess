@@ -1018,6 +1018,25 @@ function should_promote(piece)
     }
 }
 
+// Return whether the move would cause the piece to promote
+function would_promote(piece, move)
+{
+    // Does it promote?
+    if (!PIECE_TYPES[piece.type].promote) {
+        return false;
+    }
+
+    // Will it be on the last rank?
+    if (GAME_STATE.active_color === "white") {
+        return move.y === 8;    // 8th rank
+    } else if (GAME_STATE.active_color === "black") {
+        return move.y === 1;    // 1st rank
+    } else {
+        assert(false, "would_promote(" + piece + "): unknown active color");
+    }
+}
+
+
 // Finish up a promotion move.
 function promote(piece, type, notation, is_immediate)
 {
@@ -1208,7 +1227,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
 
             if (capture_x === "x" && piece.type === "pawn") {
                 // Pawn captures begin with file of pawn.
-                algs = [starting_file + capture_x + dest_filerank + promote_or_blank]; // ?xd5
+                algs = [starting_file + capture_x + dest_filerank]; // ?xd5
             } else {
                 algs = [
                     capture_x + dest_filerank,                      // ?f3
@@ -2166,7 +2185,7 @@ function filtered_moves(piece, color, is_hypothetical)
             continue; 
         }
 
-        if (piece_info.promote) {
+        if (would_promote(piece, abs_move)) {
             // Expand promotions; make a move for each piece you can promote to
             for (var j = 0; j < piece_info.promote.length; j += 1) {
                 var prom_move = {promote_to: piece_info.promote[j]};
@@ -2975,7 +2994,7 @@ function notation_from_piece_square(piece, square, text_input)
 
                 if (!this_move.promote_to) {
                     // Speed hack: no-promotion moves are unique by pc+sq
-                    break;
+                    return one;
                 }
             }
         }
@@ -3094,7 +3113,6 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate, text
     } else {
         // If not a multi-move (moving rook in castling), log and go to next turn
         if (!is_hypothetical) {
-            console.log(tieback);
             finish_up_move(tieback.notation, is_immediate);
         }
     }
