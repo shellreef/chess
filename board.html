@@ -1043,37 +1043,30 @@ function promote(piece, type, tieback, is_immediate)
 // Change a piece to whatever it promotes to.
 function ask_to_promote(piece, tieback, is_immediate)
 {
-    var promotes_to, element, container, choice;
+    var element, container, choice;
 
     realize_vboard();
 
-    //console.log("promotion");
-
-    // TODO: give option to what to promote to, if more than one.
-    // Click/tap piece to change it, after moved? Cycle through?
-    // Most people choose queen, but it is really important, as 
-    // sometimes a queen promotion can lead to a stalemate, or a 
-    // knight promotion etc. might actually be a better move.
-    // TODO: would also need to codify this in algebraic move, =Q, etc.
-    promotes_to = PIECE_TYPES[piece.type].promote;
-
+    // Clear previous container
     var container = $("promote_container");
 
     while(container.firstChild) {
         container.removeChild(container.firstChild);
     }
 
-    // Creation promotion elements
-    for (var i = 0; i < promotes_to.length; i += 1) {
-        choice = promotes_to[i];
+    // Create clickable promotion pieces
+    for (var choice in tieback.choices) {
+        if (tieback.choices.hasOwnProperty(choice)) {
+            var type = tieback.choices[choice].move.promote_to;
 
-        //element = create_piece(GAME_STATE.active_color, choice);
-        element = Builder.node("img", {src:image_path_for(choice, piece.color), piece_type:choice});
-        element.onclick = function() {
-            // Finishes up the move
-            promote(piece, dojo.attr(this, "piece_type"), tieback, is_immediate);
-        };
-        container.appendChild(element);
+            //element = create_piece(GAME_STATE.active_color, type);
+            element = Builder.node("img", {src:image_path_for(type, piece.color), piece_type:type});
+            element.onclick = function() {
+                // Finishes up the move
+                promote(piece, dojo.attr(this, "piece_type"), tieback, is_immediate);
+            };
+            container.appendChild(element);
+        }
     }
 
     container.show();
