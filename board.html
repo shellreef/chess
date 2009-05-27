@@ -204,7 +204,6 @@ var VALID_MOVES_OPP = null;         // Moves opponent could make, if it was thei
 var VALID_MOVE_NOTATIONS = null;    // Map SAN, LAN, MAN, RAN, CRAN, FAN, coord, desc, Smith etc. -> [piece, square]
 var ALT_MOVE_NOTATIONS = null;      // Same as above, but non-canonical, longer forms (Nb1c3 when Nc3 would do, etc.)
 var ALL_DROP_TARGETS = [];          // Droppables for UI
-var POSSIBLE_EP_TARGETS = null;     // If move to key, set en passant target to value
 
 // Board 
 var RANK_MAX = 8;
@@ -2111,12 +2110,9 @@ function filtered_moves(piece, color, is_hypothetical)
 
         if (!is_hypothetical) {
            if (mark_ep_target_dx !== undefined) {
-                POSSIBLE_EP_TARGETS[xy2filerank([x, y])] = 
-                    [mark_ep_target_dx + start_x,
-                     mark_ep_target_dy + start_y];
-                // relative positions are hardcoded above. 
-
-                abs_move.creates_ep_target = true;
+                abs_move.create_ep_target = [
+                    mark_ep_target_dx + start_x, 
+                    mark_ep_target_dy + start_y];
             }
 
         }
@@ -2659,7 +2655,6 @@ function set_turn(color, historical)
     }
 
     GAME_STATE.active_color = new_color;
-    POSSIBLE_EP_TARGETS = {};
    
     // Active player in check?
     checked = GAME_STATE.active_in_check = in_check(GAME_STATE.active_color, calculate_moves(opposite_color(new_color), true));
@@ -3094,8 +3089,6 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate, text
     tieback.text_input = text_input;
     move = tieback.move;
 
-    console.log(move);
-
     if (!is_hypothetical) {
         // For highlighting recent move on board
         GAME_STATE.recent_square = from_square;
@@ -3154,9 +3147,8 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate, text
     if (!is_hypothetical) {
         // If double pawn move, this creates an en passant target square
         filerank = xy2filerank([square.x, square.y]);
-        // TODO: Instead of using POSSIBLE_EP_TARGETS, pass in creates_ep_target
-        if (POSSIBLE_EP_TARGETS[filerank] && move.creates_ep_target) {
-            GAME_STATE.ep_target = POSSIBLE_EP_TARGETS[filerank];
+        if (move.create_ep_target) {
+            GAME_STATE.ep_target = move.create_ep_target;
         } else {
             // En passant possibility disappears immediately after any other move
             GAME_STATE.ep_target = null;
