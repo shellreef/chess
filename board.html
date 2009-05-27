@@ -2651,7 +2651,7 @@ function set_turn(color, historical)
 
     // Move number is incremented after black moves, according to rules.
     old_fullmove = GAME_STATE.fullmove_number;
-    if (GAME_STATE.active_color === "black") {
+    if (color === "next" && GAME_STATE.active_color === "black") {
         GAME_STATE.fullmove_number += 1;
     }
 
@@ -3509,6 +3509,8 @@ function load_starting_position(fen, replay)
 
     if (!replay) {
         name_pieces();
+        // Clear move history. TODO: Better way.
+        $("move_history").innerHTML = "";
     }
 }
 
