@@ -2115,6 +2115,8 @@ function filtered_moves(piece, color, is_hypothetical)
                     [mark_ep_target_dx + start_x,
                      mark_ep_target_dy + start_y];
                 // relative positions are hardcoded above. 
+
+                abs_move.creates_ep_target = true;
             }
 
         }
@@ -3092,6 +3094,8 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate, text
     tieback.text_input = text_input;
     move = tieback.move;
 
+    console.log(move);
+
     if (!is_hypothetical) {
         // For highlighting recent move on board
         GAME_STATE.recent_square = from_square;
@@ -3150,7 +3154,8 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate, text
     if (!is_hypothetical) {
         // If double pawn move, this creates an en passant target square
         filerank = xy2filerank([square.x, square.y]);
-        if (POSSIBLE_EP_TARGETS[filerank]) {
+        // TODO: Instead of using POSSIBLE_EP_TARGETS, pass in creates_ep_target
+        if (POSSIBLE_EP_TARGETS[filerank] && move.creates_ep_target) {
             GAME_STATE.ep_target = POSSIBLE_EP_TARGETS[filerank];
         } else {
             // En passant possibility disappears immediately after any other move
