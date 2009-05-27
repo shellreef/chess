@@ -266,10 +266,10 @@ var PIECE_TYPES = {
 
     // Other hippogonals, good for testing
     zero: {parlett: "~0/0", letter: "O"},
-    man: {parlett: "1*", letter: "M"},    // same as king, but not royale (also known as commoner)
+    man: {parlett: "1*", letter: "M"},    // same as king, but not royale (also known as commoner), alternate image: guard
     warmachine: {parlett: "~2+", letter: "D"},  // or ~2/0
-    alfil: {parlett: "~2X", letter: "Y"},    // TODO: image          or ~2/2
-    alibaba: {parlett: "~2/0, ~2X", letter: "L"},   // TODO: image
+    alfil: {parlett: "~2X", letter: "Y"},       // TODO: image, pieceolpedia uses an elephant, but.. //  or ~2/2
+    alibaba: {parlett: "~2/0, ~2X", letter: "L", image:"elephantwarmachine"},
     squirrel: {parlett: "~0/2, ~1/2, ~2/2", letter: "S"},
     threeleaper: {parlett: "~3/0", letter: "H"}, 
     tripper: {parlett: "~3/3", letter: "XT"},
@@ -287,19 +287,21 @@ var PIECE_TYPES = {
     // TODO: root-65 leaper, bat, see http://members.shaw.ca/quadibloc/chess/ch03.htm
     buffalo: {parlett: "~1/2, ~1/3, ~2/3"},         
 
-    maharajah: {parlett: "#amazon", letter: "XJ", royal: true, image:"paladin"},   // Q+N+K, Maharajah chess
+    maharajah: {parlett: "#amazon", letter: "XJ", royal: true, image:"paladin"},   // Q+N+K, Maharajah chess TODO: crown amazon?
     royal_knight: {parlett: "#knight", letter: "XR", royal: true, image:"knight"},  // Knightmate chess TODO: crown on knight
     royal_queen: {parlet: "#queen", royal: true}, 
 
     // Combined pieces
     // From piecelopedia or http://members.shaw.ca/quadibloc/chess/ch03.htm or 
     // http://www.chessvariants.com/graphics.dir/alfaerie/
-    eques_rex: {parlett: "#king, #knight", image:"equesrex", royal: true},
-    centaur: {parlett: "#knight, #man"},         // aka crowned knight
+    equesrex: {parlett: "#king, #knight", image:"equesrex", royal: true},
+    centaur: {parlett: "#knight, #man"},         // not royal, so not an equesrex  TODO: remove cross, make bcentaur.gif?
     amazon: {parlett: "#queen, #knight", letter: "XV"},     // Q+N, aka superqueen
     chancellor: {parlett: "#rook, #knight", letter: "C"},   // R+N, aka empress, marshal (Capablanca, X-FEN standard)
     archbishop: {parlett: "#bishop, #knight", letter: "A", image: "cardinal"}, // B+N, aka cardinal, princess, janus (Capablanca, X-FEN standard)
-    dragon: {parlett: "#pawn, #knight", image: "pawnknight"},
+    dragon: {parlett: "#pawn, #knight", image: "pawnknight"},   // alt image: dragon, but less descriptive
+    dragonhorse: {parlett: "#bishop, #wazir", image: "promotedbishop"},
+    berse: {parlett: "#rook, #ferz", image: "promtoedrook"},    // aka dragon king, but its not royal
     caliph: {parlett: "#camel, #bishop", image: "camelbishop"},
     pope: {parlett: "#king, #bishop", image:"kingbishop"},  // http://www.chessvariants.com/difftaking.dir/thunder.html 
     dragon_king: {parlett: "#king, #rook", royal: true},  
@@ -318,22 +320,23 @@ var PIECE_TYPES = {
 
     walker: {parlett: "o#wazir, c#ferz"},
     tiger: {parlett: "o#bishop, c#knight"},
-    bd: {parlett: "#warmachine, #bishop"},
-    canvasser: {parlett: "#camel, #rook"},
-    carpenter: {parlett: "#knight, #warmachine"},
+    bd: {parlett: "#warmachine, #bishop", image:"bishopwarmachine"},
+    canvasser: {parlett: "#camel, #rook", image:"camelrook"},
+    carpenter: {parlett: "#knight, #warmachine", image:"knightwarmachine"},
     champion: {parlett: "#wazir, #alfil, #warmachine"},
     crowned_rook: {parlett: "#rook, #ferz"},      
     fad: {parlett: "#ferz, #alfil, #warmachine"},       
     general: {parlett: "#ferz", royal: true}, 
     kangaroo: {parlett: "#knight, #alfil"},  
-    waffle: {parlett: "#wazir, #alfil"},          // TODO: image of a waffle!
-    wizard: {parlett: "#camel, #ferz"},
+    waffle: {parlett: "#wazir, #alfil"},        // TODO: image of a waffle!
+    wizard: {parlett: "#camel, #ferz"},         // TODO: image
 
     // More complex fairy / non-intl chess pieces
     // See http://en.wikipedia.org/wiki/Fairy_chess_piece#Notable_examples
     // and even better, Piecelopedia 
     // http://chessvariants.wikidot.com/pcp:piececlopedia
-   
+  
+    lance: {parlett: "n+>"},
     colonel: {parlett: "n>, n=, 2/1>, 1*", letter: "XC"}, 
     murray_lion: {parlett: "~0/2, ~2/2, c1*", letter: "XM"},
     lion: {parlett: "~n*", letter: "XL"},
@@ -343,6 +346,9 @@ var PIECE_TYPES = {
     khohn: {parlett: "1X, 1>", letter: "XK"},
     ferz: {parlett: "1X", letter: "XF"},
     wazir: {parlett: "1+", letter: "I"},
+    // TODO: mushroom, try out Extended Parlett's [], explicitly giving relative moves. See:
+    // http://www.chessvariants.org/graphics.dir/alfaeriemisc/spratt/ - would need to add (and all others)
+    // http://www.chessvariants.org/piececlopedia.dir/mushroom.html
     // TODO: support ~0/0 for "null move" (---), but don't let drop to null, instead show a button
     kraken: {parlett: "~n/m ~0/0"},     // any square, not realistic since always checkmates!
     octopus: {parlett: "o~n/m ~0/0", letter: "XD"}, // any square (8x8, octo, get it?) but can't capture, much less powerful
@@ -481,7 +487,7 @@ var SAVED_BOARDS = {
 "Test Getting out of Check": "rnbqkbnr/ppp1p1pp/4P3/3p3Q/5p2/8/PPPP1PPP/RNB1KBNR b KQkq - 0 4",
 "Test Check Checking": "rnbQ1bnr/ppp1kppp/8/4p3/7q/8/PPPP1PPP/RNBQKBNR b KQ - 0 5",
 "Test Parlett Move Interference": "r/8/8/1N3b2/3PP3/1P1BBN/8/8 w - - 0 17",
-"Test Fairy Pieces": "X(airplane)x(airplane)/4x(caliph)x(pope)X(elephantwarmachine)/8/8/8/8/mSwZ/AcDeIJvT w - - 0 1"
+"Test Fairy Pieces": "X(airplane)x(airplane)/4x(caliph)x(pope)X(elephantwarmachine)/8/8/8/4S/X(lance)1wZ/AcDeIJvT w - - 0 1"
     }
 };
 
