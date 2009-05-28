@@ -354,8 +354,8 @@ var PIECE_TYPES = {
     octopus: {parlett: "o~n/m ~0/0", letter: "XD"}, // any square (8x8, octo, get it?) but can't capture, much less powerful
     universal_leaper: {parlett: "~n/m"},// like kraken, but can't go to square it is on (like a zero)
     airplane: {parlett: "o~n/m", letter: "U", image:"plane"},
-    
-    //gun: {parlett: "{
+
+    gun: {parlett: "#man, {cn*;snapback=0,0}"},
 
     // Pieces from chess-3
     // http://www.chessbase.com/newsdetail.asp?newsid=4553
@@ -467,7 +467,7 @@ var SAVED_BOARDS = {
 "Test Leapers": "K/2M1Y1H1/8/1XT2WXG1Z/8/3Z1N/4oo/5k w - - 0 1", // TODO: antelope, flamingo
 "Test Amphibians": "4k/8/8/slslslsl/8/8/FFFFFFFF/4K w - - 0 1",
 "Test Royalty": "x(royalrook)x(royalknight)x(royalbishop)xjkx(royalbishop)x(royalknight)x(royalrook)/pppppppp/8/8/8/8/PPPPPPPP/X(royalrook)X(royalknight)X(royalbishop)XJKX(royalbishop)X(royalknight)X(royalrook) w KQkq - 0 1",
-"Test Experimental": "x(airplane)X(airplane) w - - 0 1",
+"Test Experimental": "x(airplane)X(airplane)/8/1x(bird)/2x(bird)x(bird)x(bird)/3x(bird)x(bird)/4x(bird)/8/2X(gun) w - - 0 1",
     },
 
     "Test Rules": {
@@ -1863,8 +1863,9 @@ function do_virtual_move(piece, move)
     var captured, from_square, to_square, capture_square, piece_moved_over;
  
     from_square = piece.square;
+
     to_square = VBOARD[move.x][move.y];
-  
+ 
     // Special case: en passant captures to an empty square
     if (GAME_STATE.ep_target &&
         to_square.x === GAME_STATE.ep_target[0] && 
@@ -1890,8 +1891,16 @@ function do_virtual_move(piece, move)
         captured.square = null;
     }
 
-    piece.square = VBOARD[move.x][move.y];
-    VBOARD[move.x][move.y].piece = piece;
+    if (move.snapback) {
+        // TODO: remove snapback_dx, only support to 0,0
+        return {captured:captured, capture_square:capture_square,
+            from_square:from_square, piece:piece, move:move, 
+            to_square:from_square,  // this is key
+            piece_moved_over:captured};
+    }
+
+    piece.square = VBOARD[to_square.x][to_square.y];
+    VBOARD[to_square.x][to_square.y].piece = piece;
     VBOARD[from_square.x][from_square.y].piece = null;
 
     return {captured: captured, capture_square: capture_square, 
@@ -2036,6 +2045,7 @@ function filtered_moves(piece, color, is_hypothetical)
         var if_unblocked3_dx = flags.if_unblocked3_dx, if_unblocked3_dy = flags.if_unblocked3_dy;
         //var capture_at_dx = flags.capture_at_dx, capture_at_dy = flags.capture_at_dy;
         var mark_ep_target_dx = flags.mark_ep_target_dx, mark_ep_target_dy = flags.mark_ep_target_dy;
+        var snapback_dx = flags.snapback_dx, snapback_dy = flags.snapback_dy;
 
         // Positive is forwards, so mirror for black.
         if (color === "black") {
@@ -2046,6 +2056,7 @@ function filtered_moves(piece, color, is_hypothetical)
             if (if_unblocked3_dy) { if_unblocked3_dy = -if_unblocked3_dy; }
             //if (capture_at_dy) { capture_at_dy = -capture_at_dy; }
             if (mark_ep_target_dy) { mark_ep_target_dy = -mark_ep_target_dy; }
+            if (snapback_dy) { snapback_dy = -snapback_dy; }
         }
 
         x = rel_x + start_x;
@@ -2122,6 +2133,11 @@ function filtered_moves(piece, color, is_hypothetical)
                 continue;
             }
         }
+        // Snap back after moving - for guns
+        if (flags.snapback_dx !== undefined) {
+            abs_move.snapback = {x:flags.snapback_dx + start_x, y:flags.snapback_dy + start_y}
+        }
+
 
 
         // Map pawn moves to what the en passant target will be if
