@@ -355,7 +355,7 @@ var PIECE_TYPES = {
     universal_leaper: {parlett: "~n/m"},// like kraken, but can't go to square it is on (like a zero)
     airplane: {parlett: "o~n/m", letter: "U", image:"plane"},
 
-    gun: {parlett: "#man, {cn*;snapback=0,0}"},
+    gun: {parlett: "#man, {cn*;snapback}"},
 
     // Pieces from chess-3
     // http://www.chessbase.com/newsdetail.asp?newsid=4553
@@ -2045,7 +2045,6 @@ function filtered_moves(piece, color, is_hypothetical)
         var if_unblocked3_dx = flags.if_unblocked3_dx, if_unblocked3_dy = flags.if_unblocked3_dy;
         //var capture_at_dx = flags.capture_at_dx, capture_at_dy = flags.capture_at_dy;
         var mark_ep_target_dx = flags.mark_ep_target_dx, mark_ep_target_dy = flags.mark_ep_target_dy;
-        var snapback_dx = flags.snapback_dx, snapback_dy = flags.snapback_dy;
 
         // Positive is forwards, so mirror for black.
         if (color === "black") {
@@ -2056,7 +2055,6 @@ function filtered_moves(piece, color, is_hypothetical)
             if (if_unblocked3_dy) { if_unblocked3_dy = -if_unblocked3_dy; }
             //if (capture_at_dy) { capture_at_dy = -capture_at_dy; }
             if (mark_ep_target_dy) { mark_ep_target_dy = -mark_ep_target_dy; }
-            if (snapback_dy) { snapback_dy = -snapback_dy; }
         }
 
         x = rel_x + start_x;
@@ -2134,8 +2132,8 @@ function filtered_moves(piece, color, is_hypothetical)
             }
         }
         // Snap back after moving - for guns
-        if (flags.snapback_dx !== undefined) {
-            abs_move.snapback = {x:flags.snapback_dx + start_x, y:flags.snapback_dy + start_y}
+        if (flags.snapback !== undefined) {
+            abs_move.snapback = true;
         }
 
 
