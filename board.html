@@ -2963,7 +2963,18 @@ function init_board()
         }
     }
 
+    // Get board name in cookie, if any. This lets the user select
+    // their favorite board, and revisit the page, and it will
+    // automatically load, instead of standard chess.
+    var selected_board_group = dojo.cookie("board_group");
+    var selected_board_name = dojo.cookie("board_name");
+    if (!selected_board_name) {
+        selected_board_group = "Chess & Variants";
+        selected_board_name = "International Western Chess";
+    }
+
     // Saved boards by group
+    var index = 0, sel_index;
     for (var group_name in SAVED_BOARDS) {
         if (SAVED_BOARDS.hasOwnProperty(group_name)) {
             var members = SAVED_BOARDS[group_name];
@@ -2974,22 +2985,20 @@ function init_board()
             for (var board_name in members) {
                 if (members.hasOwnProperty(board_name)) {
                     var fen = members[board_name];
-                    group.appendChild(Builder.node("option", {value: fen}, board_name));
+                    var sel = group_name === selected_board_group && board_name === selected_board_name ? "selected" : "";
+                    if (sel) {
+                        sel_index = index;
+                    }
+                    group.appendChild(Builder.node("option", {value: fen, selected:sel}, board_name));
+                    index += 1;
                 }
             }
         }
     }
 
-    board_menu.selectedIndex = 0;
+    board_menu.selectedIndex = sel_index;
 
-    // Load board name in cookie, if any. 
-    var board_group = dojo.cookie("board_group");
-    var board_name = dojo.cookie("board_name");
-    if (!board_name) {
-        board_group = "Chess & Variants";
-        board_name = "International Western Chess";
-    }
-    load_fen(SAVED_BOARDS[board_group][board_name]);
+    load_fen(SAVED_BOARDS[selected_board_group][selected_board_name]);
 
 
 }
