@@ -16,31 +16,10 @@ http://www.chessvariants.com/graphics.dir/alfaerie4/
 http://www.chessvariants.com/graphics.dir/alfaerie5/
 No http://www.chessvariants.com/graphics.dir/alfaerie6/ yet..
 
-http://www.chessvariants.com/graphics.dir/alfaerie-plus/ is included here,
-with the following changes to avoid name conflicts:
- elephant -> elephantmodern (has x)
- elephantrider -> elephantridermodern (has x)
-    belephant.gif is an alfil: http://chessvariants.wikidot.com/pcp-aa:alfil
-    but the one from alfaerie-plus is the modern elephant, 
-    http://chessvariants.wikidot.com/pcp-ae:elephant-modern
- flexibleknight is identical in both sets
- jumpinggeneral in alfaerie-plus is jumpinggeneral2, already in an expansion set
- same with slidinggeneral
- templar -> templar2 (has color cross)
- twistedknight is identical
- zigzaggeneral is zigzaggeneral2 (gray war machine)
-So alfaerie-plus adds:
-    dababbarider
-    elephantmodern
-    elephantridermodern
-    highpriest_ess
-    nwd
-    parallelgeneral
-    templar2
-Many are listed at http://chessvariants.wikidot.com/pcp:piececlopedia
-but this page is more comprehensive:
-http://www.chessvariants.org/index/mainquery.php?type=Piececlopedia&orderby=LinkText&displayauthor=1&displayinventor=1&usethisheading=Piececlopedia
-TODO: make an html page for this
+http://www.chessvariants.com/graphics.dir/alfaerie-plus/ is included here, 
+with a few minor modifications necesssary to avoid name conflicts. See alfaerieplus.html
+for details.
+
 
 There are some more graphics available at:
 
