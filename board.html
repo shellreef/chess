@@ -342,8 +342,8 @@ var PIECE_TYPES = {
     colonel: {parlett: "n>, n=, 2/1>, 1*", letter: "XC"}, 
     murray_lion: {parlett: "~0/2, ~2/2, c1*", letter: "XM"},
     lion: {parlett: "~n*", letter: "XL"},
-    berolina_pawn: {parlett: "o1X>, c1>, io2X>", letter: "XB", image:"berolinapawn", resets_50move: true},
-    superpawn: {parlett: "on>, cnX>", letter: "XP"},
+    berolinapawn: {parlett: "o1X>, c1>, io2X>", letter: "XB", image:"berolinapawn", resets_50move: true},
+    superpawn: {parlett: "on>, cnX>", letter: "XP", image:"pawninv"},
     elephant: {parlett: "2X", letter: "E"},         // Not a leaper, path can be blocked (unlike alfil, ~2X)
     khohn: {parlett: "1X, 1>", letter: "XK"},
     ferz: {parlett: "1X", letter: "XF"},
@@ -458,7 +458,11 @@ var SAVED_BOARDS = {
     "Chess Openings": {
     },
 
-    "Test Cases": {
+    "Test Pieces": {
+"Test Pawns": "8/x(rookpawn)x(dragon)x(bishoppawn)x(superpawn)1x(berolinapawn)x(pawnattackrook)x(pawn)/8/8/8/8/X(rookpawn)X(dragon)X(bishoppawn)X(superpawn)1X(berolinapawn)X(pawnattackrook)X(pawn) w - - 0 1",
+    },
+
+    "Test Rules": {
 "Test Checkmate": "r1bknbrN/pppppppp/8/8/8/8/PPPPPPPP/nRBNKB1R b - - 0 1",
 "Test Stalemate":     "k7/8/8/8/8/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5",
 "Test Remove Check by Capture":     "4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5",
