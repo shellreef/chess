@@ -383,6 +383,10 @@ var PIECE_TYPES = {
     // TODO: pieces from http://members.shaw.ca/quadibloc/chess/ch04.htm
 };
 
+        
+var DEFAULT_BOARD_GROUP = "Chess & Variants";
+var DEFAULT_BOARD_NAME = "International Western Chess";
+
 // Saved board setups in FEN
 var SAVED_BOARDS = {
     "Chess & Variants": {
@@ -2969,8 +2973,8 @@ function init_board()
     var selected_board_group = dojo.cookie("board_group");
     var selected_board_name = dojo.cookie("board_name");
     if (!selected_board_name) {
-        selected_board_group = "Chess & Variants";
-        selected_board_name = "International Western Chess";
+        selected_board_group = DEFAULT_BOARD_GROUP;
+        selected_board_name = DEFAULT_BOARD_NAME;
     }
 
     // Saved boards by group
@@ -2985,22 +2989,28 @@ function init_board()
             for (var board_name in members) {
                 if (members.hasOwnProperty(board_name)) {
                     var fen = members[board_name];
-                    var sel = group_name === selected_board_group && board_name === selected_board_name ? "selected" : "";
-                    if (sel) {
+                    if (group_name === selected_board_group && board_name === selected_board_name) {
                         sel_index = index;
                     }
-                    group.appendChild(Builder.node("option", {value: fen, selected:sel}, board_name));
+                    group.appendChild(Builder.node("option", {value: fen}, board_name));
                     index += 1;
                 }
             }
         }
     }
 
+    // Select loaded board. Could use selected attribute, but Firefox selects last item,
+    // unless we set selectedIndex, so just do that.
     board_menu.selectedIndex = sel_index;
 
-    load_fen(SAVED_BOARDS[selected_board_group][selected_board_name]);
+    var fen = SAVED_BOARDS[selected_board_group][selected_board_name];
+    if (!fen) {
+        // Cookie corrupted? Load default.
+        fen = SAVED_BOARDS[DEFAULT_BOARD_GROUP][DEFAULT_BOARD_NAME];
+        board_menu.selectedIndex = 0;
+    }
 
-
+    load_fen(fen);
 }
 
 // Load a board from the drop down menu of SAVED_BOARDS.
