@@ -243,7 +243,7 @@ var PIECE_TYPES = {
     knight: {parlett: "~1/2", letter: "N", figurines: ["\u2658", "\u265e"], iccf_number: 4},
 
 
-    // Pawn in new notation
+    // Pawns
     pawn: {parlett: 
         "o1>, c1X>, " + 
         "oi[0,2;if_unblocked=0,1;mark_ep_target=0,1], " +
@@ -256,13 +256,13 @@ var PIECE_TYPES = {
         alg_letter: "",
         resets_50move: true     // a pawn move resets the halfmove counter for the 50-move rule
     },
+    weakpawn: {parlett: "o1>, c1X>"},   // No double move, no promotion
+    superpawn: {parlett: "on>, cnX>", letter: "XP", image:"quickpawn"},
+    berolinapawn: {parlett: "o1X>, c1>, io2X>", letter: "XB", image:"berolinapawn", resets_50move: true},
+    dragon: {parlett: "#pawn, #knight", image: "pawnknight"},   // alt image: dragon, but less descriptive
+    // David's pawn
+    pawnattackrook: {parlett: "#pawn, c#rook", image:"pawn135cw", promote: ["dragon", "rookpawn"]},
 
-    // OLD NOTATION
-    // P allows for moving to GAME_STATE.ep_target square (must be before other capture move)
-    // oi2> is another way to write the one/two-forward move, but it is really two possible moves:
-    // - oi2>eE: exactly two forward, store piece behind in ep_target (notated by "E")
-    // - oi1>e: exactly one forward
-    //pawn: {parlett: "o1>, P, c1X>, oi2>eE, oi1>e", letter: "P", alg_letter: "", promote: ["queen", "knight", "rook", "bishop"], figurines: ["\u2659", "\u265f"]},
 
     // Other hippogonals, good for testing
     zero: {parlett: "~0/0", letter: "O"},
@@ -299,7 +299,6 @@ var PIECE_TYPES = {
     amazon: {parlett: "#queen, #knight", letter: "XV"},     // Q+N, aka superqueen
     chancellor: {parlett: "#rook, #knight", letter: "C"},   // R+N, aka empress, marshal (Capablanca, X-FEN standard)
     archbishop: {parlett: "#bishop, #knight", letter: "A", image: "cardinal"}, // B+N, aka cardinal, princess, janus (Capablanca, X-FEN standard)
-    dragon: {parlett: "#pawn, #knight", image: "pawnknight"},   // alt image: dragon, but less descriptive
     dragonhorse: {parlett: "#bishop, #wazir", image: "promotedbishop"},
     berse: {parlett: "#rook, #ferz", image: "promtoedrook"},    // aka dragon king, but its not royal
     caliph: {parlett: "#camel, #bishop", image: "camelbishop"},
@@ -315,9 +314,6 @@ var PIECE_TYPES = {
     elephantwazir: {parlett: "#elephant, #wazir"},
     elephantferzwarmachine: {parlett: "#elephant, #ferz, #warmachine"},
     warmachinewazir: {parlett: "#warmachine, #wazir"},
-
-    // David's pawn
-    pawnattackrook: {parlett: "#pawn, c#rook", image:"pawn135cw", promote: ["dragon", "rookpawn"]},
 
     walker: {parlett: "o#wazir, c#ferz"},
     tiger: {parlett: "o#bishop, c#knight"},
@@ -342,8 +338,6 @@ var PIECE_TYPES = {
     colonel: {parlett: "n>, n=, 2/1>, 1*", letter: "XC"}, 
     murray_lion: {parlett: "~0/2, ~2/2, c1*", letter: "XM"},
     lion: {parlett: "~n*", letter: "XL"},
-    berolinapawn: {parlett: "o1X>, c1>, io2X>", letter: "XB", image:"berolinapawn", resets_50move: true},
-    superpawn: {parlett: "on>, cnX>", letter: "XP", image:"pawninv"},
     elephant: {parlett: "2X", letter: "E"},         // Not a leaper, path can be blocked (unlike alfil, ~2X)
     khohn: {parlett: "1X, 1>", letter: "XK"},
     ferz: {parlett: "1X", letter: "XF"},
@@ -463,7 +457,7 @@ var SAVED_BOARDS = {
     },
 
     "Test Pieces": {
-"Test Pawns": "8/x(rookpawn)x(dragon)x(bishoppawn)x(superpawn)1x(berolinapawn)x(pawnattackrook)x(pawn)/8/8/8/8/X(rookpawn)X(dragon)X(bishoppawn)X(superpawn)1X(berolinapawn)X(pawnattackrook)X(pawn) w - - 0 1",
+"Test Pawns": "8/x(rookpawn)x(dragon)x(bishoppawn)x(superpawn)x(weakpawn)x(berolinapawn)x(pawnattackrook)x(pawn)/8/8/8/8/X(rookpawn)X(dragon)X(bishoppawn)X(superpawn)X(weakpawn)X(berolinapawn)X(pawnattackrook)X(pawn) w - - 0 1",
     },
 
     "Test Rules": {
