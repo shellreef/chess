@@ -3022,7 +3022,7 @@ function change_loaded_board(menu)
 
     var option = menu.options[menu.selectedIndex];
     var group = option.parentNode.label;        // optgroup 
-    var name = option.innerText;
+    var name = option.innerHTML;
     dojo.cookie("board_group", group);
     dojo.cookie("board_name", name);
 
