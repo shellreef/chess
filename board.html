@@ -264,22 +264,22 @@ var PIECE_TYPES = {
     pawnattackrook: {parlett: "#pawn, c#rook", image:"pawn135cw", promote: ["dragon", "rookpawn"]},
 
 
-    // Other hippogonals, good for testing
-    zero: {parlett: "~0/0", letter: "O"},
+    // Hippogonal leapers
+    zero: {parlett: "~0/0", letter: "O", image:"circle"},    // TODO: support null move
     man: {parlett: "1*", letter: "M"},    // same as king, but not royale (also known as commoner), alternate image: guard
     warmachine: {parlett: "~2+", letter: "D"},  // or ~2/0
-    alfil: {parlett: "~2X", letter: "Y"},       // TODO: image, pieceolpedia uses an elephant, but.. //  or ~2/2
-    alibaba: {parlett: "~2/0, ~2X", letter: "L", image:"elephantwarmachine"},
-    squirrel: {parlett: "~0/2, ~1/2, ~2/2", letter: "S"},
-    threeleaper: {parlett: "~3/0", letter: "H"}, 
-    tripper: {parlett: "~3/3", letter: "XT"},
+    alfil: {parlett: "~2X", letter: "Y", image:"elephant2"},       //  or ~2/2
+    threeheadmonster: {parlett: "~3/0", letter: "H"},     // aka threeleaper
+    bird: {parlett: "~3/3", letter: "XT"},                // aka tripper
     camel: {parlett: "~1/3", letter: "W"},
     zebra: {parlett:"~2/3", letter: "Z"},
     giraffe: {parlett: "~1/4", letter: "XG"},
-    antelope: {parlett: "~3/4"}, 
-    flamingo: {parlett: "~1/6"}, 
+    antelope: {parlett: "~3/4"},    // TODO: image
+    flamingo: {parlett: "~1/6"},    // TODO: image
 
     // Amphibians (combined leapers)
+    alibaba: {parlett: "~2/0, ~2X", letter: "L", image:"elephantwarmachine"},
+    squirrel: {parlett: "~0/2, ~1/2, ~2/2", letter: "S"},
     frog: {parlett: "~1/1, ~0/3", letter: "F"},     
     bison: {parlett: "~1/3, ~2/3"},                 
     gnu: {parlett: "~1/2, ~1/3"},                  
@@ -458,6 +458,8 @@ var SAVED_BOARDS = {
 
     "Test Pieces": {
 "Test Pawns": "8/x(rookpawn)x(dragon)x(bishoppawn)x(superpawn)x(weakpawn)x(berolinapawn)x(pawnattackrook)x(pawn)/8/8/8/8/X(rookpawn)X(dragon)X(bishoppawn)X(superpawn)X(weakpawn)X(berolinapawn)X(pawnattackrook)X(pawn) w - - 0 1",
+"Test Leapers": "8/O1M1Y1H1/8/1XT2WXG1Z/8/8/3Z1N/5k w - - 0 1", // TODO: antelope, flamingo
+
     },
 
     "Test Rules": {
