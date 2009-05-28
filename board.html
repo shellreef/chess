@@ -312,11 +312,12 @@ var PIECE_TYPES = {
     rookpawn: {parlett: "#rook, #pawn"},
     knightfers: {parlett: "#knight, #ferz", image: "knightferz"},
     knightwazir: {parlett: "#knight, #wazir"},
-    bishopwarmachine: {parlett: "#bishop, #warmachine"},
     elephantwazir: {parlett: "#elephant, #wazir"},
     elephantferzwarmachine: {parlett: "#elephant, #ferz, #warmachine"},
     warmachinewazir: {parlett: "#warmachine, #wazir"},
 
+    // David's pawn
+    pawnattackrook: {parlett: "#pawn, c#rook", image:"pawn135cw", promote: ["dragon", "rookpawn"]},
 
     walker: {parlett: "o#wazir, c#ferz"},
     tiger: {parlett: "o#bishop, c#knight"},
@@ -325,11 +326,12 @@ var PIECE_TYPES = {
     carpenter: {parlett: "#knight, #warmachine", image:"knightwarmachine"},
     champion: {parlett: "#wazir, #alfil, #warmachine"},
     crowned_rook: {parlett: "#rook, #ferz"},      
-    fad: {parlett: "#ferz, #alfil, #warmachine"},       
     general: {parlett: "#ferz", royal: true}, 
     kangaroo: {parlett: "#knight, #alfil"},  
-    waffle: {parlett: "#wazir, #alfil"},        // TODO: image of a waffle!
-    wizard: {parlett: "#camel, #ferz"},         // TODO: image
+    wizard: {parlett: "#camel, #ferz"},
+    waffle: {parlett: "#wazir, #alfil", image:"elephantwazir"},
+    fad: {parlett: "#ferz, #alfil, #warmachine", image:"elephantferzwarmachine"},
+    bede: {parlett: "#bishop, #warmachine", image:"bishopwarmachine"},
 
     // More complex fairy / non-intl chess pieces
     // See http://en.wikipedia.org/wiki/Fairy_chess_piece#Notable_examples
@@ -396,6 +398,8 @@ var SAVED_BOARDS = {
 // TODO: win if promote (kraken?), allow diagonal even if not capture
 // http://en.wikipedia.org/wiki/Breakthrough_(board_game)
 //"Breakthrough": "pppppppp/pppppppp/8/8/8/8/PPPPPPPP/PPPPPPPP w - - 0 1",
+// TODO: Support Chaturanga pawns. No double move/en passant, and promotes to where started.
+//"Chaturanga": "rnekxfenr/pppppppp/8/8/8/8/PPPPPPPP/RNEKXFENR w - 0 1",
 "Church Chess":         "bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1",
 "Corner Chess":         "4rbqk/4rb1q/4r1bb/5rrr/RRR5/BB1R4/Q1BR4/KQBR4 w - - 0 1",
 "Corner Chess II":      "kbp2pbq/nrp2prn/pp4pp/8/8/PP4PP/NRP2PRN/QBP2PBK w - - 0 1",
@@ -487,7 +491,7 @@ var SAVED_BOARDS = {
 "Test Getting out of Check": "rnbqkbnr/ppp1p1pp/4P3/3p3Q/5p2/8/PPPP1PPP/RNB1KBNR b KQkq - 0 4",
 "Test Check Checking": "rnbQ1bnr/ppp1kppp/8/4p3/7q/8/PPPP1PPP/RNBQKBNR b KQ - 0 5",
 "Test Parlett Move Interference": "r/8/8/1N3b2/3PP3/1P1BBN/8/8 w - - 0 17",
-"Test Fairy Pieces": "X(airplane)x(airplane)/4x(caliph)x(pope)X(elephantwarmachine)/8/8/8/4S/X(lance)fwZ/AcDeIJvT w - - 0 1"
+"Test Fairy Pieces": "X(airplane)x(airplane)/3x(pawnattackrook)x(caliph)x(pope)X(elephantwarmachine)/8/8/8/4S/X(lance)fwZ1X(pawnattackrook)/AcDeIFvT w - - 0 1"
     }
 };
 
@@ -1944,7 +1948,8 @@ function piece_moved(piece)
         return false;
     }
 
-    assert(piece.type === "pawn" || piece.type === "berolina_pawn", "piece_moved(" + piece + "): can only tell if pawns moved, not " + piece.type);
+    // TODO: don't hardcode! Give rank in piece type, mirror black/white.
+    //assert(piece.type === "pawn" || piece.type === "berolina_pawn" || piece.type === "pawnattackrook", "piece_moved(" + piece + "): can only tell if pawns moved, not " + piece.type);
 
     var square = piece.square;
 
@@ -3409,6 +3414,7 @@ function save_fen()
 
 // Load board state in Forsyth-Edwards Notation. If replay is true, this is reloading an 
 // existing position, not loading a new game.
+// TODO: support EPD, and special rules
 function load_fen(fen, replay)
 {
     var parts, castling;
