@@ -342,7 +342,7 @@ var PIECE_TYPES = {
     colonel: {parlett: "n>, n=, 2/1>, 1*", letter: "XC"}, 
     murray_lion: {parlett: "~0/2, ~2/2, c1*", letter: "XM"},
     lion: {parlett: "~n*", letter: "XL"},
-    elephant: {parlett: "2X", letter: "E"},         // Not a leaper, path can be blocked (unlike alfil, ~2X)
+    elephant: {parlett: "2X", letter: "E", image:"elephantmodern"},  // Not a leaper, path can be blocked (unlike alfil, ~2X)
     khohn: {parlett: "1X, 1>", letter: "XK"},
     ferz: {parlett: "1X", letter: "XF"},
     wazir: {parlett: "1+", letter: "I"},
@@ -476,7 +476,7 @@ var SAVED_BOARDS = {
 
     "Test Pieces": {
 "Test Pawns": "8/x(rookpawn)x(dragon)x(bishoppawn)x(superpawn)x(weakpawn)x(berolinapawn)x(pawnattackrook)x(pawn)/8/8/8/8/X(rookpawn)X(dragon)X(bishoppawn)X(superpawn)X(weakpawn)X(berolinapawn)X(pawnattackrook)X(pawn) w - - 0 1",
-"Test Leapers": "K/2M1Y1H1/8/1XT2WXG1Z/8/3Z1N/4oo/5k w - - 0 1", // TODO: antelope, flamingo
+"Test Leapers": "K/2E1Y1H1/3M/1XT1W1XG1Z/8/3Z1N/4oo/5k w - - 0 1", // TODO: antelope, flamingo
 "Test Amphibians": "4k/8/8/slslslsl/8/8/FFFFFFFF/4K w - - 0 1",
 "Test Royalty": "x(royalrook)x(royalknight)x(royalbishop)xjkx(royalbishop)x(royalknight)x(royalrook)/pppppppp/8/8/8/8/PPPPPPPP/X(royalrook)X(royalknight)X(royalbishop)XJKX(royalbishop)X(royalknight)X(royalrook) w KQkq - 0 1",
 "Test Projectiles": "x(airplane)X(airplane)4x(airplane)/8/1x(bird)/2x(bird)x(bird)x(bird)1x(bird)/3x(bird)x(bird)/4x(bird)/5X(archer)/x(frog)1X(gun)3X(rocket) w - - 0 1",
