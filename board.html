@@ -3073,7 +3073,12 @@ function init_board()
         board_menu.selectedIndex = 0;
     }
 
-    // TODO: load board from URL query string, if any!
+    // Load board from URL query string, if any
+    var url_fen = query_string().b;
+    if (url_fen) {
+        fen = url_fen;
+    }
+
     load_fen(fen);
 }
 
@@ -4108,6 +4113,30 @@ function sq(code, extra)
 }
 
 //// LOW-LEVEL FUNCTIONS
+
+// Get URL query string as an object
+// Based on http://www.dojotoolkit.org/book/dojo-porting-guide-0-4-x-0-9/dojo-uri-changes
+function query_string()
+{
+    var parts, dict = {};
+    var query;
+
+    if (location.search) {
+        query = location.search;
+    } else if (location.hash) {
+        query = location.hash;
+    }
+
+    parts = query.split(/&/);
+    dojo.forEach(parts, function(pair) {
+            var part = pair.match(/([a-zA-Z0-9]*)=(.*)/);
+            if (part) { 
+                dict[part[1]] = decodeURIComponent(part[2]); 
+            }
+         }, this);
+
+    return dict;
+}
 
 // Random integer within range
 function randint(minimum, maximum)
