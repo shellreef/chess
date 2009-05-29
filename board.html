@@ -365,6 +365,8 @@ var PIECE_TYPES = {
     block: {parlett: "", uncapturable: true},
     stone: {parlett: "o#man", uncapturable: true},
 
+    bomb: {parlett: "{c#queen;self-destruct}", image:"gorgona"},
+
     // Pieces from chess-3
     // http://www.chessbase.com/newsdetail.asp?newsid=4553
     // TODO: instead of using composite pieces, which aren't totally accurate because the
@@ -476,7 +478,7 @@ var SAVED_BOARDS = {
 "Test Amphibians": "4k/8/8/slslslsl/8/8/FFFFFFFF/4K w - - 0 1",
 "Test Royalty": "x(royalrook)x(royalknight)x(royalbishop)xjkx(royalbishop)x(royalknight)x(royalrook)/pppppppp/8/8/8/8/PPPPPPPP/X(royalrook)X(royalknight)X(royalbishop)XJKX(royalbishop)X(royalknight)X(royalrook) w KQkq - 0 1",
 "Test Projectiles": "x(airplane)X(airplane)4x(airplane)/8/1x(bird)/2x(bird)x(bird)x(bird)1x(bird)/3x(bird)x(bird)/4x(bird)/5X(archer)/x(frog)1X(gun)3X(rocket) w - - 0 1",
-"Test Uncapturables": "8/8/4x(block)3/4K3/5x(stone)/8/1kX(block)2X(stone)/1X(block)x(block) w - - 0 1"
+"Test Uncapturables": "2X(bomb)3x(banner)x(banner)/2x(banner)/x(banner)3x(block)3/4K3/5x(stone)/8/1kX(block)2X(stone)/1X(block)x(block) w - - 0 1"
     },
 
     "Test Rules": {
@@ -1869,11 +1871,13 @@ function disable_engine(why)
 // Make a move in the VBOARD, which can be undone. Only makes the move.
 function do_virtual_move(piece, move)
 {
-    var captured, from_square, to_square, capture_square, piece_moved_over;
- 
-    from_square = piece.square;
+    var did = {};
 
-    to_square = VBOARD[move.x][move.y];
+    did.piece = piece;
+    did.move = move;
+ 
+    did.from_square = piece.square;
+    did.to_square = VBOARD[move.x][move.y];
  
     // Special case: en passant captures to an empty square
     if (GAME_STATE.ep_target &&
@@ -1884,37 +1888,44 @@ function do_virtual_move(piece, move)
 
         var forward = forwards_vector(GAME_STATE.active_color);
 
-        capture_square = VBOARD[to_square.x][to_square.y - forward];
+        did.capture_square = VBOARD[to_square.x][to_square.y - forward];
     } else {
-        capture_square = to_square;
+        did.capture_square = did.to_square;
     }
 
     // The piece that was captured, not always where the piece moved to.
-    captured = capture_square.piece;
+    did.captured = did.capture_square.piece;
 
     // Piece that was on destination square, if any. For restoring old piece.
-    piece_moved_over = to_square.piece;
+    did.piece_moved_over = did.to_square.piece;
 
-    if (captured) { 
-        VBOARD[capture_square.x][capture_square.y].piece = null;
-        captured.square = null;
+    if (did.captured) { 
+        VBOARD[did.capture_square.x][did.capture_square.y].piece = null;
+        did.captured.square = null;
     }
 
     if (move.snapback) {
         // TODO: remove snapback_dx, only support to 0,0
+        /*
         return {captured:captured, capture_square:capture_square,
             from_square:from_square, piece:piece, move:move, 
             to_square:from_square,  // this is key
             piece_moved_over:captured};
+            */
+        did.to_square = did.from_square;
+        did.piece_moved_over = did.captured;
+        return did;
     }
 
-    piece.square = VBOARD[to_square.x][to_square.y];
-    VBOARD[to_square.x][to_square.y].piece = piece;
-    VBOARD[from_square.x][from_square.y].piece = null;
+    piece.square = VBOARD[did.to_square.x][did.to_square.y];
+    VBOARD[did.to_square.x][did.to_square.y].piece = piece;
+    VBOARD[did.from_square.x][did.from_square.y].piece = null;
 
+    return did;
+    /*
     return {captured: captured, capture_square: capture_square, 
         from_square: from_square, piece: piece, move: move, to_square: to_square,
-        piece_moved_over: piece_moved_over};
+        piece_moved_over: piece_moved_over};*/
 }
 
 // Undo a move given the result of do_virtual_move().
@@ -4288,7 +4299,7 @@ function enable_document_selection(enable) {
  <p><a href="#" onclick="edit_pgn()">edit PGN</a>
 
  <p><select id="saved_board_menu" onchange="change_loaded_board(this)"></select>
-     <button onclick="load_fen($('saved_board_menu').value)">New Game</button>
+     <button onclick="load_fen($('saved_board_menu').value)" accesskey="n">New Game</button>
  </div>
  </div>
 
