@@ -1945,6 +1945,7 @@ function do_virtual_move(piece, move)
     }
     if (move.self_destruct) {
         VBOARD[did.to_square.x][did.to_square.y].piece = null;
+        did.self_destructed = true;
         VBOARD[did.from_square.x][did.from_square.y].piece = null;
         return did;
     }
@@ -3281,6 +3282,9 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate, text
     did = do_virtual_move(piece, move);
     if (did.captured) {
         piece_was_captured(did.captured, did.capture_square);
+    }
+    if (did.self_destructed) {
+        piece_was_captured(did.piece, did.to_square);
     }
 
     if (!is_hypothetical) {
