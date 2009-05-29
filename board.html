@@ -362,8 +362,8 @@ var PIECE_TYPES = {
     archer: {parlett: "o#bishop, {c#knight;snapback}"},     // quite mobile, but can't shoot very far
 
     // Immortals
-    block: {parlett: "", immortal: true},
-    stone: {parlett: "o#man", immortal: true},
+    block: {parlett: "", uncapturable: true},
+    stone: {parlett: "o#man", uncapturable: true},
 
     // Pieces from chess-3
     // http://www.chessbase.com/newsdetail.asp?newsid=4553
@@ -2087,8 +2087,8 @@ function filtered_moves(piece, color, is_hypothetical)
                 i += flags.if_blocked_skip;
             }
 
-            // Can't move to self-occupied square OR immortal pieces
-            if (capture_piece.color === color || PIECE_TYPES[capture_piece.type].immortal) {
+            // Can't move to self-occupied square OR uncapturable pieces
+            if (capture_piece.color === color || PIECE_TYPES[capture_piece.type].uncapturable) {
                 continue;
             }
 
