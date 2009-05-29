@@ -51,6 +51,12 @@ img.piece
  /*-webkit-transition: background 1s linear;*/
 }
 
+img.captured
+{
+ width: 25px;
+ height: 25px;
+}
+
 img.black {}
 img.white {}
 
@@ -517,7 +523,8 @@ var SAVED_BOARDS = {
 "Test Getting out of Check": "rnbqkbnr/ppp1p1pp/4P3/3p3Q/5p2/8/PPPP1PPP/RNB1KBNR b KQkq - 0 4",
 "Test Check Checking": "rnbQ1bnr/ppp1kppp/8/4p3/7q/8/PPPP1PPP/RNBQKBNR b KQ - 0 5",
 "Test Parlett Move Interference": "r/8/8/1N3b2/3PP3/1P1BBN/8/8 w - - 0 17",
-"Test Fairy Pieces": "X(airplane)x(airplane)/3x(pawnattackrook)x(caliph)x(pope)X(elephantwarmachine)/8/8/8/4S/X(lance)fwZ1X(pawnattackrook)/AcDeIFvT w - - 0 1"
+//"Test Fairy Pieces": "X(airplane)x(airplane)/3x(pawnattackrook)x(caliph)x(pope)X(elephantwarmachine)/8/8/8/4S/X(lance)fwZ1X(pawnattackrook)/AcDeIFvT w - - 0 1"
+"Test Captures": "mmmmmmmm/MMMMMMMM/mmmmmmmm/MMMMMMMM/mmmmmmmm/MMMMMMMM/mmmmmmmm/MMMMMMMM w - - 0 1",
     }
 };
 
@@ -1886,7 +1893,7 @@ function disable_engine(why)
     PREFS.skill = 0;
     $("skill_level").value = PREFS.skill;
     $("skill_level").title = "Reset because of: " + why;
-    window.status = "Skill level reset because " + why;
+    window.status = "Skill level reset because: " + why;
 
     // It'll have to do
     random_move();
@@ -3120,7 +3127,12 @@ function piece_was_captured(piece, square)
         }
     }
 
-    // TODO: show as captured, somewhere with icons
+    // Show captured with icons
+    // TODO: data structure
+    // TODO: sort white then black
+    // TODO: store in GAME_STATE, allow saving in PGN for loading, and reset
+    var node = Builder.node("img", {src:image_path_for(piece.type, piece.color), 'class': "captured"});
+    $("captured_piece_images").appendChild(node);
 }
 
 // Find precomputed algebraic notation for this move. Called when
@@ -4354,6 +4366,7 @@ function enable_document_selection(enable) {
 
  <p><a href="#" onclick="edit_pgn()">edit PGN</a>
  <p><a href="#" onclick="email_board()">email board</a>
+ <p><span id="captured_piece_images"></span>
 
  <p><select id="saved_board_menu" onchange="change_loaded_board(this)"></select>
      <button onclick="load_fen($('saved_board_menu').value)" accesskey="n">New Game</button>
