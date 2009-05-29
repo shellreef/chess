@@ -1883,10 +1883,10 @@ function got_engine_error(response)
 // Disable the external chess engine usage and make a random move in its place.
 function disable_engine(why)
 {
-    $("engine_status").innerHTML = why;
     PREFS.skill = 0;
     $("skill_level").value = PREFS.skill;
     $("skill_level").title = "Reset because of: " + why;
+    window.status = "Skill level reset because " + why;
 
     // It'll have to do
     random_move();
@@ -4346,7 +4346,6 @@ function enable_document_selection(enable) {
  <label for="black_computer">Black AI<input type="checkbox" id="black_computer" name="black_computer" onclick="computer_move_if_applicable(this)"></label>
 
  <span id="score"></span><br>
- <span id="engine_status"></span>
 
  <div id="show_skill" style="display: none"><p>Skill Level: 
   <input type="text" size="3" maxlength="3" id="skill_level" onchange="update_skill(this)"></div>
