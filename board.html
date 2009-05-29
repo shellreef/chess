@@ -365,7 +365,9 @@ var PIECE_TYPES = {
     block: {parlett: "", uncapturable: true},
     stone: {parlett: "o#man", uncapturable: true},
 
-    bomb: {parlett: "{c#queen;self-destruct}", image:"gorgona"},
+    // Consumables
+    bomb: {parlett: "{cn*;self_destruct}", image:"medusa"},
+    superbomb: {parlett: "{c~n*;self_destruct}", image:"gorgona"},
 
     // Pieces from chess-3
     // http://www.chessbase.com/newsdetail.asp?newsid=4553
@@ -478,7 +480,8 @@ var SAVED_BOARDS = {
 "Test Amphibians": "4k/8/8/slslslsl/8/8/FFFFFFFF/4K w - - 0 1",
 "Test Royalty": "x(royalrook)x(royalknight)x(royalbishop)xjkx(royalbishop)x(royalknight)x(royalrook)/pppppppp/8/8/8/8/PPPPPPPP/X(royalrook)X(royalknight)X(royalbishop)XJKX(royalbishop)X(royalknight)X(royalrook) w KQkq - 0 1",
 "Test Projectiles": "x(airplane)X(airplane)4x(airplane)/8/1x(bird)/2x(bird)x(bird)x(bird)1x(bird)/3x(bird)x(bird)/4x(bird)/5X(archer)/x(frog)1X(gun)3X(rocket) w - - 0 1",
-"Test Uncapturables": "2X(bomb)3x(banner)x(banner)/2x(banner)/x(banner)3x(block)3/4K3/5x(stone)/8/1kX(block)2X(stone)/1X(block)x(block) w - - 0 1"
+"Test Uncapturables": "3x(banner)x(banner)//x(banner)3x(block)3/4K3/5x(stone)/8/1kX(block)2X(stone)/1X(block)x(block) w - - 0 1",
+"Test Consumables": "4k/pppppppp/1pppppp1/2pppp2/X(bomb)2X(superbomb)/8/PPPPPPPP/4K w - - 0 1"
     },
 
     "Test Rules": {
@@ -1905,15 +1908,14 @@ function do_virtual_move(piece, move)
     }
 
     if (move.snapback) {
-        // TODO: remove snapback_dx, only support to 0,0
-        /*
-        return {captured:captured, capture_square:capture_square,
-            from_square:from_square, piece:piece, move:move, 
-            to_square:from_square,  // this is key
-            piece_moved_over:captured};
-            */
-        did.to_square = did.from_square;
+        // Projectile attack, withdrawals back to where it came from
+        did.to_square = did.from_square;    // this is key
         did.piece_moved_over = did.captured;
+        return did;
+    }
+    if (move.self_destruct) {
+        VBOARD[did.to_square.x][did.to_square.y].piece = null;
+        VBOARD[did.from_square.x][did.from_square.y].piece = null;
         return did;
     }
 
@@ -1922,10 +1924,6 @@ function do_virtual_move(piece, move)
     VBOARD[did.from_square.x][did.from_square.y].piece = null;
 
     return did;
-    /*
-    return {captured: captured, capture_square: capture_square, 
-        from_square: from_square, piece: piece, move: move, to_square: to_square,
-        piece_moved_over: piece_moved_over};*/
 }
 
 // Undo a move given the result of do_virtual_move().
@@ -2151,11 +2149,16 @@ function filtered_moves(piece, color, is_hypothetical)
                 continue;
             }
         }
+
         // Snap back after moving - for guns
         if (flags.snapback !== undefined) {
             abs_move.snapback = true;
         }
-
+       
+        // Self-destruct - for consumables
+        if (flags.self_destruct !== undefined) {
+            abs_move.self_destruct = true;
+        }
 
 
         // Map pawn moves to what the en passant target will be if
