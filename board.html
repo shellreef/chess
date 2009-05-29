@@ -662,6 +662,27 @@ function load_notations()
     menu.selectedIndex = 0;
 }
 
+// Open a mail message with a link to the board state
+function email_board()
+{
+    var to, subject, body, url, dots, link;
+
+    to = "shellreef@gmail.com";
+    subject = "Chess game";
+    dots = GAME_STATE.active_color === "black" ? "... " : " ";
+
+    // TODO: last move notation?
+    link = document.URL + "?b=" + encodeURIComponent(active_fen());
+    body = GAME_STATE.fullmove_number + ". " + dots + '<a href="' + link + '">move</a>';
+
+    url = "mailto:" + encodeURIComponent(to) + 
+        "?subject=" + encodeURIComponent(subject) + 
+        "&body=" + encodeURIComponent(body);
+    window.open(url);
+    
+    // TODO: need to update init_board() to have loading work
+}
+
 // Make the PGN content editable (not to be confused with edible).
 var ORIGINAL_UI_HTML;
 function edit_pgn()
@@ -1884,14 +1905,14 @@ function do_virtual_move(piece, move)
  
     // Special case: en passant captures to an empty square
     if (GAME_STATE.ep_target &&
-        to_square.x === GAME_STATE.ep_target[0] && 
-        to_square.y === GAME_STATE.ep_target[1]) {
+        did.to_square.x === GAME_STATE.ep_target[0] && 
+        did.to_square.y === GAME_STATE.ep_target[1]) {
 
         // TODO: use move instead of comparing location to find if ep
 
         var forward = forwards_vector(GAME_STATE.active_color);
 
-        did.capture_square = VBOARD[to_square.x][to_square.y - forward];
+        did.capture_square = VBOARD[did.to_square.x][did.to_square.y - forward];
     } else {
         did.capture_square = did.to_square;
     }
@@ -3052,6 +3073,7 @@ function init_board()
         board_menu.selectedIndex = 0;
     }
 
+    // TODO: load board from URL query string, if any!
     load_fen(fen);
 }
 
@@ -4300,6 +4322,7 @@ function enable_document_selection(enable) {
  <p><select id="output_notation" name="output_notation"></select>
 
  <p><a href="#" onclick="edit_pgn()">edit PGN</a>
+ <p><a href="#" onclick="email_board()">email board</a>
 
  <p><select id="saved_board_menu" onchange="change_loaded_board(this)"></select>
      <button onclick="load_fen($('saved_board_menu').value)" accesskey="n">New Game</button>
