@@ -194,12 +194,14 @@ var GAME_STATE = {
     halfmove_clock: 0,          // Ply since last pawn advance / capture
     fullmove_number: 0,         // Increment after black moves
 
-    // Not game state, but other globals
-    dragging: false,
     position_moves: {},         // Board position -> move IDs, for 3n move repetition
     position_after: {},         // Board positions at each move, for playback
-    active_in_check: false,
     ended: false,               // Game is done (drawn, won)
+    captured: {white:[], black:[]}, // Captured pieces
+
+    // Not game state, but other globals
+    dragging: false,
+    active_in_check: false,
     recent_piece: null,         // Recently moved piece
     recent_square: null         // Recently moved from square
 };    
@@ -524,7 +526,7 @@ var SAVED_BOARDS = {
 "Test Check Checking": "rnbQ1bnr/ppp1kppp/8/4p3/7q/8/PPPP1PPP/RNBQKBNR b KQ - 0 5",
 "Test Parlett Move Interference": "r/8/8/1N3b2/3PP3/1P1BBN/8/8 w - - 0 17",
 //"Test Fairy Pieces": "X(airplane)x(airplane)/3x(pawnattackrook)x(caliph)x(pope)X(elephantwarmachine)/8/8/8/4S/X(lance)fwZ1X(pawnattackrook)/AcDeIFvT w - - 0 1"
-"Test Captures": "mmmmmmmm/MMMMMMMM/mmmmmmmm/MMMMMMMM/mmmmmmmm/MMMMMMMM/mmmmmmmm/MMMMMMMM w - - 0 1",
+"Test Captures": "8/MMMMMMMM/mmmmmmmm/8/QQQQQQQQ/qqqqqqqq/NNNNNNNN/xlxlxlxlxlxlxlxl w - - 0 1",
     }
 };
 
@@ -748,8 +750,8 @@ function reload_pgn()
     load_pgn(pgn);
 }
 
-// TODO: support any base 10 number, and asterisks for filling remainder of rank with empty
-// spaces, and {} for labels, see http://play.chessvariants.org/pbm/devguide.html
+// Load Portable Game Notation data
+// TODO: support a tag for captured pieces, and tags for FEN at each move so don't need to compute
 function load_pgn(pgn)
 {
     var game = parse_pgn(pgn);
@@ -3127,12 +3129,30 @@ function piece_was_captured(piece, square)
         }
     }
 
-    // Show captured with icons
-    // TODO: data structure
-    // TODO: sort white then black
-    // TODO: store in GAME_STATE, allow saving in PGN for loading, and reset
-    var node = Builder.node("img", {src:image_path_for(piece.type, piece.color), 'class': "captured"});
-    $("captured_piece_images").appendChild(node);
+    GAME_STATE.captured[piece.color].push(piece);
+    update_captured_piece_images();
+}
+
+// Show captured with icons from GAME_STATE.captured
+function update_captured_piece_images(piece)
+{
+
+    var html = "";
+    for (var i = 0; i < GAME_STATE.captured.white.length; i += 1) {
+        var p = GAME_STATE.captured.white[i];
+        html += '<img src="' + image_path_for(p.type, p.color) + '" class="captured"> ';
+    }
+    html += "&nbsp;&nbsp;";
+    for (var i = 0; i < GAME_STATE.captured.black.length; i += 1) {
+        var p = GAME_STATE.captured.black[i];
+        html += '<img src="' + image_path_for(p.type, p.color) + '" class="captured"> ';
+    }
+
+    $("captured_piece_images").innerHTML = html;
+
+    // DOM is slower
+    //var node = Builder.node("img", {src:image_path_for(piece.type, piece.color), 'class': "captured"});
+    //$("captured_piece_images").appendChild(node);
 }
 
 // Find precomputed algebraic notation for this move. Called when
@@ -3521,6 +3541,8 @@ function save_fen()
 // Load board state in Forsyth-Edwards Notation. If replay is true, this is reloading an 
 // existing position, not loading a new game.
 // TODO: support EPD, and special rules
+// TODO: support any base 10 number (10 for skip ten spaces), and asterisks for filling remainder of rank with empty
+// spaces, and {} for labels, see http://play.chessvariants.org/pbm/devguide.html
 function load_fen(fen, replay)
 {
     var parts, castling;
@@ -3549,6 +3571,8 @@ function load_fen(fen, replay)
         GAME_STATE.position_moves = {}; 
         GAME_STATE.position_after = [fen];  // 0th ply = initial state
         GAME_STATE.ended = null; 
+        GAME_STATE.captured = {white:[], black:[]};
+        update_captured_piece_images();
     }
    
     // Now that everything is loaded, set the turn.
@@ -4366,7 +4390,7 @@ function enable_document_selection(enable) {
 
  <p><a href="#" onclick="edit_pgn()">edit PGN</a>
  <p><a href="#" onclick="email_board()">email board</a>
- <p><span id="captured_piece_images"></span>
+ <p><div id="captured_piece_images" style="width: 250px;"></div>
 
  <p><select id="saved_board_menu" onchange="change_loaded_board(this)"></select>
      <button onclick="load_fen($('saved_board_menu').value)" accesskey="n">New Game</button>
