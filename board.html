@@ -369,13 +369,17 @@ var PIECE_TYPES = {
     // Note: not the patented archer at http://www.google.com/patents?id=MLEWAAAAEBAJ&dq=5901957
     archer: {parlett: "o#bishop, {c#knight;snapback}"},     // quite mobile, but can't shoot very far
 
-    // Uncapturables
-    block: {parlett: "", uncapturable: true},
-    stone: {parlett: "o#man", uncapturable: true},
+    // Invincibles
+    block: {parlett: "", invincible: true},
+    // TODO: easier way to write: reversed and negatives?
+    stone: {parlett: "[0,2], [0,4;if_unblocked=0,2], [0,6;if_unblocked=0,4], " +
+                     "[2,0], [4,0;if_unblocked=2,0], [6,0;if_unblocked=4,0], " +
+                     "[-2,0], [-4,0;if_unblocked=-2,0], [-6,0;if_unblocked=-4,0], " +
+                     "[0,-2], [0,-4;if_unblocked=0,-2], [0,-6;if_unblocked=0,-4]", invincible: true},
 
     // Consumables
-    bomb: {parlett: "{cn*;self_destruct}", image:"medusa"},
-    superbomb: {parlett: "{c~n*;self_destruct}", image:"gorgona"},
+    bomb: {parlett: "o1*, {c1*;self_destruct}", image:"medusa", invincible:true},
+    superbomb: {parlett: "on*, {c~n*;self_destruct}", image:"gorgona"},
 
     // Pieces from chess-3
     // http://www.chessbase.com/newsdetail.asp?newsid=4553
@@ -488,8 +492,9 @@ var SAVED_BOARDS = {
 "Test Amphibians": "4k/8/8/slslslsl/8/8/FFFFFFFF/4K w - - 0 1",
 "Test Royalty": "x(royalrook)x(royalknight)x(royalbishop)xjkx(royalbishop)x(royalknight)x(royalrook)/pppppppp/8/8/8/8/PPPPPPPP/X(royalrook)X(royalknight)X(royalbishop)XJKX(royalbishop)X(royalknight)X(royalrook) w KQkq - 0 1",
 "Test Projectiles": "x(airplane)X(airplane)4x(airplane)/8/1x(bird)/2x(bird)x(bird)x(bird)1x(bird)/3x(bird)x(bird)/4x(bird)/5X(archer)/x(frog)1X(gun)3X(rocket) w - - 0 1",
-"Test Uncapturables": "3x(banner)x(banner)//x(banner)3x(block)3/4K3/5x(stone)/8/1kX(block)2X(stone)/1X(block)x(block) w - - 0 1",
-"Test Consumables": "4k/pppppppp/1pppppp1/2pppp2/X(bomb)2X(superbomb)/8/PPPPPPPP/4K w - - 0 1"
+"Test Invincibles": "3x(banner)x(banner)//x(banner)3x(block)3/4K3/5x(stone)/8/1kX(block)1X(stone)/1X(block)x(block) w - - 0 1",
+"Test Consumables": "4k/pppppppp/1pppppp1/2pppp2/X(bomb)2X(superbomb)/8/PPPPPPPP/4K w - - 0 1",
+"Test Mix 1": "X(airplane)x(airplane)/3x(pawnattackrook)x(caliph)x(pope)X(elephantwarmachine)/8/8/8/4S/X(lance)fwZ1X(pawnattackrook)/AcDeIFvT w - - 0 1"
     },
 
     "Test Rules": {
@@ -525,8 +530,7 @@ var SAVED_BOARDS = {
 "Test Getting out of Check": "rnbqkbnr/ppp1p1pp/4P3/3p3Q/5p2/8/PPPP1PPP/RNB1KBNR b KQkq - 0 4",
 "Test Check Checking": "rnbQ1bnr/ppp1kppp/8/4p3/7q/8/PPPP1PPP/RNBQKBNR b KQ - 0 5",
 "Test Parlett Move Interference": "r/8/8/1N3b2/3PP3/1P1BBN/8/8 w - - 0 17",
-//"Test Fairy Pieces": "X(airplane)x(airplane)/3x(pawnattackrook)x(caliph)x(pope)X(elephantwarmachine)/8/8/8/4S/X(lance)fwZ1X(pawnattackrook)/AcDeIFvT w - - 0 1"
-"Test Captures": "8/MMMMMMMM/mmmmmmmm/8/QQQQQQQQ/qqqqqqqq/NNNNNNNN/xlxlxlxlxlxlxlxl w - - 0 1",
+"Test Captures": "8/MMMMMMMM/mmmmmmmm/8/QQQQQQQQ/qqqqqqqq/NNNNNNNN/xlxlxlxlxlxlxlxl w - - 0 1"
     }
 };
 
@@ -2127,8 +2131,8 @@ function filtered_moves(piece, color, is_hypothetical)
                 i += flags.if_blocked_skip;
             }
 
-            // Can't move to self-occupied square OR uncapturable pieces
-            if (capture_piece.color === color || PIECE_TYPES[capture_piece.type].uncapturable) {
+            // Can't move to self-occupied square OR invincible pieces
+            if (capture_piece.color === color || PIECE_TYPES[capture_piece.type].invincible) {
                 continue;
             }
 
