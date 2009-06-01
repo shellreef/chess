@@ -1917,12 +1917,7 @@ function do_virtual_move(piece, move)
     did.to_square = VBOARD[move.x][move.y];
  
     // Special case: en passant captures to an empty square
-    if (GAME_STATE.ep_target &&
-        did.to_square.x === GAME_STATE.ep_target[0] && 
-        did.to_square.y === GAME_STATE.ep_target[1]) {
-
-        // TODO: use move instead of comparing location to find if ep
-
+    if (move.en_passant_capture) {
         var forward = forwards_vector(GAME_STATE.active_color);
 
         did.capture_square = VBOARD[did.to_square.x][did.to_square.y - forward];
@@ -2215,7 +2210,6 @@ function filtered_moves(piece, color, is_hypothetical)
                 continue;
             }
 
-            // For move notations, informational purposes, only.
             abs_move.en_passant_capture = true;
         }
 
