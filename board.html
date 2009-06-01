@@ -1905,6 +1905,28 @@ function disable_engine(why)
     random_move();
 }
 
+// Decode a serialized "raw" move for do_virtual_move()
+// Syntax: /from_square/to_square/piece_code/flags
+// TODO: Use for quickly loading a saved game, in a URL, without calculating valid
+// moves (time consuming)
+function decode_raw_move(s)
+{
+    var a, piece, move;
+
+    assert(s.substr(0, 1) === "/", "decode_raw_move(" + s + "): must begin with /");
+
+    a = s.split("/");
+
+    piece = decode_piece_letter(a[3]);
+    piece.square = filerank2obj(a[1]);
+    move = filerank2obj(a[2]);
+
+    console.log(piece);
+    console.log(move);
+
+    // TODO: all flags
+}
+
 // Make a move in the VBOARD, which can be undone. Only makes the move.
 function do_virtual_move(piece, move)
 {
@@ -4032,6 +4054,15 @@ function filerank2xy(code)
     //assert(y >= 1 && y <= RANK_MAX, "filerank2xy(" + code + "): bad y: " + y);
 
     return [x, y];
+}
+
+// Return an object with x and y from a filerank
+// TODO: Replace filerank2xy with this
+function filerank2obj(code)
+{
+    var xy = filerank2xy(code);
+
+    return {x:xy[0], y:xy[1]};
 }
 
 // Convert from x,y coordinates to filerank notation for human consumption. Can either pass
