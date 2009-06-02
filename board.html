@@ -3438,7 +3438,7 @@ function finish_up_move(tieback, is_immediate, final_type)
 {
     var alg_move, ply, turn_info, move_text;
 
-    move_text = tieback[final_type].notation;
+    move_text = tieback[final_type].notations[$F("output_notation")];
 
     // TODO: ellipsis if black is first recorded move, or intervening commentary
     if (GAME_STATE.active_color === "white") {
