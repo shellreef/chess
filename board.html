@@ -586,7 +586,7 @@ var OPENINGS = {
 
 /* Global functions for jslint to recognize. TODO: move to objects? */
 
-/*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved unfiltered_moves filtered_moves relative_decode_direction parse_flags nested_flags decode_relative_raw_move decode_one_parlett without_dupes opposite_color set_turn set_check_message check_repetition load_notations capture_piece notation_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position init_board name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc image_path_for create_piece create_piece_by_letter highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection make_move_by_menu populate_make_a_move_list make_vboard realize_vboard*/
+/*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved unfiltered_moves filtered_moves relative_decode_direction parse_flags nested_flags decode_relative_explicit_move decode_one_parlett without_dupes opposite_color set_turn set_check_message check_repetition load_notations capture_piece notation_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position init_board name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc image_path_for create_piece create_piece_by_letter highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection make_move_by_menu populate_make_a_move_list make_vboard realize_vboard*/
  
 google.setOnLoadCallback(function() {
 // http://o.aolcdn.com/dojo/1.0.0/dojo/cookie.xd.js
@@ -1926,7 +1926,7 @@ function do_raw_notation(s)
 {
     var a, piece, move;
 
-    assert(s.substr(0, 1) === "/", "decode_raw_move(" + s + "): must begin with /");
+    assert(s.substr(0, 1) === "/", "do_raw_move(" + s + "): must begin with /");
 
     a = s.split("/");
 
@@ -2497,7 +2497,7 @@ function nested_flags(parlett)
 }
 
 // Decodes an explicit relative move that was in square brackets: [0,2;initial_only]
-function decode_relative_raw_move(text_move, existing_flags)
+function decode_relative_explicit_move(text_move, existing_flags)
 {
     var xy_text_flags, xy_text, xy, x, y, flags;
     
@@ -2512,7 +2512,7 @@ function decode_relative_raw_move(text_move, existing_flags)
     } else {
         // TODO: call decode_one_parlett, to allow
         // [oi2>;flags] or oi[2>;flags], etc.
-        assert(false, "decode_relative_raw_move(" + text_move + ", " + existing_flags + "): not [x,y;flags], missing comma");
+        assert(false, "decode_relative_explicit_move(" + text_move + ", " + existing_flags + "): not [x,y;flags], missing comma");
     }
 
     flags = parse_flags(xy_text_flags, existing_flags);
@@ -2584,7 +2584,7 @@ function decode_one_parlett(parlett)
 
                 text_move += chi;
             }
-            rel_moves.push(decode_relative_raw_move(text_move, flags));
+            rel_moves.push(decode_relative_explicit_move(text_move, flags));
 
         // Nested flags: {oi2>, asdf.. ;flag1;flag2;flag3...}
         } else if (ch === "{") {
