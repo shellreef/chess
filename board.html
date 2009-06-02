@@ -1132,7 +1132,7 @@ function would_promote(piece, move)
 
 
 // Finish up a promotion move.
-function promote(piece, type, notation, is_immediate)
+function promote(piece, square, type, notation, is_immediate)
 {
     // TODO: Puff out, or fade in from new to old piece. Is there an
     // effect that can fade from one image to another? LikE IE page transitions.
@@ -1148,7 +1148,10 @@ function promote(piece, type, notation, is_immediate)
 
     $("promote_container").hide();
 
-    finish_up_move(notation, is_immediate);
+    // TODO: call with a correct tieback. Re-find it?
+    var tieback = get_notations(piece, square, type);
+
+    finish_up_move(tieback, is_immediate, type);
 }
 
 // Change a piece to whatever it promotes to.
@@ -1169,15 +1172,13 @@ function ask_to_promote(piece, tieback, is_immediate)
     for (var type in tieback) {
         if (tieback.hasOwnProperty(type)) {
             // The move the user selected that will be made
-            var real_move = tieback[type];
-
-            var notation = real_move.notation;
+            var notation = tieback[type].notations[$F("output_notation")];
 
             //element = create_piece(GAME_STATE.active_color, type);
             element = Builder.node("img", {src:image_path_for(type, piece.color), piece_type:type, notation:notation});
             element.onclick = function() {
                 // Finishes up the move
-                promote(piece, dojo.attr(this, "piece_type"), dojo.attr(this, "notation"), is_immediate);
+                promote(piece, tieback[type].square, dojo.attr(this, "piece_type"), dojo.attr(this, "notation"), is_immediate);
             };
             container.appendChild(element);
         }
@@ -3194,8 +3195,8 @@ function update_captured_piece_images(piece)
 
 // Get all the move notation texts and moves for a given piece and destination
 // square combination. Returns an object structured by a property for each
-// final piece type (queen, knight, etc. for promotion, or original piece type
-// otherwise), then with keys: move, piece, square, and notations. The notations
+// promotion piece type (queen, knight, etc.) or undefined if not a promotion,
+// then with keys: move, piece, square, and notations. The notations
 // object has properties for each notation type, with strings as values.
 // promote_to optionally narrows down the move to a specific promotion, otherwise,
 // all promotion moves are returned (if it is a promotion).
@@ -3218,7 +3219,7 @@ function get_notations(piece, square, promote_to)
                         (!promote_to || this_move.promote_to === promote_to)) {
 
                         // Key by final piece type. Promotion type, if any.
-                        var key = this_move.promote_to ? this_move.promote_to : this_piece.type;
+                        var key = this_move.promote_to || "undefined";
 
                         if (!finds[key]) {
                             finds[key] = {
@@ -3323,18 +3324,17 @@ function forwards_vector(color)
 // piece + square are given, the promotion piece type will have to be queried.
 function move_piece_to_square(piece, square, is_hypothetical, is_immediate, promote_to)
 {
-    var from_square, move_text, filerank, only_move, move, tieback, tiebacks, did;
+    var from_square, move_text, filerank, only_move, move, tieback, did;
     
     from_square = piece.square;
 
     // Find out what move this was.
-    tiebacks = get_notations(piece, square, promote_to);
+    tieback = get_notations(piece, square, promote_to);
 
-    tieback = tiebacks[$F("output_notation")];
     if (promote_to && tieback[promote_to]) {
         move = tieback[promote_to].move;
-    } else if (tieback[piece.type]) {
-        move = tieback[piece.type].move;
+    } else if (tieback.undefined) {
+        move = tieback.undefined.move;
     } else {
         // Surrogate move, for location only
         move = tieback.bishop.move;
@@ -3422,7 +3422,7 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate, prom
     } else {
         // If not a multi-move (moving rook in castling), log and go to next turn
         if (!is_hypothetical) {
-            finish_up_move(tiebacks, is_immediate);
+            finish_up_move(tieback, is_immediate);
         }
     }
 
@@ -3433,15 +3433,12 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate, prom
 
 // Perform bookkeeping on the move after it has been actually made, 
 // in move_piece_to_square().
-function finish_up_move(tiebacks, is_immediate)
+// final_type is the type for promotions, or undefined otherwise.
+function finish_up_move(tieback, is_immediate, final_type)
 {
-    var alg_move, ply, turn_info, move_text, final_type;
+    var alg_move, ply, turn_info, move_text;
 
-    for (var a in tiebacks) {
-        final_type = a;
-    }
-
-    move_text = tiebacks[final_type].notation;
+    move_text = tieback[final_type].notation;
 
     // TODO: ellipsis if black is first recorded move, or intervening commentary
     if (GAME_STATE.active_color === "white") {
