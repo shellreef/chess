@@ -3193,9 +3193,10 @@ function update_captured_piece_images(piece)
 }
 
 // Get all the move notation texts and moves for a given piece and destination
-// square combination. Returns an object with a property for each notation
-// type, with properties for each final piece type (queen, knight, etc. if
-// promotes, otherwise original piece type).
+// square combination. Returns an object structured by a property for each
+// final piece type (queen, knight, etc. for promotion, or original piece type
+// otherwise), then with keys: move, piece, square, and notations. The notations
+// object has properties for each notation type, with strings as values.
 // promote_to optionally narrows down the move to a specific promotion, otherwise,
 // all promotion moves are returned (if it is a promotion).
 function get_notations(piece, square, promote_to)
@@ -3205,8 +3206,6 @@ function get_notations(piece, square, promote_to)
     for (var notation in AVAILABLE_NOTATIONS) {
         if (AVAILABLE_NOTATIONS.hasOwnProperty(notation)) {
             var texts = VALID_MOVE_NOTATIONS[notation];
-
-            finds[notation] = {};
 
             for (var text in texts) {
                 if (texts.hasOwnProperty(text)) {
@@ -3220,8 +3219,16 @@ function get_notations(piece, square, promote_to)
 
                         // Key by final piece type. Promotion type, if any.
                         var key = this_move.promote_to ? this_move.promote_to : this_piece.type;
+
+                        if (!finds[key]) {
+                            finds[key] = {
+                                move: this_move, 
+                                square: this_square,
+                                piece: this_piece,
+                                notations: {}};
+                        }
                         
-                        finds[notation][key] = {notation:text, move:this_move};
+                        finds[key].notations[notation] = text;
                     }
                 }
             }
