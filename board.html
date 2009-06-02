@@ -3218,7 +3218,7 @@ function get_notations(piece, square)
                         // Key by final piece type. Promotion type, if any.
                         var key = this_move.promote_to ? this_move.promote_to : this_piece.type;
                         
-                        finds[notation][key] = text;
+                        finds[notation][key] = {notation:text, move:this_move};
                     }
                 }
             }
