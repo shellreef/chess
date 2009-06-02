@@ -1666,15 +1666,6 @@ function calculate_moves(color, is_hypothetical)
                 valid_moves[starting_filerank] = moves;
             }
 
-            // Raw move notations, correspond directly to piece+abs_move
-            dojo.forEach(moves, function(m) {
-                    raw_notations[make_raw_notation(piece, m)] = {
-                        move:m,
-                        piece:piece,
-                        square:VBOARD[m.x][m.y]
-                    };
-                });
-
             //console.log(starting_filerank, moves);
         }
     }
@@ -1694,8 +1685,6 @@ function calculate_moves(color, is_hypothetical)
                 ALT_MOVE_NOTATIONS[notation] = canonical_and_synonyms[1];
             }
         }
-
-        VALID_MOVE_NOTATIONS.raw = raw_notations;
 
         // For reals.
         VALID_MOVES = valid_moves;
