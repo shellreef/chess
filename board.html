@@ -3192,6 +3192,42 @@ function update_captured_piece_images(piece)
     //$("captured_piece_images").appendChild(node);
 }
 
+// Get all the move notation texts for a given piece and destination
+// square combination. Returns an object with a property for each notation
+// type, with properties for each final piece type (queen, knight, etc. if
+// promotes, otherwise original piece type).
+function get_notations(piece, square)
+{
+    var finds = {};
+
+    for (var notation in AVAILABLE_NOTATIONS) {
+        if (AVAILABLE_NOTATIONS.hasOwnProperty(notation)) {
+            var texts = VALID_MOVE_NOTATIONS[notation];
+
+            finds[notation] = {};
+
+            for (var text in texts) {
+                if (texts.hasOwnProperty(text)) {
+                    var this_square = texts[text].square;
+                    var this_piece = texts[text].piece;
+                    var this_move = texts[text].move;
+
+                    if (this_square.x === square.x && this_square.y === square.y && 
+                        this_piece.unique_id === piece.unique_id) {
+
+                        // Key by final piece type. Promotion type, if any.
+                        var key = this_move.promote_to ? this_move.promote_to : this_piece.type;
+                        
+                        finds[notation][key] = text;
+                    }
+                }
+            }
+        }
+    }
+
+    return finds;
+}
+
 // Get the move(s) for the given piece moving to the given square, in all of the
 // available move notations.
 function all_notations_from_piece_square(piece, square, text_input)
@@ -3206,7 +3242,6 @@ function all_notations_from_piece_square(piece, square, text_input)
 
     return results;
 }
-
 
 // Find precomputed algebraic notation for this move. Called when
 // user drags a piece to a square and we don't know what move it is.
@@ -3276,16 +3311,17 @@ function forwards_vector(color)
 // since piece+square is not always a non-ambiguous way to find the move (a8Q, a8N, etc.).
 function move_piece_to_square(piece, square, is_hypothetical, is_immediate, text_input)
 {
-    var from_square, move_text, filerank, only_move, move, tieback, did;
+    var from_square, move_text, filerank, only_move, move, tieback, tiebacks, did;
 
     from_square = piece.square;
 
     // Find out what move this was.
-    tieback = notation_from_piece_square(piece, square, null);
+    tiebacks = all_notations_from_piece_square(piece, square, null);
     if (!tieback) {
         // Text input
-        tieback = notation_from_piece_square(piece, square, text_input);
+        tiebacks = all_notations_from_piece_square(piece, square, text_input);
     }
+    tieback = tiebacks[$F("output_notation")];
     tieback.text_input = text_input;
     move = tieback.move;
 
@@ -3293,14 +3329,6 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate, text
         // For highlighting recent move on board
         GAME_STATE.recent_square = from_square;
         GAME_STATE.recent_piece = piece;
-
-        move_text = tieback.notation;
-
-        var ply = encode_ply(GAME_STATE.active_color, GAME_STATE.fullmove_number);
-
-        // TODO: store all other notations for easily changing notations of past moves
-        // XXX
-        //GAME_STATE.made_moves[ply] = {
 
         // Moving king makes it ineligible for castling
         if (move.clear_castle_short) {
@@ -3370,7 +3398,7 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate, text
             // Piece+square move, need input from user: what piece 
             ask_to_promote(piece, tieback, is_immediate);
         } else {
-            // Piece+square+piece to promote have been given (probably from mv())
+            // Piece+square+piece to promote has been given (probably from mv())
             promote(piece, tieback.move.promote_to, tieback.notation, is_immediate);
         }
     } else {
