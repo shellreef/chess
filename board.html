@@ -1132,10 +1132,10 @@ function would_promote(piece, move)
 
 
 // Finish up a promotion move.
-function promote(piece, type, tiebacks, is_immediate)
+function promote(piece, type, notation, is_immediate)
 {
     // TODO: Puff out, or fade in from new to old piece. Is there an
-    // effect that can fade from one image to another? Like IE page transitions.
+    // effect that can fade from one image to another? LikE IE page transitions.
     // http://sachiniscool.blogspot.com/2006/01/implementing-page-transitions-in.html
     // ... except when changing images. Safari has CSS animations.
     // new Effect.Puff(piece);
@@ -1148,7 +1148,7 @@ function promote(piece, type, tiebacks, is_immediate)
 
     $("promote_container").hide();
 
-    finish_up_move(tiebacks, type, is_immediate);
+    finish_up_move(notation, is_immediate);
 }
 
 // Change a piece to whatever it promotes to.
@@ -3322,6 +3322,7 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate, prom
 
     // Find out what move this was.
     tiebacks = get_notations(piece, square, promote_to);
+
     tieback = tiebacks[$F("output_notation")];
     if (promote_to && tieback[promote_to]) {
         move = tieback[promote_to].move;
@@ -3406,24 +3407,15 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate, prom
             ask_to_promote(piece, tieback, is_immediate);
         } else {
             for (var a in tieback) {
-                if (tiebacks.hasOwnProperty(a)) {
-                    promote_to = a;
-                }
+                promote_to = a;
             }
             // Piece+square+piece to promote has been given (probably from mv())
             promote(piece, promote_to, tieback.notation, is_immediate);
         }
     } else {
-        var final_type;
-        for (var a in tiebacks[$F("output_notation")]) {
-            if (tiebacks[$F("output_notation")].hasOwnProperty(a)) {
-                final_type = a;
-            }
-        }
-
         // If not a multi-move (moving rook in castling), log and go to next turn
         if (!is_hypothetical) {
-            finish_up_move(tiebacks, final_type, is_immediate);
+            finish_up_move(tiebacks, is_immediate);
         }
     }
 
@@ -3433,14 +3425,16 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate, prom
 }
 
 // Perform bookkeeping on the move after it has been actually made, 
-// in move_piece_to_square(). final_type is the possibly new type of
-// the piece (for promotions), or the original type (for all others).
-function finish_up_move(tiebacks, final_type, is_immediate)
+// in move_piece_to_square().
+function finish_up_move(tiebacks, is_immediate)
 {
     var alg_move, ply, turn_info, move_text, final_type;
 
+    for (var a in tiebacks) {
+        final_type = a;
+    }
 
-    move_text = tiebacks[$F("output_notation")][final_type].notation;
+    move_text = tiebacks[final_type].notation;
 
     // TODO: ellipsis if black is first recorded move, or intervening commentary
     if (GAME_STATE.active_color === "white") {
