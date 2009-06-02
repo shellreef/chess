@@ -1622,7 +1622,7 @@ function make_droppables()
 function calculate_moves(color, is_hypothetical)
 {
     var valid_moves = {};
-    var possible_notations, notation;
+    var possible_notations, notation, raw_notations = {};
 
     if (!is_hypothetical) { 
         // Values are [ [ [piece, square ], [possible move names] ], ... ]
@@ -1666,6 +1666,15 @@ function calculate_moves(color, is_hypothetical)
                 valid_moves[starting_filerank] = moves;
             }
 
+            // Raw move notations, correspond directly to piece+abs_move
+            dojo.forEach(moves, function(m) {
+                    raw_notations[make_raw_notation(piece, m)] = {
+                        move:m,
+                        piece:piece,
+                        square:VBOARD[m.x][m.y]
+                    };
+                });
+
             //console.log(starting_filerank, moves);
         }
     }
@@ -1685,6 +1694,8 @@ function calculate_moves(color, is_hypothetical)
                 ALT_MOVE_NOTATIONS[notation] = canonical_and_synonyms[1];
             }
         }
+
+        VALID_MOVE_NOTATIONS.raw = raw_notations;
 
         // For reals.
         VALID_MOVES = valid_moves;
@@ -1905,11 +1916,13 @@ function disable_engine(why)
     random_move();
 }
 
-// Decode a serialized "raw" move for do_virtual_move()
+// Decode a serialized "raw" notation and execute it using do_virtual_move().
+// This move notation allows moves to be made without calculating the valid
+// moves, a time-consuming process.
 // Syntax: /from_square/to_square/piece_code/flags
 // TODO: Use for quickly loading a saved game, in a URL, without calculating valid
 // moves (time consuming)
-function decode_raw_move(s)
+function do_raw_notation(s)
 {
     var a, piece, move;
 
@@ -1921,10 +1934,20 @@ function decode_raw_move(s)
     piece.square = filerank2obj(a[1]);
     move = filerank2obj(a[2]);
 
-    console.log(piece);
-    console.log(move);
+    do_virtual_move(piece, move);
+}
 
-    // TODO: all flags
+// Generate the raw move notation for a move
+function make_raw_notation(piece, move)
+{
+    var from_square, to_square, piece_code, flags;
+
+    from_square = xy2filerank([piece.square.x, piece.square.y]);
+    to_square = xy2filerank([move.x, move.y]);
+    piece_code = color_piece_prefix(piece);
+
+    // TODO: flags
+    return ["", from_square, to_square, piece_code].join("/");
 }
 
 // Make a move in the VBOARD, which can be undone. Only makes the move.
@@ -3788,7 +3811,22 @@ function full_piece_prefix(piece)
     if (letter !== undefined) {
         return letter;
     } else {
-        return (piece.color === "white" ? "X" : "x") + "(" + piece.type + ")";
+        return "X(" + piece.type + ")";
+    }
+}
+
+// Return the full piece prefix using lowercase for black, uppercase for white.
+// The resulting code can be decoded with decode_piece_letter().
+function color_piece_prefix(piece)
+{
+    var letter = full_piece_prefix(piece);
+    var first = letter.substr(0, 1);
+    var rest = letter.substr(1);
+
+    if (piece.color === "white") {
+        return letter.toUpperCase() + rest;
+    } else {
+        return letter.toLowerCase() + rest;
     }
 }
 
@@ -3873,6 +3911,7 @@ function image_path_for(type, color)
 // Decode Forsyth-Edwards Notation piece code, for example:
 //  r = black rook, R = white rook, N = white knight
 // Also allows extended names, X(elephant), x(elephant), etc.
+// To encode, use color_piece_prefix().
 function decode_piece_letter(name)
 {
     var color, type;
