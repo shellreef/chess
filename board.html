@@ -1007,11 +1007,12 @@ function encode_ply(color, fullmove_number)
 
 //// USER FUNCTIONS
 
-// Convenience function to move given algebraic notation, for use within
-// JavaScript console (Develop -> Show Error Console in Safari) if you want
-// a command-line instead of a GUI. Computer move also uses this function, but it is
-// not used for drag-and-drop.
-function mv(alg_move, virtual)
+// Make a move using any notation. Useful to use for moving within the JavaScript
+// console (Develop -> Show Error Console in Safari), if you prefer CLI over GUI,
+// and computer moves also use this function. 
+// If is_not_immediate is true, then the UI is not updated after the move; useful
+// for quickly making many moves without UI slowness.
+function mv(alg_move, is_not_immediate)
 {
     var piece_square, piece, square;
 
@@ -1081,7 +1082,7 @@ function mv(alg_move, virtual)
     // TODO: do some Effect.Move animation, optionally (make two functions)
     //new Effect.Move(piece, { x: 10, y: 20, mode: 'relative' });
    
-    move_piece_to_square(piece, square, false, true, alg_move);
+    move_piece_to_square(piece, square, false, !is_not_immediate, alg_move);
 }
 
 //// SPECIAL MOVE FUNCTIONS
