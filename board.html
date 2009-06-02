@@ -196,7 +196,7 @@ var GAME_STATE = {
 
     position_moves: {},         // Board position -> move IDs, for 3n move repetition
     position_after: {},         // Board positions at each move, for quick playback
-    move_history: {},           // TODO: store piece,square and each move notation!
+    history_moves: {},          // TODO: store piece,square and each move notation!
     ended: false,               // Game is done (drawn, won)
     captured: {white:[], black:[]}, // Captured pieces
 
@@ -1016,7 +1016,7 @@ function mv(alg_move, virtual)
     var piece_square, piece, square;
 
     if (!alg_move) {
-        assert(VALID_MOVE_NOTATIONS, "mv(" + alg_move + "): called with VALID_MOVE_NOTATINS false");
+        assert(VALID_MOVE_NOTATIONS, "mv(" + alg_move + "): called with VALID_MOVE_NOTATIONS false");
         return own_properties(VALID_MOVE_NOTATIONS[PREFS.input_notation]);
     }
 
@@ -1080,7 +1080,7 @@ function mv(alg_move, virtual)
 
     // TODO: do some Effect.Move animation, optionally (make two functions)
     //new Effect.Move(piece, { x: 10, y: 20, mode: 'relative' });
-    
+   
     move_piece_to_square(piece, square, false, true, alg_move);
 }
 
@@ -3252,6 +3252,8 @@ function forwards_vector(color)
 // If is_hypothetical is true, this is an internal move part of another move
 // (castling) so it shouldn't be logged.
 // If is_immediate, then finish_up_move() will realize the virtual board.
+// text_input is the optional move notation, used for chosing the promotion piece,
+// since piece+square is not always a non-ambiguous way to find the move (a8Q, a8N, etc.).
 function move_piece_to_square(piece, square, is_hypothetical, is_immediate, text_input)
 {
     var from_square, move_text, filerank, only_move, move, tieback, did;
@@ -3259,7 +3261,11 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate, text
     from_square = piece.square;
 
     // Find out what move this was.
-    tieback = notation_from_piece_square(piece, square, text_input);
+    tieback = notation_from_piece_square(piece, square, null);
+    if (!tieback) {
+        // Text input
+        tieback = notation_from_piece_square(piece, square, text_input);
+    }
     tieback.text_input = text_input;
     move = tieback.move;
 
