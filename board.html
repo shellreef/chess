@@ -1080,7 +1080,7 @@ function mv(alg_move, is_not_immediate)
 
     piece = piece_square.piece;
     square = piece_square.square;
-    var promote_to = piece_square.promote_to;
+    var promote_to = piece_square.move.promote_to;
 
     // TODO: do some Effect.Move animation, optionally (make two functions)
     //new Effect.Move(piece, { x: 10, y: 20, mode: 'relative' });
@@ -3417,7 +3417,7 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate, prom
                 promote_to = a;
             }
             // Piece+square+piece to promote has been given (probably from mv())
-            promote(piece, promote_to, tieback.notation, is_immediate);
+            promote(piece, square, promote_to, tieback.notation, is_immediate);
         }
     } else {
         // If not a multi-move (moving rook in castling), log and go to next turn
