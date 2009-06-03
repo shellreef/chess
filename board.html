@@ -1085,7 +1085,7 @@ function mv(alg_move, is_not_immediate)
     // TODO: do some Effect.Move animation, optionally (make two functions)
     //new Effect.Move(piece, { x: 10, y: 20, mode: 'relative' });
    
-    move_piece_to_square(piece, square, false, !is_not_immediate, alg_move);
+    move_piece_to_square(piece, square, false, !is_not_immediate, promote_to);
 }
 
 //// SPECIAL MOVE FUNCTIONS
