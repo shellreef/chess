@@ -195,8 +195,8 @@ var GAME_STATE = {
     fullmove_number: 0,         // Increment after black moves
 
     position_moves: {},         // Board position -> move IDs, for 3n move repetition
-    position_after: {},         // Board positions at each move, for quick playback
-    made_moves: {},             // TODO: store piece,square and each move notation!
+    position_after: [],         // Board positions at each move, for quick playback
+    made_moves: [],             // TODO: store piece,square and each move notation!
     ended: false,               // Game is done (drawn, won)
     captured: {white:[], black:[]}, // Captured pieces
 
@@ -3433,12 +3433,12 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate, prom
 
 // Perform bookkeeping on the move after it has been actually made, 
 // in move_piece_to_square().
-// final_type is the type for promotions, or undefined otherwise.
-function finish_up_move(tieback, is_immediate, final_type)
+// promote_to is the type for promotions, or undefined otherwise.
+function finish_up_move(tieback, is_immediate, promote_to)
 {
     var alg_move, ply, turn_info, move_text;
 
-    move_text = tieback[final_type].notations[$F("output_notation")];
+    move_text = tieback[promote_to].notations[$F("output_notation")];
 
     // TODO: ellipsis if black is first recorded move, or intervening commentary
     if (GAME_STATE.active_color === "white") {
@@ -3479,8 +3479,91 @@ function finish_up_move(tieback, is_immediate, final_type)
 
     // PERFORMANCE: This takes 4% of load_pgn, 576 ms on a 14.456 s load. 
     // TODO: Instead of concatenating incrementally, gather it up, load all at once.
-    //TODO ABC console.log(get_notations(piece, square, promote_to)); - store all notations in GAME_STATE.made_move
+    //TODO ABC console.log(get_notations(piece, square, promote_to)); - store all notations in GAME_STATE.made_moves
     $("move_history").innerHTML += alg_move;
+
+    GAME_STATE.made_moves[ply] = tieback[promote_to];
+
+    // End-text, not a move. Terminates the game.
+    if (turn_info.text_end) {
+        $("move_history").innerHTML += "\n" + turn_info.text_end;
+    }
+
+    // If there was a repetition, it occurred on this move. Indicate the moves.
+    if (turn_info.repeats) { 
+        turn_info.repeats.push(ply);
+        mark_repeated_moves(turn_info.repeats);
+    }
+
+    var opening = OPENINGS[active_fen(true)];
+    if (opening) {
+        $("opening_name").innerHTML = opening;
+    }
+    // If not recognized, do not clear it -- keep up opening during the game
+
+
+
+    if (is_immediate) {
+        realize_vboard();
+
+        make_droppables();
+        populate_make_a_move_list();
+        computer_move_if_applicable();
+    }
+}
+
+// TODO: populate move_history
+function show_move_history()
+{
+    for (var i = 0; i < GAME_STATE.made_moves.length; i += 1) {
+    }
+    // TODO
+
+    move_text = tieback[promote_to].notations[$F("output_notation")];
+
+    // TODO: ellipsis if black is first recorded move, or intervening commentary
+    if (GAME_STATE.active_color === "white") {
+        alg_move = '<span class="fullmove_number">' + GAME_STATE.fullmove_number + '<\/span>';
+        if (GAME_STATE.fullmove_number === 1) {
+            // Period goes to initial position, kind of strange, but its uninstrusive
+            alg_move += move_link(0, ".");
+        } else {
+            alg_move += ".";
+        }
+        alg_move += " ";
+    } else {
+        alg_move = " ";
+    }
+
+    ply = encode_ply(GAME_STATE.active_color, GAME_STATE.fullmove_number);
+
+    only_move = own_property_count(VALID_MOVE_NOTATIONS.SAN) === 1;
+
+    turn_info = set_turn("next", false);
+
+    if (turn_info.text_move) {
+        move_text += turn_info.text_move;
+    }
+
+    alg_move += move_link(ply, move_text) + " ";
+
+    if (only_move) {
+        // NAG for "only move", see http://www.markalowery.net/Chess/Notation/NAG.html
+        alg_move += "$7 ";
+    }
+
+    $$("a.active_move").each(function(m) {
+            m.removeClassName("active_move");
+        });
+
+    set_next_back_accesskeys(ply);
+
+    // PERFORMANCE: This takes 4% of load_pgn, 576 ms on a 14.456 s load. 
+    // TODO: Instead of concatenating incrementally, gather it up, load all at once.
+    //TODO ABC console.log(get_notations(piece, square, promote_to)); - store all notations in GAME_STATE.made_moves
+    $("move_history").innerHTML += alg_move;
+
+    GAME_STATE.made_moves[ply] = tieback;
 
     // End-text, not a move. Terminates the game.
     if (turn_info.text_end) {
