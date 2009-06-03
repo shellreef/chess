@@ -502,7 +502,7 @@ var SAVED_BOARDS = {
 "Test Checkmate": "r1bknbrN/pppppppp/8/8/8/8/PPPPPPPP/nRBNKB1R b - - 0 1",
 "Test Stalemate":     "k7/8/8/8/8/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5",
 "Test Remove Check by Capture":     "4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5",
-"Test Promotion":     "K/PPPPPPPP/8/8/8/8/pppppppp/7k b - - 0 5",
+"Test Promotion":     "K/PPPPPPPP/8/8/8/8/pppppppp/7k w - - 0 1",
 "Test Promotion to Rook": "8/k1P5/p7/P3K3/8/8/8/8 w - - 0 53", // from http://chessteacher.110mb.com/2008/10/22/minor-promotion/
 "Test Promotion to Bishop": "8/5P1k/5K1p/7P/8/8/8/8 w - - 0 51",
 "Test En Passant (alone)":     "8/8/8/3pP3/8/8/8/8 w - d6 0 5",
@@ -3436,64 +3436,24 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate, prom
 // promote_to is the type for promotions, or undefined otherwise.
 function finish_up_move(tieback, is_immediate, promote_to)
 {
-    var alg_move, ply, turn_info, move_text;
+    var alg_move, ply, turn_info, move_text, info;
 
-    move_text = tieback[promote_to].notations[$F("output_notation")];
-
-    // TODO: ellipsis if black is first recorded move, or intervening commentary
-    if (GAME_STATE.active_color === "white") {
-        alg_move = '<span class="fullmove_number">' + GAME_STATE.fullmove_number + '<\/span>';
-        if (GAME_STATE.fullmove_number === 1) {
-            // Period goes to initial position, kind of strange, but its uninstrusive
-            alg_move += move_link(0, ".");
-        } else {
-            alg_move += ".";
-        }
-        alg_move += " ";
-    } else {
-        alg_move = " ";
-    }
+    info = tieback[promote_to];
 
     ply = encode_ply(GAME_STATE.active_color, GAME_STATE.fullmove_number);
-
-    only_move = own_property_count(VALID_MOVE_NOTATIONS.SAN) === 1;
-
+   
+    info.only_move = own_property_count(VALID_MOVE_NOTATIONS.SAN) === 1;
     turn_info = set_turn("next", false);
 
-    if (turn_info.text_move) {
-        move_text += turn_info.text_move;
-    }
-
-    alg_move += move_link(ply, move_text) + " ";
-
-    if (only_move) {
-        // NAG for "only move", see http://www.markalowery.net/Chess/Notation/NAG.html
-        alg_move += "$7 ";
-    }
-
-    $$("a.active_move").each(function(m) {
-            m.removeClassName("active_move");
-        });
-
-    set_next_back_accesskeys(ply);
-
-    // PERFORMANCE: This takes 4% of load_pgn, 576 ms on a 14.456 s load. 
-    // TODO: Instead of concatenating incrementally, gather it up, load all at once.
-    //TODO ABC console.log(get_notations(piece, square, promote_to)); - store all notations in GAME_STATE.made_moves
-    $("move_history").innerHTML += alg_move;
-
-    GAME_STATE.made_moves[ply] = tieback[promote_to];
-
-    // End-text, not a move. Terminates the game.
-    if (turn_info.text_end) {
-        $("move_history").innerHTML += "\n" + turn_info.text_end;
-    }
-
+    if (turn_info.text_move) { info.add_text = turn_info.text_move; }
+    if (turn_info.text_end) { info.text_end = turn_info.text_end; } 
     // If there was a repetition, it occurred on this move. Indicate the moves.
     if (turn_info.repeats) { 
         turn_info.repeats.push(ply);
-        mark_repeated_moves(turn_info.repeats);
+        info.repeats = turn_info.repeats;
     }
+
+    GAME_STATE.made_moves[ply] = info;
 
     var opening = OPENINGS[active_fen(true)];
     if (opening) {
@@ -3501,96 +3461,84 @@ function finish_up_move(tieback, is_immediate, promote_to)
     }
     // If not recognized, do not clear it -- keep up opening during the game
 
-
-
     if (is_immediate) {
         realize_vboard();
 
+        show_move_history();
         make_droppables();
         populate_make_a_move_list();
         computer_move_if_applicable();
     }
 }
 
-// TODO: populate move_history
+// Fill in move_history with the move history
 function show_move_history()
 {
-    for (var i = 0; i < GAME_STATE.made_moves.length; i += 1) {
-    }
-    // TODO
+    var htmls = [];
 
-    move_text = tieback[promote_to].notations[$F("output_notation")];
+    for (var ply = 1; ply < GAME_STATE.made_moves.length; ply += 1) {
+        var color_fullmove, color, fullmove_number, move_text, move_info, this_html, only_move;
 
-    // TODO: ellipsis if black is first recorded move, or intervening commentary
-    if (GAME_STATE.active_color === "white") {
-        alg_move = '<span class="fullmove_number">' + GAME_STATE.fullmove_number + '<\/span>';
-        if (GAME_STATE.fullmove_number === 1) {
-            // Period goes to initial position, kind of strange, but its uninstrusive
-            alg_move += move_link(0, ".");
-        } else {
-            alg_move += ".";
+        color_fullmove = decode_ply(ply);
+        color = color_fullmove.color;
+        fullmove_number = color_fullmove.fullmove_number;
+
+        move_info = GAME_STATE.made_moves[ply];
+        if (!move_info) {
+            continue;
         }
-        alg_move += " ";
-    } else {
-        alg_move = " ";
+
+        move_text = move_info.notations[$F("output_notation")];
+        this_html = "";
+
+        // TODO: ellipsis if black is first recorded move, or intervening commentary
+        if (color === "white") {
+            this_html += '<span class="fullmove_number">' + fullmove_number + '<\/span>';
+            if (fullmove_number === 1) {
+                // Period goes to initial position, kind of strange, but its uninstrusive
+                this_html += move_link(0, ".");
+            } else {
+                this_html += ".";
+            }
+            this_html += " ";
+        } else {
+            this_html += " ";
+        }
+
+        this_html += move_link(ply, move_text);
+
+
+        if (move_info.only_move) {
+            // NAG for "only move", see http://www.markalowery.net/Chess/Notation/NAG.html
+            this_html += "$7 ";
+        }
+
+        if (move_info.add_text) {
+            this_html += move_info.add_text;
+        }
+
+        if (move_info.repeats) {
+            mark_repeated_moves(move_info.repeats);
+        }
+
+        // End-text, not a move. Terminates the game.
+        if (move_info.text_end) {
+            this_html += "\n" + move_info.text_end;
+        }
+
+        this_html += " ";
+
+        htmls.push(this_html);
     }
 
-    ply = encode_ply(GAME_STATE.active_color, GAME_STATE.fullmove_number);
+    $("move_history").innerHTML = htmls.join("");
 
-    only_move = own_property_count(VALID_MOVE_NOTATIONS.SAN) === 1;
-
-    turn_info = set_turn("next", false);
-
-    if (turn_info.text_move) {
-        move_text += turn_info.text_move;
-    }
-
-    alg_move += move_link(ply, move_text) + " ";
-
-    if (only_move) {
-        // NAG for "only move", see http://www.markalowery.net/Chess/Notation/NAG.html
-        alg_move += "$7 ";
-    }
-
+    // Last ply
     $$("a.active_move").each(function(m) {
             m.removeClassName("active_move");
         });
 
     set_next_back_accesskeys(ply);
-
-    // PERFORMANCE: This takes 4% of load_pgn, 576 ms on a 14.456 s load. 
-    // TODO: Instead of concatenating incrementally, gather it up, load all at once.
-    //TODO ABC console.log(get_notations(piece, square, promote_to)); - store all notations in GAME_STATE.made_moves
-    $("move_history").innerHTML += alg_move;
-
-    GAME_STATE.made_moves[ply] = tieback;
-
-    // End-text, not a move. Terminates the game.
-    if (turn_info.text_end) {
-        $("move_history").innerHTML += "\n" + turn_info.text_end;
-    }
-
-    // If there was a repetition, it occurred on this move. Indicate the moves.
-    if (turn_info.repeats) { 
-        turn_info.repeats.push(ply);
-        mark_repeated_moves(turn_info.repeats);
-    }
-
-    var opening = OPENINGS[active_fen(true)];
-    if (opening) {
-        $("opening_name").innerHTML = opening;
-    }
-    // If not recognized, do not clear it -- keep up opening during the game
-
-
-
-    if (is_immediate) {
-        realize_vboard();
-
-        make_droppables();
-        populate_make_a_move_list();
-        computer_move_if_applicable();
-    }
 }
 
 // Visually indicate the moves which after threefold repetition
