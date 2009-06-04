@@ -1023,6 +1023,10 @@ function mv(alg_move, is_not_immediate)
         return own_properties(VALID_MOVE_NOTATIONS[PREFS.input_notation]);
     }
 
+    if (alg_move.substr(0, 1) === "/") {
+        // TODO: do raw move
+    }
+
     piece_square = find_legal_move(alg_move);
     assert(piece_square, "mv(" + alg_move + "): illegal move");
 
@@ -1886,14 +1890,6 @@ function got_engine_move(response)
         // TODO: show a meter for the board position
         $("score").innerHTML = "Score: " + response.score;
     } else {
-        // How to explain this? Occurs frequently:
-        //
-        // Crafty v23.0 (2 cpus)
-        //
-        // White(1): setboard rn1qkbnr/pp2pppp/2p5/3pPb2/3P4/8/PPP2PPP/RNBQKBNR w KQkq f6 1 4
-        // enpassant status is bad (must be on 3rd/6th rank only.
-        // bad string = "rn1qkbnr/pp2pppp/2p5/3pPb2/3P4/8/PPP2PPP/RNBQKBNR"
-        // Illegal position, using normal initial chess position
         disable_engine("Engine error: " + response.error);
     }
 }
@@ -1933,6 +1929,8 @@ function do_raw_notation(s)
     piece = decode_piece_letter(a[3]);
     piece.square = filerank2obj(a[1]);
     move = filerank2obj(a[2]);
+    move.piece = piece;
+    move.square = VBOARD[move.x][move.y];
 
     do_virtual_move(piece, move);
 }
