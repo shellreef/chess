@@ -1031,14 +1031,10 @@ function mv(alg_move, is_not_immediate)
     // would have to convert from SAN to non-ambiguous formats. Or just make 
     // calculate_moves() faster.
     
-    piece = piece_square.piece;
-    square = piece_square.square;
-    var promote_to = piece_square.move.promote_to;
-
     // TODO: do some Effect.Move animation, optionally (make two functions)
     //new Effect.Move(piece, { x: 10, y: 20, mode: 'relative' });
    
-    move_piece_to_square(piece, square, false, !is_not_immediate, promote_to);
+    move_piece_to_square(piece_square, false, !is_not_immediate);
 }
 
 // Find a legal move, given the move text, precalculated already with
@@ -3329,11 +3325,12 @@ function forwards_vector(color)
 // If is_hypothetical is true, this is an internal move part of another move
 // (castling) so it shouldn't be logged.
 // If is_immediate, then finish_up_move() will realize the virtual board.
-// If promote_to is given, it is the name of the piece type to promote to - along with
+// If piece_square.promote_to is given, it is the name of the piece type to promote to - along with
 // piece and square, this uniquely identifies a move (a1Q, a1N, etc.) whereas if only
 // piece + square are given, the promotion piece type will have to be queried.
-function move_piece_to_square(piece, square, is_hypothetical, is_immediate, promote_to)
+function move_piece_to_square(piece_square, is_hypothetical, is_immediate)
 {
+    var piece = piece_square.piece, square = piece_square.square, promote_to = piece_square.promote_to;
     var from_square, move_text, filerank, only_move, move, tieback, did;
     
     from_square = piece.square;
@@ -3391,10 +3388,10 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate, prom
             if (square.x === 7) {
                 // TODO: actually calculate square moved over, then move rook there
                 // (instead of hardcoding). Short.
-                move_piece_to_square(pc(8, first_rank, piece.virtual), VBOARD[6][first_rank], true, true);
+                move_piece_to_square({piece:pc(8, first_rank, piece.virtual), square:VBOARD[6][first_rank]}, true, true);
             } else if (square.x === 3) {
                 // Castle long.
-                move_piece_to_square(pc(1, first_rank, piece.virtual), VBOARD[4][first_rank], true, true);
+                move_piece_to_square({piece:pc(1, first_rank, piece.virtual), square:VBOARD[4][first_rank]}, true, true);
             }
         }
     }
@@ -3608,7 +3605,7 @@ function move_dropped_piece(piece, square, event)
     var virtual_square = VBOARD[square.x][square.y];
     var virtual_piece = VBOARD[piece.square.x][piece.square.y].piece;
  
-    move_piece_to_square(virtual_piece, virtual_square, false, true);
+    move_piece_to_square({piece:virtual_piece, square:virtual_square}, false, true);
 
     // Scriptaculous requires position:relative; with static, you can drag it
     // but it won't move with the cursor, so set it and crucially, reset the
