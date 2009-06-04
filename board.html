@@ -3336,10 +3336,8 @@ function move_piece_to_square(piece_square, is_hypothetical, is_immediate)
     // Find out what move this was.
     tieback = get_notations(piece, square, promote_to);
 
-    if (promote_to && tieback[promote_to]) {
+    if (tieback[promote_to]) {
         move = tieback[promote_to].move;
-    } else if (tieback.undefined) {
-        move = tieback.undefined.move;
     } else {
         // Surrogate move, for location only
         move = tieback.bishop.move;
