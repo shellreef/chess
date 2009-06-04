@@ -3359,13 +3359,8 @@ function execute_move(piece_square, choices, is_hypothetical, is_immediate)
     var piece, square, promote_to;
     var from_square, move_text, filerank, only_move, move, choices, did, one;
   
-    piece = piece_square.piece;
-    square = piece_square.square;
-
     // Optional promotion
     promote_to = piece_square.move && piece_square.move.promote_to;
-
-    from_square = piece.square;
 
     if (choices[promote_to]) {
         one = choices[promote_to];
@@ -3374,6 +3369,9 @@ function execute_move(piece_square, choices, is_hypothetical, is_immediate)
         one = choices.bishop;
     }
     move = one.move;
+    piece = one.piece;
+    square = one.square;
+    from_square = piece.square;
 
     if (!is_hypothetical) {
         // For highlighting recent move on board
