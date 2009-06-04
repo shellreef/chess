@@ -3336,13 +3336,13 @@ function forwards_vector(color)
 // If piece_square.promote_to is given, it is the name of the piece type to promote to - along with
 // piece and square, this uniquely identifies a move (a1Q, a1N, etc.) whereas if only
 // piece + square are given, the promotion piece type will have to be queried.
-function move_piece_to_square(piece, square, is_hypothetical, is_immediate, promote_to)
+function move_piece_to_square(piece, square, is_hypothetical, is_immediate)
 {
     var tieback;
 
-    //tieback = get_notations(piece, square, promote_to);
+    tieback = get_notations(piece, square);
 
-    execute_move({piece:piece, square:square, promote_to:promote_to}, is_hypothetical, is_immediate);
+    execute_move({piece:piece, square:square}, is_hypothetical, is_immediate);
 }
 
 function execute_move(piece_square, is_hypothetical, is_immediate) 
