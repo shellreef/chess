@@ -1037,8 +1037,13 @@ function mv(alg_move, is_not_immediate)
     
     // TODO: do some Effect.Move animation, optionally (make two functions)
     //new Effect.Move(piece, { x: 10, y: 20, mode: 'relative' });
-   
-    execute_move(piece_square, false, !is_not_immediate);
+ 
+    // There is only one choice..
+    var promote_to = piece_square.move.promote_to;
+    var choices = {};
+    choices[promote_to] = piece_square;
+
+    execute_move(piece_square, choices, false, !is_not_immediate);
 }
 
 // Find a legal move, given the move text, precalculated already with
@@ -3338,35 +3343,38 @@ function forwards_vector(color)
 // piece + square are given, the promotion piece type will have to be queried.
 function move_piece_to_square(piece, square, is_hypothetical, is_immediate)
 {
-    var tieback;
+    var choices, surrogate;
 
-    tieback = get_notations(piece, square);
+    // Get all possible moves for this piece+square combination, keyed
+    // by promotion type (or undefined). A move like c8 as invoked by drag
+    // and drop expands here to c8Q, c8N, c8R, c8B.
+    choices = get_notations(piece, square);
+    assert(choices, "move_piece_to_square(" + piece + ", " + square + "): could not find notation");
 
-    execute_move({piece:piece, square:square}, is_hypothetical, is_immediate);
+    execute_move({piece:piece, square:square}, choices, is_hypothetical, is_immediate);
 }
 
-function execute_move(piece_square, is_hypothetical, is_immediate) 
+function execute_move(piece_square, choices, is_hypothetical, is_immediate) 
 {
-    var piece = piece_square.piece, square = piece_square.square, promote_to;
-    var from_square, move_text, filerank, only_move, move, tieback, did;
+    var piece, square, promote_to;
+    var from_square, move_text, filerank, only_move, move, tieback, did, one;
   
-    console.log(piece_square);
+    piece = piece_square.piece;
+    square = piece_square.square;
 
     // Optional promotion
     promote_to = piece_square.move && piece_square.move.promote_to;
 
     from_square = piece.square;
-
-    // Find out what move this was.
-    tieback = get_notations(piece, square, promote_to);
-    assert(tieback, "move_piece_to_square(" + piece_square + "): could not find notation");
+    tieback = choices;
 
     if (tieback[promote_to]) {
-        move = tieback[promote_to].move;
+        one = tieback[promote_to];
     } else {
         // Surrogate move, for location only
-        move = tieback.bishop.move;
+        one = tieback.bishop;
     }
+    move = one.move;
 
     if (!is_hypothetical) {
         // For highlighting recent move on board
