@@ -1925,7 +1925,7 @@ function disable_engine(why)
 // moves (time consuming)
 function decode_raw_move(s)
 {
-    var a, piece, move, square, notations;
+    var a, piece, move, square, notations, flags;
 
     assert(s.substr(0, 1) === "/", "do_raw_move(" + s + "): must begin with /");
 
@@ -1934,18 +1934,47 @@ function decode_raw_move(s)
     piece = decode_piece_letter(a[3]);
     piece.square = filerank2obj(a[1]);
     move = filerank2obj(a[2]);
+    flags = a[4] || "";
+    
     square = VBOARD[move.x][move.y];
 
-    // TODO: populate move with flags
+    // Populate move with flags
     // s snapback
     // r clear_castle_short (rook, king move)
     // R clear_castle_long (rook, king, move)
     // d self_destruct
     // e en_passant_capture
     // E create_ep_target but with args
-    //
+    for (var i = 0; i < flags.length; i += 1) {
+        var flag = flags.charAt(i);
+
+        switch(flag)
+        {
+        case "s": 
+            move.snapback = true; 
+            break;
+        case "r":
+            move.clear_castle_short = true;
+            break;
+        case "R":
+            move.clear_castle_long = true;
+            break;
+        case "d":
+            move.self_destruct = true;
+            break;
+        case "e":
+            move.en_passant_capture = true;
+            break;
+        //case "E":
+        //    move.create_ep_target =  // TODO: square, or just have the flag calculate it and make a boolean?
+        default:
+            assert(flags, "decode_raw_move(" + s + "): unknown flag |" + flag + "|");
+        }
+    }
+
     // TODO: move.notations, in raw move? Avoid redundant 
-    // notations, store compactly FAN/SAN? If needed.
+    // notations, store compactly FAN/SAN? If needed. 
+    // /a8/b8/K//Kb8/K-K8/etc.
     notations = {};
     notations[$F("output_notation")] = "hi";
 
