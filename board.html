@@ -1024,17 +1024,17 @@ function mv(alg_move, is_not_immediate)
     }
 
     if (alg_move.substr(0, 1) === "/") {
-        // TODO: do raw move
+        // Raw move notation, parsed directly, no legal move checking. For
+        // loading in-progress games quickly, as no move calculation is
+        // needed.
+        piece_square = decode_raw_move(alg_move);
+    } else {
+        // For ordinary notations, find move in precalculated notations. 
+        piece_square = find_legal_move(alg_move);
     }
 
-    piece_square = find_legal_move(alg_move);
     assert(piece_square, "mv(" + alg_move + "): illegal move");
 
-    // TODO: Non-ambiguous notations can be parsed directly, without needing to
-    // calculate the valid moves. Maybe useful for loading in-progress games? And
-    // would have to convert from SAN to non-ambiguous formats. Or just make 
-    // calculate_moves() faster.
-    
     // TODO: do some Effect.Move animation, optionally (make two functions)
     //new Effect.Move(piece, { x: 10, y: 20, mode: 'relative' });
  
@@ -1923,9 +1923,9 @@ function disable_engine(why)
 // Syntax: /from_square/to_square/piece_code/flags
 // TODO: Use for quickly loading a saved game, in a URL, without calculating valid
 // moves (time consuming)
-function do_raw_notation(s)
+function decode_raw_move(s)
 {
-    var a, piece, move;
+    var a, piece, move, square, notations;
 
     assert(s.substr(0, 1) === "/", "do_raw_move(" + s + "): must begin with /");
 
@@ -1934,10 +1934,23 @@ function do_raw_notation(s)
     piece = decode_piece_letter(a[3]);
     piece.square = filerank2obj(a[1]);
     move = filerank2obj(a[2]);
-    move.piece = piece;
-    move.square = VBOARD[move.x][move.y];
+    square = VBOARD[move.x][move.y];
 
-    do_virtual_move(piece, move);
+    // TODO: populate move with flags
+    // s snapback
+    // r clear_castle_short (rook, king move)
+    // R clear_castle_long (rook, king, move)
+    // d self_destruct
+    // e en_passant_capture
+    // E create_ep_target but with args
+    //
+    // TODO: move.notations, in raw move? Avoid redundant 
+    // notations, store compactly FAN/SAN? If needed.
+    notations = {};
+    notations[$F("output_notation")] = "hi";
+
+    return {piece:piece, square:square, move:move, notations:notations};
+    //do_virtual_move(piece, move);
 }
 
 // Generate the raw move notation for a move
@@ -3334,7 +3347,7 @@ function forwards_vector(color)
 
 
 
-// Make a move on the virtual board.
+// Make a move or half-move on the virtual board given piece + square.
 // If is_hypothetical is true, this is an internal move part of another move
 // (castling) so it shouldn't be logged.
 // If is_immediate, then finish_up_move() will realize the virtual board.
@@ -3354,6 +3367,7 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate)
     execute_move(undefined, choices, is_hypothetical, is_immediate);
 }
 
+// Make a move, or half-move, given choices.
 function execute_move(promote_to, choices, is_hypothetical, is_immediate) 
 {
     var piece, square, promote_to;
