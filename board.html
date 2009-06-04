@@ -1043,7 +1043,7 @@ function mv(alg_move, is_not_immediate)
     var choices = {};
     choices[promote_to] = piece_square;
 
-    execute_move(piece_square, choices, false, !is_not_immediate);
+    execute_move(promote_to, choices, false, !is_not_immediate);
 }
 
 // Find a legal move, given the move text, precalculated already with
@@ -3351,17 +3351,14 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate)
     choices = get_notations(piece, square);
     assert(choices, "move_piece_to_square(" + piece + ", " + square + "): could not find notation");
 
-    execute_move({piece:piece, square:square}, choices, is_hypothetical, is_immediate);
+    execute_move(undefined, choices, is_hypothetical, is_immediate);
 }
 
-function execute_move(piece_square, choices, is_hypothetical, is_immediate) 
+function execute_move(promote_to, choices, is_hypothetical, is_immediate) 
 {
     var piece, square, promote_to;
     var from_square, move_text, filerank, only_move, move, choices, did, one;
   
-    // Optional promotion
-    promote_to = piece_square.move && piece_square.move.promote_to;
-
     if (choices[promote_to]) {
         one = choices[promote_to];
     } else {
