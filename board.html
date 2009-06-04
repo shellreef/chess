@@ -3338,9 +3338,13 @@ function forwards_vector(color)
 // piece + square are given, the promotion piece type will have to be queried.
 function move_piece_to_square(piece_square, is_hypothetical, is_immediate)
 {
-    var piece = piece_square.piece, square = piece_square.square, promote_to = piece_square.move.promote_to;
+    var piece = piece_square.piece, square = piece_square.square, promote_to;
     var from_square, move_text, filerank, only_move, move, tieback, did;
-    
+   
+    if (piece_square.move) {
+        promote_to = piece_square.move.promote_to;
+    }
+
     from_square = piece.square;
 
     // Find out what move this was.
