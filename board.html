@@ -4638,7 +4638,7 @@ function enable_document_selection(enable) {
  <div id="show_skill" style="display: none"><p>Skill Level: 
   <input type="text" size="3" maxlength="3" id="skill_level" onchange="update_skill(this)"></div>
 
- <p><select id="output_notation" name="output_notation"></select>
+ <p><select id="output_notation" name="output_notation" onchange="show_move_history()"></select>
 
  <p><a href="#" onclick="edit_pgn()">edit PGN</a>
  <p><a href="#" onclick="email_board()">email board</a>
