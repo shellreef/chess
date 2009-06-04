@@ -3207,6 +3207,7 @@ function update_captured_piece_images(piece)
 function get_notations(piece, square, promote_to)
 {
     var finds = {};
+    var last_key;
 
     for (var notation in AVAILABLE_NOTATIONS) {
         if (AVAILABLE_NOTATIONS.hasOwnProperty(notation)) {
@@ -3224,6 +3225,7 @@ function get_notations(piece, square, promote_to)
 
                         // Key by final piece type. Promotion type, if any.
                         var key = this_move.promote_to || "undefined";
+                        last_key = key;
 
                         if (!finds[key]) {
                             finds[key] = {
@@ -3239,6 +3241,14 @@ function get_notations(piece, square, promote_to)
             }
         }
     }
+  
+    // Ensure that the 'undefined' key is always defined, so that for
+    // promotions, the first half of the move can still be completed
+    // without having a chosen promotion piece.
+    // TODO
+    /*if (!finds.undefined) {
+        finds.undefined = finds[last_key];
+    }*/
 
     return finds;
 }
@@ -3328,13 +3338,14 @@ function forwards_vector(color)
 // piece + square are given, the promotion piece type will have to be queried.
 function move_piece_to_square(piece_square, is_hypothetical, is_immediate)
 {
-    var piece = piece_square.piece, square = piece_square.square, promote_to = piece_square.promote_to;
+    var piece = piece_square.piece, square = piece_square.square, promote_to = piece_square.move.promote_to;
     var from_square, move_text, filerank, only_move, move, tieback, did;
     
     from_square = piece.square;
 
     // Find out what move this was.
     tieback = get_notations(piece, square, promote_to);
+    assert(tieback, "move_piece_to_square(" + piece_square + "): could not find notation");
 
     if (tieback[promote_to]) {
         move = tieback[promote_to].move;
@@ -3417,7 +3428,9 @@ function move_piece_to_square(piece_square, is_hypothetical, is_immediate)
             ask_to_promote(piece, tieback, is_immediate);
         } else {
             for (var a in tieback) {
-                promote_to = a;
+                if (tieback.hasOwnProperty(a)) {
+                    promote_to = a;
+                }
             }
             // Piece+square+piece to promote has been given (probably from mv())
             promote(piece, square, promote_to, tieback.notation, is_immediate);
