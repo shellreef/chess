@@ -3357,7 +3357,7 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate)
 function execute_move(piece_square, choices, is_hypothetical, is_immediate) 
 {
     var piece, square, promote_to;
-    var from_square, move_text, filerank, only_move, move, tieback, did, one;
+    var from_square, move_text, filerank, only_move, move, choices, did, one;
   
     piece = piece_square.piece;
     square = piece_square.square;
@@ -3366,13 +3366,12 @@ function execute_move(piece_square, choices, is_hypothetical, is_immediate)
     promote_to = piece_square.move && piece_square.move.promote_to;
 
     from_square = piece.square;
-    tieback = choices;
 
-    if (tieback[promote_to]) {
-        one = tieback[promote_to];
+    if (choices[promote_to]) {
+        one = choices[promote_to];
     } else {
         // Surrogate move, for location only
-        one = tieback.bishop;
+        one = choices.bishop;
     }
     move = one.move;
 
@@ -3409,7 +3408,7 @@ function execute_move(piece_square, choices, is_hypothetical, is_immediate)
     }
 
     // If castling, move the rook in place. Ugly hardcoded.
-    // Note: if pass this in abs_move/tieback, need to save in raw move notation, too.
+    // Note: if pass this in abs_move/choices, need to save in raw move notation, too.
     if (piece.type === "king") {
         // TODO: test with chess960 positions
         var first_rank = (GAME_STATE.active_color === "white" ? 1 : 8);
@@ -3445,22 +3444,22 @@ function execute_move(piece_square, choices, is_hypothetical, is_immediate)
     }
 
     if (should_promote(piece)) {
-        if (own_property_count(tieback) > 1) {
+        if (own_property_count(choices) > 1) {
             // Piece+square move, need input from user: what piece 
-            ask_to_promote(piece, tieback, is_immediate);
+            ask_to_promote(piece, choices, is_immediate);
         } else {
-            for (var a in tieback) {
-                if (tieback.hasOwnProperty(a)) {
+            for (var a in choices) {
+                if (choices.hasOwnProperty(a)) {
                     promote_to = a;
                 }
             }
             // Piece+square+piece to promote has been given (probably from mv())
-            promote(piece, square, promote_to, tieback.notation, is_immediate);
+            promote(piece, square, promote_to, choices.notation, is_immediate);
         }
     } else {
         // If not a multi-move (moving rook in castling), log and go to next turn
         if (!is_hypothetical) {
-            finish_up_move(tieback, is_immediate);
+            finish_up_move(choices, is_immediate);
         }
     }
 
