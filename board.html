@@ -1038,7 +1038,7 @@ function mv(alg_move, is_not_immediate)
     // TODO: do some Effect.Move animation, optionally (make two functions)
     //new Effect.Move(piece, { x: 10, y: 20, mode: 'relative' });
    
-    move_piece_to_square(piece_square.piece, piece_square.square, false, !is_not_immediate, piece_square.promote_to);
+    execute_move(piece_square, false, !is_not_immediate);
 }
 
 // Find a legal move, given the move text, precalculated already with
@@ -3338,6 +3338,10 @@ function forwards_vector(color)
 // piece + square are given, the promotion piece type will have to be queried.
 function move_piece_to_square(piece, square, is_hypothetical, is_immediate, promote_to)
 {
+    var tieback;
+
+    //tieback = get_notations(piece, square, promote_to);
+
     execute_move({piece:piece, square:square, promote_to:promote_to}, is_hypothetical, is_immediate);
 }
 
@@ -3345,10 +3349,11 @@ function execute_move(piece_square, is_hypothetical, is_immediate)
 {
     var piece = piece_square.piece, square = piece_square.square, promote_to;
     var from_square, move_text, filerank, only_move, move, tieback, did;
-   
-    if (piece_square.move) {
-        promote_to = piece_square.move.promote_to;
-    }
+  
+    console.log(piece_square);
+
+    // Optional promotion
+    promote_to = piece_square.move && piece_square.move.promote_to;
 
     from_square = piece.square;
 
