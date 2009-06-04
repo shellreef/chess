@@ -1023,23 +1023,47 @@ function mv(alg_move, is_not_immediate)
         return own_properties(VALID_MOVE_NOTATIONS[PREFS.input_notation]);
     }
 
+    piece_square = find_legal_move(alg_move);
+    assert(piece_square, "mv(" + alg_move + "): illegal move");
+
+    // TODO: Non-ambiguous notations can be parsed directly, without needing to
+    // calculate the valid moves. Maybe useful for loading in-progress games? And
+    // would have to convert from SAN to non-ambiguous formats. Or just make 
+    // calculate_moves() faster.
+    
+    piece = piece_square.piece;
+    square = piece_square.square;
+    var promote_to = piece_square.move.promote_to;
+
+    // TODO: do some Effect.Move animation, optionally (make two functions)
+    //new Effect.Move(piece, { x: 10, y: 20, mode: 'relative' });
+   
+    move_piece_to_square(piece, square, false, !is_not_immediate, promote_to);
+}
+
+// Find a legal move, given the move text, precalculated already with
+// calculate_notations().
+function find_legal_move(text)
+{
+    var piece_square;
+
     // Accept digits, but prefer the letter oh.
-    alg_move = alg_move.replace("0-0-0", "O-O-O").replace("0-0", "O-O");
+    text = text.replace("0-0-0", "O-O-O").replace("0-0", "O-O");
 
     // Check/mate indicators not part of move.
-    alg_move = alg_move.replace("+", "").replace("#", "");
+    text = text.replace("+", "").replace("#", "");
 
     // Promotions, e1=Q, not needed, e1Q is fine
-    alg_move = alg_move.replace("=", "")
+    text = text.replace("=", "")
 
     // Prefer these move notations, in this order.
     for (var notation in AVAILABLE_NOTATIONS) {
         if (AVAILABLE_NOTATIONS.hasOwnProperty(notation)) {
             if (notation === "descr" || notation === "adesc") {
-                alg_move = alg_move.replace(/Kt/g, "N");
+                text = text.replace(/Kt/g, "N");
             }
 
-            piece_square = VALID_MOVE_NOTATIONS[notation][alg_move];
+            piece_square = VALID_MOVE_NOTATIONS[notation][text];
 
             if (piece_square) {
                 // Found one.
@@ -1058,10 +1082,10 @@ function mv(alg_move, is_not_immediate)
         for (notation in AVAILABLE_NOTATIONS) {
             if (AVAILABLE_NOTATIONS.hasOwnProperty(notation)) {
                 if (notation === "descr" || notation === "adesc") {
-                    alg_move = alg_move.replace(/Kt/g, "N");
+                    text = text.replace(/Kt/g, "N");
                 }
 
-                piece_square = ALT_MOVE_NOTATIONS[notation][alg_move];
+                piece_square = ALT_MOVE_NOTATIONS[notation][text];
 
                 if (piece_square) {
                     //console.log("Warning: non-canonical move notation: ", notation);
@@ -1071,23 +1095,9 @@ function mv(alg_move, is_not_immediate)
         }
     }
 
-    // TODO: Non-ambiguous notations can be parsed directly, without needing to
-    // calculate the valid moves. Maybe useful for loading in-progress games? And
-    // would have to convert from SAN to non-ambiguous formats. Or just make 
-    // calculate_moves() faster.
-
-    assert(piece_square, "mv(" + alg_move + "): illegal move");
-
-    piece = piece_square.piece;
-    square = piece_square.square;
-    var promote_to = piece_square.move.promote_to;
-
-    // TODO: do some Effect.Move animation, optionally (make two functions)
-    //new Effect.Move(piece, { x: 10, y: 20, mode: 'relative' });
-   
-    move_piece_to_square(piece, square, false, !is_not_immediate, promote_to);
+    return piece_square;
 }
-
+ 
 //// SPECIAL MOVE FUNCTIONS
 
 // Return whether a piece should be promoted
