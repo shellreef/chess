@@ -1100,6 +1100,14 @@ function find_legal_move(text)
         }
     }
 
+    if (piece_square) {
+        // Find move in all other notations
+        // TODO: avoid calling get_notations() which loops; the answer should be above
+        piece_square.notations = get_notations(piece_square.piece,
+                piece_square.square, 
+                piece_square.move.promote_to)[piece_square.move.promote_to].notations;
+    }
+
     return piece_square;
 }
  
