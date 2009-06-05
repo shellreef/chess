@@ -181,12 +181,13 @@ var AVAILABLE_NOTATIONS = {
     adesc:"Algebraic Descriptive Notation"//            BxN         P-e4
 };
 
-// Alternate notations to export with save_pgn(), in addition to SAN.
+// Notations to export with save_pgn(). The first notation is stored in
+// the PGN move text, others in special tags.
 // TODO: export all by default, but then only include these for email?
-var EXPORT_NOTATIONS = {
-    descr: true,
-    adesc: true
-};
+var EXPORT_NOTATIONS = [
+    "adesc",
+    "descr",
+];
 
 
 // Info about the game
@@ -757,16 +758,15 @@ function save_pgn()
         if (ply_info.color === "white") {
             move_text += ply_info.fullmove_number + ". ";
         }
-        move_text += made.notations.SAN;
+        move_text += made.notations[EXPORT_NOTATIONS[0]];
         move_text += " ";
 
-        for (var notation in EXPORT_NOTATIONS) {
-            if (EXPORT_NOTATIONS.hasOwnProperty(notation)) {
-                if (!other_move_texts[notation]) {
-                    other_move_texts[notation] = [];
-                }
-                other_move_texts[notation][ply] = made.notations[notation];
+        for (var i = 1; i < EXPORT_NOTATIONS.length; i += 1) {
+            var notation = EXPORT_NOTATIONS[i];
+            if (!other_move_texts[notation]) {
+                other_move_texts[notation] = [];
             }
+            other_move_texts[notation][ply] = made.notations[notation];
         }
     }
 
