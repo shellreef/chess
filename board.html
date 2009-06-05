@@ -186,7 +186,8 @@ var AVAILABLE_NOTATIONS = {
 // TODO: export all by default, but then only include these for email?
 var EXPORT_NOTATIONS = [
     "SAN",
-    "descr"
+    "descr",
+    "adesc"
     // TODO: raw
 ];
 
@@ -747,9 +748,7 @@ function save_pgn()
     // Non-standard. The standard tags are FEN and SetUp, for starting position only.
     dict.CurrentFEN = active_fen();
 
-    pgn = output_pgn_dict(dict);
-
-    // Generate move text in SAN
+    // Generate move text (not in a tag) 
     var move_text = "";
     var other_move_texts = {};
     for (var ply = 1; ply < GAME_STATE.made_moves.length; ply += 1) {
@@ -770,16 +769,21 @@ function save_pgn()
             other_move_texts[notation][ply] = made.notations[notation];
         }
     }
-
+ 
+    // Alternate moves, in tag
     for (notation in other_move_texts) {
         if (other_move_texts.hasOwnProperty(notation)) {
-            pgn += "[Moves " + notation + " ";
+            var text = "";
             for (ply = 1; ply < other_move_texts[notation].length; ply += 1) {
-                pgn += other_move_texts[notation][ply] + " ";
+                text += other_move_texts[notation][ply] + " ";
             }
-            pgn += "]\n";
+
+            dict["Moves_" + notation] = text;
         }
     }
+
+   
+    pgn = output_pgn_dict(dict);
 
     pgn += "\n";
     pgn += move_text;
