@@ -4648,7 +4648,7 @@ function enable_document_selection(enable) {
  <div id="controls" style="display: block; border-left: 2px solid blue">
  <div>
 
- <p><select id="make_move_menu" onchange="make_move_by_menu(this)"></select>
+ <p><select accesskey="m" id="make_move_menu" onchange="make_move_by_menu(this)"></select>
 
  <p><span id="opening_name"></span>
 
@@ -4662,7 +4662,7 @@ function enable_document_selection(enable) {
  <div id="show_skill" style="display: none"><p>Skill Level: 
   <input type="text" size="3" maxlength="3" id="skill_level" onchange="update_skill(this)"></div>
 
- <p><select id="output_notation" name="output_notation" onchange="show_move_history()"></select>
+ <p><select accesskey="o" id="output_notation" name="output_notation" onchange="show_move_history()"></select>
 
  <p><a href="#" onclick="edit_pgn()">edit PGN</a>
  <p><a href="#" onclick="email_board()">email board</a>
