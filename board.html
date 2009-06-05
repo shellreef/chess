@@ -739,20 +739,47 @@ function save_pgn()
 
     pgn = output_pgn_dict(dict);
 
-    pgn += "\n";
-
-    // Save move text
+    // Generate move text in SAN
+    var move_text = "";
+    var other_move_texts = {};
     for (var ply = 1; ply < GAME_STATE.made_moves.length; ply += 1) {
         var made = GAME_STATE.made_moves[ply];
         var ply_info = decode_ply(ply);
 
         if (ply_info.color === "white") {
-            pgn += ply_info.fullmove_number + ". ";
+            move_text += ply_info.fullmove_number + ". ";
         }
-        pgn += made.notations.SAN;
-        pgn += " ";
+        move_text += made.notations.SAN;
+        move_text += " ";
+
+        for (var notation in AVAILABLE_NOTATIONS) {
+            if (notation === "SAN") {
+                continue;
+            }
+
+            if (AVAILABLE_NOTATIONS.hasOwnProperty(notation)) {
+                if (!other_move_texts[notation]) {
+                    other_move_texts[notation] = [];
+                }
+                other_move_texts[notation][ply] = made.notations[notation];
+            }
+        }
     }
-    
+
+    for (notation in other_move_texts) {
+        if (other_move_texts.hasOwnProperty(notation)) {
+            pgn += "[Moves " + notation + " ";
+            for (ply = 1; ply < other_move_texts[notation].length; ply += 1) {
+                pgn += other_move_texts[notation][ply] + " ";
+            }
+            pgn += "\n";
+        }
+    }
+
+    pgn += "\n";
+    pgn += move_text;
+
+   
     return pgn;
 }
 
