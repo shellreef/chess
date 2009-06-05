@@ -167,6 +167,7 @@ var PREFS = {
 // Chess movement notations, in descending precedence. 
 // For more info see http://en.wikipedia.org/wiki/Chess_notation
 var AVAILABLE_NOTATIONS = {
+    // Acronym: full name                               examples
     SAN:  "Standard Algebraic Notation",//              Bxc6        e5
     LAN:  "Long Algebraic Notation",//                  Bb5xc6      e7-e5
     MAN:  "Minimal Algebraic Notation",//               Bc6         e5
@@ -178,6 +179,13 @@ var AVAILABLE_NOTATIONS = {
     smith:"Smith Notation",//                           b5c6n       e7e5
     descr:"English Descriptive Notation",//             BxN         P-K4
     adesc:"Algebraic Descriptive Notation"//            BxN         P-e4
+};
+
+// Alternate notations to export with save_pgn(), in addition to SAN.
+// TODO: export all by default, but then only include these for email?
+var EXPORT_NOTATIONS = {
+    descr: true,
+    adesc: true
 };
 
 
@@ -752,12 +760,8 @@ function save_pgn()
         move_text += made.notations.SAN;
         move_text += " ";
 
-        for (var notation in AVAILABLE_NOTATIONS) {
-            if (notation === "SAN") {
-                continue;
-            }
-
-            if (AVAILABLE_NOTATIONS.hasOwnProperty(notation)) {
+        for (var notation in EXPORT_NOTATIONS) {
+            if (EXPORT_NOTATIONS.hasOwnProperty(notation)) {
                 if (!other_move_texts[notation]) {
                     other_move_texts[notation] = [];
                 }
@@ -772,7 +776,7 @@ function save_pgn()
             for (ply = 1; ply < other_move_texts[notation].length; ply += 1) {
                 pgn += other_move_texts[notation][ply] + " ";
             }
-            pgn += "\n";
+            pgn += "]\n";
         }
     }
 
