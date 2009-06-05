@@ -1061,7 +1061,12 @@ function encode_ply(color, fullmove_number)
 // and computer moves also use this function. 
 // If is_not_immediate is true, then the UI is not updated after the move; useful
 // for quickly making many moves without UI slowness.
-function mv(alg_move, is_not_immediate)
+// notations is for specifying move notations of the raw move
+// Examples:
+// mv("e4")
+// mv("P-K4")
+// mv("/e2/e4/P", false, {SAN:"e4", descr:"P-K4"})
+function mv(alg_move, is_not_immediate, notations)
 {
     var piece_square, piece, square;
 
@@ -1075,6 +1080,7 @@ function mv(alg_move, is_not_immediate)
         // loading in-progress games quickly, as no move calculation is
         // needed.
         piece_square = decode_raw_move(alg_move);
+        dojo.mixin(piece_square, {notations:notations});
     } else {
         // For ordinary notations, find move in precalculated notations. 
         piece_square = find_legal_move(alg_move);
@@ -1996,13 +2002,7 @@ function decode_raw_move(s)
     // Populate move with flags
     dojo.mixin(move, parse_flags(flags));
 
-    // TODO: move.notations, in raw move? Avoid redundant 
-    // notations, store compactly FAN/SAN? If needed. 
-    // /a8/b8/K//Kb8/K-K8/etc.
-    notations = {};
-    notations[$F("output_notation")] = "hi";
-
-    return {piece:piece, square:square, move:move, notations:notations};
+    return {piece:piece, square:square, move:move};
     //do_virtual_move(piece, move);
 }
 
