@@ -866,10 +866,19 @@ function load_pgn(pgn)
         if (others && others.raw) {
             // Do raw move if possible
             // TODO: move out conditional
-            mv(others.raw, true, others);
+            //mv(others.raw, true, others);
+            var dr = decode_raw_move(others.raw);
+            do_virtual_move(dr.piece, dr.move);
         } else {
             mv(move, true, others);
         }
+    }
+
+    if (others.raw) {
+        // TODO: consolidate finish_up_move, it needs to do
+        // certain tasks here..
+        var last_ply = decode_ply(ply);
+        set_turn(last_ply.color);
     }
     
     realize_vboard();
