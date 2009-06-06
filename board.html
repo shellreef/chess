@@ -1109,7 +1109,7 @@ function encode_ply(color, fullmove_number)
 // mv("/e2/e4/P", false, {SAN:"e4", descr:"P-K4"})
 function mv(alg_move, is_not_immediate, notations)
 {
-    var piece_square, piece, square;
+    var piece_square, piece, square, is_raw;
 
     if (!alg_move) {
         assert(VALID_MOVE_NOTATIONS, "mv(" + alg_move + "): called with VALID_MOVE_NOTATIONS false");
@@ -1122,6 +1122,7 @@ function mv(alg_move, is_not_immediate, notations)
         // needed.
         piece_square = decode_raw_move(alg_move);
         dojo.mixin(piece_square, {notations:notations});
+        is_raw = true;
     } else {
         // For ordinary notations, find move in precalculated notations. 
         piece_square = find_legal_move(alg_move);
@@ -1137,7 +1138,7 @@ function mv(alg_move, is_not_immediate, notations)
     var choices = {};
     choices[promote_to] = piece_square;
 
-    execute_move(promote_to, choices, false, !is_not_immediate);
+    execute_move(promote_to, choices, false, !is_not_immediate, is_raw);
 }
 
 // Find a legal move, given the move text, precalculated already with
@@ -3461,7 +3462,7 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate)
 }
 
 // Make a move, or half-move, given choices.
-function execute_move(promote_to, choices, is_hypothetical, is_immediate) 
+function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw) 
 {
     var piece, square, promote_to;
     var from_square, move_text, filerank, only_move, move, choices, did, one;
@@ -3561,7 +3562,7 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate)
     } else {
         // If not a multi-move (moving rook in castling), log and go to next turn
         if (!is_hypothetical) {
-            finish_up_move(choices, is_immediate);
+            finish_up_move(choices, is_immediate, false, is_raw);
         }
     }
 
@@ -3573,15 +3574,16 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate)
 // Perform bookkeeping on the move after it has been actually made, 
 // in move_piece_to_square().
 // promote_to is the type for promotions, or undefined otherwise.
-function finish_up_move(tieback, is_immediate, promote_to)
+function finish_up_move(tieback, is_immediate, promote_to, is_raw)
 {
     var alg_move, ply, turn_info, move_text, info;
 
     info = tieback[promote_to];
 
     ply = encode_ply(GAME_STATE.active_color, GAME_STATE.fullmove_number);
-   
+  
     info.only_move = own_property_count(VALID_MOVE_NOTATIONS.SAN) === 1;
+    // TODO: skip move calculation if is_raw
     turn_info = set_turn("next", false);
 
     if (turn_info.text_move) { info.add_text = turn_info.text_move; }
