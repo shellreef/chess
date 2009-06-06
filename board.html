@@ -4649,7 +4649,6 @@ function enable_document_selection(enable) {
   <span id="promote_container"></span>
  </p>
 
-
  <!-- TODO: disclosure triangles -->
  <p><a href="#" onclick="javascript:new Effect.toggle('controls', 'slide', { duration: 0.1 })">advanced</a>
  
@@ -4674,13 +4673,13 @@ function enable_document_selection(enable) {
 
  <p><a href="#" onclick="edit_pgn()">edit PGN</a>
  <p><a href="#" onclick="email_board()">email board</a>
- <p><div id="captured_piece_images" style="width: 250px;"></div>
 
  <p><select id="saved_board_menu" onchange="change_loaded_board(this)"></select>
      <button onclick="load_fen($('saved_board_menu').value)" accesskey="n">New Game</button>
  </div>
  </div>
 
+  <div id="captured_piece_images" style="width: 250px;"></div>
   <div id="moves_container" style="width: 500px; text-align: justify">
   <!-- TODO: scrollbar, http://livepipe.net/control/scrollbar -->
   <p id="move_history"></p>
