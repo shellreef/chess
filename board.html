@@ -836,27 +836,34 @@ function load_pgn(pgn)
     GAME_STATE.position_after[0] = game.FEN;
 
     // Alternate notations for moves given in tags
-    var other_notations = {};
+    var other_notations = [];
     for (i = 0; i < EXPORT_NOTATIONS.length; i += 1) {
         var not = EXPORT_NOTATIONS[i];
         if (game["Moves_" + not]) {
-            other_notations[not] = game["Moves_" + not].split(" ");
-            other_notations[not].unshift(null);
-            console.log("AS",other_notations[not]);
+            var ns = game["Moves_" + not].split(" ");
+
+            for (var j = 0; j < ns.length; j += 1) {
+                var ply = j + 1;
+                if (!other_notations[ply]) {
+                    other_notations[ply] = {};
+                }
+                other_notations[ply][not] = ns[j];
+            }
         }
     }
 
-    console.log(other_notations);
-
     // Movetext given in SAN
-    for (var ply = 1; ply < game.moves.length; ply += 1) {
+    for (ply = 1; ply < game.moves.length; ply += 1) {
         var move = game.moves[ply];
 
-        if (other_notations.raw && other_notations.raw[ply]) {
-            console.log("FAST",ply,other_notations.raw[ply]);
-            mv(other_notations.raw[ply], true, dojo.clone(other_notations));
+        var others = other_notations[ply] || {};
+
+        if (others && others.raw) {
+            // Do raw move if possible
+            // TODO: move out conditional
+            mv(others.raw, true, others);
         } else {
-            mv(move, true, other_notations);
+            mv(move, true, others);
         }
     }
     
@@ -3576,6 +3583,7 @@ function finish_up_move(tieback, is_immediate, promote_to)
     // calculate_notations(), to avoid inadvertently looking it up
     // from a legal move calculation (slowly) instead of executing it
     // directly.
+    // TOOD: move to calculate_notations to avoid modifying notations??
     info.notations.raw = make_raw_notation(info.piece, info.move);
 
     // Save for history
