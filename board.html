@@ -2011,6 +2011,26 @@ function disable_engine(why)
     random_move();
 }
 
+// Codes for raw notation
+// TODO: use
+var RAW_NOTATION_FLAG_LONG2SHORT = {
+    clear_short_castle: "r",
+    clear_long_castle: "R",
+    create_ep_target: "E",
+    en_passant_capture: "e",
+    snapback: "s",
+    self_destruct: "d"
+};
+
+var RAW_NOTATION_FLAG_SHORT2LONG = {
+    r: "clear_short_castle",
+    R: "clear_long_castle",
+    E: "create_ep_target",
+    e: "en_passant_capture",
+    s: "snapback",
+    d: "self_destruct"
+};
+
 // Decode a serialized "raw" notation and execute it using do_virtual_move().
 // This move notation allows moves to be made without calculating the valid
 // moves, a time-consuming process.
@@ -2056,7 +2076,7 @@ function make_raw_notation(piece, move)
 
             flags += prop;
             if (move[prop] !== true) {
-                flags + "=" + move[prop];
+                flags += "=" + move[prop];
             }
 
             flags += ";";
