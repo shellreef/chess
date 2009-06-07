@@ -517,7 +517,7 @@ var SAVED_BOARDS = {
 "Test Promotion":     "K/PPPPPPPP/8/8/8/8/pppppppp/7k w - - 0 1",
 "Test Promotion to Rook": "8/k1P5/p7/P3K3/8/8/8/8 w - - 0 53", // from http://chessteacher.110mb.com/2008/10/22/minor-promotion/
 "Test Promotion to Bishop": "8/5P1k/5K1p/7P/8/8/8/8 w - - 0 51",
-"Test En Passant (alone)":     "8/8/8/3pP3/8/8/8/8 w - d6 0 5",
+"Test En Passant (alone)":     "8/8/8/3pP3/8/8/8/8 w - d6 0 1",
 "Test En Passant":     "rnbqkbnr/ppp2ppp/8/3pP3/3Qn/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5",
 "Test En Passant into Check": "qk6/8/8/3pP3/8/8/8/7K w - d6 0 5",
 "Test Lone King": "K w KQkq - 0 1",
@@ -778,6 +778,11 @@ function save_pgn()
     var other_move_texts = {};
     for (var ply = 1; ply < GAME_STATE.made_moves.length; ply += 1) {
         var made = GAME_STATE.made_moves[ply];
+        if (!made) {
+            // Missing move, for one reason or another. Game started late?
+            continue;
+        }
+
         var ply_info = decode_ply(ply);
 
         if (ply_info.color === "white") {
@@ -2045,11 +2050,11 @@ function disable_engine(why)
 }
 
 // Codes for raw notation
-// TODO: use
+// TODO: generalize in raw notation and abs_move? 
 var RAW_NOTATION_FLAG_LONG2SHORT = {
-    en_passant_capture: "e",
-    snapback: "s",
-    self_destruct: "d"
+    en_passant_capture: "e",    // captures pawn behind destination square
+    snapback: "s",              // clears "destination square", piece doesn't move
+    self_destruct: "d"          // destination square is cleared
 };
 
 var RAW_NOTATION_FLAG_SHORT2LONG = {
@@ -2075,6 +2080,15 @@ function decode_raw_move(s)
     piece.square = filerank2obj(s.substring(1, 3));
     move = filerank2obj(s.substring(3, 5));
     flags = s.substring(6);
+
+    for (var i = 0; i < flags.length; i += 1) {
+        var flag_code = flags.charAt(i);
+        var long_flag = RAW_NOTATION_FLAG_SHORT2LONG[flag_code];
+        
+        assert(long_flag, "decode_raw_move(" + s + "): invalid flag code: " + flag_code);
+        move[long_flag] = true;
+    }
+
     
     square = VBOARD[move.x][move.y];
 
