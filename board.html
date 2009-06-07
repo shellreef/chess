@@ -2014,18 +2014,12 @@ function disable_engine(why)
 // Codes for raw notation
 // TODO: use
 var RAW_NOTATION_FLAG_LONG2SHORT = {
-    clear_short_castle: "r",
-    clear_long_castle: "R",
-    create_ep_target: "E",
     en_passant_capture: "e",
     snapback: "s",
     self_destruct: "d"
 };
 
 var RAW_NOTATION_FLAG_SHORT2LONG = {
-    r: "clear_short_castle",
-    R: "clear_long_castle",
-    E: "create_ep_target",
     e: "en_passant_capture",
     s: "snapback",
     d: "self_destruct"
@@ -2070,23 +2064,12 @@ function make_raw_notation(piece, move)
     for (var prop in move) 
     {
         if (move.hasOwnProperty(prop)) {
-            // Skip to_square, already encoded
-            // And skip capture, not needed
-            // TODO: save captured in save_pgn()
-            if (prop === "x" || prop === "y" || prop === "capture") {
-                continue;
+            var code = RAW_NOTATION_FLAG_LONG2SHORT[prop];
+            if (code) {
+                flags += code;
             }
-
-            flags += prop;
-            if (move[prop] !== true) {
-                flags += "=" + move[prop];
-            }
-
-            flags += ";";
         }
     }
-    // Remove trailing ;
-    flags = flags.substr(0, flags.length - 1);
 
     return "/" + from_square + to_square + piece_code + flags;
 }
@@ -3896,6 +3879,7 @@ function load_fen(fen, replay)
         GAME_STATE.position_after = [fen];  // 0th ply = initial state
         GAME_STATE.ended = null; 
         GAME_STATE.captured = {white:[], black:[]};
+        GAME_STATE.made_moves = [];
         update_captured_piece_images();
     }
    
