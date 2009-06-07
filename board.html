@@ -743,10 +743,12 @@ function save_pgn()
    
     dict = {};
     for (var i = 0; i < tags.length; i += 1) {
-        // jslint thinks this is unused, wonder why
         var tag = tags[i];
+        var elt = $("PGN_" + tag);
 
-        dict[tag] = $("PGN_" + tag).innerHTML;
+        if (elt.visible()) {
+            dict[tag] = elt.innerHTML;
+        }
     }
 
     // Non-standard. The standard tags are FEN and SetUp, for starting position only.
