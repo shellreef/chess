@@ -440,7 +440,7 @@ var SAVED_BOARDS = {
 // http://en.wikipedia.org/wiki/Breakthrough_(board_game)
 //"Breakthrough": "pppppppp/pppppppp/8/8/8/8/PPPPPPPP/PPPPPPPP w - - 0 1",
 // TODO: Support Chaturanga pawns. No double move/en passant, and promotes to where started.
-//"Chaturanga": "rnekxfenr/pppppppp/8/8/8/8/PPPPPPPP/RNEKXFENR w - 0 1",
+//"Indian Chess (Chaturanga)": "rnekxfenr/pppppppp/8/8/8/8/PPPPPPPP/RNEKXFENR w - 0 1",
 "Church Chess":         "bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1",
 "Corner Chess":         "4rbqk/4rb1q/4r1bb/5rrr/RRR5/BB1R4/Q1BR4/KQBR4 w - - 0 1",
 "Corner Chess II":      "kbp2pbq/nrp2prn/pp4pp/8/8/PP4PP/NRP2PRN/QBP2PBK w - - 0 1",
@@ -740,7 +740,8 @@ function save_pgn()
 {
     var pgn = "", dict;
     var tags = ["White", "WhiteElo", "Black", "BlackElo", "Event", "Round", "Site", "Date", "Time"];
-   
+  
+    // PGN header information
     dict = {};
     for (var i = 0; i < tags.length; i += 1) {
         var tag = tags[i];
@@ -751,7 +752,25 @@ function save_pgn()
         }
     }
 
-    // Non-standard. The standard tags are FEN and SetUp, for starting position only.
+    // Non-standard: captured pieces
+    var captured = "";
+    var captured_count = 0;
+    for (var i = 0; i < GAME_STATE.captured.white.length; i += 1) {
+        var p = GAME_STATE.captured.white[i];
+        captured += color_piece_prefix(p);
+        captured_count += 1;
+    }
+    for (i = 0; i < GAME_STATE.captured.black.length; i += 1) {
+        var p = GAME_STATE.captured.black[i];
+        captured += color_piece_prefix(p);
+        captured_count += 1;
+    }
+    if (captured_count) {
+        dict.Captured = captured;
+    }
+
+
+    // Non-standard: current board state. The standard tags are FEN and SetUp, for starting position only.
     dict.CurrentFEN = active_fen();
 
     // Generate move text (not in a tag) 
@@ -840,6 +859,20 @@ function load_pgn(pgn)
     // Starting position
     load_fen(game.FEN);
     GAME_STATE.position_after[0] = game.FEN;
+
+    // Captured pieces
+    if (game.Captured) {
+        console.log(game.Captured);
+        for (i = 0; i < game.Captured.length; i += 1) {
+            // TODO: support X(...) piece codes
+            var letter = game.Captured.substr(i, 1);
+            var decoded_piece = decode_piece_letter(letter);
+            console.log(letter,decoded_piece);
+            GAME_STATE.captured[decoded_piece.color].push(decoded_piece);
+        }
+        update_captured_piece_images();
+    }
+
 
     // Alternate notations for moves given in tags
     var other_notations = [];
@@ -2037,6 +2070,7 @@ function decode_raw_move(s)
 
     assert(s.substr(0, 1) === "/", "do_raw_move(" + s + "): must begin with /");
 
+    // TODO: support X(...) piece codes
     piece = decode_piece_letter(s.substring(5, 6));
     piece.square = filerank2obj(s.substring(1, 3));
     move = filerank2obj(s.substring(3, 5));
