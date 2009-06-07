@@ -3327,7 +3327,6 @@ function update_captured_piece_images(piece)
         var p = GAME_STATE.captured.white[i];
         html += '<img src="' + image_path_for(p.type, p.color) + '" class="captured"> ';
     }
-    html += "&nbsp;&nbsp;";
     for (var i = 0; i < GAME_STATE.captured.black.length; i += 1) {
         var p = GAME_STATE.captured.black[i];
         html += '<img src="' + image_path_for(p.type, p.color) + '" class="captured"> ';
