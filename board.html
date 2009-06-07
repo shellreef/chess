@@ -4085,9 +4085,9 @@ function color_piece_prefix(piece)
     var rest = letter.substr(1);
 
     if (piece.color === "white") {
-        return letter.toUpperCase() + rest;
+        return first.toUpperCase() + rest;
     } else {
-        return letter.toLowerCase() + rest;
+        return first.toLowerCase() + rest;
     }
 }
 
