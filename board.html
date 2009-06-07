@@ -2070,7 +2070,10 @@ function make_raw_notation(piece, move)
     for (var prop in move) 
     {
         if (move.hasOwnProperty(prop)) {
-            if (prop === "x" || prop === "y") {
+            // Skip to_square, already encoded
+            // And skip capture, not needed
+            // TODO: save captured in save_pgn()
+            if (prop === "x" || prop === "y" || prop === "capture") {
                 continue;
             }
 
