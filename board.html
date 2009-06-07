@@ -2021,12 +2021,10 @@ function decode_raw_move(s)
 
     assert(s.substr(0, 1) === "/", "do_raw_move(" + s + "): must begin with /");
 
-    a = s.split("/");
-
-    piece = decode_piece_letter(a[3]);
-    piece.square = filerank2obj(a[1]);
-    move = filerank2obj(a[2]);
-    flags = a[4] || "";
+    piece = decode_piece_letter(s.substring(5, 6));
+    piece.square = filerank2obj(s.substring(3, 5));
+    move = filerank2obj(s.substring(3, 5));
+    flags = s.substring(6);
     
     square = VBOARD[move.x][move.y];
 
@@ -2054,11 +2052,11 @@ function make_raw_notation(piece, move)
                 continue;
             }
 
-            flags += prop + "=" + move[prop] + ",";
+            flags += prop + "=" + move[prop] + ";";
         }
     }
 
-    return ["", from_square, to_square, piece_code, flags].join("/");
+    return "/" + from_square + to_square + piece_code + flags;
 }
 
 // Make a move in the VBOARD, which can be undone. Only makes the move.
