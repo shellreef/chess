@@ -704,15 +704,22 @@ function load_notations()
 // Open a mail message with a link to the board state
 function email_board()
 {
-    var to, subject, body, url, dots, link;
+    var to, subject, body, url, dots, link, link_text, ply, ply_info;
+    
+    ply = encode_ply(GAME_STATE.active_color, GAME_STATE.fullmove_number) - 1;
+    ply_info = decode_ply(ply);
 
     to = "shellreef@gmail.com";
     subject = "Chess game";
-    dots = GAME_STATE.active_color === "black" ? "... " : " ";
+    dots = ply_info.color ? (ply_info.color === "black" ? "... " : " ") : "";
 
-    // TODO: last move notation?
-    link = document.URL + "?b=" + encodeURIComponent(active_fen());
-    body = GAME_STATE.fullmove_number + ". " + dots + '<a href="' + link + '">move</a>';
+    link = $("copyable_link").href;
+    link_text = GAME_STATE.made_moves[ply] ? GAME_STATE.made_moves[ply].notations[$F("output_notation")] : "move";
+    // Note: IE ActiveXObject for Outlook: http://www.webdeveloper.com/forum/showthread.php?t=176548
+    // Got an automation error when I tried it, but it could supposedly allow HTML bodies on Windows
+    //body = ply_info.fullmove_number + ". " + dots + '<a href="' + link + '">' + link_text + '</a>';
+    // Plain text
+    body = ply_info.fullmove_number + ". " + dots + link_text + " " + link;
 
     url = "mailto:" + encodeURIComponent(to) + 
         "?subject=" + encodeURIComponent(subject) + 
@@ -3355,6 +3362,8 @@ function load_from_query_string()
     if (!query.b) {
         return false;
     }
+
+    // TODO: convert query to PGN, then load that
 
     query.b = query.b.replace(/~/g, " ").replace(/\|/g, "/");
     load_fen(query.b);
