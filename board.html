@@ -3042,7 +3042,28 @@ function set_turn(color, historical)
         GAME_STATE.position_after[ply] = new_state;
     }
 
+    set_copyable_link();
+
     return {text_move: text_move, text_end: text_end, repeats: repeats};
+}
+
+// Update the copyable link that goes to the board state
+function set_copyable_link()
+{
+    var base, base_split, query, href, fen;
+
+    // Get current URL without query string
+    base_split = document.URL.split("?");
+    base = base_split[0];
+
+    fen = active_fen();
+    // Replace with characters that do not need to be encoded
+    fen = fen.replace(/ /g, "~").replace(/\//g, "|");
+    query = "?b=" + encodeURIComponent(fen);
+
+    href = base + query;
+
+    $("copyable_link").href = href;
 }
 
 // Set the game check status (or draw, checkmate) message.
@@ -3322,14 +3343,25 @@ function init_board()
         board_menu.selectedIndex = 0;
     }
 
-    // Load board from URL query string, if any
-    var url_fen = query_string().b;
-    if (url_fen) {
-        fen = url_fen;
+    if (!load_from_query_string()) {
+        load_fen(fen);
+    }
+}
+
+// Load board from URL query string, if any
+function load_from_query_string()
+{
+    var query = query_string();
+    if (!query.b) {
+        return false;
     }
 
-    load_fen(fen);
+    query.b = query.b.replace(/~/g, " ").replace(/\|/g, "/");
+
+    load_fen(query.b);
 }
+
+
 
 // Load a board from the drop down menu of SAVED_BOARDS.
 function change_loaded_board(menu)
@@ -4793,7 +4825,7 @@ function enable_document_selection(enable) {
  <p><select accesskey="o" id="output_notation" name="output_notation" onchange="show_move_history()"></select>
 
  <p><a href="#" onclick="edit_pgn()">edit PGN</a>
- <p><a href="#" onclick="email_board()">email board</a>
+ <p><a id="copyable_link">copyable link</a> | <a href="#" onclick="email_board()">email board</a>
 
  <p><select id="saved_board_menu" onchange="change_loaded_board(this)"></select>
      <button onclick="load_fen($('saved_board_menu').value)" accesskey="n">New Game</button>
