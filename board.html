@@ -4820,15 +4820,16 @@ function enable_document_selection(enable) {
   <span id="promote_container"></span>
  </p>
 
+ <p><a id="copyable_link">copyable link</a> (<a href="#" onclick="email_board()">email</a>)
+ <p><span id="opening_name"></span>
+
  <!-- TODO: disclosure triangles -->
  <p><a href="#" onclick="javascript:new Effect.toggle('controls', 'slide', { duration: 0.1 })">advanced</a>
  
- <div id="controls" style="display: block; border-left: 2px solid blue">
+ <div id="controls" style="display: none; border-left: 2px solid blue">
  <div>
 
  <p><select accesskey="m" id="make_move_menu" onchange="make_move_by_menu(this)"></select>
-
- <p><span id="opening_name"></span>
 
  <!-- TODO: hide all this, since the purpose of this app is
  not to implement chess AI. But having automatic moves is useful for testing. -->
@@ -4843,12 +4844,12 @@ function enable_document_selection(enable) {
  <p><select accesskey="o" id="output_notation" name="output_notation" onchange="show_move_history()"></select>
 
  <p><a href="#" onclick="edit_pgn()">edit PGN</a>
- <p><a id="copyable_link">copyable link</a> | <a href="#" onclick="email_board()">email board</a>
 
  <p><select id="saved_board_menu" onchange="change_loaded_board(this)"></select>
      <button onclick="load_fen($('saved_board_menu').value)" accesskey="n">New Game</button>
  </div>
  </div>
+ <!-- end advanced -->
 
   <div id="captured_piece_images" style="width: 250px;"></div>
   <div id="moves_container" style="width: 500px; text-align: justify">
