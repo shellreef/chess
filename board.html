@@ -619,8 +619,8 @@ dojo.cookie=function(_2,_3,_4){var c=document.cookie;if(arguments.length==1){var
 
     /* Safari and IE7: Disable text selection to stop interfering with dragging */
     enable_document_selection(false);    
-    init_board();
     load_notations();
+    init_board();
 
 
     // Test raw notation
@@ -3357,8 +3357,17 @@ function load_from_query_string()
     }
 
     query.b = query.b.replace(/~/g, " ").replace(/\|/g, "/");
-
     load_fen(query.b);
+
+    if (query.m) {
+        dojo.forEach(query.m.split(","), function(move_text) {
+                mv(move_text);
+            });
+    }
+
+
+    // Succeeded
+    return true;
 }
 
 
@@ -4603,7 +4612,7 @@ function query_string()
         return {};
     }
 
-    parts = query.split(/&/);
+    parts = query.split(/[&;]/);
     dojo.forEach(parts, function(pair) {
             var part = pair.match(/([a-zA-Z0-9]*)=(.*)/);
             if (part) { 
