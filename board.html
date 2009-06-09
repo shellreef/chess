@@ -719,7 +719,7 @@ function email_board()
     // Got an automation error when I tried it, but it could supposedly allow HTML bodies on Windows
     //body = ply_info.fullmove_number + ". " + dots + '<a href="' + link + '">' + link_text + '</a>';
     // Plain text
-    body = ply_info.fullmove_number + ". " + dots + link_text + " " + link;
+    body = ply_info.fullmove_number + ". " + dots + link_text + " <" + link + ">";
 
     url = "mailto:" + encodeURIComponent(to) + 
         "?subject=" + encodeURIComponent(subject) + 
@@ -3057,20 +3057,40 @@ function set_turn(color, historical)
 // Update the copyable link that goes to the board state
 function set_copyable_link()
 {
-    var base, base_split, query, href, fen;
+    var last = GAME_STATE.position_after.length && GAME_STATE.position_after.slice(-1)[0];
+
+    if (!last) {
+        $("copyable_link").href = make_copyable_link(active_fen());
+    } else {
+        // TODO: up to N last moves
+        // TODO: Get this working; load board state -1 then make recent move
+        /*var last_move = GAME_STATE.made_moves.slice(-1);
+        if (last_move && last_move.length) { 
+            last_move = ";m=" + last_move[0].notations[$F("output_notation")];
+        } else {
+            last_move = "";
+        }*/
+
+        $("copyable_link").href = make_copyable_link(last); // + last_move;
+    }
+}
+
+// Make a URL that can be clicked to go to this board state
+function make_copyable_link(fen)
+{
+    var base, base_split, query, href;
 
     // Get current URL without query string
     base_split = document.URL.split("?");
     base = base_split[0];
 
-    fen = active_fen();
     // Replace with characters that do not need to be encoded
     fen = fen.replace(/ /g, "~").replace(/\//g, "|");
     query = "?b=" + encodeURIComponent(fen);
 
     href = base + query;
 
-    $("copyable_link").href = href;
+    return href;
 }
 
 // Set the game check status (or draw, checkmate) message.
