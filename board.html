@@ -3782,6 +3782,7 @@ function finish_up_move(tieback, is_immediate, promote_to, is_raw)
 function show_move_history()
 {
     var htmls = [];
+    var first = true;
 
     for (var ply = 1; ply < GAME_STATE.made_moves.length; ply += 1) {
         var color_fullmove, color, fullmove_number, move_text, move_info, this_html, only_move;
@@ -3797,8 +3798,7 @@ function show_move_history()
 
         move_text = move_info.notations[$F("output_notation")];
         this_html = "";
-
-        // TODO: ellipsis if black is first recorded move, or intervening commentary
+        
         if (color === "white") {
             this_html += '<span class="fullmove_number">' + fullmove_number + '<\/span>';
             if (fullmove_number === 1) {
@@ -3809,6 +3809,13 @@ function show_move_history()
             }
             this_html += " ";
         } else {
+            // Ellipsis if black is first recorded move,
+            // TODO: or intervening commentary
+            if (first) {
+                this_html += '<span class="fullmove_number">' + fullmove_number + '<\/span>';
+                this_html += "&hellip; ";
+            }
+            
             this_html += " ";
         }
 
@@ -3836,6 +3843,8 @@ function show_move_history()
         this_html += " ";
 
         htmls.push(this_html);
+
+        first = false;
     }
 
     $("move_history").innerHTML = htmls.join("");
