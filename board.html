@@ -944,7 +944,7 @@ function load_pgn(pgn)
             var dr = decode_raw_move(others.raw);
             do_virtual_move(dr.piece, dr.move);
         } else {
-            console.log("slow move",move);
+            //console.log("slow move",move);
             mv(move, true, others);
         }
     }
@@ -2540,7 +2540,7 @@ function filtered_moves(piece, color, is_hypothetical)
            }
 
            var capture = VBOARD[cx][cy].piece;
-           console.log("C",xy2filerank([cx,cy]));
+           //console.log("C",xy2filerank([cx,cy]));
            if (capture) {
                abs_move.capture = capture;
            } else {
@@ -3924,6 +3924,11 @@ function move_dropped_piece(piece, square, event)
     //   new Effect.Squish(square.virtual ? square.piece : square.firstChild);
     //}
 
+    // Remove from square highlighting.
+    // TODO: Keep this active, along with destination square highlighting, so
+    // it shows the recent move clearly. Remove it on the *next* move so there is only one.
+    dojo.removeClass(piece.square, "recent-move-" + piece.square.color);
+
     // Can't drop this piece anywhere anymore.
     piece.removeClassName("piece-" + piece.prior_position);
     ALL_DROP_TARGETS.each(function(square) {
@@ -4064,7 +4069,6 @@ function load_fen(fen, replay)
         GAME_STATE.position_after = [fen];  // 0th ply = initial state
 
         var ply = encode_ply(color, GAME_STATE.fullmove_number);
-        console.log(ply);
         GAME_STATE.position_after[ply] = fen;
 
         GAME_STATE.ended = null; 
@@ -4435,13 +4439,19 @@ function create_piece(color, type)
     // Highlight/unhighlight legal moves on mouse over, like Chess with Friends.
     // Yahoo Games does this too, but uses a yellow outline.
     Event.observe(piece, 'mouseover', function() {
-            highlight_moves(piece, true);
+            var square = highlight_moves(piece, true);
             // for debugging
             //piece.setStyle({border: '1px solid black'});
+            if (square) {
+                dojo.addClass(square, "recent-move-" + square.color);
+            }
         });
     Event.observe(piece, 'mouseout', function() {
-            highlight_moves(piece, false);
+            var square = highlight_moves(piece, false);
             //piece.setStyle({border: 'none'});
+            if (square) {
+                dojo.removeClass(square, "recent-move-" + square.color);
+            }
         });
 
     // Make all new pieces draggable. I tried only making the active color's
@@ -4467,6 +4477,7 @@ function create_piece(color, type)
 }
 
 // Highlight/unhighlight moves for a given piece, unless dragging.
+// Return the from square, if anything was highlighted.
 function highlight_moves(piece, enable)
 {
     var from_square, moves;
@@ -4474,12 +4485,12 @@ function highlight_moves(piece, enable)
     // If player is dragging a piece over another piece, don't show
     // legal moves for the piece under it.
     if (GAME_STATE.dragging) {
-        return;
-        }
+        return null;
+    }
 
     // If not this player's turn, no legal moves
     if (piece.color !== GAME_STATE.active_color) {
-        return [];
+        return null;
     }
 
     from_square = piece.square;
@@ -4487,14 +4498,14 @@ function highlight_moves(piece, enable)
     if (!from_square) {
         // Could not find a square for the piece, it no longer exists,
         // so no need to concern ourselves with highlighting its moves.
-        return;
+        return null;
     }
 
     //console.log(from_square.filerank);
     moves = VALID_MOVES[from_square.filerank];
     //console.log(moves);
     if (!moves) {
-        return;    
+        return null;    
     }
 
     moves.each(function(move) {
@@ -4516,6 +4527,8 @@ function highlight_moves(piece, enable)
                 to_square.removeClassName("legal-move-black");
         }
     });
+
+    return from_square;
 }
 
 // Unhighlight all highlighted black/white squares. Used in onEnd draggable, for
