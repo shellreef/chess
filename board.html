@@ -3080,6 +3080,14 @@ function set_copyable_link()
     // TODO: up to N last moves
     var last_move = GAME_STATE.made_moves.slice(-1)[0];
 
+    captured = GAME_STATE.last_captured;
+    if (captured) {
+        captured = ";c=" + captured;
+    } else {
+        captured = "";
+    }
+
+
     if (last_move) {
         // Store the previous move and the board state _before_ the move,
         // so it can be made.
@@ -3095,14 +3103,6 @@ function set_copyable_link()
         last_move = "";
         fen = last;
     }
-
-    captured = GAME_STATE.last_captured;
-    if (captured) {
-        captured = ";c=" + captured;
-    } else {
-        captured = "";
-    }
-
 
     // TODO: also include c=, like Captured tag, so can know what was captured
     
