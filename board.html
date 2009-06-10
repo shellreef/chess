@@ -3050,31 +3050,38 @@ function set_turn(color, historical)
     }
 
     set_copyable_link();
-
     return {text_move: text_move, text_end: text_end, repeats: repeats};
 }
 
 // Update the copyable link that goes to the board state
 function set_copyable_link()
 {
-    var last = GAME_STATE.position_after.length && GAME_STATE.position_after.slice(-1)[0];
+    var fen;
+    var last = GAME_STATE.position_after.slice(-1)[0];
+    var prior = GAME_STATE.position_after.slice(-2)[0];
 
-    if (!last) {
-        $("copyable_link").href = make_copyable_link(active_fen());
+    // TODO: up to N last moves
+    var last_move = GAME_STATE.made_moves.slice(-1)[0];
+
+    if (last_move) {
+        // Store the previous move and the board state _before_ the move,
+        // so it can be made.
+        last_move = ";m=" + last_move.notations[$F("output_notation")];
+        if (!prior) {
+            // No move has been made yet
+            $("copyable_link").href = document.URL;
+            return;
+        }
+
+        fen = prior;
     } else {
-        // TODO: up to N last moves
-        // TODO: Get this working; load board state -1 then make recent move
-        /*var last_move = GAME_STATE.made_moves.slice(-1);
-        if (last_move && last_move.length) { 
-            last_move = ";m=" + last_move[0].notations[$F("output_notation")];
-        } else {
-            last_move = "";
-        }*/
-
-        // TODO: also include c=, like Captured tag, so can know what was captured
-        
-        $("copyable_link").href = make_copyable_link(last); // + last_move;
+        last_move = "";
+        fen = last;
     }
+
+    // TODO: also include c=, like Captured tag, so can know what was captured
+    
+    $("copyable_link").href = make_copyable_link(fen) + last_move;
 }
 
 // Make a URL that can be clicked to go to this board state
@@ -3762,6 +3769,7 @@ function finish_up_move(tieback, is_immediate, promote_to, is_raw)
 
     if (is_immediate) {
         realize_vboard();
+        set_copyable_link();
 
         show_move_history();
         make_droppables();
@@ -3996,7 +4004,7 @@ function save_fen()
 // spaces, and {} for labels, see http://play.chessvariants.org/pbm/devguide.html
 function load_fen(fen, replay)
 {
-    var parts, castling;
+    var parts, castling, color;
 
     parts = fen.split(" ");
     load_starting_position(parts[0], replay);
@@ -4018,18 +4026,27 @@ function load_fen(fen, replay)
     GAME_STATE.halfmove_clock = parseInt(parts[4], 10);
     GAME_STATE.fullmove_number = parseInt(parts[5], 10);
 
+    color = {w:"white", b:"black"}[parts[1]];
+
     if (!replay) { 
         GAME_STATE.position_moves = {}; 
         GAME_STATE.position_after = [fen];  // 0th ply = initial state
+
+        var ply = encode_ply(color, GAME_STATE.fullmove_number);
+        console.log(ply);
+        GAME_STATE.position_after[ply] = fen;
+
         GAME_STATE.ended = null; 
         GAME_STATE.captured = {white:[], black:[]};
-        GAME_STATE.made_moves = [];
+        GAME_STATE.made_moves = [null];
+        GAME_STATE.made_moves[ply] = null;
+
         update_captured_piece_images();
     }
    
     // Now that everything is loaded, set the turn.
     make_vboard();
-    set_turn({w:"white", b:"black"}[parts[1]], replay);
+    set_turn(color, replay);
     make_droppables();
     populate_make_a_move_list();
 }
