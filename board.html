@@ -3800,25 +3800,19 @@ function show_move_history()
         
         if (color === "white") {
             htmls.push('<span class="fullmove_number">' + fullmove_number + '<\/span>');
-            if (fullmove_number === 1) {
-                // Period goes to initial position, kind of strange, but its uninstrusive
-                htmls.push(move_link(0, "."));
-            } else {
-                htmls.push(".");
-            }
-            htmls.push(" ");
+            // Period goes to initial position, kind of strange, but its uninstrusive
+            htmls.push(first ? move_link(0, ".") : ".");
         } else {
             // Ellipsis if black is first recorded move,
             // TODO: or intervening commentary
             if (first) {
                 htmls.push('<span class="fullmove_number">' + fullmove_number + '<\/span>');
+                htmls.push(first ? move_link(0, ".") : ".");
                 htmls.push("&hellip; ");
             }
-            
-            htmls.push(" ");
         }
 
-        htmls.push(move_link(ply, move_text));
+        htmls.push(" " + move_link(ply, move_text));
 
         if (move_info.only_move) {
             // NAG for "only move", see http://www.markalowery.net/Chess/Notation/NAG.html
