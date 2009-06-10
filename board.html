@@ -215,7 +215,7 @@ var GAME_STATE = {
 
     position_moves: {},         // Board position -> move IDs, for 3n move repetition
     position_after: [],         // Board positions at each move, for quick playback
-    made_moves: [],             // TODO: store piece,square and each move notation!
+    made_moves: [],             // Piece, square and each move notation for past moves
     ended: false,               // Game is done (drawn, won)
     captured: {white:[], black:[]}, // Captured pieces
 
@@ -223,7 +223,8 @@ var GAME_STATE = {
     dragging: false,
     active_in_check: false,
     recent_piece: null,         // Recently moved piece
-    recent_square: null         // Recently moved from square
+    recent_square: null,        // Recently moved from square
+    last_captured: null         // export_captured() string _before_ current move 
 };    
 
 // Moves that can be made right now, for each active piece.
@@ -752,10 +753,45 @@ function restore_edit()
     $("game_ui").innerHTML = ORIGINAL_UI_HTML;
 }
 
+// Return a string of color-coded captured piece codes, or null if none.
+function export_captured()
+{
+    var captured = "";
+    var captured_count = 0;
+    for (var i = 0; i < GAME_STATE.captured.white.length; i += 1) {
+        var p = GAME_STATE.captured.white[i];
+        captured += color_piece_prefix(p);
+        captured_count += 1;
+    }
+    for (i = 0; i < GAME_STATE.captured.black.length; i += 1) {
+        var p = GAME_STATE.captured.black[i];
+        captured += color_piece_prefix(p);
+        captured_count += 1;
+    }
+    if (captured_count) {
+        return captured;
+    } else {
+        return null;
+    }
+}
+
+
+// Import a color-coded string of captured pieces from export_captured() into GAME_STATE
+function import_captured(captured)
+{
+    for (var i = 0; i < captured.length; i += 1) {
+        // TODO: support X(...) piece codes
+        var letter = captured.substr(i, 1);
+        var decoded_piece = decode_piece_letter(letter);
+        //console.log(letter,decoded_piece);
+        GAME_STATE.captured[decoded_piece.color].push(decoded_piece);
+    }
+}
+
 // Export game as PGN.
 function save_pgn()
 {
-    var pgn = "", dict;
+    var pgn = "", dict, captured;
     var tags = ["White", "WhiteElo", "Black", "BlackElo", "Event", "Round", "Site", "Date", "Time"];
   
     // PGN header information
@@ -770,22 +806,10 @@ function save_pgn()
     }
 
     // Non-standard: captured pieces
-    var captured = "";
-    var captured_count = 0;
-    for (var i = 0; i < GAME_STATE.captured.white.length; i += 1) {
-        var p = GAME_STATE.captured.white[i];
-        captured += color_piece_prefix(p);
-        captured_count += 1;
-    }
-    for (i = 0; i < GAME_STATE.captured.black.length; i += 1) {
-        var p = GAME_STATE.captured.black[i];
-        captured += color_piece_prefix(p);
-        captured_count += 1;
-    }
-    if (captured_count) {
+    captured = export_captured();
+    if (captured) {
         dict.Captured = captured;
     }
-
 
     // Non-standard: current board state. The standard tags are FEN and SetUp, for starting position only.
     dict.CurrentFEN = active_fen();
@@ -884,14 +908,7 @@ function load_pgn(pgn)
 
     // Captured pieces
     if (game.Captured) {
-        console.log(game.Captured);
-        for (i = 0; i < game.Captured.length; i += 1) {
-            // TODO: support X(...) piece codes
-            var letter = game.Captured.substr(i, 1);
-            var decoded_piece = decode_piece_letter(letter);
-            console.log(letter,decoded_piece);
-            GAME_STATE.captured[decoded_piece.color].push(decoded_piece);
-        }
+        import_captured(game.Captured);
         update_captured_piece_images();
     }
 
@@ -3056,7 +3073,7 @@ function set_turn(color, historical)
 // Update the copyable link that goes to the board state
 function set_copyable_link()
 {
-    var fen;
+    var fen, captured;
     var last = GAME_STATE.position_after.slice(-1)[0];
     var prior = GAME_STATE.position_after.slice(-2)[0];
 
@@ -3079,9 +3096,17 @@ function set_copyable_link()
         fen = last;
     }
 
+    captured = GAME_STATE.last_captured;
+    if (captured) {
+        captured = ";c=" + captured;
+    } else {
+        captured = "";
+    }
+
+
     // TODO: also include c=, like Captured tag, so can know what was captured
     
-    $("copyable_link").href = make_copyable_link(fen) + last_move;
+    $("copyable_link").href = make_copyable_link(fen) + last_move + captured;
 }
 
 // Make a URL that can be clicked to go to this board state
@@ -3403,6 +3428,10 @@ function load_from_query_string()
             });
     }
 
+    if (query.c) {
+        import_captured(query.c);
+        update_captured_piece_images();
+    }
 
     // Succeeded
     return true;
@@ -3643,6 +3672,9 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
     from_square = piece.square;
 
     if (!is_hypothetical) {
+        // Pieces captured /before/ this move
+        GAME_STATE.last_captured = export_captured();
+
         // For highlighting recent move on board
         GAME_STATE.recent_square = from_square;
         GAME_STATE.recent_piece = piece;
