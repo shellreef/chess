@@ -3785,7 +3785,7 @@ function show_move_history()
     var first = true;
 
     for (var ply = 1; ply < GAME_STATE.made_moves.length; ply += 1) {
-        var color_fullmove, color, fullmove_number, move_text, move_info, this_html, only_move;
+        var color_fullmove, color, fullmove_number, move_text, move_info, only_move;
 
         color_fullmove = decode_ply(ply);
         color = color_fullmove.color;
@@ -3797,38 +3797,36 @@ function show_move_history()
         }
 
         move_text = move_info.notations[$F("output_notation")];
-        this_html = "";
         
         if (color === "white") {
-            this_html += '<span class="fullmove_number">' + fullmove_number + '<\/span>';
+            htmls.push('<span class="fullmove_number">' + fullmove_number + '<\/span>');
             if (fullmove_number === 1) {
                 // Period goes to initial position, kind of strange, but its uninstrusive
-                this_html += move_link(0, ".");
+                htmls.push(move_link(0, "."));
             } else {
-                this_html += ".";
+                htmls.push(".");
             }
-            this_html += " ";
+            htmls.push(" ");
         } else {
             // Ellipsis if black is first recorded move,
             // TODO: or intervening commentary
             if (first) {
-                this_html += '<span class="fullmove_number">' + fullmove_number + '<\/span>';
-                this_html += "&hellip; ";
+                htmls.push('<span class="fullmove_number">' + fullmove_number + '<\/span>');
+                htmls.push("&hellip; ");
             }
             
-            this_html += " ";
+            htmls.push(" ");
         }
 
-        this_html += move_link(ply, move_text);
-
+        htmls.push(move_link(ply, move_text));
 
         if (move_info.only_move) {
             // NAG for "only move", see http://www.markalowery.net/Chess/Notation/NAG.html
-            this_html += "$7 ";
+            htmls.push("$7 ");
         }
 
         if (move_info.add_text) {
-            this_html += move_info.add_text;
+            htmls.push(move_info.add_text);
         }
 
         if (move_info.repeats) {
@@ -3837,12 +3835,10 @@ function show_move_history()
 
         // End-text, not a move. Terminates the game.
         if (move_info.text_end) {
-            this_html += "\n" + move_info.text_end;
+            htmls.push("\n" + move_info.text_end);
         }
 
-        this_html += " ";
-
-        htmls.push(this_html);
+        htmls.push(" ");
 
         first = false;
     }
