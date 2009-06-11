@@ -88,12 +88,6 @@ td.rank { border-right: 2px solid black; padding-right: 5px; }
 td.right-edge { border-right: 2px solid black; }
 td.bottom-edge { border-bottom: 2px solid black; }
 
-td.hover 
-{ 
- /* border: 1px solid black; */
- background-color: blue !important;
-}
-
 
 /* Colors based on http://en.wikipedia.org/wiki/Chessboard
  * Useful site: http://www.cssdrive.com/imagepalette/index.php
@@ -109,16 +103,24 @@ td.black { background-color: #d18b47; }
 
 /* Highlights */
 
+/* Legal squares to move to on mouseover */
 /* different shades of tan
 td.legal-move-white { background-color: #cf9e6e; }
 td.legal-move-black { background-color: #a15b17; }
 */
-/* Green tint */
 td.legal-move-white { background-color: seagreen; }
 td.legal-move-black { background-color: green; }
 
+/* Recent move, shown during mouse operation and also once after */
+
+/* Source square */
 td.recent-move-white { background-color: #0066ff; }
 td.recent-move-black { background-color: #0099ff; }
+
+/* Destination square */
+td.drop-square { background-color: blue !important; }
+td.drop-square2 { background-color: blue !important; }
+
 
 /* TODO:
  * yellow - piece to promote
@@ -1800,7 +1802,7 @@ function make_droppables()
                     Droppables.add(square, {
                         accept: "piece-" + starting_filerank,
                         onDrop: move_dropped_piece,
-                        hoverclass: 'hover'});
+                        hoverclass: "drop-square"});
                 });
         }
     }
@@ -3924,11 +3926,6 @@ function move_dropped_piece(piece, square, event)
     //   new Effect.Squish(square.virtual ? square.piece : square.firstChild);
     //}
 
-    // Remove from square highlighting.
-    // TODO: Keep this active, along with destination square highlighting, so
-    // it shows the recent move clearly. Remove it on the *next* move so there is only one.
-    dojo.removeClass(piece.square, "recent-move-" + piece.square.color);
-
     // Can't drop this piece anywhere anymore.
     piece.removeClassName("piece-" + piece.prior_position);
     ALL_DROP_TARGETS.each(function(square) {
@@ -3948,6 +3945,16 @@ function move_dropped_piece(piece, square, event)
     // relative position so that it won' be misaligned.
     piece.style.position = "relative";
     piece.style.left = piece.style.right = piece.style.top = piece.style.bottom = 0;
+
+    // Remove old from square highlighting, and re-add new. This makes it
+    // persist after the move has been made, to show what happened.
+    dojo.query(".recent-move-black").removeClass("recent-move-black");
+    dojo.query(".recent-move-white").removeClass("recent-move-white");
+    dojo.addClass(piece.square, "recent-move-" + piece.square.color);
+
+    // Re-highlight to square, since hoverclass in Droppable removes it
+    dojo.query(".drop-square2").removeClass("drop-square2");
+    dojo.addClass(square, "drop-square2");
 }
 
 // Get the representation of the active board state in FEN.
