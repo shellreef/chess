@@ -3715,6 +3715,19 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
         } else {
             GAME_STATE.halfmove_clock += 1;
         }
+
+        var real_square = SQUARES[square.x][square.y];
+        var real_from_square = SQUARES[from_square.x][from_square.y];
+
+        // Remove old from square highlighting, and re-add new. This makes it
+        // persist after the move has been made, to show what happened.
+        dojo.query(".recent-move-black").removeClass("recent-move-black");
+        dojo.query(".recent-move-white").removeClass("recent-move-white");
+        dojo.addClass(real_from_square, " recent-move-" + real_from_square.color);
+
+        // Re-highlight to square, since hoverclass in Droppable removes it
+        dojo.query(".drop-square2").removeClass("drop-square2");
+        dojo.addClass(real_square, " drop-square2");
     }
 
     // If castling, move the rook in place. Ugly hardcoded.
@@ -3772,6 +3785,7 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
             finish_up_move(choices, is_immediate, undefined, is_raw);
         }
     }
+
 
     // TODO: return from finish_up_move, deferred? promotions..
     // To allow undo_virtual_move
@@ -3955,15 +3969,6 @@ function move_dropped_piece(piece, square, event)
     piece.style.position = "relative";
     piece.style.left = piece.style.right = piece.style.top = piece.style.bottom = 0;
 
-    // Remove old from square highlighting, and re-add new. This makes it
-    // persist after the move has been made, to show what happened.
-    dojo.query(".recent-move-black").removeClass("recent-move-black");
-    dojo.query(".recent-move-white").removeClass("recent-move-white");
-    dojo.addClass(piece.square, "recent-move-" + piece.square.color);
-
-    // Re-highlight to square, since hoverclass in Droppable removes it
-    dojo.query(".drop-square2").removeClass("drop-square2");
-    dojo.addClass(square, "drop-square2");
 }
 
 // Get the representation of the active board state in FEN.
