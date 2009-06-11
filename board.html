@@ -121,6 +121,15 @@ td.recent-move-black { background-color: #0099ff; }
 td.drop-square { background-color: blue !important; }
 td.drop-square2 { background-color: blue !important; }
 
+/* TODO: if destination square is a capture, make it red, even
+ * when hovering. This gives more information on the move but also
+ * provides better feedback when dragging to capture your opponent's
+ * piece that just moved, because it'll already be colored with
+ * drop-square, giving no visual feedback - but it would if this
+ * class was used in that scenario. */
+td.drop-square-capture { background-color: red !important; }
+td.drop-square-capture2 { background-color: red !important; }
+
 
 /* TODO:
  * yellow - piece to promote
