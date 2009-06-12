@@ -281,6 +281,7 @@ var PIECE_TYPES = {
     // figurines: [white, black] Unicode strings for Figurine Algebraic Notation
     // iccf_number: number for ICCF Numberic Notation
     // royal: if true, if checked, must make move that unthreatens, otherwise checkmate
+    // resets_50move: if true, resets the counter for the 50-move rule (pawns)
     // castles_with: piece to move in conjunction with this piece if castling
     // castle: if true, this piece can be moved during castling
     // promote: array of piece names that this piece can promote to, in order of preference
@@ -4211,7 +4212,7 @@ function load_starting_position(fen, replay)
 // Show information on a piece
 function show_piece_inspector(piece)
 {
-    var symbols, type_info;
+    var symbols, type_info, misc;
     var inspector = $("piece-inspector");
 
     type_info = PIECE_TYPES[piece.type];
@@ -4236,11 +4237,28 @@ function show_piece_inspector(piece)
     if (type_info.iccf_number) {
         symbols += ", " + type_info.iccf_number;
     }
-
     $("inspector-symbols").innerHTML = symbols;
 
-    console.log(piece);
-    
+    // Other settings
+    misc = "";
+    if (type_info.promotes_to) {
+        // TODO: links to view other pieces?
+        misc += "Promotes to " + type_info.promotes_to.join(", ") + "<br>";
+    }
+    if (type_info.royal) {
+        misc += "Royal (can be checked/checkmated)<br>";
+    }
+    if (type_info.resets_50move) {
+        misc += "Resets 50-move counter<br>";
+    }
+    if (type_info.castles_with) {
+        misc += "Castles with " + type_info.castles_with + "<br>";
+    }
+    if (type_info.castle) {
+        misc += "Is a castle<br>";
+    }
+    $("inspector-info").innerHTML = misc;
+
     inspector.show();
 }
 
@@ -5003,7 +5021,7 @@ function enable_document_selection(enable) {
  <p><span id="opening_name"></span>
 
  <div id="piece-inspector" style="display: none">
- <p><img id="inspector-image"> <span id="inspector-type" style="font-weight: bold">type</span>
+ <p><img style="vertical-align: middle" id="inspector-image"> <span id="inspector-type" style="font-weight: bold">type</span>
  <p>Movement: <span id="inspector-movement">movement</span>
  <p>Symbols: <span id="inspector-symbols">symbols</span>
  <p><span id="inspector-info">other info</span>
