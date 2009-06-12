@@ -4241,9 +4241,9 @@ function show_piece_inspector(piece)
 
     // Other settings
     misc = "";
-    if (type_info.promotes_to) {
+    if (type_info.promote) {
         // TODO: links to view other pieces?
-        misc += "Promotes to " + type_info.promotes_to.join(", ") + "<br>";
+        misc += "Promotes to " + type_info.promote.join(", ") + "<br>";
     }
     if (type_info.royal) {
         misc += "Royal (can be checked/checkmated)<br>";
