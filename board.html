@@ -120,9 +120,14 @@ td.recent-move-black { background-color: #0099ff; }*/
 td.recent-move-white { background-color: blue; }
 td.recent-move-black { background-color: blue; }
 
+/* Next to last move */
+/* TODO
+td.penultimate-move-white { background-color: yellow; }
+td.penultimate-move-black { background-color: yellow; }*/
+
 
 /* Destination square */
-td.drop-square { background-color: blue; }
+td.drop-square { background-color: blue !important; }
 td.drop-square2 { background-color: blue; }
 
 /* TODO: if destination square is a capture, make it red, even
@@ -4100,6 +4105,10 @@ function load_fen(fen, replay)
         GAME_STATE.captured = {white:[], black:[]};
         GAME_STATE.made_moves = [null];
         GAME_STATE.made_moves[ply] = null;
+
+        dojo.query(".recent-move-black").removeClass("recent-move-black");
+        dojo.query(".recent-move-white").removeClass("recent-move-white");
+        dojo.query(".drop-square2").removeClass("drop-square2");
 
         update_captured_piece_images();
     }
