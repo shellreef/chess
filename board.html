@@ -4200,13 +4200,11 @@ function load_starting_position(fen, replay)
 // Show information on a piece
 function show_piece_inspector(piece)
 {
-    var inspector = Builder.node("div", {
-        id: "piece-inspector",
-        style: "position: absolute; top: 0; left: 0; background-color: black; width: 100px; height: 100px"});
-
-    document.body.appendChild(inspector);
+    var inspector = $("piece-inspector");
 
     console.log(piece);
+    
+    inspector.show();
 }
 
 // Hide information on the piece shown, if any
@@ -4214,9 +4212,7 @@ function hide_piece_inspector()
 {
     var inspector = $("piece-inspector");
 
-    if (inspector) {
-        inspector.remove();
-    }
+    inspector.hide();
 }
 
 // Name each piece, in standard chess1 locations, using English descriptive notation.
@@ -4968,6 +4964,8 @@ function enable_document_selection(enable) {
 
  <p><a id="copyable_link">copyable link</a> (<a href="#" onclick="email_board()">email</a>)
  <p><span id="opening_name"></span>
+
+ <div id="piece-inspector" style="position: absolute; width: 100px; height: 100px; background-color: black; display: none"></div>
 
  <!-- TODO: disclosure triangles -->
  <p><a href="#" onclick="javascript:new Effect.toggle('controls', 'slide', { duration: 0.1 })">advanced</a>
