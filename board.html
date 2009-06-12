@@ -268,11 +268,12 @@ var PIECE_TYPES = {
     // parlett: movement of piece in extended Parlett notation
     // letter: uppercase character representing the piece in FEN
     // alg_letter: uppercase character for algebraic notation [defaults to FEN letter]
+    // figurines: [white, black] Unicode strings for Figurine Algebraic Notation
+    // iccf_number: number for ICCF Numberic Notation
     // royal: if true, if checked, must make move that unthreatens, otherwise checkmate
     // castles_with: piece to move in conjunction with this piece if castling
     // castle: if true, this piece can be moved during castling
     // promote: array of piece names that this piece can promote to, in order of preference
-    // figurines: [white, black] Unicode strings for Figurine Algebraic Notation
 
     // Standard international chess piece
     
@@ -4200,7 +4201,33 @@ function load_starting_position(fen, replay)
 // Show information on a piece
 function show_piece_inspector(piece)
 {
+    var symbols, type_info;
     var inspector = $("piece-inspector");
+
+    type_info = PIECE_TYPES[piece.type];
+
+    $("inspector-type").innerHTML = piece.type;
+    $("inspector-image").src = image_path_for(piece.type, piece.color);
+    $("inspector-movement").innerHTML = type_info.parlett;
+
+    // Symbols (letter, figurine, number) for notations
+    symbols = "";
+    if (type_info.letter) {
+        symbols += type_info.letter;
+    } else {
+        symbols += "X(" + piece.type + ")";
+    }
+    if (type_info.alg_letter) {
+        symbols += " (algebraic: " + type_info.alg_letter + ")";
+    }
+    if (type_info.figurines) {
+        symbols += ", " + type_info.figurines.join(", ");
+    }
+    if (type_info.iccf_number) {
+        symbols += ", " + type_info.iccf_number;
+    }
+
+    $("inspector-symbols").innerHTML = symbols;
 
     console.log(piece);
     
@@ -4965,7 +4992,12 @@ function enable_document_selection(enable) {
  <p><a id="copyable_link">copyable link</a> (<a href="#" onclick="email_board()">email</a>)
  <p><span id="opening_name"></span>
 
- <div id="piece-inspector" style="position: absolute; width: 100px; height: 100px; background-color: black; display: none"></div>
+ <div id="piece-inspector" style="position: absolute; display: none; border: 1px solid black; background-color: lightgray">
+ <p><img id="inspector-image"> <span id="inspector-type" style="font-weight: bold">type</span>
+ <p>Movement: <span id="inspector-movement">movement</span>
+ <p>Symbols: <span id="inspector-symbols">symbols</span>
+ <p><span id="inspector-info">other info</span>
+ </div>
 
  <!-- TODO: disclosure triangles -->
  <p><a href="#" onclick="javascript:new Effect.toggle('controls', 'slide', { duration: 0.1 })">advanced</a>
