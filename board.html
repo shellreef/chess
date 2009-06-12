@@ -60,6 +60,10 @@ img.captured
 img.black {}
 img.white {}
 
+/* Would be cool to use CSS3 expressions to make the pattern, but they're not in
+ * Firefox 3.0.8, maybe in Firefox 3.1. Safari has them though! 
+ * If do this, would need to remember to shift nth-child per ranks. 
+ *td:nth-child(2n) { background-color: green } */
 table.board
 {
  /*border: 2px solid black;*/
@@ -148,10 +152,16 @@ td.drop-square-capture2 { background-color: red !important; }
  */
 
 
-/* Would be cool to use CSS3 expressions to make the pattern, but they're not in
- * Firefox 3.0.8, maybe in Firefox 3.1. Safari has them though! 
- * If do this, would need to remember to shift nth-child per ranks. 
- *td:nth-child(2n) { background-color: green } */
+#piece-inspector {
+    position: absolute; 
+    border: 1px solid black; 
+    background-color: lightgray;
+    /* Need to make this large, so king's movement doesn't extend beyond box. 
+     * Would like to have the movement wrap, but I guess ; is not a word-breaking
+     * character, so could use &shy;, works on Safari, and supposedly IE7 and Firefox.
+     */
+    width: 600px;
+}
 
 </style>
 <!-- <script type='text/javascript' src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'></script> -->
@@ -4992,7 +5002,7 @@ function enable_document_selection(enable) {
  <p><a id="copyable_link">copyable link</a> (<a href="#" onclick="email_board()">email</a>)
  <p><span id="opening_name"></span>
 
- <div id="piece-inspector" style="position: absolute; display: none; border: 1px solid black; background-color: lightgray">
+ <div id="piece-inspector" style="display: none">
  <p><img id="inspector-image"> <span id="inspector-type" style="font-weight: bold">type</span>
  <p>Movement: <span id="inspector-movement">movement</span>
  <p>Symbols: <span id="inspector-symbols">symbols</span>
