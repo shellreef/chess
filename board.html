@@ -4208,13 +4208,19 @@ function load_starting_position(fen, replay)
 
 function toggle_piece_library()
 {
-    var table, lib;
+    var table, lib, enable_edit_mode, parent;
 
-    new Effect.toggle("piece-library-parent", 'slide', { duration: 0.1 });
+    parent = $("piece-library-parent");
+    enable_edit_mode = !parent.visible();
+    new Effect.toggle(parent, 'slide', { duration: 0.1 });
 
-    lib = $("piece-library");
+    if (enable_edit_mode) {
+        // TODO: Enable dragging pieces to any square
+        console.log("TODO: enable editing");
+    }
 
     // Lazily generate the table. 
+    lib = $("piece-library");
     if ($("piece-library-table")) {
         return;
     }
