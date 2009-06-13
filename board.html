@@ -4274,6 +4274,13 @@ function show_library_images()
     dojo.xhrGet({url:root + "list.txt", load:function(text) {
         var images = text.split("\n");
 
+        document.write("<html><head><title>All piece images</title></head><body>");
+        document.write("<h1>All piece images (" + images.length + ")" + "</h1>");
+        document.write("<p>This is a list of all blue and white piece images available in the <b>" + PREFS.image_set + "</b> image set, including those that are not assigned to a piece. See also: <ul>");
+        document.write("<li><a href=\"images/" + PREFS.image_set + "\">Directory listing</a>");
+        document.write("<li><a href=\"images/" + PREFS.image_set + "/README.html\">README</a>");
+        document.write("</ul>");
+
         document.write("<table>");
         for (var i = 0; i < images.length; i += 1) {
             var image = images[i];
@@ -4287,7 +4294,7 @@ function show_library_images()
             document.write('<td>' + (used_paths[wpath] || "") + '</td>');
             document.write('</tr>');
         }
-        document.write('</table>');
+        document.write('</table></body></html>');
     }});
 }
 
