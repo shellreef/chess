@@ -471,6 +471,8 @@ var PIECE_TYPES = {
                      "[2,0], [4,0;if_unblocked=2,0], [6,0;if_unblocked=4,0], " +
                      "[-2,0], [-4,0;if_unblocked=-2,0], [-6,0;if_unblocked=-4,0], " +
                      "[0,-2], [0,-4;if_unblocked=0,-2], [0,-6;if_unblocked=0,-4]", invincible: true},
+    fortress: {parlett: "o#man", invincible: true},
+    nwall: {parlett: "o1>, o1=", invincible: true},
 
     // Consumables
     bomb: {parlett: "o1*, {c1*;self_destruct}", image:"medusa", invincible:true},
@@ -594,7 +596,7 @@ var SAVED_BOARDS = {
 "Test Amphibians": "4k/8/8/slslslsl/8/8/FFFFFFFF/4K w - - 0 1",
 "Test Royalty": "x(royalrook)x(royalknight)x(royalbishop)xjkx(royalbishop)x(royalknight)x(royalrook)/pppppppp/8/8/8/8/PPPPPPPP/X(royalrook)X(royalknight)X(royalbishop)XJKX(royalbishop)X(royalknight)X(royalrook) w KQkq - 0 1",
 "Test Projectiles": "x(airplane)X(airplane)4x(airplane)/8/1x(bird)/2x(bird)x(bird)x(bird)1x(bird)/3x(bird)x(bird)/3X(archerzz3)x(bird)/4X(archerzz2)X(archer)/x(frog)1X(gun)3X(rocket) w - - 0 1",
-"Test Invincibles": "3x(banner)x(banner)//x(banner)3x(block)3/4K3/5x(stone)/8/1kX(block)1X(stone)/1X(block)x(block) w - - 0 1",
+"Test Invincibles": "3x(banner)x(banner)/7x(nwall)/x(banner)3x(block)1X(fortress)/4K3/5x(stone)/8/1kX(block)1X(stone)/1X(block)x(block)3X(nwall) w - - 0 1",
 "Test Consumables": "4k/pppppppp/1pppppp1/2pppp2/X(bomb)2X(superbomb)/8/PPPPPPPP/4K w - - 0 1",
 "Test Mix 1": "X(airplane)x(airplane)/3x(pawnattackrook)x(caliph)x(pope)X(elephantwarmachine)/8/8/8/4S/X(lance)fwZ1X(pawnattackrook)/AcDeIFvT w - - 0 1",
 "Test Mix 2": "//1X(silvergeneral)X(2movewazirferz)/4X(mushroom)/3X(crab)X(wizard)/4X(barc)1X(goldgeneral)/2X(2movewazir)/7m w - - 0 1",
@@ -4290,7 +4292,7 @@ function show_library_images()
 // Show the piece library, of readily usable pieces with defined movement
 function toggle_piece_library()
 {
-    var table, lib, enable_edit_mode, parent;
+    var table, lib, enable_edit_mode, parent, count;
 
     parent = $("piece-library-parent");
     enable_edit_mode = !parent.visible();
@@ -4314,6 +4316,7 @@ function toggle_piece_library()
             Builder.node("th", "Name")
             ]]);
 
+    count = 0;
     for (var type in PIECE_TYPES) {
         if (PIECE_TYPES.hasOwnProperty(type)) {
             var wp = create_piece("white", type);
@@ -4323,10 +4326,12 @@ function toggle_piece_library()
                     Builder.node("td", [wp, bp]),
                     Builder.node("td", type)]);
             table.appendChild(row);
+            count += 1;
         }
     }
 
     lib.appendChild(table);
+    lib.appendChild(Builder.node("p", [count + " pieces available"]));
     lib.appendChild(Builder.node("a", {href: "javascript:show_library_images()"}, ["show all images (clears page)"]));
 }
 
