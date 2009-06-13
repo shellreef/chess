@@ -289,8 +289,6 @@ var PIECE_TYPES = {
 
     // Standard international chess piece
     
-    //king: {parlett: "1*, imR2=e", letter: "K", royal: true, castles_with: "rook", figurines: ["\u2654", "\u265a"]},    // or: ~1/1, ~1/0
-
     // TODO: @ for absolute, @3,0 and @4,0 short, then @7,0 for @6,0, in order to allow
     // Chess960 orthodox castling when rooks &amp; kings are not at known positions.
     //king: {parlett: "1*", /*[@3,0;move_a_castle_to=@4,0], [@7,0;move_h_castle_to=@6,0]",*/
@@ -298,11 +296,11 @@ var PIECE_TYPES = {
     king: {parlett: "1*, [-2,0;if_can_castle_long;if_unblocked=-1,0;if_unblocked2=-2,0;if_unblocked3=-3,0;move_a_castle_to=3,0], " +
               "[2,0;if_can_castle_short;if_unblocked=1,0;if_unblocked2=2,0;move_h_castle_to=-2,0]",
           royal: true, letter: "K", figurines: ["\u2654", "\u265a"],
-          castles_with: "rook"},
-    queen: {parlett: "n*", letter: "Q", figurines: ["\u2655", "\u265b"], iccf_number: 1},
-    rook: {parlett: "n+", letter: "R", castle: true, figurines: ["\u2656", "\u265c"], iccf_number: 2},
+          castles_with: "rook", url:"pc:king"},
+    queen: {parlett: "n*", letter: "Q", figurines: ["\u2655", "\u265b"], iccf_number: 1, url:"pc:queen"},
+    rook: {parlett: "n+", letter: "R", castle: true, figurines: ["\u2656", "\u265c"], iccf_number: 2, url:"pc:rook"},
     bishop: {parlett: "nX", letter: "B", figurines: ["\u2657", "\u265d"], iccf_number: 3, url:"pc:bishop"},
-    knight: {parlett: "~1/2", letter: "N", figurines: ["\u2658", "\u265e"], iccf_number: 4},
+    knight: {parlett: "~1/2", letter: "N", figurines: ["\u2658", "\u265e"], iccf_number: 4, url:"pc:knight"},
 
 
     // Pawns
@@ -316,7 +314,8 @@ var PIECE_TYPES = {
         figurines: ["\u2659", "\u265f"],
         letter: "P",
         alg_letter: "",
-        resets_50move: true     // a pawn move resets the halfmove counter for the 50-move rule
+        resets_50move: true,     // a pawn move resets the halfmove counter for the 50-move rule
+        url: "pc:pawn"
     },
     weakpawn: {parlett: "o1>, c1X>"},   // No double move, no promotion
     superpawn: {parlett: "on>, cnX>", letter: "XP", image:"quickpawn"},
@@ -324,9 +323,11 @@ var PIECE_TYPES = {
     // TODO: http://www.chessvariants.org/piececlopedia.dir/berolina-plus.html
     dragon: {parlett: "#pawn, #knight", image: "pawnknight", url:"pc:dragon"},   // alt image: dragon, but less descriptive
     // TODO: other dragon, http://www.chessvariants.org/piececlopedia.dir/dragonchess_dragon.html , and rename above pawnknight
-    
     // David's pawn
     pawnattackrook: {parlett: "#pawn, c#rook", image:"pawn135cw", promote: ["dragon", "rookpawn"]},
+    // TODO: chinesepawn from Xianqui, http://www.chessvariants.org/piececlopedia.dir/pawn-xiangqi.html
+    // 1>, but when crosses "river", can move 1=
+    sergeant: {parlett: "#berolinapawn, #pawn", promote:["queen", "knight", "rook", "bishop"], resets_50move:true, url:"pc:sergeant"},
 
 
     // Hippogonal leapers
@@ -348,7 +349,7 @@ var PIECE_TYPES = {
     frog: {parlett: "~1/1, ~0/3", letter: "F"},     
     //bison: {parlett: "~1/3, ~2/3", url:"pc:bison"},                     // TODO: image
     //gnu: {parlett: "~1/2, ~1/3", url:"pc:gnus"},                       // TODO: image
-    //root_fifty_leaper: {parlett: "~5/5, ~7/1"},         // TODO: image
+    //root_fifty_leaper: {parlett: "~5/5, ~7/1", url:"pc:root50"},         // TODO: image
     // TODO: root-65 leaper, bat, see http://members.shaw.ca/quadibloc/chess/ch03.htm
     //buffalo: {parlett: "~1/2, ~1/3, ~2/3", url:"pc:buffalo"},             // TODO: image
 
@@ -357,7 +358,7 @@ var PIECE_TYPES = {
     royalpawn: {parlett: "#pawn", royal: true},
     royalrook: {parlett: "#rook", royal: true},
     royalbishop: {parlett: "#bishop", royal: true},
-    maharajah: {parlett: "#amazon", letter: "XJ", royal: true, image:"paladin"},   // Q+N+K, Maharajah chess TODO: crown amazon?
+    maharajah: {parlett: "#amazon", letter: "XJ", royal: true, image:"paladin", url:"http://www.chessvariants.org/unequal.dir/maharaja.html"},   // Q+N+K, Maharajah chess TODO: crown amazon?
     //royalqueen: {parlett: "#queen", royal: true},   // TODO: image
 
     // Combined pieces
@@ -393,7 +394,7 @@ var PIECE_TYPES = {
     champion: {parlett: "#wazir, #alfil, #warmachine", url:"pc:champion"},
     //crowned_rook: {parlett: "#rook, #ferz"},       // TODO: image
     general: {parlett: "#wazir", royal: true, url:"pc:general"}, 
-    kangaroo: {parlett: "#knight, #alfil"},  
+    kangaroo: {parlett: "#knight, #alfil", url:"pc:cangaroo"},  // Newton kangaroo, different than pc:kangaroo
     //wizard: {parlett: "#camel, #ferz"}, // TODO: image
     waffle: {parlett: "#wazir, #alfil", image:"elephantwazir"},
     fad: {parlett: "#ferz, #alfil, #warmachine", image:"elephantferzwarmachine", url:"pc:fad"},
@@ -408,10 +409,10 @@ var PIECE_TYPES = {
     //hornedfalcon: {parlett: "n=x, 2>"},    // from Parlett, TODO: image
     //honorablehorse: {parlett: "1/2>"},    // TODO: image
     //chineseknight: {parlett: "1//2"}, // TODO: intervening must be unblocked
-    lance: {parlett: "n+>"},
+    lance: {parlett: "n+>", url:"pc:lance"},
     //colonel: {parlett: "n>, n=, 2/1>, 1*", letter: "XC"}, // TODO: image
     //murray_lion: {parlett: "~0/2, ~2/2, c1*", letter: "XM"}, // TODO: image
-    lion: {parlett: "~n*", letter: "XL"},
+    lion: {parlett: "~n*", letter: "XL", url:"pc:lion"},
     elephant: {parlett: "2X", letter: "E", image:"elephantmodern", url:"pc:elephant"},  // Not a leaper, path can be blocked (unlike alfil, ~2X)
     //khohn: {parlett: "1X, 1>", letter: "XK"}, // TODO: image
     ferz: {parlett: "1X", letter: "XF", url:"pc:ferz"},
@@ -555,7 +556,7 @@ var SAVED_BOARDS = {
     },
 
     "Test Pieces": {
-"Test Pawns": "8/x(rookpawn)x(dragon)x(bishoppawn)x(superpawn)x(weakpawn)x(berolinapawn)x(pawnattackrook)p/8/8/8/8/X(rookpawn)X(dragon)X(bishoppawn)X(superpawn)X(weakpawn)X(berolinapawn)X(pawnattackrook)P w - - 0 1",
+"Test Pawns": "8/x(rookpawn)x(dragon)x(bishoppawn)x(superpawn)x(weakpawn)x(berolinapawn)x(pawnattackrook)p/8/8/4X(sergeant)/8/X(rookpawn)X(dragon)X(bishoppawn)X(superpawn)X(weakpawn)X(berolinapawn)X(pawnattackrook)P w - - 0 1",
 "Test Leapers": "K/2E1Y1H1/3M/1XT1W1XG1Z/8/3Z1N/4oo/5k w - - 0 1", // TODO: antelope, flamingo
 "Test Amphibians": "4k/8/8/slslslsl/8/8/FFFFFFFF/4K w - - 0 1",
 "Test Royalty": "x(royalrook)x(royalknight)x(royalbishop)xjkx(royalbishop)x(royalknight)x(royalrook)/pppppppp/8/8/8/8/PPPPPPPP/X(royalrook)X(royalknight)X(royalbishop)XJKX(royalbishop)X(royalknight)X(royalrook) w KQkq - 0 1",
