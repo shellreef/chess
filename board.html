@@ -255,7 +255,8 @@ var GAME_STATE = {
     recent_piece: null,         // Recently moved piece
     recent_square: null,        // Recently moved from square
     last_captured: null,        // export_captured() string _before_ current move 
-    piece_under: null           // Piece under cursor for piece inspector
+    piece_under: null,          // Piece under cursor for piece inspector
+    flipped: false              // True if from black's perspective instead of white (only for toggling!)
 };    
 
 // Moves that can be made right now, for each active piece.
@@ -810,8 +811,6 @@ function email_board()
         "?subject=" + encodeURIComponent(subject) + 
         "&body=" + encodeURIComponent(body);
     window.open(url);
-    
-    // TODO: need to update init_board() to have loading work
 }
 
 // Make the PGN content editable (not to be confused with edible).
@@ -3356,12 +3355,17 @@ function make_vboard()
     }
 }
 
+function flip()
+{
+    init_board(!GAME_STATE.flipped);
+}
+
 // Internally name the square cells with their (x,y) coordinates
 // and filerank notation, once when the page loads. This is only code so I
 // don't have to manually type <td x=0 y=0 filerank=a8> etc. in all the cells.
 // Also populates SQUARES for fast lookup, and VBOARD virtual board.
-var KEYS_PRESSED;
-function init_board()
+// If flipped is true, then the board is from black's perspective, instead of white's.
+function init_board(flipped)
 {
     SQUARES = [];
     VBOARD = [];
@@ -3371,7 +3375,7 @@ function init_board()
         for (var y = 1; y <= RANK_MAX; y += 1) {
             // Lookup the table cell from the DOM. This is extraordinarly expensive,
             // so it is only done once here then stored in a global, SQUARES.
-            var square  = $('board-body').childNodes[9 - y].childNodes[x];
+            var square  = $('board-body').childNodes[flipped ? y : 9 - y].childNodes[flipped ? 9 - x : x];
 
             square.x = x;
             square.y = y;
@@ -3416,12 +3420,12 @@ function init_board()
     // Label ranks and files
     var ranks = dojo.query(".rank.label")
     for (var i = 0; i < ranks.length; i += 1) {
-        ranks[i].innerHTML = 8 - i;
+        ranks[i].innerHTML = flipped ? i + 1 : 8 - i;
     }
 
     var files = dojo.query(".file.label");
     for (i = 0; i < files.length; i += 1) {
-        files[i].innerHTML = String.fromCharCode("a".charCodeAt(0) + i);
+        files[i].innerHTML = String.fromCharCode(flipped ? "h".charCodeAt(0) - i : "a".charCodeAt(0) + i);
     }
 
 
@@ -3498,6 +3502,8 @@ function init_board()
     if (!load_from_query_string()) {
         load_fen(fen);
     }
+
+    GAME_STATE.flipped = flipped;
 }
 
 // Load board from URL query string, if any
@@ -5209,7 +5215,7 @@ function enable_document_selection(enable) {
 
  <p><select accesskey="o" id="output_notation" name="output_notation" onchange="show_move_history()"></select>
 
- <p><a href="#" onclick="edit_pgn()">edit PGN</a>
+ <p><a href="javascript:flip()">flip</a> | <a href="javascript:edit_pgn()">edit PGN</a>
 
  <p><select id="saved_board_menu" onchange="change_loaded_board(this)"></select>
      <button onclick="load_fen($('saved_board_menu').value)" accesskey="n">New Game</button>
