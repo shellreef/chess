@@ -33,7 +33,8 @@ for my $name (sort keys %{$colors{w}})
     ($shortname = $name) =~ s/\.gif//;
     $i += 1;
     print "<tr><td>$i</td>";
-    for my $color (qw(w b r g y l)) {
+    #for my $color (qw(w b r g y l)) {
+    for my $color (qw(w b)) {
         print "<td>";
         print "<img src=\"$color$name\">" if $colors{$color}{$name};
         print "</td>";
