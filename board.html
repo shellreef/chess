@@ -4226,8 +4226,11 @@ function toggle_piece_library()
 
     for (var type in PIECE_TYPES) {
         if (PIECE_TYPES.hasOwnProperty(type)) {
+            var wp = create_piece("white", type);
+            var bp = create_piece("black", type);
+
             var row = Builder.node("tr", [
-                    Builder.node("td", [create_piece("white", type), create_piece("black", type)]),
+                    Builder.node("td", [wp, bp]),
                     Builder.node("td", type)]);
             table.appendChild(row);
         }
