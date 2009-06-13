@@ -5030,7 +5030,8 @@ function enable_document_selection(enable) {
  </div>
 
  <!-- TODO: disclosure triangles -->
- <p><a href="#" onclick="javascript:new Effect.toggle('controls', 'slide', { duration: 0.1 })">advanced</a>
+ <p><a href="#" onclick="javascript:new Effect.toggle('controls', 'slide', { duration: 0.1 })">controls</a> | 
+    <a href="#" onclick="javascript:new Effect.toggle('piece-library-parent', 'slide', { duration: 0.1 })">pieces</a>
  
  <div id="controls" style="display: none; border-left: 2px solid blue">
  <div>
@@ -5054,15 +5055,17 @@ function enable_document_selection(enable) {
  <p><select id="saved_board_menu" onchange="change_loaded_board(this)"></select>
      <button onclick="load_fen($('saved_board_menu').value)" accesskey="n">New Game</button>
  
- <div id="piece-library" style="width: 600px; height: 150px; overflow: scroll">
+ </div>
+ </div>
+ <!-- end controls-->
+
+ <div id="piece-library-parent" style="display: none">
+ <div id="piece-library" style="width: 600px; height: 325px; overflow: scroll">
  Lorem ipsum dolor sit amet natus et architecto aspernatur beatae vitae sit error error, sed magni ab qui ratione nemo vitae beatae accusantium eos eaque vitae qui totam doloremque voluptas voluptas, enim consequuntur ut aut consequuntur illo veritatis sed odit eaque illo voluptatem iste quia sit doloremque doloremque , natus quia quae rem error sit aut odit perspiciatis ut accusantium sed accusantium aut qui
 
  Lorem ipsum dolar sit amet voluptatem vitae aspernatur explicabo dicta veritatis illo ipsa iste nemo laudantium fugit omnis omnis, voluptatem perspiciatis eaque illo rem ab aut illo quae veritatis explicabo ab dolores ut sit quia quasi rem inventore explicabo explicabo, qui voluptas unde aperiam totam error et consequuntur ab sed ipsam voluptas dicta ratione natus error ipsa perspiciatis voluptatem qui qui, iste magni odit sed consequuntur laudantium aut voluptas aut quasi omnis sed enim enim laudantium laudantium, ipsa ipsa rem ipsam
  </div>
-
  </div>
- </div>
- <!-- end advanced -->
 
   <div id="captured_piece_images" style="width: 250px;"></div>
   <div id="moves_container" style="width: 500px; text-align: justify">
