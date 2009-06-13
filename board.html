@@ -301,7 +301,7 @@ var PIECE_TYPES = {
           castles_with: "rook"},
     queen: {parlett: "n*", letter: "Q", figurines: ["\u2655", "\u265b"], iccf_number: 1},
     rook: {parlett: "n+", letter: "R", castle: true, figurines: ["\u2656", "\u265c"], iccf_number: 2},
-    bishop: {parlett: "nX", letter: "B", figurines: ["\u2657", "\u265d"], iccf_number: 3},
+    bishop: {parlett: "nX", letter: "B", figurines: ["\u2657", "\u265d"], iccf_number: 3, url:"pc:bishop"},
     knight: {parlett: "~1/2", letter: "N", figurines: ["\u2658", "\u265e"], iccf_number: 4},
 
 
@@ -320,34 +320,37 @@ var PIECE_TYPES = {
     },
     weakpawn: {parlett: "o1>, c1X>"},   // No double move, no promotion
     superpawn: {parlett: "on>, cnX>", letter: "XP", image:"quickpawn"},
-    berolinapawn: {parlett: "o1X>, c1>, io2X>", letter: "XB", image:"berolinapawn", resets_50move: true},
-    dragon: {parlett: "#pawn, #knight", image: "pawnknight"},   // alt image: dragon, but less descriptive
+    berolinapawn: {parlett: "o1X>, c1>, io2X>", letter: "XB", image:"berolinapawn", resets_50move: true, url:"pc:berolina"},
+    // TODO: http://www.chessvariants.org/piececlopedia.dir/berolina-plus.html
+    dragon: {parlett: "#pawn, #knight", image: "pawnknight", url:"pc:dragon"},   // alt image: dragon, but less descriptive
+    // TODO: other dragon, http://www.chessvariants.org/piececlopedia.dir/dragonchess_dragon.html , and rename above pawnknight
+    
     // David's pawn
     pawnattackrook: {parlett: "#pawn, c#rook", image:"pawn135cw", promote: ["dragon", "rookpawn"]},
 
 
     // Hippogonal leapers
     banner: {parlett: "~0/0", letter: "O", image:"banner"},    // aka dummy
-    man: {parlett: "1*", letter: "M", image:"guard"},    // same as king, but not royale (also known as commoner, guard)
-    warmachine: {parlett: "~2+", letter: "D"},  // or ~2/0
-    alfil: {parlett: "~2X", letter: "Y", image:"elephant2"},       //  or ~2/2
+    man: {parlett: "1*", letter: "M", image:"mann2", url:"pc:man"},    // same as king, but not royale (also known as commoner, guard)
+    warmachine: {parlett: "~2+", letter: "D", url:"pc:dabbabah"},  // or ~2/0
+    alfil: {parlett: "~2X", letter: "Y", image:"elephant2", url:"pc:alfil"},       //  or ~2/2
     threeheadmonster: {parlett: "~3/0", letter: "H"},     // aka threeleaper
     bird: {parlett: "~3/3", letter: "XT"},                // aka tripper
-    camel: {parlett: "~1/3", letter: "W"},
+    camel: {parlett: "~1/3", letter: "W", url:"pc:camel"},
     zebra: {parlett:"~2/3", letter: "Z"},
-    giraffe: {parlett: "~1/4", letter: "XG"},
-    //antelope: {parlett: "~3/4"},    // TODO: image
-    //flamingo: {parlett: "~1/6"},    // TODO: image
+    giraffe: {parlett: "~1/4", letter: "XG", url:"pc:giraffe"},
+    //antelope: {parlett: "~3/4", url:"pc:antelope"},    // TODO: image
+    //flamingo: {parlett: "~1/6", url:"pc:flamingo"},    // TODO: image
 
     // Amphibians (combined leapers)
-    alibaba: {parlett: "~2/0, ~2X", letter: "L", image:"elephantwarmachine"},
+    alibaba: {parlett: "~2/0, ~2X", letter: "L", image:"elephantwarmachine", url:"pc:alibaba"},
     squirrel: {parlett: "~0/2, ~1/2, ~2/2", letter: "S"},
     frog: {parlett: "~1/1, ~0/3", letter: "F"},     
-    //bison: {parlett: "~1/3, ~2/3"},                     // TODO: image
-    //gnu: {parlett: "~1/2, ~1/3"},                       // TODO: image
+    //bison: {parlett: "~1/3, ~2/3", url:"pc:bison"},                     // TODO: image
+    //gnu: {parlett: "~1/2, ~1/3", url:"pc:gnus"},                       // TODO: image
     //root_fifty_leaper: {parlett: "~5/5, ~7/1"},         // TODO: image
     // TODO: root-65 leaper, bat, see http://members.shaw.ca/quadibloc/chess/ch03.htm
-    //buffalo: {parlett: "~1/2, ~1/3, ~2/3"},             // TODO: image
+    //buffalo: {parlett: "~1/2, ~1/3, ~2/3", url:"pc:buffalo"},             // TODO: image
 
     // Royal pieces
     royalknight: {parlett: "#knight", letter: "XR", royal: true},  // Knightmate chess TODO: crown on knight
@@ -362,15 +365,15 @@ var PIECE_TYPES = {
     // or http://members.shaw.ca/quadibloc/chess/ch03.htm or 
     // http://www.chessvariants.com/graphics.dir/alfaerie/
     equesrex: {parlett: "#king, #knight", image:"equesrex", royal: true},
-    //centaur: {parlett: "#knight, #man"},         // not royal, so not an equesrex  TODO: remove cross, make bcentaur.gif?
-    amazon: {parlett: "#queen, #knight", letter: "XV"},     // Q+N, aka superqueen
-    chancellor: {parlett: "#rook, #knight", letter: "C"},   // R+N, aka empress, marshal (Capablanca, X-FEN standard)
-    archbishop: {parlett: "#bishop, #knight", letter: "A", image: "cardinal"}, // B+N, aka cardinal, princess, janus (Capablanca, X-FEN standard)
-    dragonhorse: {parlett: "#bishop, #wazir", image: "promotedbishop"},
+    //centaur: {parlett: "#knight, #man", url:"pc:centaur"},         // not royal, so not an equesrex  TODO: remove cross, make bcentaur.gif?
+    amazon: {parlett: "#queen, #knight", letter: "XV", url:"pc:amazon"},     // Q+N, aka superqueen
+    chancellor: {parlett: "#rook, #knight", letter: "C", url:"pc:rook-knight"},   // R+N, aka empress, marshal (Capablanca, X-FEN standard)
+    archbishop: {parlett: "#bishop, #knight", letter: "A", image: "cardinal", url:"pc:bishop-knight"}, // B+N, aka cardinal, princess, janus (Capablanca, X-FEN standard)
+    dragonhorse: {parlett: "#bishop, #wazir", image: "promotedbishop", url:"pc:dragonhorse"},
     //berse: {parlett: "#rook, #ferz", image: "promtoedrook"},    // aka dragon king, but its not royal TODO: image
-    caliph: {parlett: "#camel, #bishop", image: "camelbishop"},
+    caliph: {parlett: "#camel, #bishop", image: "camelbishop", url:"pc:caliph"},
     pope: {parlett: "#king, #bishop", image:"kingbishop"},  // http://www.chessvariants.com/difftaking.dir/thunder.html 
-    //dragon_king: {parlett: "#king, #rook", royal: true},   // TODO: image
+    //dragonking: {parlett: "#king, #rook", royal: true, url:"pc:dragonking"},   // TODO: image
 
     knightcamel: {parlett: "#knight, #camel"},
     elephantwarmachine: {parlett: "#elephant, #warmachine"},
@@ -384,17 +387,18 @@ var PIECE_TYPES = {
 
     //walker: {parlett: "o#wazir, c#ferz"}, // TODO: image
     tiger: {parlett: "o#bishop, c#knight"},
-    bd: {parlett: "#warmachine, #bishop", image:"bishopwarmachine"},
-    canvasser: {parlett: "#camel, #rook", image:"camelrook"},
-    carpenter: {parlett: "#knight, #warmachine", image:"knightwarmachine"},
-    champion: {parlett: "#wazir, #alfil, #warmachine"},
+    bd: {parlett: "#warmachine, #bishop", image:"bishopwarmachine", url:"pc:bd"},
+    canvasser: {parlett: "#camel, #rook", image:"camelrook", url:"pc:canvassr"}, // yes, url is canvassr (no e)
+    carpenter: {parlett: "#knight, #warmachine", image:"knightwarmachine", url:"pc:carpentr"},
+    champion: {parlett: "#wazir, #alfil, #warmachine", url:"pc:champion"},
     //crowned_rook: {parlett: "#rook, #ferz"},       // TODO: image
-    general: {parlett: "#ferz", royal: true}, 
+    general: {parlett: "#wazir", royal: true, url:"pc:general"}, 
     kangaroo: {parlett: "#knight, #alfil"},  
     //wizard: {parlett: "#camel, #ferz"}, // TODO: image
     waffle: {parlett: "#wazir, #alfil", image:"elephantwazir"},
-    fad: {parlett: "#ferz, #alfil, #warmachine", image:"elephantferzwarmachine"},
+    fad: {parlett: "#ferz, #alfil, #warmachine", image:"elephantferzwarmachine", url:"pc:fad"},
     bede: {parlett: "#bishop, #warmachine", image:"bishopwarmachine"},
+    //fibnif: {parlett: "#ferz, [1,2], [-1,2], [-1,2], [-1,-2]", url:"pc:fibnif"},  // TODO: image
 
     // More complex fairy / non-intl chess pieces
     // See http://en.wikipedia.org/wiki/Fairy_chess_piece#Notable_examples
@@ -408,9 +412,9 @@ var PIECE_TYPES = {
     //colonel: {parlett: "n>, n=, 2/1>, 1*", letter: "XC"}, // TODO: image
     //murray_lion: {parlett: "~0/2, ~2/2, c1*", letter: "XM"}, // TODO: image
     lion: {parlett: "~n*", letter: "XL"},
-    elephant: {parlett: "2X", letter: "E", image:"elephantmodern"},  // Not a leaper, path can be blocked (unlike alfil, ~2X)
+    elephant: {parlett: "2X", letter: "E", image:"elephantmodern", url:"pc:elephant"},  // Not a leaper, path can be blocked (unlike alfil, ~2X)
     //khohn: {parlett: "1X, 1>", letter: "XK"}, // TODO: image
-    ferz: {parlett: "1X", letter: "XF"},
+    ferz: {parlett: "1X", letter: "XF", url:"pc:ferz"},
     wazir: {parlett: "1+", letter: "I"},
     // TODO: mushroom, try out Extended Parlett's [], explicitly giving relative moves. See:
     // http://www.chessvariants.org/graphics.dir/alfaeriemisc/spratt/ - would need to add (and all others)
@@ -456,8 +460,8 @@ var PIECE_TYPES = {
 
     // Novelties
     mushroom: {parlett: "[-1,2], [1,2], [3,1], [-3,1], [1,-1], [1,-2], [-1,-1], [-1,-2]"},
-    crab: {parlett: "[1,2], [-1,2], [-2,-1], [2,-1]", image: "crab2"},
-    barc: {parlett: "[1,-2], [-1,-2], [-2,1], [2,1]", image: "barc2"}
+    crab: {parlett: "[1,2], [-1,2], [-2,-1], [2,-1]", image: "crab2", url:"pc:crab"},
+    barc: {parlett: "[1,-2], [-1,-2], [-2,1], [2,1]", image: "barc2", url:"pc:barc"}
 
     // Pieces that probably won't be supported without significant coding
     //leo: {parlett: "on*, c^" + AMP, letter:"XO"},        // no &amp; support, whatever that is
