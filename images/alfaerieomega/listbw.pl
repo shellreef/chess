@@ -1,32 +1,35 @@
+#!/usr/bin/perl
+# Created:20090612
+# By Jeff Connelly
+#
+# Create comprehensive list of all pieces
+
 opendir(DIR,".")||die;
 my @files=readdir(DIR);
 closedir(DIR);
-my %whites, %blacks;
+my %colors;
 for my $file (@files)
 {
-    next if $file !~ m/^[bw]/ || $file !~ m/\.gif$/;
+    next if $file !~ m/\.gif$/;
 
-    if ($file =~ m/^w(.*)/) {
-        $whites{$1} = 1;
-    } elsif ($file =~ m/^b(.*)/) {
-        $blacks{$1} = 1;
-    } else {
-        die "??? $file";
-    }
+    my $color = substr($file, 0, 1);
+    my $key = substr($file, 1);
+
+    $colors{$color}{$key} = 1;
 }
 
 print <<HTML;
-<table><tr><th>#</th><th>white</th><th>black</th><th>name</th></tr>
+<table><tr><th>#</th><th>white</th><th>blue</th><th>name</th></tr>
 HTML
 my $i = 0;
-for my $name (sort keys %whites)
+for my $name (sort keys %{$colors{w}})
 {
     # Skip white pieces without corresponding black, currently:
     # wewall.gif
     # wforfnibakking.gif
     # wfurlrurlbakking.gif
     # wwwall.gif
-    next if !$blacks{$name};
+    next if !$colors{b}{$name};
 
     my $shortname;
     ($shortname = $name) =~ s/\.gif//;
