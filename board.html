@@ -359,9 +359,13 @@ var PIECE_TYPES = {
     royalrook: {parlett: "#rook", royal: true},
     royalbishop: {parlett: "#bishop", royal: true},
     maharajah: {parlett: "#amazon", letter: "XJ", royal: true, image:"paladin", url:"http://www.chessvariants.org/unequal.dir/maharaja.html"},   // Q+N+K, Maharajah chess TODO: crown amazon?
+    supermaharajah: {parlett: "#amazon, #camel", royal: true, image:"supermaharajaschah"},
     //royalqueen: {parlett: "#queen", royal: true},   // TODO: image
+    kingpawn: {parlett: "#king, #pawn", royal: true},
+    kingrook: {parlett: "#king, #rook", royal: true},
 
-    // Combined pieces
+
+    // Combined pieces (compound pieces)
     // From piececlopedia http://www.chessvariants.org/index/mainquery.php?type=Piececlopedia&orderby=LinkText&displayauthor=1&displayinventor=1&usethisheading=Piececlopedia
     // or http://members.shaw.ca/quadibloc/chess/ch03.htm or 
     // http://www.chessvariants.com/graphics.dir/alfaerie/
@@ -370,6 +374,7 @@ var PIECE_TYPES = {
     amazon: {parlett: "#queen, #knight", letter: "XV", url:"pc:amazon"},     // Q+N, aka superqueen
     chancellor: {parlett: "#rook, #knight", letter: "C", url:"pc:rook-knight"},   // R+N, aka empress, marshal (Capablanca, X-FEN standard)
     archbishop: {parlett: "#bishop, #knight", letter: "A", image: "cardinal", url:"pc:bishop-knight"}, // B+N, aka cardinal, princess, janus (Capablanca, X-FEN standard)
+    cardinalferz: {parlett: "#archbishop, #ferz"},
     dragonhorse: {parlett: "#bishop, #wazir", image: "promotedbishop", url:"pc:dragonhorse"},
     //berse: {parlett: "#rook, #ferz", image: "promtoedrook"},    // aka dragon king, but its not royal TODO: image
     caliph: {parlett: "#camel, #bishop", image: "camelbishop", url:"pc:caliph"},
@@ -385,6 +390,28 @@ var PIECE_TYPES = {
     elephantwazir: {parlett: "#elephant, #wazir"},
     elephantferzwarmachine: {parlett: "#elephant, #ferz, #warmachine"},
     warmachinewazir: {parlett: "#warmachine, #wazir"},
+    alfilbishop: {parlett: "#alfil, #bishop"},
+    camelferz: {parlett: "#camel, #ferz"},
+    camelqueen: {parlett: "#camel, #queen"},
+    crabalfil: {parlett: "#crab, #alfil"},
+    crabwarmachine: {parlett: "#crab, #warmachine", image:"crabdabbaba"},
+    crabferz: {parlett: "#crab, #ferz"},
+    elephantcamel: {parlett: "#elephant, #camel"},
+    elephantferz: {parlett: "#elephant, #ferz"},
+    elephantferzrook: {parlett: "#elephant, #ferz, #rook"},
+    elephantknight: {parlett: "#elephant, #knight"},
+    elephantknightwazir: {parlett: "#elephant, #knight, #wazir"},
+    elephantzzmoon: {parlett: "#elephant, #wizard"},
+    giraffeferz: {parlett: "#giraffe, #ferz"},
+    giraffewazir: {parlett: "#giraffe, #wazir"},
+    knightcamelzebra: {parlett: "#knight, #camel, #zebra"},
+    knightwarmachineferz: {parlett: "#knight, #warmachine, #ferz", image:"knightdababaferz"},
+    knightwazirwarmachine: {parlett: "#knight, #wazir, #warmachine"},
+    queenalfilwarmachine: {parlett: "#queen, #alfil, #warmachine", image:"queenalfildabbaba3"},
+    wazirwarmachinealfil: {parlett: "#wazir, #dabbaba, #alfil", image:"wazirdababaalfil"},
+    zebracamel: {parlett: "#zebra, #camel"},
+    zebraferz: {parlett: "#zebra, #ferz"},
+    zebrawazir: {parlett: "#zebra, #wazir"},
 
     //walker: {parlett: "o#wazir, c#ferz"}, // TODO: image
     tiger: {parlett: "o#bishop, c#knight"},
@@ -434,6 +461,8 @@ var PIECE_TYPES = {
     rocket: {parlett: "o<<1, o>>1, {~cn+>;snapback}"},    // shoots straight, not very mobile
     // Note: not the patented archer at http://www.google.com/patents?id=MLEWAAAAEBAJ&dq=5901957
     archer: {parlett: "o#bishop, {c#knight;snapback}"},     // quite mobile, but can't shoot very far
+    archerzz2: {parlett: "o#rook, {c#knight;snapback}"},
+    archerzz3: {parlett: "o#bishop, {c#squirrel;snapback}"},
 
     // Invincibles
     block: {parlett: "", invincible: true},
@@ -564,12 +593,12 @@ var SAVED_BOARDS = {
 "Test Leapers": "K/2E1Y1H1/3M/1XT1W1XG1Z/8/3Z1N/4oo/5k w - - 0 1", // TODO: antelope, flamingo
 "Test Amphibians": "4k/8/8/slslslsl/8/8/FFFFFFFF/4K w - - 0 1",
 "Test Royalty": "x(royalrook)x(royalknight)x(royalbishop)xjkx(royalbishop)x(royalknight)x(royalrook)/pppppppp/8/8/8/8/PPPPPPPP/X(royalrook)X(royalknight)X(royalbishop)XJKX(royalbishop)X(royalknight)X(royalrook) w KQkq - 0 1",
-"Test Projectiles": "x(airplane)X(airplane)4x(airplane)/8/1x(bird)/2x(bird)x(bird)x(bird)1x(bird)/3x(bird)x(bird)/4x(bird)/5X(archer)/x(frog)1X(gun)3X(rocket) w - - 0 1",
+"Test Projectiles": "x(airplane)X(airplane)4x(airplane)/8/1x(bird)/2x(bird)x(bird)x(bird)1x(bird)/3x(bird)x(bird)/3X(archerzz3)x(bird)/4X(archerzz2)X(archer)/x(frog)1X(gun)3X(rocket) w - - 0 1",
 "Test Invincibles": "3x(banner)x(banner)//x(banner)3x(block)3/4K3/5x(stone)/8/1kX(block)1X(stone)/1X(block)x(block) w - - 0 1",
 "Test Consumables": "4k/pppppppp/1pppppp1/2pppp2/X(bomb)2X(superbomb)/8/PPPPPPPP/4K w - - 0 1",
 "Test Mix 1": "X(airplane)x(airplane)/3x(pawnattackrook)x(caliph)x(pope)X(elephantwarmachine)/8/8/8/4S/X(lance)fwZ1X(pawnattackrook)/AcDeIFvT w - - 0 1",
 "Test Mix 2": "//1X(silvergeneral)X(2movewazirferz)/4X(mushroom)/3X(crab)X(wizard)/4X(barc)1X(goldgeneral)/2X(2movewazir)/7m w - - 0 1",
-"Test Mix 3": "TODO w - - 0 1"
+"Test Mix 3": "x(zebracamel)////3X(supermaharajah) w - - 0 1"
     },
 
     "Test Rules": {
