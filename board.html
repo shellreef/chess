@@ -417,6 +417,9 @@ var PIECE_TYPES = {
     //khohn: {parlett: "1X, 1>", letter: "XK"}, // TODO: image
     ferz: {parlett: "1X", letter: "XF", url:"pc:ferz"},
     wazir: {parlett: "1+", letter: "I", url:"pc:wazir"},
+    "2movewazir": {parlett: "2+"},
+    "2movewazirferz": {parlett: "2X, 2+"},
+
     // TODO: mushroom, try out Extended Parlett's [], explicitly giving relative moves. See:
     // http://www.chessvariants.org/graphics.dir/alfaeriemisc/spratt/ - would need to add (and all others)
     // http://www.chessvariants.org/piececlopedia.dir/mushroom.html
@@ -565,7 +568,8 @@ var SAVED_BOARDS = {
 "Test Invincibles": "3x(banner)x(banner)//x(banner)3x(block)3/4K3/5x(stone)/8/1kX(block)1X(stone)/1X(block)x(block) w - - 0 1",
 "Test Consumables": "4k/pppppppp/1pppppp1/2pppp2/X(bomb)2X(superbomb)/8/PPPPPPPP/4K w - - 0 1",
 "Test Mix 1": "X(airplane)x(airplane)/3x(pawnattackrook)x(caliph)x(pope)X(elephantwarmachine)/8/8/8/4S/X(lance)fwZ1X(pawnattackrook)/AcDeIFvT w - - 0 1",
-"Test Mix 2": "//1X(silvergeneral)/4X(mushroom)/3X(crab)X(wizard)/4X(barc)1X(goldgeneral)//7m w - - 0 1"
+"Test Mix 2": "//1X(silvergeneral)X(2movewazirferz)/4X(mushroom)/3X(crab)X(wizard)/4X(barc)1X(goldgeneral)/2X(2movewazir)/7m w - - 0 1",
+"Test Mix 3": "TODO w - - 0 1"
     },
 
     "Test Rules": {
