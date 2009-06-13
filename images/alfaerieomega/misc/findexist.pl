@@ -11,12 +11,10 @@ while(<FH>)
     my $fn = pop @a;
     my $dir = join("/", @a);
 
+    $fn = lc($fn);
     my $existing = "../$fn";
 
-    my $info = "";
-    if (same($existing, $path)) {
-        $info = "identical";
-    }
+    $info = "";
 
     if (-e($existing)) {
         print <<HTML;
