@@ -4204,7 +4204,37 @@ function load_starting_position(fen, replay)
     }
 }
 
-//// PIECE FUNCTIONS
+//// PIECE LIBRARY / INFO FUNCTIONS
+
+function toggle_piece_library()
+{
+    var table, lib;
+
+    new Effect.toggle("piece-library-parent", 'slide', { duration: 0.1 });
+
+    lib = $("piece-library");
+
+    // Lazily generate the table. 
+    if ($("piece-library-table")) {
+        return;
+    }
+
+    table = Builder.node("table", {width: "100%", id:"piece-library-table"}, [Builder.node("tr"), [
+            Builder.node("th", "Images"),
+            Builder.node("th", "Name")
+            ]]);
+
+    for (var type in PIECE_TYPES) {
+        if (PIECE_TYPES.hasOwnProperty(type)) {
+            var row = Builder.node("tr", [
+                    Builder.node("td", [create_piece("white", type), create_piece("black", type)]),
+                    Builder.node("td", type)]);
+            table.appendChild(row);
+        }
+    }
+
+    lib.appendChild(table);
+}
 
 // Show information on a piece
 function show_piece_inspector(piece)
@@ -4266,6 +4296,8 @@ function hide_piece_inspector()
 
     inspector.hide();
 }
+
+//// PIECE FUNCTIONS
 
 // Name each piece, in standard chess1 locations, using English descriptive notation.
 function name_pieces()
@@ -5031,8 +5063,8 @@ function enable_document_selection(enable) {
 
  <!-- TODO: disclosure triangles -->
  <p><a href="javascript:new Effect.toggle('controls', 'slide', { duration: 0.1 })">controls</a> | 
-    <a href="javascript:new Effect.toggle('piece-library-parent', 'slide', { duration: 0.1 })">pieces</a>
- 
+    <a href="javascript:toggle_piece_library();">pieces</a>
+
  <div id="controls" style="display: none; border-left: 2px solid blue">
  <div>
 
@@ -5060,16 +5092,7 @@ function enable_document_selection(enable) {
  <!-- end controls-->
 
  <div id="piece-library-parent" style="display: none">
- <div id="piece-library" style="width: 600px; height: 325px; overflow: scroll">
- Lorem ipsum dolor sit amet natus et architecto aspernatur beatae vitae sit error error, sed magni ab qui ratione nemo vitae beatae accusantium eos eaque vitae qui totam doloremque voluptas voluptas, enim consequuntur ut aut consequuntur illo veritatis sed odit eaque illo voluptatem iste quia sit doloremque doloremque , natus quia quae rem error sit aut odit perspiciatis ut accusantium sed accusantium aut qui
-
- Lorem ipsum dolar sit amet voluptatem vitae aspernatur explicabo dicta veritatis illo ipsa iste nemo laudantium fugit omnis omnis, voluptatem perspiciatis eaque illo rem ab aut illo quae veritatis explicabo ab dolores ut sit quia quasi rem inventore explicabo explicabo, qui voluptas unde aperiam totam error et consequuntur ab sed ipsam voluptas dicta ratione natus error ipsa perspiciatis voluptatem qui qui, iste magni odit sed consequuntur laudantium aut voluptas aut quasi omnis sed enim enim laudantium laudantium, ipsa ipsa rem ipsam
-
- Lorem ipsum dolar sit amet voluptatem vitae aspernatur explicabo dicta veritatis illo ipsa iste nemo laudantium fugit omnis omnis, voluptatem perspiciatis eaque illo rem ab aut illo quae veritatis explicabo ab dolores ut sit quia quasi rem inventore explicabo explicabo, qui voluptas unde aperiam totam error et consequuntur ab sed ipsam voluptas dicta ratione natus error ipsa perspiciatis voluptatem qui qui, iste magni odit sed consequuntur laudantium aut voluptas aut quasi omnis sed enim enim laudantium laudantium, ipsa ipsa rem ipsam
-
- Lorem ipsum dolar sit amet voluptatem vitae aspernatur explicabo dicta veritatis illo ipsa iste nemo laudantium fugit omnis omnis, voluptatem perspiciatis eaque illo rem ab aut illo quae veritatis explicabo ab dolores ut sit quia quasi rem inventore explicabo explicabo, qui voluptas unde aperiam totam error et consequuntur ab sed ipsam voluptas dicta ratione natus error ipsa perspiciatis voluptatem qui qui, iste magni odit sed consequuntur laudantium aut voluptas aut quasi omnis sed enim enim laudantium laudantium, ipsa ipsa rem ipsam
-
- </div>
+ <div id="piece-library" style="width: 600px; height: 325px; overflow: scroll"></div>
  </div>
 
   <div id="captured_piece_images" style="width: 250px;"></div>
