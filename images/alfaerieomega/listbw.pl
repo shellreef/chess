@@ -18,9 +18,7 @@ for my $file (@files)
     $colors{$color}{$key} = 1;
 }
 
-print <<HTML;
-<table><tr><th>#</th><th>white</th><th>blue</th><th>name</th></tr>
-HTML
+print "<table>\n";
 my $i = 0;
 for my $name (sort keys %{$colors{w}})
 {
@@ -35,7 +33,7 @@ for my $name (sort keys %{$colors{w}})
     ($shortname = $name) =~ s/\.gif//;
     $i += 1;
     print "<tr><td>$i</td>";
-    for my $color (qw(w b)) {
+    for my $color (qw(w b r g y l)) {
         print "<td>";
         print "<img src=\"$color$name\">" if $colors{$color}{$name};
         print "</td>";
