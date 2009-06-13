@@ -4223,16 +4223,31 @@ function load_starting_position(fen, replay)
 // Show all available images, even those without movement
 function show_library_images()
 {
-    var root = "images/alfaerieomega/";
+    var root = "images/" + PREFS.image_set + "/";
+    var used_paths = {};
+
+    // Map path of used image to piece type it is used for
+    for (var type in PIECE_TYPES) {
+        if (PIECE_TYPES.hasOwnProperty(type)) {
+            used_paths[image_path_for(type, "white")] = type;
+        }
+    }
+
+    // Get list of all images, even those not being used in a piece
     dojo.xhrGet({url:root + "list.txt", load:function(text) {
         var images = text.split("\n");
 
         document.write("<table>");
         for (var i = 0; i < images.length; i += 1) {
             var image = images[i];
+            var wpath = root + "w" + image + ".gif";
+            var bpath = root + "b" + image + ".gif";
+
             document.write('<tr>');
-            document.write('<td><img src="' + root + 'w' + image + '.gif"></td>');
-            document.write('<td><img src="' + root + 'b' + image + '.gif">' + image + '</td>');
+            document.write('<td><img src="' + wpath + '"></td>');
+            document.write('<td><img src="' + bpath + '"></td>');
+            document.write('<td>' + image + '</td>');
+            document.write('<td>' + (used_paths[wpath] || "") + '</td>');
             document.write('</tr>');
         }
         document.write('</table>');
@@ -4279,6 +4294,7 @@ function toggle_piece_library()
     }
 
     lib.appendChild(table);
+    lib.appendChild(Builder.node("a", {href: "javascript:show_library_images()"}, ["show all images (clears page)"]));
 }
 
 // Show information on a piece
@@ -5145,9 +5161,7 @@ function enable_document_selection(enable) {
  <!-- end controls-->
 
  <div id="piece-library-parent" style="display: none">
- <div id="piece-library" style="width: 600px; height: 325px; overflow: scroll">
- <a href="javascript:show_library_images()">all images</a>
- </div>
+ <div id="piece-library" style="width: 600px; height: 325px; overflow: scroll"> </div>
  </div>
 
   <div id="captured_piece_images" style="width: 250px;"></div>
