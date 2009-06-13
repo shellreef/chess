@@ -3413,6 +3413,17 @@ function init_board()
         }
     }
 
+    // Label ranks and files
+    var ranks = dojo.query(".rank.label")
+    for (var i = 0; i < ranks.length; i += 1) {
+        ranks[i].innerHTML = 8 - i;
+    }
+
+    var files = dojo.query(".file.label");
+    for (i = 0; i < files.length; i += 1) {
+        files[i].innerHTML = String.fromCharCode("a".charCodeAt(0) + i);
+    }
+
 
     document.onkeydown = function(event) {
             if (!event.keyCode) { 
