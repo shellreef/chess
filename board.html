@@ -3362,23 +3362,12 @@ function init_board()
     }
 
 
-    // Konami code
-    // TODO: type to move, match anything
-    /*
-    KEYS_PRESSED = [];
     document.onkeydown = function(event) {
             if (!event.keyCode) { 
                 return;
             }
-            KEYS_PRESSED.push(event.keyCode);
-            if (KEYS_PRESSED.length > 11) {
-                KEYS_PRESSED.shift();
-            }
-            if (KEYS_PRESSED.join('') === '3838404037393739666513') {
-                alert("TODO: easter egg");
-            }
+            // TODO: type move to do it
         };
-    */
 
     var board_menu = $("saved_board_menu");
 
