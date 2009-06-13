@@ -4562,8 +4562,11 @@ function create_piece(color, type)
             if (square) {
                 dojo.removeClass(square, "recent-move-" + square.color);
             }
-            
-            hide_piece_inspector();
+           
+            if (!event.shiftKey) {
+                hide_piece_inspector();
+            }
+
             GAME_STATE.piece_under = null;
         });
 
