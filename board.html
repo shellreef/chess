@@ -254,7 +254,8 @@ var GAME_STATE = {
     active_in_check: false,
     recent_piece: null,         // Recently moved piece
     recent_square: null,        // Recently moved from square
-    last_captured: null         // export_captured() string _before_ current move 
+    last_captured: null,        // export_captured() string _before_ current move 
+    piece_under: null           // Piece under mouse for piece inspector
 };    
 
 // Moves that can be made right now, for each active piece.
@@ -3367,6 +3368,11 @@ function init_board()
                 return;
             }
             // TODO: type move to do it
+            
+            // Shift = show piece inspector
+            if (event.keyCode === 16) {
+                show_piece_inspector(GAME_STATE.piece_under);
+            }
         };
 
     var board_menu = $("saved_board_menu");
@@ -4542,10 +4548,9 @@ function create_piece(color, type)
             if (square) {
                 dojo.addClass(square, "recent-move-" + square.color);
             }
-           
-            if (event.shiftKey) {
-                show_piece_inspector(piece);
-            }
+          
+            GAME_STATE.piece_under = piece;
+            show_piece_inspector(piece);
         });
     Event.observe(piece, 'mouseout', function(event) {
             var square = highlight_moves(piece, false);
@@ -4553,8 +4558,8 @@ function create_piece(color, type)
             if (square) {
                 dojo.removeClass(square, "recent-move-" + square.color);
             }
-            
-            hide_piece_inspector();
+        
+            GAME_STATE.piece_under = null;
         });
 
     // Make all new pieces draggable. I tried only making the active color's
