@@ -4220,6 +4220,26 @@ function load_starting_position(fen, replay)
 
 //// PIECE LIBRARY / INFO FUNCTIONS
 
+// Show all available images, even those without movement
+function show_library_images()
+{
+    var root = "images/alfaerieomega/";
+    dojo.xhrGet({url:root + "list.txt", load:function(text) {
+        var images = text.split("\n");
+
+        document.write("<table>");
+        for (var i = 0; i < images.length; i += 1) {
+            var image = images[i];
+            document.write('<tr>');
+            document.write('<td><img src="' + root + 'w' + image + '.gif"></td>');
+            document.write('<td><img src="' + root + 'b' + image + '.gif">' + image + '</td>');
+            document.write('</tr>');
+        }
+        document.write('</table>');
+    }});
+}
+
+// Show the piece library, of readily usable pieces with defined movement
 function toggle_piece_library()
 {
     var table, lib, enable_edit_mode, parent;
