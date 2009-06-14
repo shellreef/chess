@@ -149,8 +149,12 @@ dojo.addOnLoad(function(){
         offset_y: 0,
         element: null,      // what is being dragged
         old_zindex: 0,      
-        ing: false,         // true if dragging is in process
-        drop_area: {}       // box to be detect drop areas in
+        ing: false
+    };
+
+    var DROP = {
+        area: {},           // box to detect drop areas in
+        square: null        // square dropping over
     };
 
     // Hide address bar
@@ -253,16 +257,16 @@ dojo.addOnLoad(function(){
     function over(element, left, top)
     {
         // Position from center
-        var x = left + (DRAG.drop_area.cell_width / 2);
-        var y = top + (DRAG.drop_area.cell_width / 2);
+        var x = left + (DROP.area.cell_width / 2);
+        var y = top + (DROP.area.cell_width / 2);
 
         // Inside board?
-        if (x > DRAG.drop_area.left && y > DRAG.drop_area.top &&
-            x < DRAG.drop_area.right && y < DRAG.drop_area.bottom) {
+        if (x > DROP.area.left && y > DROP.area.top &&
+            x < DROP.area.right && y < DROP.area.bottom) {
 
             // Find cell mathematically
-            var cell_x = Math.ceil((x - DRAG.drop_area.left) / DRAG.drop_area.cell_width);
-            var cell_y = Math.ceil((DRAG.drop_area.right - y) / DRAG.drop_area.cell_width);
+            var cell_x = Math.ceil((x - DROP.area.left) / DROP.area.cell_width);
+            var cell_y = Math.ceil((DROP.area.right - y) / DROP.area.cell_width);
             if (cell_y === 0) {
                 cell_y = 1;
             }
@@ -271,12 +275,17 @@ dojo.addOnLoad(function(){
             var flipped = false;
             var square  = dojo.query('#board-body')[0].childNodes[flipped ? cell_y : 9 - cell_y].childNodes[flipped ? 9 - cell_x : cell_x];
 
-            dojo.query(".drop-square").removeClass("drop-square");
+            if (DROP.square) {
+                dojo.removeClass(DROP.square, "drop-square");
+            }
+
+            DROP.square = square;
             dojo.addClass(square, "drop-square");
 
         } else {
-            // TODO: store and clear
-            //dojo.query(".drop-square").removeClass("drop-square");
+            if (DROP.square) {
+                dojo.removeClass(DROP.square, "drop-square");
+            }
 
             // TODO: change icon to show out of range, if was from within range
         }
@@ -334,20 +343,20 @@ dojo.addOnLoad(function(){
         var top_left_square = dojo.query("#top-left-square")[0];
         var bottom_right_square = dojo.query("#bottom-right-square")[0];
         var top_left = dojo._abs(top_left_square);
-        DRAG.drop_area.left = top_left.x;
-        DRAG.drop_area.top = top_left.y;
+        DROP.area.left = top_left.x;
+        DROP.area.top = top_left.y;
 
         var bottom_right_top_left = dojo._abs(bottom_right_square);
-        DRAG.drop_area.cell_width = dojo.style(bottom_right_square, "width");
-        DRAG.drop_area.width = bottom_right_top_left.x - DRAG.drop_area.left + DRAG.drop_area.cell_width;
+        DROP.area.cell_width = dojo.style(bottom_right_square, "width");
+        DROP.area.width = bottom_right_top_left.x - DROP.area.left + DROP.area.cell_width;
         console.log(dojo.style(bottom_right_square, "height"));
-        DRAG.drop_area.height  = bottom_right_top_left.y - DRAG.drop_area.top + DRAG.drop_area.cell_width; // square
+        DROP.area.height  = bottom_right_top_left.y - DROP.area.top + DROP.area.cell_width; // square
 
         // for testing
-        //dojo._setBox(foo, DRAG.drop_area.left, DRAG.drop_area.top, DRAG.drop_area.width, DRAG.drop_area.height, "px");
+        //dojo._setBox(foo, DROP.area.left, DROP.area.top, DROP.area.width, DROP.area.height, "px");
 
-        DRAG.drop_area.right = DRAG.drop_area.left + DRAG.drop_area.width;
-        DRAG.drop_area.bottom = DRAG.drop_area.top + DRAG.drop_area.height;
+        DROP.area.right = DROP.area.left + DROP.area.width;
+        DROP.area.bottom = DROP.area.top + DROP.area.height;
     }
 });
 </script>
