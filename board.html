@@ -3371,7 +3371,7 @@ function make_vboard()
 function flip()
 {
     label_board(!GAME_STATE.flipped);
-    load_fen(active_fen());
+    load_fen(active_fen(), true);
 }
 
 // Internally name the square cells with their (x,y) coordinates
