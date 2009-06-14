@@ -303,6 +303,7 @@ dojo.addOnLoad(function(){
             
             if (DROP.square) {
                 dojo.removeClass(DROP.square, "drop-square");
+                DROP.square = null;
             }
 
             // TODO: change icon to show out of range, if was from within range
@@ -360,16 +361,21 @@ dojo.addOnLoad(function(){
         }
 
         square = DROP.square;
+        if (!square) {
+            // TODO: Only revert when not over a valid square
+            
+            // Revert
+            // TODO: use webkit transforms if available; faster
+            dojo.anim(piece, { left: DRAG.initial_left, top: DRAG.initial_top }, 350);
+            return;
+        }
+
         dojo.addClass(square, "legal-move-black");
 
         console.log(piece, square);
         //alert("Drop" + piece + " " + square);
         // TODO: move 
 
-        // TODO: Only revert when not over a valid square
-        
-        // Revert
-        dojo.anim(piece, { left: DRAG.initial_left, top: DRAG.initial_top });
     }
 
     function init_dnd() {
