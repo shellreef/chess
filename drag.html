@@ -147,9 +147,9 @@ dojo.addOnLoad(function(){
         start_y: 0,
         offset_x: 0,
         offset_y: 0,
-        element: null,      // what is being dragged
+        element: null,      // (desktop) what is being dragged
         old_zindex: 0,      
-        ing: false
+        ing: false          // (phone) if something is being dragged
     };
 
     var DROP = {
@@ -171,6 +171,10 @@ dojo.addOnLoad(function(){
         event = event || window.event;
 
         target = event.target !== undefined ? event.target : event.srcElement;
+
+        if (target.className.indexOf("draggable") === -1) {
+            return;
+        }
 
         DRAG.initial_x = event.clientX;
         DRAG.initial_y = event.clientY;
@@ -311,11 +315,15 @@ dojo.addOnLoad(function(){
         document.onselectstart = null;
         DRAG.element.ondragstart = null;
 
+        drop();
+
         DRAG.element = null;
     }
 
 
     function touchend(evt){
+        drop();
+
         for (var i = 0; i < evt.changedTouches.length; ++i) {
             var e = evt.changedTouches[i];
 
@@ -332,6 +340,19 @@ dojo.addOnLoad(function(){
                 }
             }
         }
+    }
+
+    function drop()
+    {
+        if (!DRAG.element && !DRAG.ing) {
+            // Nothing was being dragged
+            return;
+        }
+
+        alert("Drop" + DRAG.element + " " + DRAG.ing);
+        console.log(DROP.square);
+
+        // TODO: move 
     }
 
     function init_dnd() {
@@ -480,6 +501,6 @@ dojo.addOnLoad(function(){
 <img src="images/alfaerieomega/wbishop.gif" class="draggable" style="left: 100px; top: 0px">
 <img src="images/alfaerieomega/bking.gif" class="draggable" style="left: 50px; top: 0px">
 <img src="images/alfaerieomega/wking.gif" class="draggable" style="left: 0px; top: 0px">
-<div style="background-color: black; width: 50px; height: 50px; left: 100px; position: absolute;"></div> <!-- not draggable -->
+<!-- <div style="background-color: black; width: 50px; height: 50px; left: 100px; position: absolute;"></div> --> <!-- not draggable -->
 </body>
 </html>
