@@ -147,7 +147,8 @@ dojo.addOnLoad(function(){
         start_y: 0,
         offset_x: 0,
         offset_y: 0,
-        element: null,      // what is being dragged
+        element_m: null,    // what is being dragged by the mouse
+        element_t: null,    // by the touch interface
         old_zindex: 0,      
         ing: false          // whether something is being dragged
     };
@@ -187,7 +188,7 @@ dojo.addOnLoad(function(){
         target.style.zIndex = 10000;
 
         // Capture mouse
-        DRAG.element = target;
+        DRAG.element_m = target;
         document.onmousemove = mousemove;
         document.onmouseup = mouseup;
 
@@ -220,7 +221,7 @@ dojo.addOnLoad(function(){
             
         event = event || window.event;
 
-        element = DRAG.element;
+        element = DRAG.element_m;
 
         // Must have draggable class
         if (!element || element.className.indexOf("draggable") === -1) {
@@ -253,8 +254,7 @@ dojo.addOnLoad(function(){
                     e.target.style.top = new_y + "px";
 
                     dragging_over(e.target, new_x, new_y);
-                    // TODO: find out why this breaks hover
-                    DRAG.element = e.target;
+                    DRAG.element_t = e.target;
             }
         }
     }
@@ -308,18 +308,18 @@ dojo.addOnLoad(function(){
 
     function mouseup()
     {
-        if (DRAG.element === null) {
+        if (DRAG.element_m === null) {
             return;
         }
 
-        DRAG.element.style.zIndex = DRAG.old_zindex;
+        DRAG.element_m.style.zIndex = DRAG.old_zindex;
         document.onmousemove = null;
         document.onselectstart = null;
-        DRAG.element.ondragstart = null;
+        DRAG.element_m.ondragstart = null;
 
         drop();
 
-        DRAG.element = null;
+        DRAG.element_m = null;
     }
 
 
@@ -346,12 +346,15 @@ dojo.addOnLoad(function(){
 
     function drop()
     {
-        if (!DRAG.element && !DRAG.ing) {
+        var piece;
+
+        piece = DRAG.element_t || DRAG.element_m;
+        if (!piece) {
             // Nothing was being dragged
             return;
         }
 
-        alert("Drop" + DRAG.element + " " + DRAG.ing);
+        alert("Drop" + piece);
         dojo.addClass(DROP.square, "legal-move-black");
 
         // TODO: move 
