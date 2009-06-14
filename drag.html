@@ -22,8 +22,12 @@ table.board
 /* This is like cellspacing=0 cellpadding=0 */
  border-collapse: collapse;
 
-/* Firefox: disable text selection when dragging */
+/* Firefox and Safari: disable text selection when dragging */
  -moz-user-select: none;
+ -webkit-user-select: none;
+
+/* Standard http://www.w3.org/TR/1999/WD-css3-userint-19990916#user-select */
+ user-select: none;
 }
 
 td.square
@@ -122,11 +126,25 @@ td.drop-square-capture2 { background-color: red !important; }
  * http://www.sitepen.com/labs/code/iphone/events.html
  */
 
+// Based on http://tech.hickorywind.org/articles/2008/10/24/turning-off-text-selection-in-javascript
+var ORIGINAL_ONSELECTSTART;
+function enable_document_selection(enable) {
+    if(enable) {
+        document.onselectstart = ORIGINAL_ONSELECTSTART;
+    } else {
+        ORIGINAL_ONSELECTSTART = document.onselectstart;
+        document.onselectstart = function() { return false; };
+    }
+}
+
+
 
 dojo.addOnLoad(function(){
     // Hide address bar
     setTimeout(function() { window.scrollTo(0, 1); }, 0);
-
+    enable_document_selection(false);
+    init_dnd();
+        
     var DRAG = 
     {
         start_x: 0,
@@ -262,8 +280,6 @@ dojo.addOnLoad(function(){
             });
         document.ontouchend = touchend;
     }
-
-    init_dnd();
 });
 </script>
 </body>
