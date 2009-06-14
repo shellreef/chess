@@ -961,9 +961,16 @@ function reload_pgn()
 // TODO: support a tag for captured pieces, and tags for FEN at each move so don't need to compute
 function load_pgn(pgn)
 {
-    var game = parse_pgn(pgn);
+    var games = parse_pgn(pgn);
+    var game;
     var tags = ["White", "WhiteElo", "Black", "BlackElo", "Event", "Round", "Site", "Date", "Time"];
     var time_started = new Date().getTime();
+
+    // TODO: UI to list all games in a PGN and pick one to load, move out parsing from this function
+    assert(games.length === 1,
+            "load_pgn(" + pgn + "): multiple games (" + games.length + ") found, but only one can be loaded at a time");
+
+    game = games[0];
 
     // Header
     for (var i = 0; i < tags.length; i += 1) {
@@ -1050,7 +1057,7 @@ function load_pgn(pgn)
     }
 }
 
-// Parse PGN into a dictionary
+// Parse PGN into an array of dictionaries, one dictionary per game.
 function parse_pgn(pgn)
 {
     var dict = {move_text: ""};
@@ -1166,8 +1173,7 @@ function parse_pgn(pgn)
         dict.moves = moves;
     }
 
-    // TODO: Return all
-    return dicts[0];
+    return dicts;
 }
 
 // Export a PGN tag dictionary to PGN format, opposite of parse_pgn.
