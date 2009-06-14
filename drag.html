@@ -138,9 +138,6 @@ function enable_document_selection(enable) {
 }
 
 
-
-dojo.addOnLoad(function(){
-       
     var DRAG = 
     {
         start_x: 0,
@@ -158,6 +155,9 @@ dojo.addOnLoad(function(){
         square: null        // square dropping over
     };
 
+
+dojo.addOnLoad(function(){
+       
     // Hide address bar
     setTimeout(function() { window.scrollTo(0, 1); }, 0);
     enable_document_selection(false);
@@ -182,6 +182,9 @@ dojo.addOnLoad(function(){
 
         DRAG.start_x = target.offsetLeft;
         DRAG.start_y = target.offsetTop;
+
+        DRAG.initial_left = dojo.style(target, "left");
+        DRAG.initial_top = dojo.style(target, "top");
 
         // Bring to front
         DRAG.old_zindex = target.style.zIndex;
@@ -346,7 +349,7 @@ dojo.addOnLoad(function(){
 
     function drop()
     {
-        var piece;
+        var piece, square;
 
         piece = (DRAG.ing && DRAG.element_t) || DRAG.element_m;
         if (!piece) {
@@ -354,10 +357,17 @@ dojo.addOnLoad(function(){
             return;
         }
 
-        alert("Drop" + piece);
-        dojo.addClass(DROP.square, "legal-move-black");
+        square = DROP.square;
+        dojo.addClass(square, "legal-move-black");
 
+        console.log(piece, square);
+        //alert("Drop" + piece + " " + square);
         // TODO: move 
+
+        // TODO: Only revert when not over a valid square
+        
+        // Revert
+        dojo.anim(piece, { left: DRAG.initial_left, top: DRAG.initial_top });
     }
 
     function init_dnd() {
@@ -502,9 +512,9 @@ dojo.addOnLoad(function(){
 ></table>
 
 <p>
-<img src="images/alfaerieomega/wbishop.gif" class="draggable" style="left: 100px; top: 0px">
-<img src="images/alfaerieomega/bking.gif" class="draggable" style="left: 50px; top: 0px">
-<img src="images/alfaerieomega/wking.gif" class="draggable" style="left: 0px; top: 0px">
+<img id="p1" src="images/alfaerieomega/wbishop.gif" class="draggable" style="left: 100px; top: 0px">
+<img id="p2" src="images/alfaerieomega/bking.gif" class="draggable" style="left: 50px; top: 0px">
+<img id="p3" src="images/alfaerieomega/wking.gif" class="draggable" style="left: 0px; top: 0px">
 <!-- <div style="background-color: black; width: 50px; height: 50px; left: 100px; position: absolute;"></div> --> <!-- not draggable -->
 </body>
 </html>
