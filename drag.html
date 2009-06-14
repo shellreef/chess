@@ -237,9 +237,9 @@ dojo.addOnLoad(function(){
         new_y = event.clientY - DRAG.initial_y + DRAG.start_y;
 
         // Drag
+        element.style.webkitTransition = "";
         element.style.left = new_x + "px";
         element.style.top = new_y + "px";
-
         dragging_over(element, new_x, new_y);
 
         return false;
@@ -255,6 +255,7 @@ dojo.addOnLoad(function(){
                     var new_x = e.pageX - DRAG.ing[0];
                     var new_y = e.pageY - DRAG.ing[1];
                     
+                    e.target.style.webkitTransition = "";
                     e.target.style.left = new_x + "px";
                     e.target.style.top = new_y + "px";
 
@@ -366,7 +367,10 @@ dojo.addOnLoad(function(){
             
             // Revert
             // TODO: use webkit transforms if available; faster
-            dojo.anim(piece, { left: DRAG.initial_left, top: DRAG.initial_top }, 350);
+            //dojo.anim(piece, { left: DRAG.initial_left, top: DRAG.initial_top }, 350);
+            piece.style.webkitTransition = "left 350ms linear, top 350ms linear";
+            piece.style.left = DRAG.initial_left + "px";
+            piece.style.top  = DRAG.initial_top + "px";
             return;
         }
 
