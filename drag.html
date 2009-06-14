@@ -250,11 +250,35 @@ dojo.addOnLoad(function(){
     }
 
     // Detect if over droppable area
-    function over(element, x, y)
+    function over(element, left, top)
     {
+        // Position from center
+        var x = left + (DRAG.drop_area.cell_width / 2);
+        var y = top + (DRAG.drop_area.cell_width / 2);
+
+        // Inside board?
         if (x > DRAG.drop_area.left && y > DRAG.drop_area.top &&
             x < DRAG.drop_area.right && y < DRAG.drop_area.bottom) {
-            console.log("within");
+
+            // Find cell mathematically
+            var cell_x = Math.ceil((x - DRAG.drop_area.left) / DRAG.drop_area.cell_width);
+            var cell_y = Math.ceil((DRAG.drop_area.right - y) / DRAG.drop_area.cell_width);
+            if (cell_y === 0) {
+                cell_y = 1;
+            }
+
+            // TODO: use SQUARES, considered flipped
+            var flipped = false;
+            var square  = dojo.query('#board-body')[0].childNodes[flipped ? cell_y : 9 - cell_y].childNodes[flipped ? 9 - cell_x : cell_x];
+
+            dojo.query(".drop-square").removeClass("drop-square");
+            dojo.addClass(square, "drop-square");
+
+        } else {
+            // TODO: store and clear
+            //dojo.query(".drop-square").removeClass("drop-square");
+
+            // TODO: change icon to show out of range, if was from within range
         }
     }
 
@@ -314,11 +338,13 @@ dojo.addOnLoad(function(){
         DRAG.drop_area.top = top_left.y;
 
         var bottom_right_top_left = dojo._abs(bottom_right_square);
-        DRAG.drop_area.width = bottom_right_top_left.x - DRAG.drop_area.left + dojo.style(bottom_right_square, "width");
+        DRAG.drop_area.cell_width = dojo.style(bottom_right_square, "width");
+        DRAG.drop_area.width = bottom_right_top_left.x - DRAG.drop_area.left + DRAG.drop_area.cell_width;
         console.log(dojo.style(bottom_right_square, "height"));
-        DRAG.drop_area.height  = bottom_right_top_left.y - DRAG.drop_area.top + dojo.style(bottom_right_square, "width"); // square
+        DRAG.drop_area.height  = bottom_right_top_left.y - DRAG.drop_area.top + DRAG.drop_area.cell_width; // square
 
-        dojo._setBox(foo, DRAG.drop_area.left, DRAG.drop_area.top, DRAG.drop_area.width, DRAG.drop_area.height, "px");
+        // for testing
+        //dojo._setBox(foo, DRAG.drop_area.left, DRAG.drop_area.top, DRAG.drop_area.width, DRAG.drop_area.height, "px");
 
         DRAG.drop_area.right = DRAG.drop_area.left + DRAG.drop_area.width;
         DRAG.drop_area.bottom = DRAG.drop_area.top + DRAG.drop_area.height;
@@ -435,7 +461,7 @@ dojo.addOnLoad(function(){
 ></table>
 
 <p>
-<div id="foo" class="draggable" style="background-color: blue; width: 417px; height: 412px; top: 0px; left: 0px;"></div>
+<div id="foo" class="draggable" style="background-color: blue; width: 50px; height: 50px; top: 0px; left: 0px;"></div>
 <div class="draggable" style="background-color: red; width: 50px; height: 50px; top: 0px; left: 100px;"></div>
 <div class="draggable" style="background-color: yellow; width: 50px; height: 50px; top: 100px; left: 0px;"></div>
 <div class="draggable" style="background-color: gray; width: 30px; height: 30px; left: 150px; top: 150px;"></div>
