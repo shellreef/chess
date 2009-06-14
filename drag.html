@@ -147,9 +147,9 @@ dojo.addOnLoad(function(){
         start_y: 0,
         offset_x: 0,
         offset_y: 0,
-        element: null,      // (desktop) what is being dragged
+        element: null,      // what is being dragged
         old_zindex: 0,      
-        ing: false          // (phone) if something is being dragged
+        ing: false          // whether something is being dragged
     };
 
     var DROP = {
@@ -253,6 +253,8 @@ dojo.addOnLoad(function(){
                     e.target.style.top = new_y + "px";
 
                     dragging_over(e.target, new_x, new_y);
+                    // TODO: find out why this breaks hover
+                    DRAG.element = e.target;
             }
         }
     }
@@ -350,7 +352,7 @@ dojo.addOnLoad(function(){
         }
 
         alert("Drop" + DRAG.element + " " + DRAG.ing);
-        console.log(DROP.square);
+        dojo.addClass(DROP.square, "legal-move-black");
 
         // TODO: move 
     }
@@ -366,7 +368,6 @@ dojo.addOnLoad(function(){
         document.ontouchend = touchend;
 
         // Get dimensions of droppable area
-        // TODO: allow dropping and get cell from within
         var foo = dojo.query("#foo")[0];
         var top_left_square = dojo.query("#top-left-square")[0];
         var bottom_right_square = dojo.query("#bottom-right-square")[0];
