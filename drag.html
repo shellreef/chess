@@ -279,6 +279,22 @@ dojo.addOnLoad(function(){
                 e.ontouchmove = touchmove;
             });
         document.ontouchend = touchend;
+
+        // Get dimensions of droppable area
+        // TODO: allow dropping and get cell from within
+        var l, t, w, h;
+        var foo = dojo.query("#foo")[0];
+        var top_left_square = dojo.query("#top-left-square")[0];
+        var bottom_right_square = dojo.query("#bottom-right-square")[0];
+        var top_left = dojo._abs(top_left_square);
+        l = top_left.x;
+        t = top_left.y;
+
+        var bottom_right_top_left = dojo._abs(bottom_right_square);
+        w = bottom_right_top_left.x;
+        h = bottom_right_top_left.y;
+
+        dojo._setBox(foo, l, t, w, h, "px");
     }
 });
 </script>
@@ -302,7 +318,7 @@ dojo.addOnLoad(function(){
 ></tr
 ><tr
   ><td class="rank label">8</td
-  ><td class="white square"></td
+  ><td class="white square" id="top-left-square"></td
   ><td class="black square"></td
   ><td class="white square"></td
   ><td class="black square"></td
@@ -386,15 +402,17 @@ dojo.addOnLoad(function(){
  ><td class="black square bottom-edge"></td
  ><td class="white square bottom-edge"></td
  ><td class="black square bottom-edge"></td
- ><td class="white square bottom-edge right-edge"></td
+ ><td class="white square bottom-edge right-edge" id="bottom-right-square"></td
 ></tr
 ></tbody
 ></table>
 
-<p><div class="draggable" style="background-color: blue; width: 50px; height: 50px; top: 0px; left: 0px;"></div>
-<p><div class="draggable" style="background-color: red; width: 50px; height: 50px; top: 0px; left: 100px;"></div>
+<p>
+<div id="foo" class="draggable" style="background-color: blue; width: 417px; height: 412px; top: 0px; left: 0px;"></div>
+<div class="draggable" style="background-color: red; width: 50px; height: 50px; top: 0px; left: 100px;"></div>
 <div class="draggable" style="background-color: yellow; width: 50px; height: 50px; top: 100px; left: 0px;"></div>
 <div class="draggable" style="background-color: gray; width: 30px; height: 30px; left: 150px; top: 150px;"></div>
+<img src="images/alfaerieomega/wking.gif" class="draggable" style="left: 200px; top: 475px">
 <div style="background-color: black; width: 50px; height: 50px; left: 100px; position: absolute;"></div> <!-- not draggable -->
 </body>
 </html>
