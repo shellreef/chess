@@ -291,8 +291,9 @@ dojo.addOnLoad(function(){
         t = top_left.y;
 
         var bottom_right_top_left = dojo._abs(bottom_right_square);
-        w = bottom_right_top_left.x;
-        h = bottom_right_top_left.y;
+        w = bottom_right_top_left.x - l + dojo.style(bottom_right_square, "width");
+        console.log(dojo.style(bottom_right_square, "height"));
+        h = bottom_right_top_left.y - t + dojo.style(bottom_right_square, "width"); // square
 
         dojo._setBox(foo, l, t, w, h, "px");
     }
