@@ -1053,10 +1053,10 @@ function load_pgn(pgn)
 // Parse PGN into a dictionary
 function parse_pgn(pgn)
 {
-    var dict = {};
-    var move_text = "";
+    var dict = {move_text: ""};
+    var dicts = [dict];
 
-    // Parse header into dictionary
+    // Parse headers into dictionaries
     for (var i = 0; i < pgn.length; i += 1) {
         var ch = pgn.charAt(i);
 
@@ -1088,77 +1088,86 @@ function parse_pgn(pgn)
                 value = value.substr(1, value.length - 2);
             }
 
+            if (dict[key]) {
+                // Duplicate key means this is a new game
+                dict = {move_text: ""};
+                dicts.push(dict);
+            }
             dict[key] = value;
+
         } else if (ch === "\n") {
-            move_text += " ";
+            dict.move_text += " ";
         } else {
-            move_text += ch;
+            dict.move_text += ch;
         }
     }
 
-    // Standard FEN
-    if (!dict.FEN) {
-        dict.FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-        dict.SetUp = 1;
-    }
+    // Process each game, parsing move text
+    for (var k = 0; k < dicts.length; k += 1) {
+        dict = dicts[k];
 
-    // Parse move text
-    var tokens = move_text.split(" ");
-    var fullmove_number, outcome, moves = [], color = "white";
-    var in_comment = false;
+        // Standard FEN
+        if (!dict.FEN) {
+            dict.FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+            dict.SetUp = 1;
+        }
 
-    for (i = 0; i < tokens.length; i += 1) {
-        var token = tokens[i];
+        // Parse move text
+        var tokens = dict.move_text.split(" ");
+        delete dict.move_text;  // not for anyone but this function
+        var fullmove_number, outcome, moves = [], color = "white";
+        var in_comment = false;
 
-        if (token === "") {
-            // Skip
-        } else if (in_comment) {
-            if (token.substr(token.length - 1) === "}") {
-                in_comment = false;
-            }
-            // TODO: support annotations
-        } else if (token.substring(token.length - 1) === ".") {
-            fullmove_number = parseInt(token, 10);
+        for (i = 0; i < tokens.length; i += 1) {
+            var token = tokens[i];
 
-            // 3... means black moves
-            if (token.substring(token.length - 3) === "...") {
-                color = "black";
+            if (token === "") {
+                // Skip
+            } else if (in_comment) {
+                if (token.substr(token.length - 1) === "}") {
+                    in_comment = false;
+                }
+                // TODO: support annotations
+            } else if (token.substring(token.length - 1) === ".") {
+                fullmove_number = parseInt(token, 10);
+
+                // 3... means black moves
+                if (token.substring(token.length - 3) === "...") {
+                    color = "black";
+                } else {
+                    color = "white";
+                }
+
+            } else if (token === "1-0") {
+                outcome = "White wins";
+            } else if (token === "0-1") {
+                outcome = "Black wins";
+            } else if (token === "1/2-1/2") {
+                outcome = "Draw";
+            } else if (token === "*") { 
+                outcome = "(In progress)";
+            } else if (token.substr(0, 1) === "{") {
+                in_comment = true;
             } else {
-                color = "white";
+                // Move 
+                
+                var ply = encode_ply(color, fullmove_number);
+                // TODO: handle #, + for checkmate and check, part of move
+                moves[ply] = token;
+
+                // white, then black
+                if (color === "white") {
+                    color = opposite_color(color);
+                } 
             }
-
-        } else if (token === "1-0") {
-            outcome = "White wins";
-        } else if (token === "0-1") {
-            outcome = "Black wins";
-        } else if (token === "1/2-1/2") {
-            outcome = "Draw";
-        } else if (token === "*") { 
-            outcome = "(In progress)";
-        } else if (token.substr(0, 1) === "{") {
-            in_comment = true;
-        } else {
-            // Move 
-            
-            var ply = encode_ply(color, fullmove_number);
-            // TODO: handle #, + for checkmate and check, part of move
-            moves[ply] = token;
-
-            // white, then black
-            if (color === "white") {
-                color = opposite_color(color);
-            } 
         }
+
+        dict.outcome = outcome;
+        dict.moves = moves;
     }
 
-    dict.outcome = outcome;
-    dict.moves = moves;
-
-    // TODO: parse more than one game per file, return in array, 
-    // then show drop-down list to select game from library.
-
-    //console.log(dict);
-    return dict;
+    // TODO: Return all
+    return dicts[0];
 }
 
 // Export a PGN tag dictionary to PGN format, opposite of parse_pgn.
@@ -3611,10 +3620,15 @@ function piece_was_captured(piece, square)
 // Show captured with icons from GAME_STATE.captured
 function update_captured_piece_images(piece)
 {
-
+    // Make miniature images. In this case it is better to specify the full
+    // image size and have the browser scale it, instead of having it reference
+    // a pre-scaled image, because of the higher latency involved in another request.
     var html = "";
     for (var i = 0; i < GAME_STATE.captured.white.length; i += 1) {
         var p = GAME_STATE.captured.white[i];
+        // TODO: optionally create pieces here, that can be dragged back on to the board.
+        // For Shogi (but captured pieces would need to change colors), where can drop
+        // captured pieces back onto the board. create_piece() then add captured class.
         html += '<img src="' + image_path_for(p.type, p.color) + '" class="captured"> ';
     }
     for (var i = 0; i < GAME_STATE.captured.black.length; i += 1) {
