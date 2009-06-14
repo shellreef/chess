@@ -7,6 +7,98 @@
 <style>
 .draggable { position: absolute; cursor: move; }
 
+/* from board.html */
+/* Would be cool to use CSS3 expressions to make the pattern, but they're not in
+ * Firefox 3.0.8, maybe in Firefox 3.1. Safari has them though! 
+ * If do this, would need to remember to shift nth-child per ranks. 
+ *td:nth-child(2n) { background-color: green } */
+table.board
+{
+ /*border: 2px solid black;*/
+
+/* This is like cellspacing=0 cellpadding=0 */
+ border-collapse: collapse;
+
+/* Firefox: disable text selection when dragging */
+ -moz-user-select: none;
+}
+
+td.square
+{
+ border-style: none;
+ /* border: 1px solid black; */
+ padding: 0em;
+ margin: 0em;
+ width: 55px;
+ height: 55px;
+ text-align: center;
+}
+
+td.label { text-align: center; }
+td.file { border-bottom: 2px solid black; }
+td.rank { border-right: 2px solid black; padding-right: 5px; }
+td.right-edge { border-right: 2px solid black; }
+td.bottom-edge { border-bottom: 2px solid black; }
+
+
+/* Colors based on http://en.wikipedia.org/wiki/Chessboard
+ * Useful site: http://www.cssdrive.com/imagepalette/index.php
+ * Colors palette generator, get colors of an arbitrary image.
+ *
+ * Other colors to consider: http://chessos.com/, higher contrast
+ *  http://chessteacher.110mb.com/, much lighter
+ * But I like these, gives it a nice wooden feel. Could also
+ * use green for a tournament-style board.
+ */
+td.white { background-color: #ffce9e; }
+td.black { background-color: #d18b47; }
+
+/* Highlights */
+
+/* Legal squares to move to on mouseover */
+/* different shades of tan
+td.legal-move-white { background-color: #cf9e6e; }
+td.legal-move-black { background-color: #a15b17; }
+*/
+td.legal-move-white { background-color: seagreen !important; }
+td.legal-move-black { background-color: green !important; }
+
+/* Recent move, shown during mouse operation and also once after */
+
+/* Source square */
+/*td.recent-move-white { background-color: #0066ff; }
+td.recent-move-black { background-color: #0099ff; }*/
+
+td.recent-move-white { background-color: blue; }
+td.recent-move-black { background-color: blue; }
+
+/* Next to last move */
+/* TODO
+td.penultimate-move-white { background-color: yellow; }
+td.penultimate-move-black { background-color: yellow; }*/
+
+
+/* Destination square */
+td.drop-square { background-color: blue !important; }
+td.drop-square2 { background-color: blue; }
+
+/* TODO: if destination square is a capture, make it red, even
+ * when hovering. This gives more information on the move but also
+ * provides better feedback when dragging to capture your opponent's
+ * piece that just moved, because it'll already be colored with
+ * drop-square, giving no visual feedback - but it would if this
+ * class was used in that scenario. */
+td.drop-square-capture { background-color: red !important; }
+td.drop-square-capture2 { background-color: red !important; }
+
+
+/* TODO:
+ * yellow - piece to promote
+ * green - move just made
+ * blue - move opponent just made
+ * red - destination square if capture move
+ */
+
 </style>
 </head>
 <body>
@@ -169,6 +261,114 @@ dojo.addOnLoad(function(){
 });
 </script>
 </body>
+<table id="outer">
+ <tr>
+  <td style="vertical-align: top">
+<!-- TODO: dynamically generate, so can have arbitrary sizes -->
+<table class="board" id="board">
+<tbody id="board-body"
+><tr
+  ><td></td
+  ><td class="file label">a</td
+  ><td class="file label">b</td
+  ><td class="file label">c</td
+  ><td class="file label">d</td
+  ><td class="file label">e</td
+  ><td class="file label">f</td
+  ><td class="file label">g</td
+  ><td class="file label">h</td
+></tr
+><tr
+  ><td class="rank label">8</td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square right-edge"></td
+></tr
+><tr
+ ><td class="rank label">7</td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square right-edge"></td
+></tr
+><tr
+  ><td class="rank label">6</td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square right-edge"></td
+></tr
+><tr
+ ><td class="rank label">5</td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square right-edge"></td
+></tr
+><tr
+  ><td class="rank label">4</td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square right-edge"></td
+></tr
+><tr
+ ><td class="rank label">3</td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square"></td
+ ><td class="black square"></td
+ ><td class="white square right-edge"></td
+></tr
+><tr
+  ><td class="rank label">2</td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square"></td
+  ><td class="white square"></td
+  ><td class="black square right-edge"></td
+></tr
+><tr
+ ><td class="rank label">1</td
+ ><td class="black square bottom-edge"></td
+ ><td class="white square bottom-edge"></td
+ ><td class="black square bottom-edge"></td
+ ><td class="white square bottom-edge"></td
+ ><td class="black square bottom-edge"></td
+ ><td class="white square bottom-edge"></td
+ ><td class="black square bottom-edge"></td
+ ><td class="white square bottom-edge right-edge"></td
+></tr
+></tbody
+></table>
+
 <p><div class="draggable" style="background-color: blue; width: 10px; height: 10px; top: 0px; left: 0px;"></div>
 <p><div class="draggable" style="background-color: red; width: 10px; height: 10px; top: 0px; left: 20px;"></div>
 <div class="draggable" style="background-color: yellow; width: 10px; height: 10px; top: 20px; left: 0px;"></div>
