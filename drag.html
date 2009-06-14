@@ -211,7 +211,9 @@ dojo.addOnLoad(function(){
 
             if (target.className.indexOf("draggable") !== -1 && !DRAG.ing) {
                 // Save the offset of the touch within the current note
-                DRAG.ing = [e.pageX - dojo.style(target, "left"), e.pageY - dojo.style(target, "top")];
+                DRAG.initial_left = dojo.style(target, "left");
+                DRAG.initial_top = dojo.style(target, "top");
+                DRAG.ing = [e.pageX - DRAG.initial_left, e.pageY - DRAG.initial_top];
             }
         }
     }
