@@ -348,7 +348,7 @@ dojo.addOnLoad(function(){
     {
         var piece;
 
-        piece = DRAG.element_t || DRAG.element_m;
+        piece = (DRAG.ing && DRAG.element_t) || DRAG.element_m;
         if (!piece) {
             // Nothing was being dragged
             return;
