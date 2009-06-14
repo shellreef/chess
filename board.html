@@ -1053,38 +1053,44 @@ function load_pgn(pgn)
 // Parse PGN into a dictionary
 function parse_pgn(pgn)
 {
-    var lines = pgn.split("\n");
     var dict = {};
     var move_text = "";
 
     // Parse header into dictionary
-    for (var i = 0; i < lines.length; i += 1) {
-        var line = lines[i];
+    for (var i = 0; i < pgn.length; i += 1) {
+        var ch = pgn.charAt(i);
 
-        if (line.substr(0, 1) === "[") {
-            for (var j = 0; j < line.length; j += 1) {
-                var between, ary, tag, key, value;
-                    
-                between = line.substring(1, line.length - 1);
-                // Would have liked to use the 2nd parameter to split here, but it
-                // doesn't behave the same as in Perl. It just truncates the array,
-                // instead of stopping splitting after the deliminator.
-                // "foo,bar,baz".split(",", 2) === ["foo", "bar"]
-                // instead of ["foo", "bar,baz"].
-                ary = between.split(" ");
-                key = ary.shift();
-                value = ary.join(" ");
+        // Tag
+        if (ch === "[") {
+            var key, start, quoted;
 
-                if (value.substr(0, 1) === '"') {
-                    value = value.substring(1, value.length - 1);
+            // Read tag key name
+            for (i += 1, start = i; pgn.charAt(i) !== " "; i += 1) {
+                assert(i < pgn.length && pgn.charAt(i) !== "]",
+                    "parse_pgn(" + pgn + "), at " + i + ", tag without space, like [foo] instead of [foo bar]");
+            }
+            key = pgn.substring(start, i);
+
+            // Read value, terminated by end of tag. It can be quoted, which
+            // allows for the value to contain the ] character.
+            quoted = false;
+            for (i += 1, start = i; !quoted ? pgn.charAt(i) !== "]" : true; i += 1) {
+                if (pgn.charAt(i) === '"') {
+                    quoted = !quoted;
                 }
 
-                dict[key] = value;
+                assert(i < pgn.length, 
+                    "parse_pgn(" + pgn + "), at " + i + ", tag value for " + key + " without ]");
             }
-        } else if (line.substr(0, 1) === ";" || line.length === 0) {
-            // Comment
+            value = pgn.substring(start, i);
+            // Dequote value, as the quotes were only there for including ] characters
+            if (value.charAt(0) === '"' && value.charAt(value.length - 1) == '"') {
+                value = value.substr(1, value.length - 2);
+            }
+
+            dict[key] = value;
         } else {
-            move_text += line + " ";
+            move_text += ch;
         }
     }
 
