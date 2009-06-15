@@ -37,6 +37,9 @@ a.active_move { border-bottom: 1px dashed; }
 /*a.repeated_move { text-decoration: underline; }*/     /* goes well with dots and dashes */
 /*a.repeated_move { background-color: yellow; }*/   /* highlight */
 
+/* Element that can be dragged */
+.draggable { position: absolute; cursor: move; }
+
 /* TODO: switch to divs, for flexibility, and use background-image.. or maybe not */
 img.piece
 { 
@@ -75,6 +78,7 @@ table.board
  border-collapse: collapse;
 
 /* Disable text selection when dragging */
+/* http://www.w3.org/TR/1999/WD-css3-userint-19990916#user-select */
  -moz-user-select: none;
  -webkit-user-select: none;
  user-select: none;
@@ -742,7 +746,6 @@ dojo.cookie=function(_2,_3,_4){var c=document.cookie;if(arguments.length==1){var
     load_notations();
     label_board();
     init_board();
-
 
     // Test raw notation
     //load_pgn('[Event "F/S Return Match (Raw)"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n[Moves_raw "/e2e4P /e7e5p /g1f3N /b8c6n /f1b5B /a7a6p /b5a4B /g8f6n /e1g1K /f8e7b /f1e1R /b7b5p /a4b3B /d7d6p /c2c3P /e8g8k /h2h3P /c6b8n /d2d4P /b8d7n /c3c4P /c7c6p /c4b5P /a6b5p /b1c3N /c8b7b /c1g5B /b5b4p /c3b1N /h7h6p /g5h4B /c6c5p /d4e5P /f6e4n /h4e7B /d8e7q /e5d6P /e7f6q /b1d2N /e4d6n /d2c4N /d6c4n /b3c4B /d7b6n /f3e5N /a8e8r /c4f7B /f8f7r /e5f7N /e8e1r /d1e1Q /g8f7k /e1e3Q /f6g5q /e3g5Q /h6g5p /b2b3P /f7e6k /a2a3P /e6d6k /a3b4P /c5b4p /a1a5R /b6d5n /f2f3P /b7c8b /g1f2K /c8f5b /a5a7R /g7g6p /a7a6R /d6c5k /f2e1K /d5f4n /g2g3P /f4h3n /e1d2K /c5b5k /a6d6R /b5c5k /d6a6R /h3f2n /g3g4P /f5d3b /a6e6R"]\n\n 1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8 10. d4 Nbd7 11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5 Nxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6 23. Ne5 Rae8 24. Bxf7 Rxf7 25. Nxf7 Rxe1 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5 hxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5 35. Ra7 g6 36. Ra6 Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6 Nf2 42. g4 Bd3 43. Re6 ');
@@ -5051,6 +5054,274 @@ function sq(code, extra)
         "): out of range (" + x + ", " + y + ")");*/
 
     return SQUARES[x][y];
+}
+
+//// DRAG-AND-DROP FUNCTIONS
+
+// Initiate drag-and-drop on mouse down, if over a draggable element
+function mousedown(event)
+{
+    var target;
+
+    event = event || window.event;
+
+    target = event.target !== undefined ? event.target : event.srcElement;
+
+    if (target.className.indexOf("draggable") === -1) {
+        return;
+    }
+
+    DRAG.initial_x = event.clientX;
+    DRAG.initial_y = event.clientY;
+
+    DRAG.start_x = target.offsetLeft;
+    DRAG.start_y = target.offsetTop;
+
+    DRAG.initial_left = dojo.style(target, "left");
+    DRAG.initial_top = dojo.style(target, "top");
+
+    // Bring to front
+    DRAG.old_zindex = target.style.zIndex;
+    target.style.zIndex = 10000;
+
+    // Capture mouse
+    DRAG.element_m = target;
+    document.onmousemove = mousemove;
+    document.onmouseup = mouseup;
+
+    // Prevent text selection
+    document.body.focus();
+    document.onselectstart = function() { return false; };
+    target.ondragstart = function() { return false; };
+    return false;
+}
+
+// Initiate dragging if touching a draggable element
+function touch(evt)
+{
+    for (var i = 0; i < evt.changedTouches.length; ++i) {
+        var e = evt.changedTouches[i]; 
+
+        var color, border;
+        var target = e.target;
+
+        if (target.className.indexOf("draggable") !== -1 && !DRAG.ing) {
+            // Save the offset of the touch within the current note
+            DRAG.initial_left = dojo.style(target, "left");
+            DRAG.initial_top = dojo.style(target, "top");
+            DRAG.ing = [e.pageX - DRAG.initial_left, e.pageY - DRAG.initial_top];
+        }
+    }
+}
+
+// Continue dragging with the mouse
+function mousemove(event)
+{
+    var element, new_x, new_y;
+        
+    event = event || window.event;
+
+    element = DRAG.element_m;
+
+    // Must have draggable class
+    if (!element || element.className.indexOf("draggable") === -1) {
+        return;
+    }
+
+    new_x = event.clientX - DRAG.initial_x + DRAG.start_x;
+    new_y = event.clientY - DRAG.initial_y + DRAG.start_y;
+
+    // Drag
+    element.style.webkitTransition = "";
+    element.style.left = new_x + "px";
+    element.style.top = new_y + "px";
+    dragging_over(element, new_x, new_y);
+
+    return false;
+}
+
+// Continue dragging with touch events
+function touchmove(evt) 
+{
+    evt.preventDefault();
+    for (var i = 0; i < evt.changedTouches.length; ++i) {
+        var e = evt.changedTouches[i];
+
+        if (DRAG.ing && e.target.className.indexOf("draggable") !== -1) {
+                // Move the node if we're in a state of dragging, but not resizing
+                var new_x = e.pageX - DRAG.ing[0];
+                var new_y = e.pageY - DRAG.ing[1];
+                
+                e.target.style.webkitTransition = "";
+                e.target.style.left = new_x + "px";
+                e.target.style.top = new_y + "px";
+
+                dragging_over(e.target, new_x, new_y);
+                DRAG.element_t = e.target;
+        }
+    }
+}
+
+// Detect if over droppable area and act as needed.
+// element: the element that is /being dragged/
+function dragging_over(element, left, top)
+{
+    // Position from center
+    var x = left + (DROP.area.cell_width / 2);
+    var y = top + (DROP.area.cell_width / 2);
+
+    // Inside board?
+    if (x > DROP.area.left && y > DROP.area.top &&
+        x < DROP.area.right && y < DROP.area.bottom) {
+
+        // Find cell mathematically
+        var cell_x = Math.ceil((x - DROP.area.left) / DROP.area.cell_width);
+        var cell_y = Math.ceil((DROP.area.right - y) / DROP.area.cell_width);
+        if (cell_y === 0) {
+            cell_y = 1;
+        }
+
+        // TODO: lookup whether can drop here
+
+        // Highlight droppable square
+        
+        // TODO: use SQUARES, considered flipped
+        var flipped = false;
+        var square  = dojo.query('#board-body')[0].childNodes[flipped ? cell_y : 9 - cell_y].childNodes[flipped ? 9 - cell_x : cell_x];
+
+        if (DROP.square) {
+            dojo.removeClass(DROP.square, "drop-square");
+        }
+
+        DROP.square = square;
+        dojo.addClass(square, "drop-square");
+
+    } else {
+        // Outside droppable area
+        
+        if (DROP.square) {
+            dojo.removeClass(DROP.square, "drop-square");
+            DROP.square = null;
+        }
+
+        // TODO: change icon to show out of range, if was from within range
+    }
+}
+
+// Drop or revert on mouse up
+function mouseup()
+{
+    if (DRAG.element_m === null) {
+        return;
+    }
+
+    DRAG.element_m.style.zIndex = DRAG.old_zindex;
+    document.onmousemove = null;
+    document.onselectstart = null;
+    DRAG.element_m.ondragstart = null;
+
+    drop_or_revert();
+
+    DRAG.element_m = null;
+}
+
+
+// Drop or revert on touch end
+function touchend(evt)
+{
+    drop_or_revert();
+
+    for (var i = 0; i < evt.changedTouches.length; ++i) {
+        var e = evt.changedTouches[i];
+
+        // Check to see if we've gone from a gesture back down to a touch
+        if (e.target.className.indexOf("draggable") !== -1) {
+            if (evt.targetTouches.length == 1) {
+                // If there was rotation, this number needs to be reset
+                DRAG.ing = [evt.targetTouches[0].pageX - dojo.style(e.target, "left"), evt.targetTouches[0].pageY - dojo.style(e.target, "top")];
+            } else if(!evt.targetTouches.length) {
+                // Great use of e.targeTouches, since releasing on finger that's part
+                // of a gesture over this node would trigger a touchend even though
+                // it could keep going
+                DRAG.ing = false;
+            }
+        }
+    }
+}
+
+// Return whether square should accept dropping a piece on it
+function accepts(piece, square)
+{
+    // TODO
+    return Math.floor(Math.random() + 0.5);
+}
+
+// Drop the dragging object, or move it back if it is not over a droppable area
+function drop_or_revert()
+{
+    var piece, square;
+
+    piece = (DRAG.ing && DRAG.element_t) || DRAG.element_m;
+    if (!piece) {
+        // Nothing was being dragged
+        return;
+    }
+
+    square = DROP.square;
+    if (!square || !accepts(piece, square)) {
+        // Revert
+        if (typeof WebKitCSSMatrix === "object") {
+            // Use webkit transforms if available; faster
+            // Feature detection from http://iui.googlecode.com/svn/trunk/test/features.html
+            // (detects for css transforms, hopefully close enough)
+            piece.style.webkitTransition = "left " + DRAG.revert_time + "ms linear, " + 
+                "top " + DRAG.revert_time + "ms linear";
+            piece.style.left = DRAG.initial_left + "px";
+            piece.style.top  = DRAG.initial_top + "px";
+        } else {
+            dojo.anim(piece, { left: DRAG.initial_left, top: DRAG.initial_top }, DRAG.revert_time);
+        }
+        return;
+    }
+
+    dojo.addClass(square, "legal-move-black");
+
+    console.log(piece, square);
+    //alert("Drop" + piece + " " + square);
+    // TODO: move 
+
+}
+
+// Initialize drag and drop system
+function init_dnd() {
+    document.onmousedown = mousedown;
+    document.ontouchmove = mousemove;
+
+    document.ontouchstart = touch;
+    dojo.query(".draggable").forEach(function(e) {
+            e.ontouchmove = touchmove;
+        });
+    document.ontouchend = touchend;
+
+    // Get dimensions of droppable area
+    var foo = dojo.query("#foo")[0];
+    var top_left_square = dojo.query("#top-left-square")[0];
+    var bottom_right_square = dojo.query("#bottom-right-square")[0];
+    var top_left = dojo._abs(top_left_square);
+    DROP.area.left = top_left.x;
+    DROP.area.top = top_left.y;
+
+    var bottom_right_top_left = dojo._abs(bottom_right_square);
+    DROP.area.cell_width = dojo.style(bottom_right_square, "width");
+    DROP.area.width = bottom_right_top_left.x - DROP.area.left + DROP.area.cell_width;
+    console.log(dojo.style(bottom_right_square, "height"));
+    DROP.area.height  = bottom_right_top_left.y - DROP.area.top + DROP.area.cell_width; // square
+
+    // for testing
+    //dojo._setBox(foo, DROP.area.left, DROP.area.top, DROP.area.width, DROP.area.height, "px");
+
+    DROP.area.right = DROP.area.left + DROP.area.width;
+    DROP.area.bottom = DROP.area.top + DROP.area.height;
 }
 
 //// LOW-LEVEL FUNCTIONS
