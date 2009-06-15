@@ -138,23 +138,24 @@ function enable_document_selection(enable) {
 }
 
 
-    var DRAG = 
-    {
-        revert_time: 350,   // ms to take to revert
-        start_x: 0,
-        start_y: 0,
-        offset_x: 0,
-        offset_y: 0,
-        element_m: null,    // what is being dragged by the mouse
-        element_t: null,    // by the touch interface
-        old_zindex: 0,      
-        ing: false          // whether something is being dragged
-    };
+// Drag and drop globals
+var DRAG = 
+{
+    revert_time: 350,   // ms to take to revert
+    start_x: 0,
+    start_y: 0,
+    offset_x: 0,        
+    offset_y: 0,
+    element_m: null,    // what is being dragged by the mouse
+    element_t: null,    // by the touch interface
+    old_zindex: 0,      // z-index of dragging element to restore
+    ing: false          // whether something is being dragged
+};
 
-    var DROP = {
-        area: {},           // box to detect drop areas in
-        square: null        // square dropping over
-    };
+var DROP = {
+    area: {},           // box to detect drop areas in
+    square: null        // square dropping over
+};
 
 
 dojo.addOnLoad(function(){
@@ -164,8 +165,7 @@ dojo.addOnLoad(function(){
     enable_document_selection(false);
     init_dnd();
  
-    // Initiate drag-and-drop
-
+    // Initiate drag-and-drop on mouse down, if over a draggable element
     function mousedown(event)
     {
         var target;
@@ -203,7 +203,9 @@ dojo.addOnLoad(function(){
         return false;
     }
 
-    function touch(evt){
+    // Initiate dragging if touching a draggable element
+    function touch(evt)
+    {
         for (var i = 0; i < evt.changedTouches.length; ++i) {
             var e = evt.changedTouches[i]; 
 
@@ -219,8 +221,7 @@ dojo.addOnLoad(function(){
         }
     }
 
-    // Continue dragging
-
+    // Continue dragging with the mouse
     function mousemove(event)
     {
         var element, new_x, new_y;
@@ -246,7 +247,9 @@ dojo.addOnLoad(function(){
         return false;
     }
 
-    function touchmove(evt) {
+    // Continue dragging with touch events
+    function touchmove(evt) 
+    {
         evt.preventDefault();
         for (var i = 0; i < evt.changedTouches.length; ++i) {
             var e = evt.changedTouches[i];
@@ -312,8 +315,7 @@ dojo.addOnLoad(function(){
         }
     }
 
-    // Drop
-
+    // Drop or revert on mouse up
     function mouseup()
     {
         if (DRAG.element_m === null) {
@@ -325,14 +327,16 @@ dojo.addOnLoad(function(){
         document.onselectstart = null;
         DRAG.element_m.ondragstart = null;
 
-        drop();
+        drop_or_revert();
 
         DRAG.element_m = null;
     }
 
 
-    function touchend(evt){
-        drop();
+    // Drop or revert on touch end
+    function touchend(evt)
+    {
+        drop_or_revert();
 
         for (var i = 0; i < evt.changedTouches.length; ++i) {
             var e = evt.changedTouches[i];
@@ -352,7 +356,15 @@ dojo.addOnLoad(function(){
         }
     }
 
-    function drop()
+    // Return whether square should accept dropping a piece on it
+    function accepts(piece, square)
+    {
+        // TODO
+        return Math.floor(Math.random() + 0.5);
+    }
+
+    // Drop the dragging object, or move it back if it is not over a droppable area
+    function drop_or_revert()
     {
         var piece, square;
 
@@ -363,9 +375,7 @@ dojo.addOnLoad(function(){
         }
 
         square = DROP.square;
-        if (!square) {
-            // TODO: Only revert when not over a valid square
-            
+        if (!square || !accepts(piece, square)) {
             // Revert
             if (typeof WebKitCSSMatrix === "object") {
                 // Use webkit transforms if available; faster
@@ -389,6 +399,7 @@ dojo.addOnLoad(function(){
 
     }
 
+    // Initialize drag and drop system
     function init_dnd() {
         document.onmousedown = mousedown;
         document.ontouchmove = mousemove;
