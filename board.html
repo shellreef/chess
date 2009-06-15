@@ -4813,7 +4813,6 @@ function create_piece(color, type)
     // Highlight/unhighlight legal moves on mouse over, like Chess with Friends.
     // Yahoo Games does this too, but uses a yellow outline.
     Event.observe(piece, 'mouseover', function(event) {
-
             var square = highlight_moves(piece, true);
             // for debugging
             //piece.setStyle({border: '1px solid black'});
@@ -5113,6 +5112,9 @@ function mousedown(event)
     document.body.focus();
     document.onselectstart = function() { return false; };
     target.ondragstart = function() { return false; };
+
+    GAME_STATE.dragging = true;
+
     return false;
 }
 
@@ -5132,6 +5134,8 @@ function touch(evt)
             DRAG.ing = [e.pageX - DRAG.initial_left, e.pageY - DRAG.initial_top];
         }
     }
+
+    GAME_STATE.dragging = true;
 }
 
 // Continue dragging with the mouse
@@ -5284,6 +5288,8 @@ function accepts(piece, square)
 function drop_or_revert()
 {
     var piece, square;
+
+    GAME_STATE.dragging = false;
 
     piece = (DRAG.ing && DRAG.element_t) || DRAG.element_m;
     if (!piece) {
