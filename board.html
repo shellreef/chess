@@ -4731,11 +4731,7 @@ function image_path_for(type, color)
     assert(PIECE_TYPES[type], "image_path_for(" + type + ", " + color + "): no such piece type");
 
     // Override image name
-    if (PIECE_TYPES[type].image) {
-        base = PIECE_TYPES[type].image;
-    } else {
-        base = type;
-    }
+    base = PIECE_TYPES[type].image || type;
 
     // Rejected TODOs, lack support:
     // - pngs
@@ -4745,7 +4741,7 @@ function image_path_for(type, color)
     // - Web fonts! Supported on Firefox 3.1+, Opera 10+, Safari 3.1+, IE4+
     //   See http://fonts.philip.html5.org/
     
-    return "images/" + PREFS.image_set + "/" + {white:"w", black:"b"}[color] + base + ".gif";
+    return ["images/", PREFS.image_set, "/", {white:"w", black:"b"}[color], base, ".gif"].join("");
 }
 
 // Decode Forsyth-Edwards Notation piece code, for example:
@@ -4809,6 +4805,8 @@ function create_piece(color, type)
         classes.push("royal");
     }
 
+    // TODO: Avoid Builder.node, use raw HTML directly, see if it is faster
+    
     // TODO Use a div with background-image instead, then can have arbitrary
     // characters, instead of just images, more flexible, maybe transition too.
     piece = Builder.node('img', {'src': filename, 'class': classes.join(" ")});
