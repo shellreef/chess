@@ -4432,9 +4432,10 @@ function toggle_piece_library()
 
     // TODO: sortable columns, searchable table, so can list by symbol, alphabetically,
     // royal pieces first, pieces that promote, and find what you want.
-    table = Builder.node("table", {width: "100%", id:"piece-library-table"}, [Builder.node("tr"), [
-            Builder.node("th", "Pieces"),
-            Builder.node("th", "Name")
+    table = Builder.node("table", {id:"piece-library-table"}, [Builder.node("tr"), [
+            Builder.node("th", "White"),
+            Builder.node("th", "Black"),
+            Builder.node("th", {style: "text-align: left"}, "Name")
             ]]);
 
     count = 0;
@@ -4443,8 +4444,12 @@ function toggle_piece_library()
             var wp = create_piece("white", type);
             var bp = create_piece("black", type);
 
+            dojo.removeClass(wp, "draggable");
+            dojo.removeClass(bp, "draggable");
+
             var row = Builder.node("tr", [
-                    Builder.node("td", [wp, bp]),
+                    Builder.node("td", wp),
+                    Builder.node("td", bp),
                     Builder.node("td", type)]);
             table.appendChild(row);
             count += 1;
