@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-<meta name="viewport" content="width = 320">
+<!-- TODO: set to 0.4 onchangeorientation to landscape -->
+<meta name="viewport" content="width=device-width; initial-scale=0.65; maximum-scale=0.65; user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <!-- TODO <base href="http://xyzzy.freeshell.org/chess/"> -->
 <title>Chess by Jeff</title>
 <!-- Copyright (C) 2009 Jeff Connelly -->
@@ -262,6 +265,25 @@ var GAME_STATE = {
     piece_under: null,          // Piece under cursor for piece inspector
     flipped: false              // True if from black's perspective instead of white (only for toggling!)
 };    
+
+/// Drag and drop globals
+var DRAG = 
+{
+    revert_time: 350,   // ms to take to revert
+    start_x: 0,
+    start_y: 0,
+    offset_x: 0,        
+    offset_y: 0,
+    element_m: null,    // what is being dragged by the mouse
+    element_t: null,    // by the touch interface
+    old_zindex: 0,      // z-index of dragging element to restore
+    ing: false          // whether something is being dragged
+};
+
+var DROP = {
+    area: {},           // box to detect drop areas in
+    square: null        // square dropping over
+};
 
 // Moves that can be made right now, for each active piece.
 var VALID_MOVES = null;             // Keyed by filerank of source, array of moves, x, y and any flags
@@ -710,8 +732,13 @@ google.setOnLoadCallback(function() {
 dojo.cookie=function(_2,_3,_4){var c=document.cookie;if(arguments.length==1){var _6=c.lastIndexOf(_2+"=");if(_6==-1){return null;}var _7=_6+_2.length+1;var _8=c.indexOf(";",_6+_2.length+1);if(_8==-1){_8=c.length;}return decodeURIComponent(c.substring(_7,_8));}else{_4=_4||{};_3=encodeURIComponent(_3);if(typeof (_4.expires)=="number"){var d=new Date();d.setTime(d.getTime()+(_4.expires*24*60*60*1000));_4.expires=d;}document.cookie=_2+"="+_3+(_4.expires?"; expires="+_4.expires.toUTCString():"")+(_4.path?"; path="+_4.path:"")+(_4.domain?"; domain="+_4.domain:"")+(_4.secure?"; secure":"");return null;}}
 
 
-    /* Safari and IE7: Disable text selection to stop interfering with dragging */
+    // Safari and IE7: Disable text selection to stop interfering with dragging 
     enable_document_selection(false);    
+
+    // Hide address bar. TODO: Get this working
+    //setTimeout(function() { window.scrollTo(0, 1); }, 0);
+
+    // Let the games begin
     load_notations();
     label_board();
     init_board();
