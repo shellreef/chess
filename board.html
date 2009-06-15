@@ -3907,6 +3907,7 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
         dojo.addClass(real_from_square, " recent-move-" + real_from_square.color);
 
         // Re-highlight to square, since hoverclass in Droppable removes it
+        dojo.query(".drop-square").removeClass("drop-square");
         dojo.query(".drop-square2").removeClass("drop-square2");
         dojo.addClass(real_square, " drop-square2");
     }
@@ -5205,15 +5206,19 @@ function dragging_over(element, left, top)
         // Highlight droppable square
         
         // TODO: use SQUARES, considered flipped
-        var flipped = false;
+        var flipped = GAME_STATE.flipped;
         var square  = dojo.query('#board-body')[0].childNodes[flipped ? cell_y : 9 - cell_y].childNodes[flipped ? 9 - cell_x : cell_x];
 
         if (DROP.square) {
             dojo.removeClass(DROP.square, "drop-square");
         }
 
-        DROP.square = square;
-        dojo.addClass(square, "drop-square");
+        if (accepts(element, square)) {
+            DROP.square = square;
+            dojo.addClass(square, "drop-square");
+        } else {
+            DROP.square = null;
+        }
 
     } else {
         // Outside droppable area
@@ -5271,8 +5276,8 @@ function touchend(evt)
 // Return whether square should accept dropping a piece on it
 function accepts(piece, square)
 {
-    // TODO
-    return Math.floor(Math.random() + 0.5);
+    // TODO: Check if legal move
+    return dojo.hasClass(square, "legal-move-black") || dojo.hasClass(square, "legal-move-white");
 }
 
 // Drop the dragging object, or move it back if it is not over a droppable area
@@ -5303,12 +5308,8 @@ function drop_or_revert()
         return;
     }
 
-    dojo.addClass(square, "legal-move-black");
-
-    console.log(piece, square);
-    //alert("Drop" + piece + " " + square);
-    // TODO: move 
-
+    //console.log("drop",piece,square);
+    move_dropped_piece(piece, square, null);
 }
 
 // Initialize drag and drop system
@@ -5332,7 +5333,6 @@ function init_dnd() {
     var bottom_right_top_left = dojo._abs(bottom_right_square, true);
     DROP.area.cell_width = dojo.style(bottom_right_square, "width");
     DROP.area.width = bottom_right_top_left.x - DROP.area.left + DROP.area.cell_width;
-    console.log(dojo.style(bottom_right_square, "height"));
     DROP.area.height  = bottom_right_top_left.y - DROP.area.top + DROP.area.cell_width; // square
 
     // for testing
