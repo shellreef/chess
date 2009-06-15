@@ -93,6 +93,10 @@ td.square
  width: 55px;
  height: 55px;
  text-align: center;
+
+ /* So absolutely positioned images in cell are not misaligned */
+ vertical-align: top;
+ text-align: left;
 }
 
 td.label { text-align: center; }
@@ -176,7 +180,8 @@ td.drop-square-capture2 { background-color: red !important; }
 
 </style>
 <!-- <script type='text/javascript' src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'></script> -->
-<script src="http://o.aolcdn.com/dojo/1.3.1/dojo/dojo.xd.js"></script>
+<!--<script src="http://o.aolcdn.com/dojo/1.3.1/dojo/dojo.xd.js"></script>-->
+<script src="http://o.aolcdn.com/dojo/1.3.1/dojo/dojo.xd.js.uncompressed.js"></script>
 <script src="http://www.google.com/jsapi"></script>
 <script type="text/javascript">
 /*jslint bitwise: true, browser: true, eqeqeq: true, immed: true, newcap: true, nomen: true, plusplus: true, regexp: true, undef: true*/
@@ -4834,7 +4839,7 @@ function create_piece(color, type)
     // around but not drop anywhere.
 
     // TODO: Replace
-    /* XXX
+    /*
     var drag = new Draggable(piece, { 
         revert: true, 
         starteffect: undefined, 
@@ -5423,7 +5428,7 @@ function enable_document_selection(enable) {
 ></tr
 ><tr
   ><td class="rank label">8</td
-  ><td class="white square"></td
+  ><td class="white square" id="top-left-square"></td
   ><td class="black square"></td
   ><td class="white square"></td
   ><td class="black square"></td
@@ -5507,7 +5512,7 @@ function enable_document_selection(enable) {
  ><td class="black square bottom-edge"></td
  ><td class="white square bottom-edge"></td
  ><td class="black square bottom-edge"></td
- ><td class="white square bottom-edge right-edge"></td
+ ><td class="white square bottom-edge right-edge" id="bottom-right-square"></td
 ></tr
 ></tbody
 ></table>
