@@ -140,6 +140,7 @@ function enable_document_selection(enable) {
 
     var DRAG = 
     {
+        revert_time: 350,   // ms to take to revert
         start_x: 0,
         start_y: 0,
         offset_x: 0,
@@ -370,11 +371,12 @@ dojo.addOnLoad(function(){
                 // Use webkit transforms if available; faster
                 // Feature detection from http://iui.googlecode.com/svn/trunk/test/features.html
                 // (detects for css transforms, hopefully close enough)
-                piece.style.webkitTransition = "left 350ms linear, top 350ms linear";
+                piece.style.webkitTransition = "left " + DRAG.revert_time + "ms linear, " + 
+                    "top " + DRAG.revert_time + "ms linear";
                 piece.style.left = DRAG.initial_left + "px";
                 piece.style.top  = DRAG.initial_top + "px";
             } else {
-                dojo.anim(piece, { left: DRAG.initial_left, top: DRAG.initial_top }, 350);
+                dojo.anim(piece, { left: DRAG.initial_left, top: DRAG.initial_top }, DRAG.revert_time);
             }
             return;
         }
