@@ -1507,7 +1507,7 @@ function ask_to_promote(piece, tieback, is_immediate)
     // Clear previous container
     var container = $("promote_container");
 
-    while(container.firstChild) {
+    while(container.hasChildNodes()) {
         container.removeChild(container.firstChild);
     }
 
@@ -3390,7 +3390,8 @@ function realize_vboard()
             var square = SQUARES[x][y];
             var piece;
 
-            while (square.firstChild) {
+            while (square.hasChildNodes()) {
+                // 14% of realize_vboard() is spent here. TODO: Avoid removing if no change??
                 square.removeChild(square.firstChild);
             }
 
@@ -3405,10 +3406,10 @@ function realize_vboard()
         }
     }
 
-    var time_took = new Date().getTime() - time_started;
     // On my machine:
     // Safari 4: 5 ms
     // MSIE7: 100+ ms, noticeably slower piece dropping
+    var time_took = new Date().getTime() - time_started;
     alert("realize_vboard took " + time_took + " ms");
 }
 
@@ -4136,7 +4137,7 @@ function move_dropped_piece(piece, square, event)
 
     // TODO: do some cool effects when a piece is captured, but not too cool
     // Any way to finish running the code AFTER the effect finishes? New effect?
-    //if (square.firstChild) {
+    //if (square.hasChildNodes()) {
     //   new Effect.Squish(square.virtual ? square.piece : square.firstChild);
     //}
 
@@ -4308,7 +4309,7 @@ function clear_board()
     for (var x = 1; x <= RANK_MAX; x += 1) {
         for (var y = 1; y <= FILE_MAX; y += 1) {
             var square = SQUARES[x][y];
-            while(square.firstChild) {
+            while(square.hasChildNodes()) {
                 square.removeChild(square.firstChild);
             }
         }
