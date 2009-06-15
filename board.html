@@ -4444,12 +4444,14 @@ function toggle_piece_library()
             var wp = create_piece("white", type);
             var bp = create_piece("black", type);
 
+            // TODO: Make draggable! Problem is that absolute
+            // positioning interferes with the scrolling.
             dojo.removeClass(wp, "draggable");
             dojo.removeClass(bp, "draggable");
 
             var row = Builder.node("tr", [
-                    Builder.node("td", wp),
-                    Builder.node("td", bp),
+                    Builder.node("td", {"class": "square"}, wp),
+                    Builder.node("td", {"class": "square"}, bp),
                     Builder.node("td", type)]);
             table.appendChild(row);
             count += 1;
@@ -5094,8 +5096,8 @@ function mousedown(event)
     DRAG.start_x = target.offsetLeft;
     DRAG.start_y = target.offsetTop;
 
-    DRAG.initial_left = dojo._abs(target).x;
-    DRAG.initial_top = dojo._abs(target).y;
+    DRAG.initial_left = dojo._abs(target, true).x;
+    DRAG.initial_top = dojo._abs(target, true).y;
 
     // Bring to front
     DRAG.old_zindex = target.style.zIndex;
@@ -5323,11 +5325,11 @@ function init_dnd() {
     // Get dimensions of droppable area
     var top_left_square = dojo.query("#top-left-square")[0];
     var bottom_right_square = dojo.query("#bottom-right-square")[0];
-    var top_left = dojo._abs(top_left_square);
+    var top_left = dojo._abs(top_left_square, true);
     DROP.area.left = top_left.x;
     DROP.area.top = top_left.y;
 
-    var bottom_right_top_left = dojo._abs(bottom_right_square);
+    var bottom_right_top_left = dojo._abs(bottom_right_square, true);
     DROP.area.cell_width = dojo.style(bottom_right_square, "width");
     DROP.area.width = bottom_right_top_left.x - DROP.area.left + DROP.area.cell_width;
     console.log(dojo.style(bottom_right_square, "height"));
