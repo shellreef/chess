@@ -266,7 +266,6 @@ var GAME_STATE = {
     captured: {white:[], black:[]}, // Captured pieces
 
     // Not game state, but other globals
-    dragging: false,
     active_in_check: false,
     recent_piece: null,         // Recently moved piece
     recent_square: null,        // Recently moved from square
@@ -286,7 +285,8 @@ var DRAG =
     element_m: null,    // what is being dragged by the mouse
     element_t: null,    // by the touch interface
     old_zindex: 0,      // z-index of dragging element to restore
-    ing: false          // whether something is being dragged
+    touching: false,    // whether something is being touched
+    dragging: false     // whether a drag is in progress
 };
 
 var DROP = {
@@ -3468,7 +3468,7 @@ function label_board(flipped)
             /*
             Event.observe(square, "click", function() {
                         // TODO: tap-to-move, as an alternative to dragging
-                        if (GAME_STATE.dragging) {
+                        if (DRAG.dragging) {
                             alert(1);
                             //function move_dropped_piece(piece, square, event)
                         }
@@ -4853,8 +4853,8 @@ function create_piece(color, type)
         revert: true, 
         starteffect: undefined, 
         endeffect: undefined,
-        onStart: function() { GAME_STATE.dragging = true; },
-        onEnd: function() { GAME_STATE.dragging = false; }
+        onStart: function() { DRAG.dragging = true; },
+        onEnd: function() { DRAG.dragging = false; }
         // TODO: figure out why on IE7, dragged pieces are below the highlighted squares!
         // even with zindex: 1001
      });
@@ -4873,7 +4873,7 @@ function highlight_moves(piece, enable)
 
     // If player is dragging a piece over another piece, don't show
     // legal moves for the piece under it.
-    if (GAME_STATE.dragging) {
+    if (DRAG.dragging) {
         return null;
     }
 
@@ -5113,7 +5113,7 @@ function mousedown(event)
     document.onselectstart = function() { return false; };
     target.ondragstart = function() { return false; };
 
-    GAME_STATE.dragging = true;
+    DRAG.dragging = true;
 
     return false;
 }
@@ -5127,15 +5127,15 @@ function touch(evt)
         var color, border;
         var target = e.target;
 
-        if (target.className.indexOf("draggable") !== -1 && !DRAG.ing) {
+        if (target.className.indexOf("draggable") !== -1 && !DRAG.touching) {
             // Save the offset of the touch within the current note
             DRAG.initial_left = dojo.style(target, "left");
             DRAG.initial_top = dojo.style(target, "top");
-            DRAG.ing = [e.pageX - DRAG.initial_left, e.pageY - DRAG.initial_top];
+            DRAG.touching = [e.pageX - DRAG.initial_left, e.pageY - DRAG.initial_top];
         }
     }
 
-    GAME_STATE.dragging = true;
+    DRAG.dragging = true;
 }
 
 // Continue dragging with the mouse
@@ -5171,10 +5171,10 @@ function touchmove(evt)
     for (var i = 0; i < evt.changedTouches.length; ++i) {
         var e = evt.changedTouches[i];
 
-        if (DRAG.ing && e.target.className.indexOf("draggable") !== -1) {
+        if (DRAG.touching && e.target.className.indexOf("draggable") !== -1) {
                 // Move the node if we're in a state of dragging, but not resizing
-                var new_x = e.pageX - DRAG.ing[0];
-                var new_y = e.pageY - DRAG.ing[1];
+                var new_x = e.pageX - DRAG.touching[0];
+                var new_y = e.pageY - DRAG.touching[1];
                 
                 e.target.style.webkitTransition = "";
                 e.target.style.left = new_x + "px";
@@ -5266,12 +5266,12 @@ function touchend(evt)
         if (e.target.className.indexOf("draggable") !== -1) {
             if (evt.targetTouches.length == 1) {
                 // If there was rotation, this number needs to be reset
-                DRAG.ing = [evt.targetTouches[0].pageX - dojo.style(e.target, "left"), evt.targetTouches[0].pageY - dojo.style(e.target, "top")];
+                DRAG.touching = [evt.targetTouches[0].pageX - dojo.style(e.target, "left"), evt.targetTouches[0].pageY - dojo.style(e.target, "top")];
             } else if(!evt.targetTouches.length) {
                 // Great use of e.targeTouches, since releasing on finger that's part
                 // of a gesture over this node would trigger a touchend even though
                 // it could keep going
-                DRAG.ing = false;
+                DRAG.touching = false;
             }
         }
     }
@@ -5289,9 +5289,9 @@ function drop_or_revert()
 {
     var piece, square;
 
-    GAME_STATE.dragging = false;
+    DRAG.dragging = false;
 
-    piece = (DRAG.ing && DRAG.element_t) || DRAG.element_m;
+    piece = (DRAG.touching && DRAG.element_t) || DRAG.element_m;
     if (!piece) {
         // Nothing was being dragged
         return;
