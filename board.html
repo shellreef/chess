@@ -4806,11 +4806,13 @@ function create_piece(color, type)
         classes.push("royal");
     }
 
-    // TODO: Avoid Builder.node, use raw HTML directly, see if it is faster
-    
+    // Create the node
     // TODO Use a div with background-image instead, then can have arbitrary
     // characters, instead of just images, more flexible, maybe transition too.
-    piece = Builder.node('img', {'src': filename, 'class': classes.join(" ")});
+    piece = document.createElement("img");
+    piece.setAttribute("src", filename);
+    piece.setAttribute("class", classes.join(" "));
+    piece.setAttribute("className", classes.join(" "));
 
     // Property will tell name of piece. To tell what color, or if it is
     // a piece in the first place, check the class names.
