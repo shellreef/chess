@@ -4443,11 +4443,28 @@ function toggle_piece_library()
 
     // TODO: sortable columns, searchable table, so can list by symbol, alphabetically,
     // royal pieces first, pieces that promote, and find what you want.
-    table = Builder.node("table", {id:"piece-library-table"}, [Builder.node("tr"), [
+    // IE7 chokes due to the fix for http://dev.rubyonrails.org/ticket/2707
+    /*table = Builder.node("table", {id:"piece-library-table"}, [Builder.node("tr"), [
             Builder.node("th", "White"),
             Builder.node("th", "Black"),
             Builder.node("th", {style: "text-align: left"}, "Name")
             ]]);
+            */
+    // TODO: Find out why this table doesn't display in IE7
+    table = document.createElement("table");
+    table.setAttribute("id", "piece-library-table");
+    var r1 = document.createElement("tr");
+    table.appendChild(r1);
+    var c1 = document.createElement("th");
+    c1.innerHTML = "White";
+    r1.appendChild(c1);
+    var c2 = document.createElement("th");
+    c2.innerHTML = "Black";
+    r1.appendChild(c2);
+    var c3 = document.createElement("th");
+    c3.setAttribute("style", "text-align: left");
+    c3.innerHTML = "Name";
+    r1.appendChild(c3);
 
     count = 0;
     for (var type in PIECE_TYPES) {
@@ -4467,6 +4484,10 @@ function toggle_piece_library()
             table.appendChild(row);
             count += 1;
         }
+    }
+
+    if (navigator.userAgent.indexOf("MSIE") !== -1) {
+        lib.appendChild(Builder.node("p", "So sorry, I haven't figured out how to get this table to display properly on IE7 yet."));
     }
 
     lib.appendChild(table);
