@@ -3521,6 +3521,8 @@ function init_board()
     }
 
     document.onkeydown = function(event) {
+            event = event || window.event;
+
             if (!event.keyCode) { 
                 return;
             }
@@ -5087,8 +5089,8 @@ function mousedown(event)
     DRAG.start_x = target.offsetLeft;
     DRAG.start_y = target.offsetTop;
 
-    DRAG.initial_left = dojo.style(target, "left");
-    DRAG.initial_top = dojo.style(target, "top");
+    DRAG.initial_left = dojo._abs(target).x;
+    DRAG.initial_top = dojo._abs(target).y;
 
     // Bring to front
     DRAG.old_zindex = target.style.zIndex;
