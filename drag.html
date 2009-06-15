@@ -239,7 +239,6 @@ dojo.addOnLoad(function(){
         new_y = event.clientY - DRAG.initial_y + DRAG.start_y;
 
         // Drag
-        element.style.webkitTransition = "";
         element.style.left = new_x + "px";
         element.style.top = new_y + "px";
         dragging_over(element, new_x, new_y);
@@ -259,7 +258,6 @@ dojo.addOnLoad(function(){
                     var new_x = e.pageX - DRAG.ing[0];
                     var new_y = e.pageY - DRAG.ing[1];
                     
-                    e.target.style.webkitTransition = "";
                     e.target.style.left = new_x + "px";
                     e.target.style.top = new_y + "px";
 
@@ -406,7 +404,12 @@ dojo.addOnLoad(function(){
 
         document.ontouchstart = touch;
         dojo.query(".draggable").forEach(function(e) {
-                e.ontouchmove = touchmove;
+                e.ontouchmove = touchmove;    
+
+                if (e.addEventListener) {
+                    // When transitions on elements end, allow to be dragged without transitioning
+                    // (to follow mouse/touch with no delay)
+                    e.addEventListener("webkitTransitionEnd", function() { e.style.webkitTransition = ""; });                }
             });
         document.ontouchend = touchend;
 
