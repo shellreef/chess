@@ -266,6 +266,7 @@ var GAME_STATE = {
     captured: {white:[], black:[]}, // Captured pieces
 
     // Not game state, but other globals
+    dragging: false,
     active_in_check: false,
     recent_piece: null,         // Recently moved piece
     recent_square: null,        // Recently moved from square
@@ -5210,7 +5211,7 @@ function dragging_over(element, left, top)
         // Highlight droppable square
         
         // TODO: use SQUARES, considered flipped
-        var flipped = GAME_STATE.flipped;
+        var flipped = false; //GAME_STATE.flipped;
         var square  = dojo.query('#board-body')[0].childNodes[flipped ? cell_y : 9 - cell_y].childNodes[flipped ? 9 - cell_x : cell_x];
 
         if (DROP.square) {
