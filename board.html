@@ -163,79 +163,10 @@ td.drop-square-capture2 { background-color: red !important; }
      * character, so could use &shy;, works on Safari, and supposedly IE7 and Firefox.
      */
     width: 600px;
+
+    -webkit-box-shadow: 0 1px 20px rgba(0, 0, 0, 0.9); 
 }
 
-/* Based on http://almaer.com/blog/creating-custom-scrollbars-with-css-how-css-isnt-great-for-every-task */
-/* Turn on a 13x13 scrollbar */
-::-webkit-scrollbar {
-    width: 13px;
-    height: 13px;
-}
- 
-::-webkit-scrollbar-button:vertical {
-    background-color: red;
-    border: 1px dashed blue;
-}
- 
-/* Turn on single button up on top, and down on bottom */
-::-webkit-scrollbar-button:start:decrement,
-::-webkit-scrollbar-button:end:increment {
-    display: block;
-}
- 
-/* Turn off the down area up on top, and up area on bottom */
-::-webkit-scrollbar-button:vertical:start:increment,
-::-webkit-scrollbar-button:vertical:end:decrement {
-    display: none;
-}
- 
-/* Place The scroll down button at the bottom */
-::-webkit-scrollbar-button:vertical:increment {
-    background-color: black;
-    border: 1px dashed blue;
-}
- 
-/* Place The scroll up button at the up */
-::-webkit-scrollbar-button:vertical:decrement {
-    background-color: purple;
-    border: 1px dashed blue;
-}
- 
-::-webkit-scrollbar-track:vertical {
-    background-color: blue;
-    border: 1px dashed pink;
-}
- 
-/* Top area above thumb and below up button */
-::-webkit-scrollbar-track-piece:vertical:start {
-    border: 1px solid #000;
-}
- 
-/* Bottom area below thumb and down button */
-::-webkit-scrollbar-track-piece:vertical:end {
-    border: 1px dashed pink;
-}
- 
-/* Track below and above */
-::-webkit-scrollbar-track-piece {
-    background-color: green;
-}
- 
-/* The thumb itself */
-::-webkit-scrollbar-thumb:vertical {
-    height: 50px;
-    background-color: yellow;
-}
- 
-/* Corner */
-::-webkit-scrollbar-corner:vertical {
-    background-color: black;
-}
- 
-/* Resizer */
-::-webkit-scrollbar-resizer:vertical {
-    background-color: gray;
-}
 
 </style>
 <!-- <script type='text/javascript' src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'></script> -->
