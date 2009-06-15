@@ -3383,6 +3383,7 @@ function check_repetition(ply)
 // only then does the board need to be rendered in HTML. 
 function realize_vboard()
 {
+    var time_started = new Date().getTime();
     for (var x = 1; x <= FILE_MAX; x += 1) {
         for (var y = 1; y <= RANK_MAX; y += 1) {
             var v = VBOARD[x][y];
@@ -3404,8 +3405,11 @@ function realize_vboard()
         }
     }
 
-    // TODO: Find a better way to do this. Highlight when start dragging?
-    //dojo.addClass(SQUARES[GAME_STATE.recent_square.x][GAME_STATE.recent_square.y], "recent-move-" + GAME_STATE.recent_square.color);
+    var time_took = new Date().getTime() - time_started;
+    // On my machine:
+    // Safari 4: 5 ms
+    // MSIE7: 100+ ms, noticeably slower piece dropping
+    alert("realize_vboard took " + time_took + " ms");
 }
 
 // Save the current displayed board state to VBOARD.
@@ -4791,7 +4795,6 @@ function create_piece(color, type)
 
     filename = image_path_for(type, color);
 
-
     // CSS classes, can use with $$ and also shown in toString (useful 
     // for debugging), however, note that code should not use this, because
     // all the classes are in a space-separated string, .className, according to
@@ -4799,16 +4802,16 @@ function create_piece(color, type)
     // and dojo's hasClass uses indexOf so its faster, but it still involves
     // parsing, and it is ugly. Probably a design flaw, oh well.
     // Use .type and .piece (set below) instead of classes for speed.
-    classes = ["draggable", "piece", color, type].join(" ");
+    classes = ["draggable", "piece", color, type];
 
     // Royal class is very important.
     if (PIECE_TYPES[type].royal) {
-        classes += " royal";
+        classes.push("royal");
     }
 
     // TODO Use a div with background-image instead, then can have arbitrary
     // characters, instead of just images, more flexible, maybe transition too.
-    piece = Builder.node('img', {'src': filename, 'class': classes});
+    piece = Builder.node('img', {'src': filename, 'class': classes.join(" ")});
 
     // Property will tell name of piece. To tell what color, or if it is
     // a piece in the first place, check the class names.
