@@ -869,7 +869,7 @@ function edit_pgn()
     $("game_ui").innerHTML = "<textarea id='edited_pgn' name='edited_pgn' cols='80' rows='35'>" + save_pgn().escapeHTML() + 
         "<\/textarea>" + 
         "<button type='button' name='ok' accesskey='o' " + 
-        "onclick='javascript:reload_pgn()'>OK<\/button>" +
+        "onclick='reload_pgn()'>OK<\/button>" +
         "<button type='button' name='cancel' onclick='restore_edit()' accesskey='x'>Cancel<\/button>";
 
     $("edited_pgn").focus();
@@ -1292,7 +1292,7 @@ function move_link(ply, text)
     }
 
     return '<a' + extra + ' id="ply_' + ply + '" class="active_move" ' +
-        'href="javascript:load_ply(' + 
+        'href="#" onclick="load_ply(' + 
             ply +
         ')">' + text + "<\/a>";
 }
@@ -4471,7 +4471,7 @@ function toggle_piece_library()
 
     lib.appendChild(table);
     lib.appendChild(Builder.node("p", [count + " pieces available"]));
-    lib.appendChild(Builder.node("a", {href: "javascript:show_library_images()"}, ["show all images (clears page)"]));
+    lib.appendChild(Builder.node("a", {href: "#", onclick:"show_library_images()"}, ["show all images (clears page)"]));
 }
 
 // Show information on a piece
@@ -5549,7 +5549,7 @@ function enable_document_selection(enable) {
 
  <!-- Header elements, game metadata. Hidden/shown as needed. -->
  <p id="header" style="display: none; text-align: center" 
-  onclick="javascript:edit_pgn()" class="show_White">
+  onclick="edit_pgn()" class="show_White">
   <span class="players">
    <span id="PGN_White" class="player_name" style="display: none">White</span>
    <span class="player_elo"><span style="display: none" class="show_WhiteElo">(</span><span id="PGN_WhiteElo" style="display: none">1500</span><span class="show_WhiteElo" style="display: none">)</span></span>
@@ -5586,8 +5586,8 @@ function enable_document_selection(enable) {
  </div>
 
  <!-- TODO: disclosure triangles -->
- <p><a href="javascript:new Effect.toggle('controls', 'slide', { duration: 0.1 })">controls</a> | 
-    <a href="javascript:toggle_piece_library();">pieces</a>
+ <p><a href="#" onclick="new Effect.toggle('controls', 'slide', { duration: 0.1 })">controls</a> | 
+    <a href="#" onclick="toggle_piece_library();">pieces</a>
 
  <div id="controls" style="display: none; border-left: 2px solid blue">
  <div>
@@ -5606,7 +5606,7 @@ function enable_document_selection(enable) {
 
  <p><select accesskey="o" id="output_notation" name="output_notation" onchange="show_move_history()"></select>
 
- <p><a href="javascript:flip()" accesskey="f">flip</a> | <a href="javascript:edit_pgn()">edit PGN</a>
+ <p><a href="#" onclick="flip()" accesskey="f">flip</a> | <a href="#" onclick="edit_pgn()">edit PGN</a>
 
  <p><select id="saved_board_menu" onchange="change_loaded_board(this)"></select>
      <button onclick="load_fen($('saved_board_menu').value)" accesskey="n">New Game</button>
