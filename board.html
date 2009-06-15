@@ -5315,7 +5315,7 @@ function drop_or_revert()
 // Initialize drag and drop system
 function init_dnd() {
     document.onmousedown = mousedown;
-    document.ontouchmove = mousemove;
+    document.ontouchmove = touchmove;//mousemove
 
     document.ontouchstart = touch;
     dojo.query(".draggable").forEach(function(e) {
