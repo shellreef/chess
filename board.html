@@ -5210,10 +5210,11 @@ function dragging_over(element, left, top)
 
         // Highlight droppable square
         
-        // TODO: use SQUARES, considered flipped
-        var flipped = false; //GAME_STATE.flipped;
-        var square  = dojo.query('#board-body')[0].childNodes[flipped ? cell_y : 9 - cell_y].childNodes[flipped ? 9 - cell_x : cell_x];
-
+        // TODO: use SQUARES, considered flipped, should be faster than querying each time
+        //var flipped = GAME_STATE.flipped;
+        //var square = SQUARES[flipped ? cell_y : 9 - cell_y][flipped ? 9 - cell_x : cell_x];
+        var square  = dojo.query('#board-body')[0].childNodes[9 - cell_y].childNodes[cell_x];
+        
         if (DROP.square) {
             dojo.removeClass(DROP.square, "drop-square");
         }
@@ -5597,7 +5598,7 @@ function enable_document_selection(enable) {
 
  <p><select accesskey="o" id="output_notation" name="output_notation" onchange="show_move_history()"></select>
 
- <p><a href="javascript:flip()">flip</a> | <a href="javascript:edit_pgn()">edit PGN</a>
+ <p><a href="javascript:flip()" accesskey="f">flip</a> | <a href="javascript:edit_pgn()">edit PGN</a>
 
  <p><select id="saved_board_menu" onchange="change_loaded_board(this)"></select>
      <button onclick="load_fen($('saved_board_menu').value)" accesskey="n">New Game</button>
