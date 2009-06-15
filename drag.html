@@ -366,11 +366,16 @@ dojo.addOnLoad(function(){
             // TODO: Only revert when not over a valid square
             
             // Revert
-            // TODO: use webkit transforms if available; faster
-            //dojo.anim(piece, { left: DRAG.initial_left, top: DRAG.initial_top }, 350);
-            piece.style.webkitTransition = "left 350ms linear, top 350ms linear";
-            piece.style.left = DRAG.initial_left + "px";
-            piece.style.top  = DRAG.initial_top + "px";
+            if (typeof WebKitCSSMatrix === "object") {
+                // Use webkit transforms if available; faster
+                // Feature detection from http://iui.googlecode.com/svn/trunk/test/features.html
+                // (detects for css transforms, hopefully close enough)
+                piece.style.webkitTransition = "left 350ms linear, top 350ms linear";
+                piece.style.left = DRAG.initial_left + "px";
+                piece.style.top  = DRAG.initial_top + "px";
+            } else {
+                dojo.anim(piece, { left: DRAG.initial_left, top: DRAG.initial_top }, 350);
+            }
             return;
         }
 
