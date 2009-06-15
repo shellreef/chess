@@ -4407,10 +4407,16 @@ function show_library_images()
         document.write("<table>");
         for (var i = 0; i < images.length; i += 1) {
             var image = images[i];
+
+            if (!image) {
+                continue;
+            }
+
             var wpath = root + "w" + image + ".gif";
             var bpath = root + "b" + image + ".gif";
 
             document.write('<tr>');
+            document.write('<td>' + i + '.</td>');
             document.write('<td><img src="' + wpath + '"></td>');
             document.write('<td><img src="' + bpath + '"></td>');
             document.write('<td>' + image + '</td>');
