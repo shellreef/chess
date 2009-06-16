@@ -1251,11 +1251,12 @@ function load_ply(ply)
     // Make "1." be ply 1, and "1..." or "1. ..." be ply 2.
     // Maybe make it a user function, go()
     
-    $$("a.active_move").invoke("removeClassName", "active_move");
+    //$$("a.active_move").invoke("removeClassName", "active_move");
+    dojo.removeClass($$("a.active_move"), "active_move");
 
     load_fen(GAME_STATE.position_after[ply], true);
 
-    $("ply_" + ply).addClassName("active_move");
+    dojo.addClass($("ply_" + ply), "active_move");
 
     set_next_back_accesskeys(ply);
 }
@@ -1919,6 +1920,9 @@ function disambiguate_notations(notations)
 // Make the drop targets for all valid moves.
 function make_droppables()
 {
+    // TODO: Remove. Was part of old drag and drop.
+    return;
+
     for (var starting_filerank in VALID_MOVES) {
         if (VALID_MOVES.hasOwnProperty(starting_filerank)) {
             var moves = VALID_MOVES[starting_filerank];
@@ -1927,7 +1931,7 @@ function make_droppables()
 
             // Create drop targets for the valid destinations, linking
             // the draggables to droppables using piece- + source square.
-            real_piece.addClassName("piece-" + starting_filerank);
+            dojo.addClass(real_piece, "piece-" + starting_filerank);
             real_piece.prior_position = starting_filerank;    // for removal
 
             // TODO: droppable on original square, if dropped there, then retain
@@ -1947,11 +1951,13 @@ function make_droppables()
                     // For removal
                     ALL_DROP_TARGETS.push(square);
 
+                    /* Old drag and drop
                     // You can drop here
                     Droppables.add(square, {
                         accept: "piece-" + starting_filerank,
                         onDrop: move_dropped_piece,
                         hoverclass: "drop-square"});
+                        */
                 });
         }
     }
@@ -3411,7 +3417,7 @@ function realize_vboard()
     // Firefox 3.0.10: 21 ms
     // MSIE7: 100+ ms, noticeably slower piece dropping
     var time_took = new Date().getTime() - time_started;
-    alert("realize_vboard took " + time_took + " ms");
+    //alert("realize_vboard took " + time_took + " ms");
 }
 
 // Save the current displayed board state to VBOARD.
@@ -4091,7 +4097,7 @@ function show_move_history()
 
     // Last ply
     $$("a.active_move").each(function(m) {
-            m.removeClassName("active_move");
+            dojo.removeClass(m, "active_move");
         });
 
     set_next_back_accesskeys(ply);
@@ -4112,7 +4118,7 @@ function mark_repeated_moves(reps)
     REPEAT_COLOR_COUNT += 1;
    
     var setcolor = function(m) {
-                //m.addClassName("repeated_move");
+                //dojo.addClass(m, "repeated_move");
                 m.setStyle({backgroundColor: color});
             };
 
@@ -4128,13 +4134,15 @@ function move_dropped_piece(piece, square, event)
 {
     //console.log(piece);
     //console.log(square);
-   
+  
+    /* TODO: Reinvestigate
     // Scriptaculous sets position:relative when creating a draggable,
     // but this will cause the relative position when it was in the container it
     // moved from, to apply to the new container it moved to, so either it will be
     // positioned at the wrong place (if revert:false) or will jump by an amount
     // proportionate to the amount it first moved, then be moved back. This fixes it.
     piece.style.position = "static";
+    */
 
     // TODO: do some cool effects when a piece is captured, but not too cool
     // Any way to finish running the code AFTER the effect finishes? New effect?
@@ -4143,7 +4151,7 @@ function move_dropped_piece(piece, square, event)
     //}
 
     // Can't drop this piece anywhere anymore.
-    piece.removeClassName("piece-" + piece.prior_position);
+    dojo.removeClass(piece, "piece-" + piece.prior_position);
     ALL_DROP_TARGETS.each(function(square) {
         Droppables.remove(square);
     });
@@ -4156,11 +4164,13 @@ function move_dropped_piece(piece, square, event)
  
     move_piece_to_square(virtual_piece, virtual_square, false, true);
 
+    /*
     // Scriptaculous requires position:relative; with static, you can drag it
     // but it won't move with the cursor, so set it and crucially, reset the
     // relative position so that it won' be misaligned.
     piece.style.position = "relative";
     piece.style.left = piece.style.right = piece.style.top = piece.style.bottom = 0;
+    */
 
 }
 
@@ -4944,13 +4954,13 @@ function highlight_moves(piece, enable)
 
         if (enable) {
             if (to_square.color === "white") {
-                to_square.addClassName("legal-move-white");
+                dojo.addClass(to_square, "legal-move-white");
             } else {
-                to_square.addClassName("legal-move-black");
+                dojo.addClass(to_square, "legal-move-black");
             }
         } else {
-                to_square.removeClassName("legal-move-white");
-                to_square.removeClassName("legal-move-black");
+            dojo.removeClass(to_square, "legal-move-white");
+            dojo.removeClass(to_square, "legal-move-black");
         }
     });
 
@@ -4962,8 +4972,8 @@ function highlight_moves(piece, enable)
 function unhighlight_all()
 {
     $$("td.legal-move-white", "td.legal-move-black").each(function(square) {
-        square.removeClassName("legal-move-white");
-        square.removeClassName("legal-move-black");
+        dojo.removeClass(square, "legal-move-white");
+        dojo.removeClass(square, "legal-move-black");
     });
 }
 
@@ -5560,8 +5570,8 @@ function enable_document_selection(enable) {
  ><td class="rank label">1</td
  ><td class="black square bottom-edge"></td
  ><td class="white square bottom-edge"></td
- ><td class="black square bottom-edge"></td
- ><td class="white square bottom-edge"></td
+ ><td class="black square bottom-edge" id="f1"></td
+ ><td class="white square bottom-edge" id="f2"></td
  ><td class="black square bottom-edge"></td
  ><td class="white square bottom-edge"></td
  ><td class="black square bottom-edge"></td
