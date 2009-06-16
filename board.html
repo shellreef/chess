@@ -5146,7 +5146,7 @@ function touchmove(evt)
                 // Move the node if we're in a state of dragging, but not resizing
                 var new_x = e.pageX - DRAG.touching[0];
                 var new_y = e.pageY - DRAG.touching[1];
-                
+
                 e.target.style.webkitTransition = "";
                 e.target.style.left = new_x + "px";
                 e.target.style.top = new_y + "px";
@@ -5280,6 +5280,9 @@ function drop_or_revert()
                 // If we continue, the top and left values will be 0, so the
                 // piece will "pop" to the top-left corner and then revert,
                 // if you click a piece without moving it.
+                // Need to reset so can drag with touch events.
+                piece.style.left = DRAG.initial_left + "px";
+                piece.style.top = DRAG.initial_top + "px";
                 // TODO: Show piece inspector? Used to try this, but was not
                 // reliable. If clicked once, worked, but then if moved, wouldn't.
                 //show_piece_inspector(piece);
