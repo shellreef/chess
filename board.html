@@ -4092,12 +4092,26 @@ function move_dropped_piece(piece, square, event)
     // Consider animating opacity or width+height (with dojo.anim or CSS transitions)
     //}
 
-    unhighlight_all();
+    // Visually rehome piece. This is a UI speed hack: after move_piece_to_square() is
+    // called, realize_vboard() will finalize the board position, moving any other
+    // pieces (castling, en passant, snapback, etc.) -- but it feels faster to have
+    // the piece immediately move to its destination. This is optional.
+    while(square.firstChild) {
+        square.removeChild(square.firstChild);
+    }
+    piece.style.position = "relative";
+    piece.style.top = piece.style.left = 0;
+    square.appendChild(piece);
+
 
     var virtual_square = VBOARD[square.x][square.y];
     var virtual_piece = VBOARD[piece.square.x][piece.square.y].piece;
- 
-    move_piece_to_square(virtual_piece, virtual_square, false, true);
+
+    // Move the piece in the virtual board and realize it.
+    setTimeout(function() { 
+            unhighlight_all();
+            move_piece_to_square(virtual_piece, virtual_square, false, true) 
+        }, 0);
 }
 
 // Get the representation of the active board state in FEN.
