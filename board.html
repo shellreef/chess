@@ -5256,7 +5256,7 @@ function accepts(piece, square)
     return dojo.hasClass(square, "legal-move-black") || dojo.hasClass(square, "legal-move-white");
 }
 
-// Drop the dragging object, or move it back if it is not over a droppable area
+// Drop the dragging object (wherever it is), or move it back if it is not over a droppable area
 function drop_or_revert()
 {
     var piece, square;
@@ -5272,8 +5272,27 @@ function drop_or_revert()
     square = DROP.square;
     if (!square || !accepts(piece, square)) {
         // Revert
+        if (!piece.style.left && !piece.style.top) {
+            if (DRAG.initial_left && DRAG.initial_top) {
+                // Dropped a piece without moving it
+                // TODO: Consider "dragging", and interpret a click as dropping
+                //alert("You dropped a piece without moving it.");
+                // If we continue, the top and left values will be 0, so the
+                // piece will "pop" to the top-left corner and then revert,
+                // if you click a piece without moving it.
+                // TODO: Show piece inspector? Used to try this, but was not
+                // reliable. If clicked once, worked, but then if moved, wouldn't.
+                //show_piece_inspector(piece);
+                return;
+            }
+        }
+
+ 
         if (typeof WebKitCSSMatrix === "object") {
-            // Use webkit transforms if available; faster
+            // TODO: On phone, you have to tap, release, and only then can you drag.
+            // If you just drag, the piece'll end up at (0,0). TODO: Fix this. Probably
+            // something is being set in mousedown that is not being set in touch.
+           // Use webkit transforms if available; faster
             // Feature detection from http://iui.googlecode.com/svn/trunk/test/features.html
             // (detects for css transforms, hopefully close enough)
             piece.style.webkitTransition = "left " + DRAG.revert_time + "ms linear, " + 
