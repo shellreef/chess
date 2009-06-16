@@ -185,7 +185,7 @@ td.drop-square-capture2 { background-color: red !important; }
 <script src="http://www.google.com/jsapi"></script>
 <script type="text/javascript">
 /*jslint bitwise: true, browser: true, eqeqeq: true, immed: true, newcap: true, nomen: true, plusplus: true, regexp: true, undef: true*/
-/*global window google $ $F $$ Hash $break Builder Event Droppables Draggable*/
+/*global window google $ $F $$ Hash $break Builder Event*/
 
 if (!window.google) {
     alert("Google was not found. Nothing will work.");
@@ -300,7 +300,6 @@ var VALID_MOVES = null;             // Keyed by filerank of source, array of mov
 var VALID_MOVES_OPP = null;         // Moves opponent could make, if it was their turn (attacking)
 var VALID_MOVE_NOTATIONS = null;    // Map SAN, LAN, MAN, RAN, CRAN, FAN, coord, desc, Smith etc. -> [piece, square]
 var ALT_MOVE_NOTATIONS = null;      // Same as above, but non-canonical, longer forms (Nb1c3 when Nc3 would do, etc.)
-var ALL_DROP_TARGETS = [];          // Droppables for UI
 
 // Board 
 var RANK_MAX = 8;
@@ -1091,7 +1090,6 @@ function load_pgn(pgn)
     }
 
     realize_vboard();
-    make_droppables();
     populate_make_a_move_list();
     show_move_history();
 
@@ -1917,53 +1915,6 @@ function disambiguate_notations(notations)
     return [canonical_notations, synonymous_notations];
 }
 
-// Make the drop targets for all valid moves.
-function make_droppables()
-{
-    // TODO: Remove. Was part of old drag and drop.
-    return;
-
-    for (var starting_filerank in VALID_MOVES) {
-        if (VALID_MOVES.hasOwnProperty(starting_filerank)) {
-            var moves = VALID_MOVES[starting_filerank];
-
-            var real_piece = pc(starting_filerank);
-
-            // Create drop targets for the valid destinations, linking
-            // the draggables to droppables using piece- + source square.
-            dojo.addClass(real_piece, "piece-" + starting_filerank);
-            real_piece.prior_position = starting_filerank;    // for removal
-
-            // TODO: droppable on original square, if dropped there, then retain
-            // move highlighting, but allow clicking/tapping to move to destination.
-            /*
-            Droppables.add(square_from, {
-                accept: "piece-" + starting_filerank,
-                onDrop: function() { alert(1); },
-                // No hoverclass
-                });
-            ALL_DROP_TARGETS.push(square_from);
-            */
-           
-            moves.each(function(move) {
-                    var square = SQUARES[move.x][move.y];
-
-                    // For removal
-                    ALL_DROP_TARGETS.push(square);
-
-                    /* Old drag and drop
-                    // You can drop here
-                    Droppables.add(square, {
-                        accept: "piece-" + starting_filerank,
-                        onDrop: move_dropped_piece,
-                        hoverclass: "drop-square"});
-                        */
-                });
-        }
-    }
-}
-
-
 // After the board changes and it is the next person's turn, calculate 
 // what the next possible allowable moves are, and update the globals with this information.
 //
@@ -1971,7 +1922,6 @@ function make_droppables()
 // check (useful for attacks, see is_hypothetical elsewhere).
 //
 // This operates on VBOARD only, for speed. Use make_vboard() before if needed.
-// Call make_droppables() after if UI drag-and-drop is desirable.
 function calculate_moves(color, is_hypothetical)
 {
     var valid_moves = {};
@@ -3919,7 +3869,7 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
         dojo.query(".recent-move-white").removeClass("recent-move-white");
         dojo.addClass(real_from_square, " recent-move-" + real_from_square.color);
 
-        // Re-highlight to square, since hoverclass in Droppable removes it
+        // Re-highlight to-square
         dojo.query(".drop-square").removeClass("drop-square");
         dojo.query(".drop-square2").removeClass("drop-square2");
         dojo.addClass(real_square, " drop-square2");
@@ -4028,7 +3978,6 @@ function finish_up_move(tieback, is_immediate, promote_to, is_raw)
         set_copyable_link();
 
         show_move_history();
-        make_droppables();
         populate_make_a_move_list();
         computer_move_if_applicable();
     }
@@ -4134,28 +4083,14 @@ function move_dropped_piece(piece, square, event)
 {
     //console.log(piece);
     //console.log(square);
-  
-    /* TODO: Reinvestigate
-    // Scriptaculous sets position:relative when creating a draggable,
-    // but this will cause the relative position when it was in the container it
-    // moved from, to apply to the new container it moved to, so either it will be
-    // positioned at the wrong place (if revert:false) or will jump by an amount
-    // proportionate to the amount it first moved, then be moved back. This fixes it.
-    piece.style.position = "static";
-    */
-
-    // TODO: do some cool effects when a piece is captured, but not too cool
+ 
+    // TODO: Consider setting piece.style.position to static here, so it is 
+    // static when stationary, and change it to absolute (absolutize) when dragging..
     // Any way to finish running the code AFTER the effect finishes? New effect?
     //if (square.firstChild) {
     //   new Effect.Squish(square.virtual ? square.piece : square.firstChild);
+    // Consider animating opacity or width+height (with dojo.anim or CSS transitions)
     //}
-
-    // Can't drop this piece anywhere anymore.
-    dojo.removeClass(piece, "piece-" + piece.prior_position);
-    ALL_DROP_TARGETS.each(function(square) {
-        Droppables.remove(square);
-    });
-    ALL_DROP_TARGETS = [];
 
     unhighlight_all();
 
@@ -4163,15 +4098,6 @@ function move_dropped_piece(piece, square, event)
     var virtual_piece = VBOARD[piece.square.x][piece.square.y].piece;
  
     move_piece_to_square(virtual_piece, virtual_square, false, true);
-
-    /*
-    // Scriptaculous requires position:relative; with static, you can drag it
-    // but it won't move with the cursor, so set it and crucially, reset the
-    // relative position so that it won' be misaligned.
-    piece.style.position = "relative";
-    piece.style.left = piece.style.right = piece.style.top = piece.style.bottom = 0;
-    */
-
 }
 
 // Get the representation of the active board state in FEN.
@@ -4310,7 +4236,6 @@ function load_fen(fen, replay)
     // Now that everything is loaded, set the turn.
     make_vboard();
     set_turn(color, replay);
-    make_droppables();
     populate_make_a_move_list();
 }
 
@@ -4893,21 +4818,6 @@ function create_piece(color, type)
     // as ghosts, which is cool, but instead: now pieces can only be dropped anywhere
     // if they are the active colors move. The player can drag the opponent's pieces
     // around but not drop anywhere.
-
-    // TODO: Replace
-    /*
-    var drag = new Draggable(piece, { 
-        revert: true, 
-        starteffect: undefined, 
-        endeffect: undefined,
-        onStart: function() { DRAG.dragging = true; },
-        onEnd: function() { DRAG.dragging = false; }
-        // TODO: figure out why on IE7, dragged pieces are below the highlighted squares!
-        // even with zindex: 1001
-     });
-     */
-     
-    // unused: drag
 
     return piece;
 }
