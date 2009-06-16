@@ -5286,6 +5286,13 @@ function drop_or_revert()
 
     square = DROP.square;
     if (!square || !accepts(piece, square)) {
+        if (!piece.style.left && !piece.style.top) {
+            // Dropped where picked it up - no movement.
+            // Do not revert, since would then pop out to (0,0)
+            // and revert it back.
+            return;
+        }
+
         // Revert
         if (typeof WebKitCSSMatrix === "object") {
             // Use webkit transforms if available; faster
