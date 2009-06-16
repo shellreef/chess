@@ -5108,7 +5108,8 @@ function touch(evt)
         var color, border;
         var target = e.target;
 
-        if (target.className.indexOf("draggable") !== -1 && !DRAG.touching) {
+        if (target && target.className &&
+                target.className.indexOf("draggable") !== -1 && !DRAG.touching) {
             // Save the offset of the touch within the current note
             DRAG.initial_left = dojo._abs(target, true).x;
             DRAG.initial_top = dojo._abs(target, true).y;
@@ -5247,7 +5248,7 @@ function touchend(evt)
         var e = evt.changedTouches[i];
 
         // Check to see if we've gone from a gesture back down to a touch
-        if (e.target.className.indexOf("draggable") !== -1) {
+        if (e.target && e.target.className && e.target.className.indexOf("draggable") !== -1) {
 
             out_piece(e.target, {});
 
@@ -5267,7 +5268,9 @@ function touchend(evt)
 // Return whether square should accept dropping a piece on it
 function accepts(piece, square)
 {
-    // TODO: Check if legal move
+    // TODO TODO TODO: Check if legal move, from data structure, instead of this UGLY HACK. XXX
+    // Doing this causes the error 'one' is not defined, if the user moves to an illegal position
+    // since the UI was not up to date with the legal moves (different piece)
     return dojo.hasClass(square, "legal-move-black") || dojo.hasClass(square, "legal-move-white");
 }
 
