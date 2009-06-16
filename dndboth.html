@@ -38,7 +38,7 @@ a.active_move { border-bottom: 1px dashed; }
 /*a.repeated_move { background-color: yellow; }*/   /* highlight */
 
 /* Element that can be dragged */
-.draggable { position: absolute; cursor: move; }
+/*NEW DND .draggable { position: absolute; cursor: move; }*/
 
 /* TODO: switch to divs, for flexibility, and use background-image.. or maybe not */
 img.piece
@@ -752,7 +752,7 @@ dojo.cookie=function(_2,_3,_4){var c=document.cookie;if(arguments.length==1){var
     load_notations();
     label_board();
     init_board();
-    init_dnd();
+    //NEW DNDinit_dnd();
 
     // Test raw notation
     //load_pgn('[Event "F/S Return Match (Raw)"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n[Moves_raw "/e2e4P /e7e5p /g1f3N /b8c6n /f1b5B /a7a6p /b5a4B /g8f6n /e1g1K /f8e7b /f1e1R /b7b5p /a4b3B /d7d6p /c2c3P /e8g8k /h2h3P /c6b8n /d2d4P /b8d7n /c3c4P /c7c6p /c4b5P /a6b5p /b1c3N /c8b7b /c1g5B /b5b4p /c3b1N /h7h6p /g5h4B /c6c5p /d4e5P /f6e4n /h4e7B /d8e7q /e5d6P /e7f6q /b1d2N /e4d6n /d2c4N /d6c4n /b3c4B /d7b6n /f3e5N /a8e8r /c4f7B /f8f7r /e5f7N /e8e1r /d1e1Q /g8f7k /e1e3Q /f6g5q /e3g5Q /h6g5p /b2b3P /f7e6k /a2a3P /e6d6k /a3b4P /c5b4p /a1a5R /b6d5n /f2f3P /b7c8b /g1f2K /c8f5b /a5a7R /g7g6p /a7a6R /d6c5k /f2e1K /d5f4n /g2g3P /f4h3n /e1d2K /c5b5k /a6d6R /b5c5k /d6a6R /h3f2n /g3g4P /f5d3b /a6e6R"]\n\n 1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8 10. d4 Nbd7 11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5 Nxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6 23. Ne5 Rae8 24. Bxf7 Rxf7 25. Nxf7 Rxe1 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5 hxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5 35. Ra7 g6 36. Ra6 Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6 Nf2 42. g4 Bd3 43. Re6 ');
@@ -1921,7 +1921,7 @@ function disambiguate_notations(notations)
 function make_droppables()
 {
     // TODO: Remove. Was part of old drag and drop.
-    return;
+    //OLD DND:return;
 
     for (var starting_filerank in VALID_MOVES) {
         if (VALID_MOVES.hasOwnProperty(starting_filerank)) {
@@ -1951,13 +1951,12 @@ function make_droppables()
                     // For removal
                     ALL_DROP_TARGETS.push(square);
 
-                    /* Old drag and drop
+                    // OLD DND
                     // You can drop here
                     Droppables.add(square, {
                         accept: "piece-" + starting_filerank,
                         onDrop: move_dropped_piece,
                         hoverclass: "drop-square"});
-                        */
                 });
         }
     }
@@ -4895,7 +4894,7 @@ function create_piece(color, type)
     // around but not drop anywhere.
 
     // TODO: Replace
-    /*
+    // OLD DND
     var drag = new Draggable(piece, { 
         revert: true, 
         starteffect: undefined, 
@@ -4905,7 +4904,6 @@ function create_piece(color, type)
         // TODO: figure out why on IE7, dragged pieces are below the highlighted squares!
         // even with zindex: 1001
      });
-     */
      
     // unused: drag
 
