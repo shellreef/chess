@@ -5113,6 +5113,8 @@ function touch(evt)
             DRAG.initial_left = dojo._abs(target, true).x;
             DRAG.initial_top = dojo._abs(target, true).y;
             DRAG.touching = [e.pageX - DRAG.initial_left, e.pageY - DRAG.initial_top];
+
+            over_piece(target, {});
         }
     }
 
@@ -5246,6 +5248,9 @@ function touchend(evt)
 
         // Check to see if we've gone from a gesture back down to a touch
         if (e.target.className.indexOf("draggable") !== -1) {
+
+            out_piece(e.target, {});
+
             if (evt.targetTouches.length == 1) {
                 // If there was rotation, this number needs to be reset
                 DRAG.touching = [evt.targetTouches[0].pageX - dojo.style(e.target, "left"), evt.targetTouches[0].pageY - dojo.style(e.target, "top")];
