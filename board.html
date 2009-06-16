@@ -4759,6 +4759,39 @@ function create_piece_by_letter(name)
     return create_piece(decoded.color, decoded.type);
 }
 
+// Called when mouse is over a piece
+function over_piece(piece, event) 
+{
+    var square = highlight_moves(piece, true);
+    // for debugging
+    //piece.setStyle({border: '1px solid black'});
+    if (square) {
+        dojo.addClass(square, "recent-move-" + square.color);
+    }
+   
+    if (event.shiftKey) {
+        show_piece_inspector(piece);
+    }
+    GAME_STATE.piece_under = piece;
+}
+
+// Called when mouse is no longer over a piece
+function out_piece(piece, event)
+{
+    var square = highlight_moves(piece, false);
+    //piece.setStyle({border: 'none'});
+    if (square) {
+        dojo.removeClass(square, "recent-move-" + square.color);
+    }
+   
+    if (!event.shiftKey) {
+        hide_piece_inspector();
+    }
+
+    GAME_STATE.piece_under = null;
+}
+
+
 // Create a new piece by color and type (full name).
 // TODO: make this a constructor so you can do new Piece().
 function create_piece(color, type)
@@ -4798,32 +4831,9 @@ function create_piece(color, type)
 
     // Highlight/unhighlight legal moves on mouse over, like Chess with Friends.
     // Yahoo Games does this too, but uses a yellow outline.
-    Event.observe(piece, 'mouseover', function(event) {
-            var square = highlight_moves(piece, true);
-            // for debugging
-            //piece.setStyle({border: '1px solid black'});
-            if (square) {
-                dojo.addClass(square, "recent-move-" + square.color);
-            }
-           
-            if (event.shiftKey) {
-                show_piece_inspector(piece);
-            }
-            GAME_STATE.piece_under = piece;
-        });
-    Event.observe(piece, 'mouseout', function(event) {
-            var square = highlight_moves(piece, false);
-            //piece.setStyle({border: 'none'});
-            if (square) {
-                dojo.removeClass(square, "recent-move-" + square.color);
-            }
-           
-            if (!event.shiftKey) {
-                hide_piece_inspector();
-            }
+    Event.observe(piece, "mouseover", function(event) { over_piece(piece, event); });
 
-            GAME_STATE.piece_under = null;
-        });
+    Event.observe(piece, "mouseout", function(event) { out_piece(piece, event); });
 
     // Make all new pieces draggable. I tried only making the active color's
     // pieces draggable, but then in Safari they can still be selected like text,
