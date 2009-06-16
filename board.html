@@ -5100,8 +5100,8 @@ function touch(evt)
 
         if (target.className.indexOf("draggable") !== -1 && !DRAG.touching) {
             // Save the offset of the touch within the current note
-            DRAG.initial_left = dojo.style(target, "left");
-            DRAG.initial_top = dojo.style(target, "top");
+            DRAG.initial_left = dojo._abs(target, true).x;
+            DRAG.initial_top = dojo._abs(target, true).y;
             DRAG.touching = [e.pageX - DRAG.initial_left, e.pageY - DRAG.initial_top];
         }
     }
@@ -5272,27 +5272,6 @@ function drop_or_revert()
     square = DROP.square;
     if (!square || !accepts(piece, square)) {
         // Revert
-        if (!piece.style.left && !piece.style.top) {
-            // TODO: On phone, you have to tap, release, and only then can you drag.
-            // If you just drag, the piece'll end up at (0,0). TODO: Fix this. Probably
-            // something is being set in mousedown that is not being set in touch.
-
-            // Dropped a piece without moving it
-            // TODO: Consider "dragging", and interpret a click as dropping
-            //alert("You dropped a piece without moving it.");
-            // If we continue, the top and left values will be 0, so the
-            // piece will "pop" to the top-left corner and then revert,
-            // if you click a piece without moving it.
-            // Need to reset so can drag with touch events.
-            piece.style.left = DRAG.initial_left + "px";
-            piece.style.top = DRAG.initial_top + "px";
-            // TODO: Show piece inspector? Used to try this, but was not
-            // reliable. If clicked once, worked, but then if moved, wouldn't.
-            //show_piece_inspector(piece);
-            return;
-        }
-
- 
         if (typeof WebKitCSSMatrix === "object") {
             // Use webkit transforms if available; faster
             // Feature detection from http://iui.googlecode.com/svn/trunk/test/features.html
