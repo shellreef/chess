@@ -410,6 +410,13 @@ var PIECE_TYPES = {
     kingpawn: {parlett: "#king, #pawn", royal: true},
     kingrook: {parlett: "#king, #rook", royal: true},
 
+    // Diminished pieces
+    b3: {parlett: "1X, 2X, 3X"},
+    b4: {parlett: "1X, 2X, 3X, 4X"},
+    r3: {parlett: "1+, 2+, 3+"},
+    r4: {parlett: "1+, 2+, 3+, 4+"},
+    q3: {parlett: "1*, 2*, 3*"},
+    q4: {parlett: "1*, 2*, 3*, 4*"},
 
     // Combined pieces (compound pieces)
     // From piececlopedia http://www.chessvariants.org/index/mainquery.php?type=Piececlopedia&orderby=LinkText&displayauthor=1&displayinventor=1&usethisheading=Piececlopedia
@@ -451,7 +458,7 @@ var PIECE_TYPES = {
     elephantferzrook: {parlett: "#elephant, #ferz, #rook"},
     elephantknight: {parlett: "#elephant, #knight"},
     elephantknightwazir: {parlett: "#elephant, #knight, #wazir"},
-    elephantzzmoon: {parlett: "#elephant, #wizard"},
+    elephantwizard: {parlett: "#elephant, #wizard", image:"elephantzzmoon"},
     giraffeferz: {parlett: "#giraffe, #ferz"},
     giraffewazir: {parlett: "#giraffe, #wazir"},
     knightcamelzebra: {parlett: "#knight, #camel, #zebra"},
@@ -652,6 +659,7 @@ var SAVED_BOARDS = {
 "Test Projectiles": "x(airplane)X(airplane)4x(airplane)/8/1x(bird)/2x(bird)x(bird)x(bird)1x(bird)/3x(bird)x(bird)/3X(archerzz3)x(bird)/4X(archerzz2)X(archer)/x(frog)1X(gun)3X(rocket) w - - 0 1",
 "Test Invincibles": "3x(banner)x(banner)/7x(nwall)/x(banner)3x(block)1X(fortress)/4K3/5x(stone)/8/1kX(block)1X(stone)/1X(block)x(block)3X(nwall) w - - 0 1",
 "Test Consumables": "4k/pppppppp/1pppppp1/2pppp2/X(bomb)2X(superbomb)/8/PPPPPPPP/4K w - - 0 1",
+"Test Diminished": "/1X(b4)5X(q4)//4X(b3)//3X(r3)/2X(r4)/7X(q3) w - - 0 1",
 "Test Mix 1": "X(airplane)x(airplane)/3x(pawnattackrook)x(caliph)x(pope)X(elephantwarmachine)/8/8/8/4S/X(lance)fwZ1X(pawnattackrook)/AcDeIFvT w - - 0 1",
 "Test Mix 2": "//2/1X(silvergeneral)2X(mushroom)/3X(crab)X(wizard)/4X(barc)1X(goldgeneral)//7m w - - 0 1",
 "Test Mix 3": "x(zebracamel)//3X(2moveferz)//3X(supermaharajah)1X(2movewazirferz)/2X(2movewazir) w - - 0 1"
