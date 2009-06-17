@@ -365,7 +365,9 @@ var PIECE_TYPES = {
     superpawn: {parlett: "on>, cnX>", letter: "XP", image:"quickpawn"},
     berolinapawn: {parlett: "o1X>, c1>, io2X>", letter: "XB", image:"berolinapawn", resets_50move: true, url:"pc:berolina"},
     // TODO: http://www.chessvariants.org/piececlopedia.dir/berolina-plus.html
-    dragon: {parlett: "#pawn, #knight", image: "pawnknight", url:"pc:dragon"},   // alt image: dragon, but less descriptive
+    
+    // alt image: dragon, but less descriptive. There is also pawnknight!
+    knightpawn: {parlett: "#pawn, #knight", image: "knightpawn", url:"pc:dragon"},   
     // TODO: other dragon, http://www.chessvariants.org/piececlopedia.dir/dragonchess_dragon.html , and rename above pawnknight
     // David's pawn
     pawnattackrook: {parlett: "#pawn, c#rook", image:"pawn135cw", promote: ["dragon", "rookpawn"]},
@@ -431,7 +433,7 @@ var PIECE_TYPES = {
     rookpawn: {parlett: "#rook, #pawn"},
     knightfers: {parlett: "#knight, #ferz", image: "knightferz"},
     knightwazir: {parlett: "#knight, #wazir"},
-    guardknight: {parlett: "#knight, #man", image "guardknight2"},
+    guardknight: {parlett: "#knight, #man", image:"guardknight2"},
     elephantwazir: {parlett: "#elephant, #wazir"},
     elephantferzwarmachine: {parlett: "#elephant, #ferz, #warmachine"},
     warmachinewazir: {parlett: "#warmachine, #wazir"},
