@@ -5281,7 +5281,9 @@ function touchend(evt)
 // Return whether square should accept dropping a piece on it
 function accepts(piece, square)
 {
-    return IS_VALID_MOVE[piece.square.filerank][square.filerank];
+    var outer = IS_VALID_MOVE[piece.square.filerank];
+
+    return outer && outer[square.filerank];
 }
 
 // Drop the dragging object (wherever it is), or move it back if it is not over a droppable area
