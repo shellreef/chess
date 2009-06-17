@@ -4412,7 +4412,7 @@ function toggle_piece_library()
     var table, lib, want_setup_mode, parent, count;
 
     parent = dojo.byId("piece-library-parent");
-    want_setup_mode = !parent.visible();
+    want_setup_mode = parent.style.display === "";
     new Effect.toggle(parent, 'slide', { duration: 0.1 });
 
     // Set setup mode as opening/closing piece library, since that is what it is for
