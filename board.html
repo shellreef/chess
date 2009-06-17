@@ -4438,8 +4438,10 @@ function toggle_piece_library()
     // TODO: Find out why this table doesn't display in IE7
     table = document.createElement("table");
     table.setAttribute("id", "piece-library-table");
+    tbody = document.createElement("tbody");
+    table.appendChild(tbody);
     var r1 = document.createElement("tr");
-    table.appendChild(r1);
+    tbody.appendChild(r1);
     var c1 = document.createElement("th");
     c1.innerHTML = "White";
     r1.appendChild(c1);
@@ -4466,13 +4468,9 @@ function toggle_piece_library()
                     Builder.node("td", {"class": "square"}, wp),
                     Builder.node("td", {"class": "square"}, bp),
                     Builder.node("td", type)]);
-            table.appendChild(row);
+            tbody.appendChild(row);
             count += 1;
         }
-    }
-
-    if (navigator.userAgent.indexOf("MSIE") !== -1) {
-        lib.appendChild(Builder.node("p", "So sorry, I haven't figured out how to get this table to display properly on IE7 yet."));
     }
 
     lib.appendChild(table);
