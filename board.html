@@ -5237,142 +5237,143 @@ function dragging_over(element, left, top)
         DROP.square = null;
     }
 
-} else {
-    // Outside droppable area
-    
-    if (DROP.square) {
-        dojo.removeClass(DROP.square, "dropping-square");
-        DROP.square = null;
-    }
+    } else {
+        // Outside droppable area
+        
+        if (DROP.square) {
+            dojo.removeClass(DROP.square, "dropping-square");
+            DROP.square = null;
+        }
 
-    // TODO: change icon to show out of range, if was from within range
-}
+        // TODO: change icon to show out of range, if was from within range
+    }
 }
 
 // Drop or revert on mouse up
 function mouseup()
 {
-if (DRAG.element_m === null) {
-    return;
-}
+    if (DRAG.element_m === null) {
+        return;
+    }
 
-DRAG.element_m.style.zIndex = DRAG.old_zindex;
-document.onmousemove = null;
-document.onselectstart = null;
-DRAG.element_m.ondragstart = null;
+    DRAG.element_m.style.zIndex = DRAG.old_zindex;
+    document.onmousemove = null;
+    document.onselectstart = null;
+    DRAG.element_m.ondragstart = null;
 
-drop_or_revert();
+    drop_or_revert();
 
-DRAG.element_m = null;
+    DRAG.element_m = null;
 }
 
 
 // Drop or revert on touch end
 function touchend(evt)
 {
-drop_or_revert();
+    drop_or_revert();
 
-for (var i = 0; i < evt.changedTouches.length; ++i) {
-    var e = evt.changedTouches[i];
+    for (var i = 0; i < evt.changedTouches.length; ++i) {
+        var e = evt.changedTouches[i];
 
-    // Check to see if we've gone from a gesture back down to a touch
-    if (e.target && e.target.className && e.target.className.indexOf("draggable") !== -1) {
+        // Check to see if we've gone from a gesture back down to a touch
+        if (e.target && e.target.className && e.target.className.indexOf("draggable") !== -1) {
 
-        out_piece(e.target, {});
+            out_piece(e.target, {});
 
-        if (evt.targetTouches.length == 1) {
-            // If there was rotation, this number needs to be reset
-            DRAG.touching = [evt.targetTouches[0].pageX - dojo.style(e.target, "left"), evt.targetTouches[0].pageY - dojo.style(e.target, "top")];
-        } else if(!evt.targetTouches.length) {
-            // Great use of e.targeTouches, since releasing on finger that's part
-            // of a gesture over this node would trigger a touchend even though
-            // it could keep going
-            DRAG.touching = false;
+            if (evt.targetTouches.length == 1) {
+                // If there was rotation, this number needs to be reset
+                DRAG.touching = [evt.targetTouches[0].pageX - dojo.style(e.target, "left"), evt.targetTouches[0].pageY - dojo.style(e.target, "top")];
+            } else if(!evt.targetTouches.length) {
+                // Great use of e.targeTouches, since releasing on finger that's part
+                // of a gesture over this node would trigger a touchend even though
+                // it could keep going
+                DRAG.touching = false;
+            }
         }
     }
-}
 }
 
 // Return whether square should accept dropping a piece on it
 function accepts(piece, square)
 {
-if (PREFS.setup_mode) {
-    return true;
-}
+    if (PREFS.setup_mode) {
+        return true;
+    }
 
-var outer = IS_VALID_MOVE[piece.square.filerank];
-return outer && outer[square.filerank];
+    var outer = IS_VALID_MOVE[piece.square.filerank];
+    return outer && outer[square.filerank];
 }
 
 // Drop the dragging object (wherever it is), or move it back if it is not over a droppable area
 function drop_or_revert()
 {
-var piece, square;
+    var piece, square;
 
-DRAG.dragging = false;
+    DRAG.dragging = false;
 
-piece = (DRAG.touching && DRAG.element_t) || DRAG.element_m;
-if (!piece) {
-    // Nothing was being dragged
-    return;
-}
-
-square = DROP.square;
-if (!square || !accepts(piece, square)) {
-    if (!piece.style.left && !piece.style.top) {
-        // Dropped where picked it up - no movement.
-        // Do not revert, since would then pop out to (0,0)
-        // and revert it back.
+    piece = (DRAG.touching && DRAG.element_t) || DRAG.element_m;
+    if (!piece) {
+        // Nothing was being dragged
         return;
     }
 
-    // Revert
-    if (typeof WebKitCSSMatrix === "object") {
-        // Use webkit transforms if available; faster
-        // Feature detection from http://iui.googlecode.com/svn/trunk/test/features.html
-        // (detects for css transforms, hopefully close enough)
-        piece.style.webkitTransition = "left " + DRAG.revert_time + "ms linear, " + 
-            "top " + DRAG.revert_time + "ms linear";
-        piece.style.left = DRAG.initial_left + "px";
-        piece.style.top  = DRAG.initial_top + "px";
-    } else {
-        dojo.anim(piece, { left: DRAG.initial_left, top: DRAG.initial_top }, DRAG.revert_time);
-    }
-    return;
-}
+    square = DROP.square;
+    if (!square || !accepts(piece, square)) {
+        if (!piece.style.left && !piece.style.top) {
+            // Dropped where picked it up - no movement.
+            // Do not revert, since would then pop out to (0,0)
+            // and revert it back.
+            return;
+        }
 
-//console.log("drop",piece,square);
-move_dropped_piece(piece, square, null);
+        // Revert
+        if (typeof WebKitCSSMatrix === "object") {
+            // Use webkit transforms if available; faster
+            // Feature detection from http://iui.googlecode.com/svn/trunk/test/features.html
+            // (detects for css transforms, hopefully close enough)
+            piece.style.webkitTransition = "left " + DRAG.revert_time + "ms linear, " + 
+                "top " + DRAG.revert_time + "ms linear";
+            piece.style.left = DRAG.initial_left + "px";
+            piece.style.top  = DRAG.initial_top + "px";
+        } else {
+            dojo.anim(piece, { left: DRAG.initial_left, top: DRAG.initial_top }, DRAG.revert_time);
+        }
+        return;
+    }
+
+    //console.log("drop",piece,square);
+    move_dropped_piece(piece, square, null);
 }
 
 // Initialize drag and drop system
-function init_dnd() {
-document.onmousedown = mousedown;
-document.ontouchmove = touchmove;//mousemove
+function init_dnd() 
+{
+    document.onmousedown = mousedown;
+    document.ontouchmove = touchmove;//mousemove
 
-document.ontouchstart = touch;
-dojo.query(".draggable").forEach(function(e) {
-        e.ontouchmove = touchmove;
-    });
-document.ontouchend = touchend;
+    document.ontouchstart = touch;
+    dojo.query(".draggable").forEach(function(e) {
+            e.ontouchmove = touchmove;
+        });
+    document.ontouchend = touchend;
 
-// Get dimensions of droppable area
-var top_left_square = dojo.query("#top-left-square")[0];
-var bottom_right_square = dojo.query("#bottom-right-square")[0];
-var top_left = dojo._abs(top_left_square, true);
-DROP.area.left = top_left.x;
-DROP.area.top = top_left.y;
+    // Get dimensions of droppable area
+    var top_left_square = dojo.query("#top-left-square")[0];
+    var bottom_right_square = dojo.query("#bottom-right-square")[0];
+    var top_left = dojo._abs(top_left_square, true);
+    DROP.area.left = top_left.x;
+    DROP.area.top = top_left.y;
 
-var bottom_right_top_left = dojo._abs(bottom_right_square, true);
-DROP.area.cell_width = dojo.style(bottom_right_square, "width");
-DROP.area.width = bottom_right_top_left.x - DROP.area.left + DROP.area.cell_width;
-DROP.area.height  = bottom_right_top_left.y - DROP.area.top + DROP.area.cell_width; // square
+    var bottom_right_top_left = dojo._abs(bottom_right_square, true);
+    DROP.area.cell_width = dojo.style(bottom_right_square, "width");
+    DROP.area.width = bottom_right_top_left.x - DROP.area.left + DROP.area.cell_width;
+    DROP.area.height  = bottom_right_top_left.y - DROP.area.top + DROP.area.cell_width; // square
 
-// for testing
-//dojo._setBox(foo, DROP.area.left, DROP.area.top, DROP.area.width, DROP.area.height, "px");
+    // for testing
+    //dojo._setBox(foo, DROP.area.left, DROP.area.top, DROP.area.width, DROP.area.height, "px");
 
-DROP.area.right = DROP.area.left + DROP.area.width;
-DROP.area.bottom = DROP.area.top + DROP.area.height;
+    DROP.area.right = DROP.area.left + DROP.area.width;
+    DROP.area.bottom = DROP.area.top + DROP.area.height;
 }
 
 //// LOW-LEVEL FUNCTIONS
@@ -5380,84 +5381,85 @@ DROP.area.bottom = DROP.area.top + DROP.area.height;
 // Get the value of a form element
 function form_value(e)
 {
-e = dojo.byId(e);
+    e = dojo.byId(e);
 
-if (e.checked !== undefined) {
+    if (e.checked !== undefined) {
     return e.checked;
-}
+    }
 
-return dojo.byId(e).value;
+    return dojo.byId(e).value;
 }
 
 // Get URL query string as an object
 // Based on http://www.dojotoolkit.org/book/dojo-porting-guide-0-4-x-0-9/dojo-uri-changes
 function query_string()
 {
-var parts, dict = {};
-var query;
+    var parts, dict = {};
+    var query;
 
-if (location.search) {
-    query = location.search;
-} else if (location.hash) {
-    query = location.hash;
-}
-if (!query) {
-    return {};
-}
+    if (location.search) {
+        query = location.search;
+    } else if (location.hash) {
+        query = location.hash;
+    }
+    if (!query) {
+        return {};
+    }
 
-parts = query.split(/[&;]/);
-dojo.forEach(parts, function(pair) {
-        var part = pair.match(/([a-zA-Z0-9]*)=(.*)/);
-        if (part) { 
-            dict[part[1]] = decodeURIComponent(part[2]); 
-        }
-     }, this);
+    parts = query.split(/[&;]/);
+    dojo.forEach(parts, function(pair) {
+            var part = pair.match(/([a-zA-Z0-9]*)=(.*)/);
+            if (part) { 
+                dict[part[1]] = decodeURIComponent(part[2]); 
+            }
+         }, this);
 
-return dict;
+    return dict;
 }
 
 // Random integer within range
 function randint(minimum, maximum)
 {
-return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
+    return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
 }
 
 // Uppercase first character, like in Perl
 function ucfirst(s)
 {
-assert(s.substring, "ucfirst(" + s + "): no substring method, not a string? callee=" + 
-        arguments.callee);
-return s.substring(0, 1).toUpperCase() + s.substring(1);
+    assert(s.substring, "ucfirst(" + s + "): no substring method, not a string? callee=" + 
+            arguments.callee);
+    return s.substring(0, 1).toUpperCase() + s.substring(1);
 }
 
 // Based on http://aymanh.com/9-javascript-tips-you-may-not-know
 function AssertException(message) { this.message = message; }
 AssertException.prototype.toString = function() {
-return 'AssertException: ' + this.message;
+    return 'AssertException: ' + this.message;
 };
 
 function assert(expression, message)
 {
-if (!expression) {
-    alert(message);
-    if (window.console && console.trace) {
-        // Give a stack trace for Firebug
-        console.trace();
-    }
+    if (!expression) {
+        alert(message);
+        if (window.console && console.trace) {
+            // Give a stack trace for Firebug
+            console.trace();
+        }
 
-    throw new AssertException(message);
-}
+        throw new AssertException(message);
+    }
 }
 
 // Based on http://tech.hickorywind.org/articles/2008/10/24/turning-off-text-selection-in-javascript
 var ORIGINAL_ONSELECTSTART;
-function enable_document_selection(enable) {
-if(enable) {
-    document.onselectstart = ORIGINAL_ONSELECTSTART;
-} else {
-    ORIGINAL_ONSELECTSTART = document.onselectstart;
-    document.onselectstart = function() { return false; };
-}
+function enable_document_selection(enable) 
+{
+    if(enable) {
+        document.onselectstart = ORIGINAL_ONSELECTSTART;
+    } else {
+        ORIGINAL_ONSELECTSTART = document.onselectstart;
+        document.onselectstart = function() { return false; };
+    }
 }
 
 </script>
