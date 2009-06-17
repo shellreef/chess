@@ -44,7 +44,7 @@ a.active_move { border-bottom: 1px dashed; }
 img.piece
 { 
  border: none;
- margin-left: 2.5px;
+ margin: 0px;
 
  /* Make captured pieces (smaller) look better on IE7+. See
   * http://www.gabrielweinberg.com/blog/2009/06/things-about-web-images-i-just-learned.html
@@ -277,7 +277,8 @@ var GAME_STATE = {
     recent_square: null,        // Recently moved from square
     last_captured: null,        // export_captured() string _before_ current move 
     piece_under: null,          // Piece under cursor for piece inspector
-    flipped: false              // True if from black's perspective instead of white (only for toggling!)
+    flipped: false,             // True if from black's perspective instead of white
+    editing_mode: false         // Whether in editing mode or not (TODO)
 };    
 
 /// Drag and drop globals
@@ -5208,9 +5209,12 @@ function dragging_over(element, left, top)
         // Highlight droppable square
         
         // TODO: use SQUARES, considered flipped, should be faster than querying each time
-        //var flipped = GAME_STATE.flipped;
-        //var square = SQUARES[flipped ? cell_y : 9 - cell_y][flipped ? 9 - cell_x : cell_x];
+        var flipped = GAME_STATE.flipped;
+        var square = SQUARES[flipped ? cell_y : 9 - cell_y][flipped ? 9 - cell_x : cell_x];
+        console.log(square.x,square.y);
         var square  = dojo.query('#board-body')[0].childNodes[9 - cell_y].childNodes[cell_x];
+        console.log(square.x,square.y);
+        console.log("---");
         
         if (DROP.square) {
             dojo.removeClass(DROP.square, "drop-square");
