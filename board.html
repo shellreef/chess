@@ -302,6 +302,7 @@ var DROP = {
 
 // Moves that can be made right now, for each active piece.
 var VALID_MOVES = null;             // Keyed by filerank of source, array of moves, x, y and any flags
+var IS_VALID_MOVE = null;           // Keyed by filerank of source, then filerank of dest
 var VALID_MOVES_OPP = null;         // Moves opponent could make, if it was their turn (attacking)
 var VALID_MOVE_NOTATIONS = null;    // Map SAN, LAN, MAN, RAN, CRAN, FAN, coord, desc, Smith etc. -> [piece, square]
 var ALT_MOVE_NOTATIONS = null;      // Same as above, but non-canonical, longer forms (Nb1c3 when Nc3 would do, etc.)
@@ -1929,7 +1930,7 @@ function disambiguate_notations(notations)
 // This operates on VBOARD only, for speed. Use make_vboard() before if needed.
 function calculate_moves(color, is_hypothetical)
 {
-    var valid_moves = {};
+    var valid_moves = {}, is_valid_move = {};
     var possible_notations, notation, raw_notations = {};
 
     if (!is_hypothetical) { 
@@ -1971,7 +1972,14 @@ function calculate_moves(color, is_hypothetical)
 
             // Store valid moves for mouseovers etc.
             if (moves.length !== 0) {
+                // For move highlighting
                 valid_moves[starting_filerank] = moves;
+
+                // Lookup for accepts()
+                is_valid_move[starting_filerank] = {};
+                moves.forEach(function(m) {
+                    is_valid_move[starting_filerank][xy2filerank([m.x, m.y])] = m;
+                });
             }
 
             //console.log(starting_filerank, moves);
@@ -1996,6 +2004,7 @@ function calculate_moves(color, is_hypothetical)
 
         // For reals.
         VALID_MOVES = valid_moves;
+        IS_VALID_MOVE = is_valid_move;
     }
     
     return valid_moves;
@@ -5273,10 +5282,7 @@ function touchend(evt)
 // Return whether square should accept dropping a piece on it
 function accepts(piece, square)
 {
-    // TODO TODO TODO: Check if legal move, from data structure, instead of this UGLY HACK. XXX
-    // Doing this causes the error 'one' is not defined, if the user moves to an illegal position
-    // since the UI was not up to date with the legal moves (different piece)
-    return dojo.hasClass(square, "legal-move-black") || dojo.hasClass(square, "legal-move-white");
+    return IS_VALID_MOVE[piece.square.filerank][square.filerank];
 }
 
 // Drop the dragging object (wherever it is), or move it back if it is not over a droppable area
