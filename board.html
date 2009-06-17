@@ -278,7 +278,7 @@ var GAME_STATE = {
     last_captured: null,        // export_captured() string _before_ current move 
     piece_under: null,          // Piece under cursor for piece inspector
     flipped: false,             // True if from black's perspective instead of white
-    edit_mode: false            // Whether in editing mode or not (TODO)
+    setup_mode: false           // Setup pieces, instead of playing game
 };    
 
 /// Drag and drop globals
@@ -4116,7 +4116,7 @@ function move_dropped_piece(piece, square, event)
     piece.style.top = piece.style.left = 0;
     square.appendChild(piece);
 
-    if (GAME_STATE.edit_mode) {
+    if (GAME_STATE.setup_mode) {
         var from_square = piece.square;
 
         do_virtual_move(piece, {x:square.x, y:square.y});
@@ -4407,16 +4407,15 @@ function show_library_images()
 // Show the piece library, of readily usable pieces with defined movement
 function toggle_piece_library()
 {
-    var table, lib, enable_edit_mode, parent, count;
+    var table, lib, want_setup_mode, parent, count;
 
     parent = dojo.byId("piece-library-parent");
-    enable_edit_mode = !parent.visible();
+    want_setup_mode = !parent.visible();
     new Effect.toggle(parent, 'slide', { duration: 0.1 });
 
-    if (enable_edit_mode) {
-        // TODO: Enable dragging pieces to any square
-        //console.log("TODO: enable editing");
-    }
+    // Set setup mode as opening/closing piece library, since that is what it is for
+    dojo.byId("enable_setup_mode").checked = want_setup_mode;
+    GAME_STATE.setup_mode = want_setup_mode;
 
     // Lazily generate the table. 
     lib = dojo.byId("piece-library");
@@ -5295,7 +5294,7 @@ function touchend(evt)
 // Return whether square should accept dropping a piece on it
 function accepts(piece, square)
 {
-    if (GAME_STATE.edit_mode) {
+    if (GAME_STATE.setup_mode) {
         return true;
     }
 
@@ -5636,7 +5635,7 @@ function enable_document_selection(enable) {
 
  <p><a href="#" onclick="flip()" accesskey="f">flip</a> | <a href="#" onclick="edit_pgn()">edit PGN</a>
 
- <p><label for="setup_mode"><input name="setup_mode" id="setup_mode" type="checkbox" onclick="GAME_STATE.edit_mode = this.checked">Setup</label>
+ <p><label for="enable_setup_mode"><input name="enable_setup_mode" id="enable_setup_mode" type="checkbox" onclick="GAME_STATE.setup_mode = this.checked">Setup</label>
 
  <p><select id="saved_board_menu" onchange="change_loaded_board(this)"></select>
      <button onclick="load_fen(dojo.byId('saved_board_menu').value)" accesskey="n">New Game</button>
