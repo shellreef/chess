@@ -190,7 +190,7 @@ td.drop-square-capture2 { background-color: red !important; }
 <script src="http://www.google.com/jsapi"></script>
 <script type="text/javascript">
 /*jslint bitwise: true, browser: true, eqeqeq: true, immed: true, newcap: true, nomen: true, plusplus: true, regexp: true, undef: true*/
-/*global window google $ $F $$ Hash $break Builder Event*/
+/*global window google form_value $$ Hash $break Builder Event*/
 
 if (!window.google) {
     alert("Google was not found. Nothing will work.");
@@ -853,8 +853,8 @@ function email_board()
     subject = "Chess game";
     dots = ply_info.color ? (ply_info.color === "black" ? "... " : " ") : "";
 
-    link = $("copyable_link").href;
-    link_text = GAME_STATE.made_moves[ply] ? GAME_STATE.made_moves[ply].notations[$F("output_notation")] : "move";
+    link = document.getElementById("copyable_link").href;
+    link_text = GAME_STATE.made_moves[ply] ? GAME_STATE.made_moves[ply].notations[form_value("output_notation")] : "move";
     // Note: IE ActiveXObject for Outlook: http://www.webdeveloper.com/forum/showthread.php?t=176548
     // Got an automation error when I tried it, but it could supposedly allow HTML bodies on Windows
     //body = ply_info.fullmove_number + ". " + dots + '<a href="' + link + '">' + link_text + '</a>';
@@ -1003,7 +1003,7 @@ function save_pgn()
 // Reload PGN after editing it.
 function reload_pgn()
 {
-    var pgn = $F("edited_pgn");
+    var pgn = form_value("edited_pgn");
 
     restore_edit();
 
@@ -1524,7 +1524,7 @@ function ask_to_promote(piece, tieback, is_immediate)
     for (var type in tieback) {
         if (tieback.hasOwnProperty(type)) {
             // The move the user selected that will be made
-            var notation = tieback[type].notations[$F("output_notation")];
+            var notation = tieback[type].notations[form_value("output_notation")];
 
             //element = create_piece(GAME_STATE.active_color, type);
             element = Builder.node("img", {src:image_path_for(type, piece.color), piece_type:type, notation:notation});
@@ -2091,7 +2091,7 @@ function populate_make_a_move_list()
 // input notation or actually make a move by the menu.
 function make_move_by_menu(menu)
 {
-    var choice = $F("make_move_menu");
+    var choice = form_value("make_move_menu");
 
     // Notation change
     if (choice.indexOf("change_") === 0) {
@@ -2111,7 +2111,7 @@ function make_move_by_menu(menu)
 function computer_move_if_applicable(clicked)
 {
     if (clicked) {
-        if ($F("black_computer") || $F("white_computer")) {
+        if (form_value("black_computer") || form_value("white_computer")) {
             $("skill_level").value = PREFS.skill;
             $("show_skill").show();
         } else {
@@ -2119,7 +2119,7 @@ function computer_move_if_applicable(clicked)
         }
     }
 
-    if (!$F(GAME_STATE.active_color + "_computer")) {
+    if (!form_value(GAME_STATE.active_color + "_computer")) {
         return;
     }
 
@@ -3209,7 +3209,7 @@ function set_copyable_link()
     if (last_move) {
         // Store the previous move and the board state _before_ the move,
         // so it can be made.
-        last_move = ";m=" + last_move.notations[$F("output_notation")];
+        last_move = ";m=" + last_move.notations[form_value("output_notation")];
         if (!prior) {
             // No move has been made yet
             $("copyable_link").href = document.URL;
@@ -3751,7 +3751,7 @@ function all_notations_from_piece_square(piece, square, text_input)
 // user drags a piece to a square and we don't know what move it is.
 function notation_from_piece_square(piece, square, text_input, notation_type)
 {
-    notation_type = notation_type || $F("output_notation");
+    notation_type = notation_type || form_value("output_notation");
     var notations = VALID_MOVE_NOTATIONS[notation_type];
     var finds = {}, find_count = 0, one;
 
@@ -4019,7 +4019,7 @@ function show_move_history()
             continue;
         }
 
-        move_text = move_info.notations[$F("output_notation")];
+        move_text = move_info.notations[form_value("output_notation")];
         
         if (color === "white") {
             htmls.push('<span class="fullmove_number">' + fullmove_number + '<\/span>');
@@ -5361,6 +5361,12 @@ function init_dnd() {
 }
 
 //// LOW-LEVEL FUNCTIONS
+
+// Get the value of a form element
+function form_value(e)
+{
+    return document.getElementById(e).value;
+}
 
 // Get URL query string as an object
 // Based on http://www.dojotoolkit.org/book/dojo-porting-guide-0-4-x-0-9/dojo-uri-changes
