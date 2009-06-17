@@ -825,13 +825,16 @@ pgn = load_pgn(
 // Load the chess notations into the input/output notation select boxes
 function load_notations()
 {
-    var menu = $("output_notation");
+    var menu = document.getElementById("output_notation");
 
     for (var notation in AVAILABLE_NOTATIONS) {
         if (AVAILABLE_NOTATIONS.hasOwnProperty(notation)) {
             var name = AVAILABLE_NOTATIONS[notation];
+            var option = document.createElement("option");
+            option.setAttribute("value", notation);
+            option.innerHTML = name;
 
-            menu.appendChild(Builder.node("option", {value: notation}, name));
+            menu.appendChild(option);
         }
     }
 
