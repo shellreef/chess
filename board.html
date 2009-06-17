@@ -822,7 +822,7 @@ pgn = load_pgn(
 // Load the chess notations into the input/output notation select boxes
 function load_notations()
 {
-    var menu = document.getElementById("output_notation");
+    var menu = dojo.byId("output_notation");
 
     for (var notation in AVAILABLE_NOTATIONS) {
         if (AVAILABLE_NOTATIONS.hasOwnProperty(notation)) {
@@ -850,7 +850,7 @@ function email_board()
     subject = "Chess game";
     dots = ply_info.color ? (ply_info.color === "black" ? "... " : " ") : "";
 
-    link = document.getElementById("copyable_link").href;
+    link = dojo.byId("copyable_link").href;
     link_text = GAME_STATE.made_moves[ply] ? GAME_STATE.made_moves[ply].notations[form_value("output_notation")] : "move";
     // Note: IE ActiveXObject for Outlook: http://www.webdeveloper.com/forum/showthread.php?t=176548
     // Got an automation error when I tried it, but it could supposedly allow HTML bodies on Windows
@@ -868,7 +868,7 @@ function email_board()
 var ORIGINAL_UI_HTML;
 function edit_pgn()
 {
-    var game_ui = document.getElementById("game_ui");
+    var game_ui = dojo.byId("game_ui");
 
     ORIGINAL_UI_HTML = game_ui.innerHTML;
 
@@ -880,13 +880,13 @@ function edit_pgn()
         "onclick='reload_pgn()'>OK<\/button>" +
         "<button type='button' name='cancel' onclick='restore_edit()' accesskey='x'>Cancel<\/button>";
 
-    document.getElementById("edited_pgn").focus();
+    dojo.byId("edited_pgn").focus();
 }
 
 // Restore the game interface, removing the edit area.
 function restore_edit()
 {
-    document.getElementById("game_ui").innerHTML = ORIGINAL_UI_HTML;
+    dojo.byId("game_ui").innerHTML = ORIGINAL_UI_HTML;
 }
 
 // Return a string of color-coded captured piece codes, or null if none.
@@ -934,7 +934,7 @@ function save_pgn()
     dict = {};
     for (var i = 0; i < tags.length; i += 1) {
         var tag = tags[i];
-        var elt = document.getElementById("PGN_" + tag);
+        var elt = dojo.byId("PGN_" + tag);
 
         if (elt.visible()) {
             dict[tag] = elt.innerHTML;
@@ -1027,7 +1027,7 @@ function load_pgn(pgn)
     // Header
     for (var i = 0; i < tags.length; i += 1) {
         var tag = tags[i];
-        var node = document.getElementById("PGN_" + tag);
+        var node = dojo.byId("PGN_" + tag);
 
         assert(node, "load_pgn(" + pgn + "): no element for tag " + tag);
 
@@ -5364,7 +5364,7 @@ function init_dnd() {
 // Get the value of a form element
 function form_value(e)
 {
-    return document.getElementById(e).value;
+    return dojo.byId(e).value;
 }
 
 // Get URL query string as an object
