@@ -761,7 +761,7 @@ dojo.cookie=function(_2,_3,_4){var c=document.cookie;if(arguments.length==1){var
     init_dnd();
 
     // test 50 move rule (game from http://www.chessville.com/misc/History/Mad_Aussie_Trivia_Archive_12.htm)
-    load_pgn('[White "Filipowicz,A"]\n[Black "Smederevac,P"]\n[Site "Rubinstein mem 04th Polanica Zdroj (14)"]\n[Date "1966"]\n\n1. e4 e6 2. d3 Ne7 3. g3 c5 4. Bg2 Nbc6 5. Be3 b6 6. Ne2 d5 7. 0-0 d4 8. Bc1 g6 9. Nd2 Bg7 10. f4 f5 11. a3 0-0 12. e5 a5 13. a4 Ba6 14. b3 Rb8 15. Nc4 Qc7 16. Kh1 Nd5 17. Bd2 Rfd8 18. Ng1 Bf8 19. Nf3 Be7 20. h4 h5 21. Qe2 Ncb4 22. Rfc1 Bb7 23. Kh2 Bc6 24. Na3 Ra8 25. Qe1 Rdb8 26. Qg1 Qb7 27. Qf1 Kg7 28. Qh1 Qd7 29. Ne1 Ra7 30. Nf3 Rba8 31. Ne1 Bd8 32. Nf3 Rb8 33. Ne1 Bc7 34. Nf3 Rh8 35. Ng5 Bd8 36. Nf3 Be7 37. Qg1 Bb7 38. Nb5 Raa8 39. Na3 Ba6 40. Qf1 Rab8 41. Nc4 Bd8 42. Qd1 Ne7 43. Nd6 Bc7 44. Qe2 Ng8 45. Ng5 Nh6 46. Bf3 Bd8 47. Nh3 Ng4+ 48. Kg1 Be7 49. Nc4 Nd5 50. Nf2 Bb7 51. Nh3 Bc6 52. Qg2 Rhc8 53. Re1 Rc7 54. Re2 Ra7 55. Ree1 Ra6 56. Re2 Rba8 57. Ree1 R8a7 58. Na3 Ra8 59. Nc4 Nh6 60. Na3 Nf7 61. Nf2 Rd8');
+    //load_pgn('[White "Filipowicz,A"]\n[Black "Smederevac,P"]\n[Site "Rubinstein mem 04th Polanica Zdroj (14)"]\n[Date "1966"]\n\n1. e4 e6 2. d3 Ne7 3. g3 c5 4. Bg2 Nbc6 5. Be3 b6 6. Ne2 d5 7. 0-0 d4 8. Bc1 g6 9. Nd2 Bg7 10. f4 f5 11. a3 0-0 12. e5 a5 13. a4 Ba6 14. b3 Rb8 15. Nc4 Qc7 16. Kh1 Nd5 17. Bd2 Rfd8 18. Ng1 Bf8 19. Nf3 Be7 20. h4 h5 21. Qe2 Ncb4 22. Rfc1 Bb7 23. Kh2 Bc6 24. Na3 Ra8 25. Qe1 Rdb8 26. Qg1 Qb7 27. Qf1 Kg7 28. Qh1 Qd7 29. Ne1 Ra7 30. Nf3 Rba8 31. Ne1 Bd8 32. Nf3 Rb8 33. Ne1 Bc7 34. Nf3 Rh8 35. Ng5 Bd8 36. Nf3 Be7 37. Qg1 Bb7 38. Nb5 Raa8 39. Na3 Ba6 40. Qf1 Rab8 41. Nc4 Bd8 42. Qd1 Ne7 43. Nd6 Bc7 44. Qe2 Ng8 45. Ng5 Nh6 46. Bf3 Bd8 47. Nh3 Ng4+ 48. Kg1 Be7 49. Nc4 Nd5 50. Nf2 Bb7 51. Nh3 Bc6 52. Qg2 Rhc8 53. Re1 Rc7 54. Re2 Ra7 55. Ree1 Ra6 56. Re2 Rba8 57. Ree1 R8a7 58. Na3 Ra8 59. Nc4 Nh6 60. Na3 Nf7 61. Nf2 Rd8');
 
     // test PGN embedded notes
     //pgn = load_pgn('[Event "F/S Return Match"]\n[Site "Belgrade, Serbia JUG"]\n[Date "1992.11.04"]\n[Round "29"]\n[White "Fischer, Robert J."]\n[Black "Spassky, Boris V."]\n[Result "1/2-1/2"]\n \n1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6\n4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7\n11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\nNxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\nhxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\nNf2 42. g4 Bd3 43. Re6 1/2-1/2');
@@ -1034,13 +1034,13 @@ function load_pgn(pgn)
         if (game[tag] && game[tag].substr(0, 1) !== "?") {
             var value = game[tag];
 
-            node.show();
+            node.style.display = "";
 
             node.innerHTML = value;
 
             $$(".show_" + tag).invoke("show");
         } else {
-            node.hide();
+            node.style.display = "none";
             $$(".show_" + tag).invoke("hide");
         }
     }
@@ -1259,11 +1259,11 @@ function load_ply(ply)
     // Maybe make it a user function, go()
     
     //$$("a.active_move").invoke("removeClassName", "active_move");
-    dojo.removeClass($$("a.active_move"), "active_move");
+    dojo.query("a.active_move").removeClass("active_move");
 
     load_fen(GAME_STATE.position_after[ply], true);
 
-    dojo.addClass($("ply_" + ply), "active_move");
+    dojo.byId("ply_" + ply).addClass("active_move");
 
     set_next_back_accesskeys(ply);
 }
@@ -1497,7 +1497,7 @@ function promote(piece, square, type, notation, is_immediate)
     piece.src = image_path_for(type, piece.color);
     piece.type = type;
 
-    $("promote_container").hide();
+    dojo.byId("promote_container").hide();
 
     // TODO: call with a correct tieback. Re-find it?
     var tieback = get_notations(piece, square, type);
@@ -1513,7 +1513,7 @@ function ask_to_promote(piece, tieback, is_immediate)
     realize_vboard();
 
     // Clear previous container
-    var container = $("promote_container");
+    var container = dojo.byId("promote_container");
 
     while(container.firstChild) {
         container.removeChild(container.firstChild);
@@ -2051,7 +2051,7 @@ function populate_make_a_move_list()
     var active_name = AVAILABLE_NOTATIONS[PREFS.input_notation];
     var move_group, change_group, count, menu;
 
-    menu = $("make_move_menu");
+    menu = dojo.byId("make_move_menu");
     menu.innerHTML = "";
 
     count = own_property_count(VALID_MOVE_NOTATIONS[PREFS.input_notation]);
@@ -2111,7 +2111,7 @@ function computer_move_if_applicable(clicked)
 {
     if (clicked) {
         if (form_value("black_computer") || form_value("white_computer")) {
-            $("skill_level").value = PREFS.skill;
+            dojo.byId("skill_level").value = PREFS.skill;
             $("show_skill").show();
         } else {
             $("show_skill").hide();
@@ -2121,10 +2121,11 @@ function computer_move_if_applicable(clicked)
     if (!form_value(GAME_STATE.active_color + "_computer")) {
         return;
     }
+    alert(form_value(GAME_STATE.active_color + "_computer"));
 
     // TODO: better variables
-    if ($("check").innerHTML.indexOf("Checkmate") !== -1 ||
-        $("check").innerHTML.indexOf("Draw") !== -1) {
+    if (dojo.byId("check").innerHTML.indexOf("Checkmate") !== -1 ||
+        dojo.byId("check").innerHTML.indexOf("Draw") !== -1) {
         // Game is completed, don't bug the computer
         return;
     }
@@ -2193,7 +2194,7 @@ function got_engine_move(response)
         set_check_message("");
         mv(response.next_move);
         // TODO: show a meter for the board position
-        $("score").innerHTML = "Score: " + response.score;
+        dojo.byId("score").innerHTML = "Score: " + response.score;
     } else {
         disable_engine("Engine error: " + response.error);
     }
@@ -2209,8 +2210,8 @@ function got_engine_error(response)
 function disable_engine(why)
 {
     PREFS.skill = 0;
-    $("skill_level").value = PREFS.skill;
-    $("skill_level").title = "Reset because of: " + why;
+    dojo.byId("skill_level").value = PREFS.skill;
+    dojo.byId("skill_level").title = "Reset because of: " + why;
     window.status = "Skill level reset because: " + why;
 
     // It'll have to do
@@ -3121,7 +3122,7 @@ function set_turn(color, historical)
         assert(false, "set_turn(" + color + "): invalid color");
     }
 
-    $("status").innerHTML = ucfirst(new_color) + "'s Turn";
+    dojo.byId("status").innerHTML = ucfirst(new_color) + "'s Turn";
 
     // Move number is incremented after black moves, according to rules.
     old_fullmove = GAME_STATE.fullmove_number;
@@ -3211,7 +3212,7 @@ function set_copyable_link()
         last_move = ";m=" + last_move.notations[form_value("output_notation")];
         if (!prior) {
             // No move has been made yet
-            $("copyable_link").href = document.URL;
+            dojo.byId("copyable_link").href = document.URL;
             return;
         }
 
@@ -3233,7 +3234,7 @@ function set_copyable_link()
 
     // TODO: also include c=, like Captured tag, so can know what was captured
     
-    $("copyable_link").href = make_copyable_link(fen) + captured + last_move + perspective;
+    dojo.byId("copyable_link").href = make_copyable_link(fen) + captured + last_move + perspective;
 }
 
 // Make a URL that can be clicked to go to this board state
@@ -3257,12 +3258,8 @@ function make_copyable_link(fen)
 // Set the game check status (or draw, checkmate) message.
 function set_check_message(msg)
 {
-    $("check").innerHTML = msg;
-    if (msg) {
-        $("dash").show();
-    } else {
-        $("dash").hide();
-    }
+    dojo.byId("check").innerHTML = msg;
+    dojo.byId("dash").style.display = msg ? "" : "none";
 }
 
 // Return whether there is insufficient material to mate
@@ -3427,7 +3424,7 @@ function label_board(flipped)
         for (var y = 1; y <= RANK_MAX; y += 1) {
             // Lookup the table cell from the DOM. This is extraordinarly expensive,
             // so it is only done once here then stored in a global, SQUARES.
-            var square  = $('board-body').childNodes[flipped ? y : 9 - y].childNodes[flipped ? 9 - x : x];
+            var square  = dojo.byId("board-body").childNodes[flipped ? y : 9 - y].childNodes[flipped ? 9 - x : x];
 
             square.x = x;
             square.y = y;
@@ -3487,7 +3484,7 @@ function label_board(flipped)
 // Only needs to be performed once per page load.
 function init_board()
 {
-    var board_menu = $("saved_board_menu");
+    var board_menu = dojo.byId("saved_board_menu");
 
     // Create saved boards for openings, since they are stored by
     // board position rather than name.
@@ -3667,11 +3664,11 @@ function update_captured_piece_images(piece)
         html += '<img src="' + image_path_for(p.type, p.color) + '" class="captured"> ';
     }
 
-    $("captured_piece_images").innerHTML = html;
+    dojo.byId("captured_piece_images").innerHTML = html;
 
     // DOM is slower
     //var node = Builder.node("img", {src:image_path_for(piece.type, piece.color), 'class': "captured"});
-    //$("captured_piece_images").appendChild(node);
+    //dojo.byId("captured_piece_images").appendChild(node);
 }
 
 // Get all the move notation texts and moves for a given piece and destination
@@ -3987,7 +3984,7 @@ function finish_up_move(tieback, is_immediate, promote_to, is_raw)
 
     var opening = OPENINGS[active_fen(true)];
     if (opening) {
-        $("opening_name").innerHTML = opening;
+        dojo.byId("opening_name").innerHTML = opening;
     }
     // If not recognized, do not clear it -- keep up opening during the game
 
@@ -4059,7 +4056,7 @@ function show_move_history()
         first = false;
     }
 
-    $("move_history").innerHTML = htmls.join("");
+    dojo.byId("move_history").innerHTML = htmls.join("");
 
     // Last ply
     $$("a.active_move").each(function(m) {
@@ -4341,7 +4338,7 @@ function load_starting_position(fen, replay)
     if (!replay) {
         name_pieces();
         // Clear move history. TODO: Better way.
-        $("move_history").innerHTML = "";
+        dojo.byId("move_history").innerHTML = "";
     }
 }
 
@@ -4399,7 +4396,7 @@ function toggle_piece_library()
 {
     var table, lib, enable_edit_mode, parent, count;
 
-    parent = $("piece-library-parent");
+    parent = dojo.byId("piece-library-parent");
     enable_edit_mode = !parent.visible();
     new Effect.toggle(parent, 'slide', { duration: 0.1 });
 
@@ -4409,8 +4406,8 @@ function toggle_piece_library()
     }
 
     // Lazily generate the table. 
-    lib = $("piece-library");
-    if ($("piece-library-table")) {
+    lib = dojo.byId("piece-library");
+    if (dojo.byId("piece-library-table")) {
         return;
     }
 
@@ -4472,13 +4469,13 @@ function toggle_piece_library()
 function show_piece_inspector(piece)
 {
     var symbols, type_info, misc;
-    var inspector = $("piece-inspector");
+    var inspector = dojo.byId("piece-inspector");
 
     type_info = PIECE_TYPES[piece.type];
 
-    $("inspector-type").innerHTML = piece.type;
-    $("inspector-image").src = image_path_for(piece.type, piece.color);
-    $("inspector-movement").innerHTML = type_info.parlett;
+    dojo.byId("inspector-type").innerHTML = piece.type;
+    dojo.byId("inspector-image").src = image_path_for(piece.type, piece.color);
+    dojo.byId("inspector-movement").innerHTML = type_info.parlett;
 
     // Symbols (letter, figurine, number) for notations
     symbols = "";
@@ -4496,7 +4493,7 @@ function show_piece_inspector(piece)
     if (type_info.iccf_number) {
         symbols += ", " + type_info.iccf_number;
     }
-    $("inspector-symbols").innerHTML = symbols;
+    dojo.byId("inspector-symbols").innerHTML = symbols;
 
     // Other settings
     misc = "";
@@ -4524,7 +4521,7 @@ function show_piece_inspector(piece)
         misc += '<a target="_new" href="' + url + '">Details</a>';
     }
 
-    $("inspector-info").innerHTML = misc;
+    dojo.byId("inspector-info").innerHTML = misc;
 
     inspector.show();
 }
@@ -4532,9 +4529,9 @@ function show_piece_inspector(piece)
 // Hide information on the piece shown, if any
 function hide_piece_inspector()
 {
-    var inspector = $("piece-inspector");
+    var inspector = dojo.byId("piece-inspector");
 
-    inspector.hide();
+    inspector.style.display = "none";
 }
 
 //// PIECE FUNCTIONS
@@ -5364,6 +5361,12 @@ function init_dnd() {
 // Get the value of a form element
 function form_value(e)
 {
+    e = dojo.byId(e);
+
+    if (e.checked !== undefined) {
+        return e.checked;
+    }
+
     return dojo.byId(e).value;
 }
 
@@ -5616,7 +5619,7 @@ function enable_document_selection(enable) {
  <p><a href="#" onclick="flip()" accesskey="f">flip</a> | <a href="#" onclick="edit_pgn()">edit PGN</a>
 
  <p><select id="saved_board_menu" onchange="change_loaded_board(this)"></select>
-     <button onclick="load_fen($('saved_board_menu').value)" accesskey="n">New Game</button>
+     <button onclick="load_fen(dojo.byId('saved_board_menu').value)" accesskey="n">New Game</button>
  
  </div>
  </div>
