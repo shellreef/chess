@@ -149,17 +149,17 @@ td.penultimate-move-black { background-color: yellow; }*/
 
 
 /* Destination square */
-td.drop-square { background-color: blue !important; }
-td.drop-square2 { background-color: blue; }
+td.dropping-square { background-color: blue !important; }   /* in progress (overrides legal) */  
+td.dropped-square { background-color: blue; }               /* finished (does not) */
 
 /* TODO: if destination square is a capture, make it red, even
  * when hovering. This gives more information on the move but also
  * provides better feedback when dragging to capture your opponent's
  * piece that just moved, because it'll already be colored with
- * drop-square, giving no visual feedback - but it would if this
+ * dropping-square, giving no visual feedback - but it would if this
  * class was used in that scenario. */
-td.drop-square-capture { background-color: red !important; }
-td.drop-square-capture2 { background-color: red !important; }
+td.dropping-square-capture { background-color: red !important; }
+td.dropping-square-capture2 { background-color: red !important; }
 
 
 /* TODO:
@@ -3884,9 +3884,9 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
         dojo.addClass(real_from_square, " recent-move-" + real_from_square.color);
 
         // Re-highlight to-square
-        dojo.query(".drop-square").removeClass("drop-square");
-        dojo.query(".drop-square2").removeClass("drop-square2");
-        dojo.addClass(real_square, " drop-square2");
+        dojo.query(".dropping-square").removeClass("dropping-square");
+        dojo.query(".dropped-square").removeClass("dropped-square");
+        dojo.addClass(real_square, " dropped-square");
     }
 
     // If castling, move the rook in place. Ugly hardcoded.
@@ -4124,8 +4124,8 @@ function move_dropped_piece(piece, square, event)
         unhighlight_all();
         dojo.query(".recent-move-black").removeClass("recent-move-black");
         dojo.query(".recent-move-white").removeClass("recent-move-white");
-        dojo.query(".drop-square2").removeClass("drop-square2");
-        dojo.addClass(from_square, "drop-square2");
+        dojo.query(".dropped-square").removeClass("dropped-square");
+        dojo.addClass(from_square, "dropped-square");
 
         realize_vboard();
         return;
@@ -4270,7 +4270,7 @@ function load_fen(fen, replay)
 
         dojo.query(".recent-move-black").removeClass("recent-move-black");
         dojo.query(".recent-move-white").removeClass("recent-move-white");
-        dojo.query(".drop-square2").removeClass("drop-square2");
+        dojo.query(".dropped-square").removeClass("dropped-square");
 
         update_captured_piece_images();
     }
@@ -5226,12 +5226,12 @@ function dragging_over(element, left, top)
         //var square  = dojo.query('#board-body')[0].childNodes[9 - cell_y].childNodes[cell_x];
         
         if (DROP.square) {
-            dojo.removeClass(DROP.square, "drop-square");
+            dojo.removeClass(DROP.square, "dropping-square");
         }
 
         if (accepts(element, square)) {
             DROP.square = square;
-            dojo.addClass(square, "drop-square");
+            dojo.addClass(square, "dropping-square");
         } else {
             DROP.square = null;
         }
@@ -5240,7 +5240,7 @@ function dragging_over(element, left, top)
         // Outside droppable area
         
         if (DROP.square) {
-            dojo.removeClass(DROP.square, "drop-square");
+            dojo.removeClass(DROP.square, "dropping-square");
             DROP.square = null;
         }
 
