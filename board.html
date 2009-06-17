@@ -202,19 +202,6 @@ if (!window.google) {
 google.load("prototype", "1.6.0.3");
 google.load("scriptaculous", "1.8.2");
 
-// Preferences, not game state.
-var PREFS = {
-    input_notation: "SAN",
-
-    // What piece images to use  - TODO: option to change
-    image_set: "alfaerieomega",   // See README in that directory
-    //image_set: "ariel",    // based on Ariel Unicode MS
-    //image_set: "chessos",
-    
-    engine: "http://jeff.tk:81/chess/crafty.cgi",
-    skill: 100                // engine strength, 0-100
-};
-
 // Chess movement notations, in descending precedence. 
 // For more info see http://en.wikipedia.org/wiki/Chess_notation
 var AVAILABLE_NOTATIONS = {
@@ -250,6 +237,22 @@ var EXPORT_NOTATIONS = [
     "raw"
 ];
 
+// Preferences, not game state.
+var PREFS = {
+    input_notation: "SAN",
+
+    // What piece images to use  - TODO: option to change
+    image_set: "alfaerieomega",   // See README in that directory
+    //image_set: "ariel",    // based on Ariel Unicode MS
+    //image_set: "chessos",
+    
+    engine: "http://jeff.tk:81/chess/crafty.cgi",
+    skill: 100,                 // engine strength, 0-100
+
+    flipped: false,             // True if from black's perspective instead of white
+    setup_mode: false           // Setup pieces, instead of playing game
+};
+
 
 // Info about the game
 var GAME_STATE = {
@@ -276,9 +279,7 @@ var GAME_STATE = {
     recent_piece: null,         // Recently moved piece
     recent_square: null,        // Recently moved from square
     last_captured: null,        // export_captured() string _before_ current move 
-    piece_under: null,          // Piece under cursor for piece inspector
-    flipped: false,             // True if from black's perspective instead of white
-    setup_mode: false           // Setup pieces, instead of playing game
+    piece_under: null           // Piece under cursor for piece inspector
 };    
 
 /// Drag and drop globals
@@ -3404,7 +3405,7 @@ function make_vboard()
 // Toggle perspective of board
 function flip()
 {
-    label_board(!GAME_STATE.flipped);
+    label_board(!PREFS.flipped);
     load_fen(active_fen(), true);
 }
 
@@ -3476,7 +3477,7 @@ function label_board(flipped)
         files[i].innerHTML = String.fromCharCode(flipped ? "h".charCodeAt(0) - i : "a".charCodeAt(0) + i);
     }
 
-    GAME_STATE.flipped = flipped;
+    PREFS.flipped = flipped;
 }
 
 // Initialize the board - menu, load from query string if present.
@@ -3575,7 +3576,7 @@ function load_from_query_string()
     // Flip/unflip board as needed. Avoid doing this unless
     // there is a change in the flip state, as it is expensive.
     // Needs to be done before loading.
-    if (!!query.f !== !!GAME_STATE.flipped) {
+    if (!!query.f !== !!PREFS.flipped) {
         label_board(query.f);
     }
 
@@ -4116,7 +4117,7 @@ function move_dropped_piece(piece, square, event)
     piece.style.top = piece.style.left = 0;
     square.appendChild(piece);
 
-    if (GAME_STATE.setup_mode) {
+    if (PREFS.setup_mode) {
         var from_square = piece.square;
 
         do_virtual_move(piece, {x:square.x, y:square.y});
@@ -4415,7 +4416,7 @@ function toggle_piece_library()
 
     // Set setup mode as opening/closing piece library, since that is what it is for
     dojo.byId("enable_setup_mode").checked = want_setup_mode;
-    GAME_STATE.setup_mode = want_setup_mode;
+    PREFS.setup_mode = want_setup_mode;
 
     // Lazily generate the table. 
     lib = dojo.byId("piece-library");
@@ -5219,7 +5220,7 @@ function dragging_over(element, left, top)
 
         // Highlight droppable square
         
-        var flipped = GAME_STATE.flipped;
+        var flipped = PREFS.flipped;
         var square = SQUARES[flipped ? 9 - cell_x : cell_x][flipped ? 9 - cell_y : cell_y];
         // Slow, so use cached node above
         //var square  = dojo.query('#board-body')[0].childNodes[9 - cell_y].childNodes[cell_x];
@@ -5294,7 +5295,7 @@ function touchend(evt)
 // Return whether square should accept dropping a piece on it
 function accepts(piece, square)
 {
-    if (GAME_STATE.setup_mode) {
+    if (PREFS.setup_mode) {
         return true;
     }
 
@@ -5635,7 +5636,7 @@ function enable_document_selection(enable) {
 
  <p><a href="#" onclick="flip()" accesskey="f">flip</a> | <a href="#" onclick="edit_pgn()">edit PGN</a>
 
- <p><label for="enable_setup_mode"><input name="enable_setup_mode" id="enable_setup_mode" type="checkbox" onclick="GAME_STATE.setup_mode = this.checked">Setup</label>
+ <p><label for="enable_setup_mode"><input name="enable_setup_mode" id="enable_setup_mode" type="checkbox" onclick="PREFS.setup_mode = this.checked">Setup</label>
 
  <p><select id="saved_board_menu" onchange="change_loaded_board(this)"></select>
      <button onclick="load_fen(dojo.byId('saved_board_menu').value)" accesskey="n">New Game</button>
