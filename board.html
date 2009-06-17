@@ -278,7 +278,7 @@ var GAME_STATE = {
     last_captured: null,        // export_captured() string _before_ current move 
     piece_under: null,          // Piece under cursor for piece inspector
     flipped: false,             // True if from black's perspective instead of white
-    editing_mode: false         // Whether in editing mode or not (TODO)
+    edit_mode: false            // Whether in editing mode or not (TODO)
 };    
 
 /// Drag and drop globals
@@ -4116,6 +4116,20 @@ function move_dropped_piece(piece, square, event)
     piece.style.top = piece.style.left = 0;
     square.appendChild(piece);
 
+    if (GAME_STATE.edit_mode) {
+        var from_square = piece.square;
+
+        do_virtual_move(piece, {x:square.x, y:square.y});
+        unhighlight_all();
+        dojo.query(".recent-move-black").removeClass("recent-move-black");
+        dojo.query(".recent-move-white").removeClass("recent-move-white");
+        dojo.query(".drop-square2").removeClass("drop-square2");
+        dojo.addClass(from_square, "drop-square2");
+
+        realize_vboard();
+        return;
+    }
+
 
     var virtual_square = VBOARD[square.x][square.y];
     var virtual_piece = VBOARD[piece.square.x][piece.square.y].piece;
@@ -5281,8 +5295,11 @@ function touchend(evt)
 // Return whether square should accept dropping a piece on it
 function accepts(piece, square)
 {
-    var outer = IS_VALID_MOVE[piece.square.filerank];
+    if (GAME_STATE.edit_mode) {
+        return true;
+    }
 
+    var outer = IS_VALID_MOVE[piece.square.filerank];
     return outer && outer[square.filerank];
 }
 
@@ -5618,6 +5635,8 @@ function enable_document_selection(enable) {
  <p><select accesskey="o" id="output_notation" name="output_notation" onchange="show_move_history()"></select>
 
  <p><a href="#" onclick="flip()" accesskey="f">flip</a> | <a href="#" onclick="edit_pgn()">edit PGN</a>
+
+ <p><label for="setup_mode"><input name="setup_mode" id="setup_mode" type="checkbox" onclick="GAME_STATE.edit_mode = this.checked">Setup</label>
 
  <p><select id="saved_board_menu" onchange="change_loaded_board(this)"></select>
      <button onclick="load_fen(dojo.byId('saved_board_menu').value)" accesskey="n">New Game</button>
