@@ -3478,6 +3478,7 @@ function label_board(flipped)
     }
 
     PREFS.flipped = flipped;
+    dojo.byId("enable_flip").checked = flipped;
 }
 
 // Initialize the board - menu, load from query string if present.
@@ -5220,158 +5221,158 @@ function dragging_over(element, left, top)
 
         // Highlight droppable square
         
-        var flipped = PREFS.flipped;
-        var square = SQUARES[flipped ? 9 - cell_x : cell_x][flipped ? 9 - cell_y : cell_y];
-        // Slow, so use cached node above
-        //var square  = dojo.query('#board-body')[0].childNodes[9 - cell_y].childNodes[cell_x];
-        
-        if (DROP.square) {
-            dojo.removeClass(DROP.square, "dropping-square");
-        }
-
-        if (accepts(element, square)) {
-            DROP.square = square;
-            dojo.addClass(square, "dropping-square");
-        } else {
-            DROP.square = null;
-        }
-
-    } else {
-        // Outside droppable area
-        
-        if (DROP.square) {
-            dojo.removeClass(DROP.square, "dropping-square");
-            DROP.square = null;
-        }
-
-        // TODO: change icon to show out of range, if was from within range
+    var flipped = PREFS.flipped;
+    var square = SQUARES[flipped ? 9 - cell_x : cell_x][flipped ? 9 - cell_y : cell_y];
+    // Slow, so use cached node above
+    //var square  = dojo.query('#board-body')[0].childNodes[9 - cell_y].childNodes[cell_x];
+    
+    if (DROP.square) {
+        dojo.removeClass(DROP.square, "dropping-square");
     }
+
+    if (accepts(element, square)) {
+        DROP.square = square;
+        dojo.addClass(square, "dropping-square");
+    } else {
+        DROP.square = null;
+    }
+
+} else {
+    // Outside droppable area
+    
+    if (DROP.square) {
+        dojo.removeClass(DROP.square, "dropping-square");
+        DROP.square = null;
+    }
+
+    // TODO: change icon to show out of range, if was from within range
+}
 }
 
 // Drop or revert on mouse up
 function mouseup()
 {
-    if (DRAG.element_m === null) {
-        return;
-    }
+if (DRAG.element_m === null) {
+    return;
+}
 
-    DRAG.element_m.style.zIndex = DRAG.old_zindex;
-    document.onmousemove = null;
-    document.onselectstart = null;
-    DRAG.element_m.ondragstart = null;
+DRAG.element_m.style.zIndex = DRAG.old_zindex;
+document.onmousemove = null;
+document.onselectstart = null;
+DRAG.element_m.ondragstart = null;
 
-    drop_or_revert();
+drop_or_revert();
 
-    DRAG.element_m = null;
+DRAG.element_m = null;
 }
 
 
 // Drop or revert on touch end
 function touchend(evt)
 {
-    drop_or_revert();
+drop_or_revert();
 
-    for (var i = 0; i < evt.changedTouches.length; ++i) {
-        var e = evt.changedTouches[i];
+for (var i = 0; i < evt.changedTouches.length; ++i) {
+    var e = evt.changedTouches[i];
 
-        // Check to see if we've gone from a gesture back down to a touch
-        if (e.target && e.target.className && e.target.className.indexOf("draggable") !== -1) {
+    // Check to see if we've gone from a gesture back down to a touch
+    if (e.target && e.target.className && e.target.className.indexOf("draggable") !== -1) {
 
-            out_piece(e.target, {});
+        out_piece(e.target, {});
 
-            if (evt.targetTouches.length == 1) {
-                // If there was rotation, this number needs to be reset
-                DRAG.touching = [evt.targetTouches[0].pageX - dojo.style(e.target, "left"), evt.targetTouches[0].pageY - dojo.style(e.target, "top")];
-            } else if(!evt.targetTouches.length) {
-                // Great use of e.targeTouches, since releasing on finger that's part
-                // of a gesture over this node would trigger a touchend even though
-                // it could keep going
-                DRAG.touching = false;
-            }
+        if (evt.targetTouches.length == 1) {
+            // If there was rotation, this number needs to be reset
+            DRAG.touching = [evt.targetTouches[0].pageX - dojo.style(e.target, "left"), evt.targetTouches[0].pageY - dojo.style(e.target, "top")];
+        } else if(!evt.targetTouches.length) {
+            // Great use of e.targeTouches, since releasing on finger that's part
+            // of a gesture over this node would trigger a touchend even though
+            // it could keep going
+            DRAG.touching = false;
         }
     }
+}
 }
 
 // Return whether square should accept dropping a piece on it
 function accepts(piece, square)
 {
-    if (PREFS.setup_mode) {
-        return true;
-    }
+if (PREFS.setup_mode) {
+    return true;
+}
 
-    var outer = IS_VALID_MOVE[piece.square.filerank];
-    return outer && outer[square.filerank];
+var outer = IS_VALID_MOVE[piece.square.filerank];
+return outer && outer[square.filerank];
 }
 
 // Drop the dragging object (wherever it is), or move it back if it is not over a droppable area
 function drop_or_revert()
 {
-    var piece, square;
+var piece, square;
 
-    DRAG.dragging = false;
+DRAG.dragging = false;
 
-    piece = (DRAG.touching && DRAG.element_t) || DRAG.element_m;
-    if (!piece) {
-        // Nothing was being dragged
+piece = (DRAG.touching && DRAG.element_t) || DRAG.element_m;
+if (!piece) {
+    // Nothing was being dragged
+    return;
+}
+
+square = DROP.square;
+if (!square || !accepts(piece, square)) {
+    if (!piece.style.left && !piece.style.top) {
+        // Dropped where picked it up - no movement.
+        // Do not revert, since would then pop out to (0,0)
+        // and revert it back.
         return;
     }
 
-    square = DROP.square;
-    if (!square || !accepts(piece, square)) {
-        if (!piece.style.left && !piece.style.top) {
-            // Dropped where picked it up - no movement.
-            // Do not revert, since would then pop out to (0,0)
-            // and revert it back.
-            return;
-        }
-
-        // Revert
-        if (typeof WebKitCSSMatrix === "object") {
-            // Use webkit transforms if available; faster
-            // Feature detection from http://iui.googlecode.com/svn/trunk/test/features.html
-            // (detects for css transforms, hopefully close enough)
-            piece.style.webkitTransition = "left " + DRAG.revert_time + "ms linear, " + 
-                "top " + DRAG.revert_time + "ms linear";
-            piece.style.left = DRAG.initial_left + "px";
-            piece.style.top  = DRAG.initial_top + "px";
-        } else {
-            dojo.anim(piece, { left: DRAG.initial_left, top: DRAG.initial_top }, DRAG.revert_time);
-        }
-        return;
+    // Revert
+    if (typeof WebKitCSSMatrix === "object") {
+        // Use webkit transforms if available; faster
+        // Feature detection from http://iui.googlecode.com/svn/trunk/test/features.html
+        // (detects for css transforms, hopefully close enough)
+        piece.style.webkitTransition = "left " + DRAG.revert_time + "ms linear, " + 
+            "top " + DRAG.revert_time + "ms linear";
+        piece.style.left = DRAG.initial_left + "px";
+        piece.style.top  = DRAG.initial_top + "px";
+    } else {
+        dojo.anim(piece, { left: DRAG.initial_left, top: DRAG.initial_top }, DRAG.revert_time);
     }
+    return;
+}
 
-    //console.log("drop",piece,square);
-    move_dropped_piece(piece, square, null);
+//console.log("drop",piece,square);
+move_dropped_piece(piece, square, null);
 }
 
 // Initialize drag and drop system
 function init_dnd() {
-    document.onmousedown = mousedown;
-    document.ontouchmove = touchmove;//mousemove
+document.onmousedown = mousedown;
+document.ontouchmove = touchmove;//mousemove
 
-    document.ontouchstart = touch;
-    dojo.query(".draggable").forEach(function(e) {
-            e.ontouchmove = touchmove;
-        });
-    document.ontouchend = touchend;
+document.ontouchstart = touch;
+dojo.query(".draggable").forEach(function(e) {
+        e.ontouchmove = touchmove;
+    });
+document.ontouchend = touchend;
 
-    // Get dimensions of droppable area
-    var top_left_square = dojo.query("#top-left-square")[0];
-    var bottom_right_square = dojo.query("#bottom-right-square")[0];
-    var top_left = dojo._abs(top_left_square, true);
-    DROP.area.left = top_left.x;
-    DROP.area.top = top_left.y;
+// Get dimensions of droppable area
+var top_left_square = dojo.query("#top-left-square")[0];
+var bottom_right_square = dojo.query("#bottom-right-square")[0];
+var top_left = dojo._abs(top_left_square, true);
+DROP.area.left = top_left.x;
+DROP.area.top = top_left.y;
 
-    var bottom_right_top_left = dojo._abs(bottom_right_square, true);
-    DROP.area.cell_width = dojo.style(bottom_right_square, "width");
-    DROP.area.width = bottom_right_top_left.x - DROP.area.left + DROP.area.cell_width;
-    DROP.area.height  = bottom_right_top_left.y - DROP.area.top + DROP.area.cell_width; // square
+var bottom_right_top_left = dojo._abs(bottom_right_square, true);
+DROP.area.cell_width = dojo.style(bottom_right_square, "width");
+DROP.area.width = bottom_right_top_left.x - DROP.area.left + DROP.area.cell_width;
+DROP.area.height  = bottom_right_top_left.y - DROP.area.top + DROP.area.cell_width; // square
 
-    // for testing
-    //dojo._setBox(foo, DROP.area.left, DROP.area.top, DROP.area.width, DROP.area.height, "px");
+// for testing
+//dojo._setBox(foo, DROP.area.left, DROP.area.top, DROP.area.width, DROP.area.height, "px");
 
-    DROP.area.right = DROP.area.left + DROP.area.width;
-    DROP.area.bottom = DROP.area.top + DROP.area.height;
+DROP.area.right = DROP.area.left + DROP.area.width;
+DROP.area.bottom = DROP.area.top + DROP.area.height;
 }
 
 //// LOW-LEVEL FUNCTIONS
@@ -5379,264 +5380,267 @@ function init_dnd() {
 // Get the value of a form element
 function form_value(e)
 {
-    e = dojo.byId(e);
+e = dojo.byId(e);
 
-    if (e.checked !== undefined) {
-        return e.checked;
-    }
+if (e.checked !== undefined) {
+    return e.checked;
+}
 
-    return dojo.byId(e).value;
+return dojo.byId(e).value;
 }
 
 // Get URL query string as an object
 // Based on http://www.dojotoolkit.org/book/dojo-porting-guide-0-4-x-0-9/dojo-uri-changes
 function query_string()
 {
-    var parts, dict = {};
-    var query;
+var parts, dict = {};
+var query;
 
-    if (location.search) {
-        query = location.search;
-    } else if (location.hash) {
-        query = location.hash;
-    }
-    if (!query) {
-        return {};
-    }
+if (location.search) {
+    query = location.search;
+} else if (location.hash) {
+    query = location.hash;
+}
+if (!query) {
+    return {};
+}
 
-    parts = query.split(/[&;]/);
-    dojo.forEach(parts, function(pair) {
-            var part = pair.match(/([a-zA-Z0-9]*)=(.*)/);
-            if (part) { 
-                dict[part[1]] = decodeURIComponent(part[2]); 
-            }
-         }, this);
+parts = query.split(/[&;]/);
+dojo.forEach(parts, function(pair) {
+        var part = pair.match(/([a-zA-Z0-9]*)=(.*)/);
+        if (part) { 
+            dict[part[1]] = decodeURIComponent(part[2]); 
+        }
+     }, this);
 
-    return dict;
+return dict;
 }
 
 // Random integer within range
 function randint(minimum, maximum)
 {
-    return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
+return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
 }
 
 // Uppercase first character, like in Perl
 function ucfirst(s)
 {
-    assert(s.substring, "ucfirst(" + s + "): no substring method, not a string? callee=" + 
-            arguments.callee);
-    return s.substring(0, 1).toUpperCase() + s.substring(1);
+assert(s.substring, "ucfirst(" + s + "): no substring method, not a string? callee=" + 
+        arguments.callee);
+return s.substring(0, 1).toUpperCase() + s.substring(1);
 }
 
 // Based on http://aymanh.com/9-javascript-tips-you-may-not-know
 function AssertException(message) { this.message = message; }
 AssertException.prototype.toString = function() {
-    return 'AssertException: ' + this.message;
+return 'AssertException: ' + this.message;
 };
 
 function assert(expression, message)
 {
-    if (!expression) {
-        alert(message);
-        if (window.console && console.trace) {
-            // Give a stack trace for Firebug
-            console.trace();
-        }
-
-        throw new AssertException(message);
+if (!expression) {
+    alert(message);
+    if (window.console && console.trace) {
+        // Give a stack trace for Firebug
+        console.trace();
     }
+
+    throw new AssertException(message);
+}
 }
 
 // Based on http://tech.hickorywind.org/articles/2008/10/24/turning-off-text-selection-in-javascript
 var ORIGINAL_ONSELECTSTART;
 function enable_document_selection(enable) {
-    if(enable) {
-        document.onselectstart = ORIGINAL_ONSELECTSTART;
-    } else {
-        ORIGINAL_ONSELECTSTART = document.onselectstart;
-        document.onselectstart = function() { return false; };
-    }
+if(enable) {
+    document.onselectstart = ORIGINAL_ONSELECTSTART;
+} else {
+    ORIGINAL_ONSELECTSTART = document.onselectstart;
+    document.onselectstart = function() { return false; };
+}
 }
 
 </script>
 </head>
 <body>
 <table id="outer">
- <tr>
-  <td style="vertical-align: top">
+<tr>
+<td style="vertical-align: top">
 <!-- TODO: dynamically generate, so can have arbitrary sizes -->
 <table class="board" id="board">
 <tbody id="board-body"
 ><tr
-  ><td></td
-  ><td class="file label">a</td
-  ><td class="file label">b</td
-  ><td class="file label">c</td
-  ><td class="file label">d</td
-  ><td class="file label">e</td
-  ><td class="file label">f</td
-  ><td class="file label">g</td
-  ><td class="file label">h</td
+><td></td
+><td class="file label">a</td
+><td class="file label">b</td
+><td class="file label">c</td
+><td class="file label">d</td
+><td class="file label">e</td
+><td class="file label">f</td
+><td class="file label">g</td
+><td class="file label">h</td
 ></tr
 ><tr
-  ><td class="rank label">8</td
-  ><td class="white square" id="top-left-square"></td
-  ><td class="black square"></td
-  ><td class="white square"></td
-  ><td class="black square"></td
-  ><td class="white square"></td
-  ><td class="black square"></td
-  ><td class="white square"></td
-  ><td class="black square right-edge"></td
+><td class="rank label">8</td
+><td class="white square" id="top-left-square"></td
+><td class="black square"></td
+><td class="white square"></td
+><td class="black square"></td
+><td class="white square"></td
+><td class="black square"></td
+><td class="white square"></td
+><td class="black square right-edge"></td
 ></tr
 ><tr
- ><td class="rank label">7</td
- ><td class="black square"></td
- ><td class="white square"></td
- ><td class="black square"></td
- ><td class="white square"></td
- ><td class="black square"></td
- ><td class="white square"></td
- ><td class="black square"></td
- ><td class="white square right-edge"></td
+><td class="rank label">7</td
+><td class="black square"></td
+><td class="white square"></td
+><td class="black square"></td
+><td class="white square"></td
+><td class="black square"></td
+><td class="white square"></td
+><td class="black square"></td
+><td class="white square right-edge"></td
 ></tr
 ><tr
-  ><td class="rank label">6</td
-  ><td class="white square"></td
-  ><td class="black square"></td
-  ><td class="white square"></td
-  ><td class="black square"></td
-  ><td class="white square"></td
-  ><td class="black square"></td
-  ><td class="white square"></td
-  ><td class="black square right-edge"></td
+><td class="rank label">6</td
+><td class="white square"></td
+><td class="black square"></td
+><td class="white square"></td
+><td class="black square"></td
+><td class="white square"></td
+><td class="black square"></td
+><td class="white square"></td
+><td class="black square right-edge"></td
 ></tr
 ><tr
- ><td class="rank label">5</td
- ><td class="black square"></td
- ><td class="white square"></td
- ><td class="black square"></td
- ><td class="white square"></td
- ><td class="black square"></td
- ><td class="white square"></td
- ><td class="black square"></td
- ><td class="white square right-edge"></td
+><td class="rank label">5</td
+><td class="black square"></td
+><td class="white square"></td
+><td class="black square"></td
+><td class="white square"></td
+><td class="black square"></td
+><td class="white square"></td
+><td class="black square"></td
+><td class="white square right-edge"></td
 ></tr
 ><tr
-  ><td class="rank label">4</td
-  ><td class="white square"></td
-  ><td class="black square"></td
-  ><td class="white square"></td
-  ><td class="black square"></td
-  ><td class="white square"></td
-  ><td class="black square"></td
-  ><td class="white square"></td
-  ><td class="black square right-edge"></td
+><td class="rank label">4</td
+><td class="white square"></td
+><td class="black square"></td
+><td class="white square"></td
+><td class="black square"></td
+><td class="white square"></td
+><td class="black square"></td
+><td class="white square"></td
+><td class="black square right-edge"></td
 ></tr
 ><tr
- ><td class="rank label">3</td
- ><td class="black square"></td
- ><td class="white square"></td
- ><td class="black square"></td
- ><td class="white square"></td
- ><td class="black square"></td
- ><td class="white square"></td
- ><td class="black square"></td
- ><td class="white square right-edge"></td
+><td class="rank label">3</td
+><td class="black square"></td
+><td class="white square"></td
+><td class="black square"></td
+><td class="white square"></td
+><td class="black square"></td
+><td class="white square"></td
+><td class="black square"></td
+><td class="white square right-edge"></td
 ></tr
 ><tr
-  ><td class="rank label">2</td
-  ><td class="white square"></td
-  ><td class="black square"></td
-  ><td class="white square"></td
-  ><td class="black square"></td
-  ><td class="white square"></td
-  ><td class="black square"></td
-  ><td class="white square"></td
-  ><td class="black square right-edge"></td
+><td class="rank label">2</td
+><td class="white square"></td
+><td class="black square"></td
+><td class="white square"></td
+><td class="black square"></td
+><td class="white square"></td
+><td class="black square"></td
+><td class="white square"></td
+><td class="black square right-edge"></td
 ></tr
 ><tr
- ><td class="rank label">1</td
- ><td class="black square bottom-edge"></td
- ><td class="white square bottom-edge"></td
- ><td class="black square bottom-edge" id="f1"></td
- ><td class="white square bottom-edge" id="f2"></td
- ><td class="black square bottom-edge"></td
- ><td class="white square bottom-edge"></td
- ><td class="black square bottom-edge"></td
- ><td class="white square bottom-edge right-edge" id="bottom-right-square"></td
+><td class="rank label">1</td
+><td class="black square bottom-edge"></td
+><td class="white square bottom-edge"></td
+><td class="black square bottom-edge" id="f1"></td
+><td class="white square bottom-edge" id="f2"></td
+><td class="black square bottom-edge"></td
+><td class="white square bottom-edge"></td
+><td class="black square bottom-edge"></td
+><td class="white square bottom-edge right-edge" id="bottom-right-square"></td
 ></tr
 ></tbody
 ></table>
 
- </td><td style="vertical-align: top">
- <noscript><p>JavaScript is disabled, nothing will work!</p></noscript>
+</td><td style="vertical-align: top">
+<noscript><p>JavaScript is disabled, nothing will work!</p></noscript>
 
- <div id="game_ui">
+<div id="game_ui">
 
- <!-- Header elements, game metadata. Hidden/shown as needed. -->
- <p id="header" style="display: none; text-align: center" 
-  onclick="edit_pgn()" class="show_White">
-  <span class="players">
-   <span id="PGN_White" class="player_name" style="display: none">White</span>
-   <span class="player_elo"><span style="display: none" class="show_WhiteElo">(</span><span id="PGN_WhiteElo" style="display: none">1500</span><span class="show_WhiteElo" style="display: none">)</span></span>
-    <span id="vs" style="display: none" class="show_White">vs.</span>
-   <span id="PGN_Black" class="player_name" style="display: none">Black</span>
-   <span class="player_elo"><span style="display: none" class="show_BlackElo">(</span><span id="PGN_BlackElo" style="display: none">1500</span><span class="show_BlackElo" style="display: none">)</span></span>
-  </span>
-   <br class="show_White" style="display: none">
+<!-- Header elements, game metadata. Hidden/shown as needed. -->
+<p id="header" style="display: none; text-align: center" 
+onclick="edit_pgn()" class="show_White">
+<span class="players">
+<span id="PGN_White" class="player_name" style="display: none">White</span>
+<span class="player_elo"><span style="display: none" class="show_WhiteElo">(</span><span id="PGN_WhiteElo" style="display: none">1500</span><span class="show_WhiteElo" style="display: none">)</span></span>
+<span id="vs" style="display: none" class="show_White">vs.</span>
+<span id="PGN_Black" class="player_name" style="display: none">Black</span>
+<span class="player_elo"><span style="display: none" class="show_BlackElo">(</span><span id="PGN_BlackElo" style="display: none">1500</span><span class="show_BlackElo" style="display: none">)</span></span>
+</span>
+<br class="show_White" style="display: none">
 
-   <span id="PGN_Event" style="display: none">Event</span>
-   <span style="display: none" class="show_Round">(</span><span id="PGN_Round" style="display: none">Round</span><span style="display: none" class="show_Round">)</span>
-   <span id="PGN_Site" style="display: none">Site</span><br class="show_Event" style="display: none">
+<span id="PGN_Event" style="display: none">Event</span>
+<span style="display: none" class="show_Round">(</span><span id="PGN_Round" style="display: none">Round</span><span style="display: none" class="show_Round">)</span>
+<span id="PGN_Site" style="display: none">Site</span><br class="show_Event" style="display: none">
 
-   <span id="PGN_Date" style="display: none">Date</span>
-   <span id="PGN_Time" style="display: none">Time</span>
- </p> 
+<span id="PGN_Date" style="display: none">Date</span>
+<span id="PGN_Time" style="display: none">Time</span>
+</p> 
+
+<p>
+<span id="status"></span> 
+<span id="dash" style="display: none">&mdash;</span>
+<span id="check"></span>
+<br>
+<span id="promote_container"></span>
+</p>
+
+<p><a id="copyable_link">copyable link</a> (<a href="#" onclick="email_board()">email</a>)
+<p><span id="opening_name"></span>
+
+<div id="piece-inspector" style="display: none; z-index: 2">
+<p><img style="vertical-align: middle" id="inspector-image"> <span id="inspector-type" style="font-weight: bold">type</span>
+<p>Movement: <span id="inspector-movement">movement</span>
+<p>Symbols: <span id="inspector-symbols">symbols</span>
+<p><span id="inspector-info">other info</span>
+</div>
+
+<!-- TODO: disclosure triangles -->
+<p><a href="#" onclick="new Effect.toggle('controls', 'slide', { duration: 0.1 })">controls</a> | 
+<a href="#" onclick="toggle_piece_library();">pieces</a>
+
+<div id="controls" style="display: none; border-left: 2px solid blue">
+<div>
+
+<p><select accesskey="m" id="make_move_menu" onchange="make_move_by_menu(this)"></select>
+
+<!-- TODO: hide all this, since the purpose of this app is
+not to implement chess AI. But having automatic moves is useful for testing. -->
+<p>Engine: <label for="white_computer"><input accesskey="w" type="checkbox" id="white_computer" name="white_computer" onclick="computer_move_if_applicable(this)">White</label> 
+<label for="black_computer"><input accesskey="b" type="checkbox" id="black_computer" name="black_computer" onclick="computer_move_if_applicable(this)">Black</label>
+
+<span id="score"></span><br>
+
+<div id="show_skill" style="display: none"><p>Skill Level: 
+<input type="text" size="3" maxlength="3" id="skill_level" onchange="update_skill(this)"></div>
+
+<p><select accesskey="o" id="output_notation" name="output_notation" onchange="show_move_history()"></select>
+
+<p><a href="#" onclick="edit_pgn()">import/edit PGN</a>
 
  <p>
-  <span id="status"></span> 
-  <span id="dash" style="display: none">&mdash;</span>
-  <span id="check"></span>
-  <br>
-  <span id="promote_container"></span>
- </p>
+ <label for="enable_flip"><input accesskey="f" name="enable_flip" id="enable_flip" type="checkbox" onclick="flip()">Flip</label>
 
- <p><a id="copyable_link">copyable link</a> (<a href="#" onclick="email_board()">email</a>)
- <p><span id="opening_name"></span>
-
- <div id="piece-inspector" style="display: none; z-index: 2">
- <p><img style="vertical-align: middle" id="inspector-image"> <span id="inspector-type" style="font-weight: bold">type</span>
- <p>Movement: <span id="inspector-movement">movement</span>
- <p>Symbols: <span id="inspector-symbols">symbols</span>
- <p><span id="inspector-info">other info</span>
- </div>
-
- <!-- TODO: disclosure triangles -->
- <p><a href="#" onclick="new Effect.toggle('controls', 'slide', { duration: 0.1 })">controls</a> | 
-    <a href="#" onclick="toggle_piece_library();">pieces</a>
-
- <div id="controls" style="display: none; border-left: 2px solid blue">
- <div>
-
- <p><select accesskey="m" id="make_move_menu" onchange="make_move_by_menu(this)"></select>
-
- <!-- TODO: hide all this, since the purpose of this app is
- not to implement chess AI. But having automatic moves is useful for testing. -->
- <p>Engine: <label for="white_computer"><input accesskey="w" type="checkbox" id="white_computer" name="white_computer" onclick="computer_move_if_applicable(this)">White</label> 
- <label for="black_computer"><input accesskey="b" type="checkbox" id="black_computer" name="black_computer" onclick="computer_move_if_applicable(this)">Black</label>
-
- <span id="score"></span><br>
-
- <div id="show_skill" style="display: none"><p>Skill Level: 
-  <input type="text" size="3" maxlength="3" id="skill_level" onchange="update_skill(this)"></div>
-
- <p><select accesskey="o" id="output_notation" name="output_notation" onchange="show_move_history()"></select>
-
- <p><a href="#" onclick="flip()" accesskey="f">flip</a> | <a href="#" onclick="edit_pgn()">edit PGN</a>
-
- <p><label for="enable_setup_mode"><input name="enable_setup_mode" id="enable_setup_mode" type="checkbox" onclick="PREFS.setup_mode = this.checked">Setup</label>
+ <label for="enable_setup_mode"><input accesskey="e" name="enable_setup_mode" id="enable_setup_mode" type="checkbox" onclick="PREFS.setup_mode = this.checked">Setup</label>
 
  <p><select id="saved_board_menu" onchange="change_loaded_board(this)"></select>
      <button onclick="load_fen(dojo.byId('saved_board_menu').value)" accesskey="n">New Game</button>
