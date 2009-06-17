@@ -1978,7 +1978,7 @@ function calculate_moves(color, is_hypothetical)
 
                 // Lookup for accepts()
                 is_valid_move[starting_filerank] = {};
-                moves.forEach(function(m) {
+                dojo.forEach(moves, function(m) {
                     is_valid_move[starting_filerank][xy2filerank([m.x, m.y])] = m;
                 });
             }
@@ -5208,13 +5208,10 @@ function dragging_over(element, left, top)
 
         // Highlight droppable square
         
-        // TODO: use SQUARES, considered flipped, should be faster than querying each time
         var flipped = GAME_STATE.flipped;
-        var square = SQUARES[flipped ? cell_y : 9 - cell_y][flipped ? 9 - cell_x : cell_x];
-        console.log(square.x,square.y);
-        var square  = dojo.query('#board-body')[0].childNodes[9 - cell_y].childNodes[cell_x];
-        console.log(square.x,square.y);
-        console.log("---");
+        var square = SQUARES[flipped ? 9 - cell_x : cell_x][flipped ? 9 - cell_y : cell_y];
+        // Slow, so use cached node above
+        //var square  = dojo.query('#board-body')[0].childNodes[9 - cell_y].childNodes[cell_x];
         
         if (DROP.square) {
             dojo.removeClass(DROP.square, "drop-square");
