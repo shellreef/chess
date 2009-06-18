@@ -4503,52 +4503,53 @@ function show_piece_inspector(piece)
     dojo.byId("inspector-movement").innerHTML = type_info.parlett;
 
     // Symbols (letter, figurine, number) for notations
-    symbols = "";
+    symbols = [];
     if (type_info.letter) {
-        symbols += type_info.letter;
+        symbols.push(type_info.letter);
     } else {
-        symbols += "X(" + piece.type + ")";
+        symbols.push("X(" + piece.type + ")");
     }
     if (type_info.alg_letter) {
-        symbols += " (algebraic: " + type_info.alg_letter + ")";
+        symbols.push(" (algebraic: " + type_info.alg_letter + ")");
     }
     if (type_info.figurines) {
-        symbols += ", " + type_info.figurines.join(", ");
+        symbols.push(", " + type_info.figurines.join(", "));
     }
     if (type_info.iccf_number) {
-        symbols += ", " + type_info.iccf_number;
+        symbols.push(", " + type_info.iccf_number);
     }
-    dojo.byId("inspector-symbols").innerHTML = symbols;
+    dojo.byId("inspector-symbols").innerHTML = symbols.join("");
 
     // Other settings
-    misc = "";
+    misc = [];
     if (type_info.promote) {
         // TODO: links to view other pieces?
-        misc += "Promotes to " + type_info.promote.join(", ") + "<br>";
+        misc.push("Promotes to " + type_info.promote.join(", ") + "<br>");
     }
     if (type_info.royal) {
-        misc += "Royal (can be checked/checkmated)<br>";
+        misc.push("Royal (can be checked/checkmated)<br>");
     }
     if (type_info.resets_50move) {
-        misc += "Resets 50-move counter<br>";
+        misc.push("Resets 50-move counter<br>");
     }
     if (type_info.castles_with) {
-        misc += "Castles with " + type_info.castles_with + "<br>";
+        misc.push("Castles with " + type_info.castles_with + "<br>");
     }
     if (type_info.castle) {
-        misc += "Is a castle<br>";
+        misc.push("Is a castle<br>");
     }
     if (type_info.url) {
         var url = type_info.url;
         if (url.substr(0, 3) === "pc:") {
             url = "http://www.chessvariants.org/piececlopedia.dir/" + url.substr(3) + ".html";
         }
-        misc += '<a target="_new" href="' + url + '">Details</a>';
+        // TODO: Shift-click piece to open in new window
+        misc.push('<a target="_new" href="' + url + '">Details</a>');
     }
 
-    dojo.byId("inspector-info").innerHTML = misc;
+    dojo.byId("inspector-info").innerHTML = misc.join("");
 
-    inspector.show();
+    inspector.style.display = "";
 }
 
 // Hide information on the piece shown, if any
