@@ -5109,11 +5109,18 @@ function sq(code, extra)
 
 //// DRAG-AND-DROP FUNCTIONS
 
+// Get a piece ready for dragging
 function prepare_for_dragging(target)
 {
     DRAG.old_position_type = target.style.position;
 
     Element.absolutize(target);
+
+    // TODO: Subtract scroll offset if inside piece library? The position
+    // is relative so that the absolutely positioned pieces react to the 
+    // relatively positioned piece library (so they can be scrolled) but then
+    // when you drag near the piece library, it is as if you're dragging near the
+    // edge of the board, since there is a different origin.
 }
 
 // Initiate drag-and-drop on mouse down, if over a draggable element
@@ -5698,7 +5705,7 @@ not to implement chess AI. But having automatic moves is useful for testing. -->
  <!-- end controls-->
 
  <div id="piece-library-parent" style="display: none">
- <div id="piece-library" style="width: 600px; height: 325px; overflow: auto"> </div>
+ <div id="piece-library" style="width: 600px; height: 325px; overflow: auto; position: relative"> </div>
  </div>
 
   <div id="captured_piece_images" style="width: 250px;"></div>
