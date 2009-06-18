@@ -515,9 +515,10 @@ var PIECE_TYPES = {
     //kraken: {parlett: "~n/m ~0/0"},     // any square, not realistic since always checkmates! TODO: image
     //octopus: {parlett: "o~n/m ~0/0", letter: "XD"}, // any square (8x8, octo, get it?) but can't capture, much less powerful TODO: image
     //universal_leaper: {parlett: "~n/m"},// like kraken, but can't go to square it is on (like a zero) TODO: image
-    airplane: {parlett: "o~n/m", letter: "U", image:"plane"},
+    allseeingeye: {parlett: "o~n/m", image:"allseeingeye2"},       // anywhere
 
     // Projectiles
+    airplane: {parlett: "#allseeingeye, {cn+<;snapback}", letter: "U", image:"plane"},  // drops bombs
     gun: {parlett: "o#man, {c#queen;snapback}"},            // able to walk around, powerful distance projectiles
     rocket: {parlett: "o<<1, o>>1, {~cn+>;snapback}"},    // shoots straight, not very mobile
     // Note: not the patented archer at http://www.google.com/patents?id=MLEWAAAAEBAJ&dq=5901957
@@ -659,7 +660,7 @@ var SAVED_BOARDS = {
 "Test Leapers": "K/2E1Y1H1/3M/1XT1W1XG1Z/8/3Z1N/4oo/5k w - - 0 1", // TODO: antelope, flamingo
 "Test Amphibians": "4k/8/8/slslslsl/8/8/FFFFFFFF/4K w - - 0 1",
 "Test Royalty": "x(royalrook)x(royalknight)x(royalbishop)xjkx(royalbishop)x(royalknight)x(royalrook)/pppppppp/8/8/8/8/PPPPPPPP/X(royalrook)X(royalknight)X(royalbishop)XJKX(royalbishop)X(royalknight)X(royalrook) w KQkq - 0 1",
-"Test Projectiles": "x(airplane)X(airplane)4x(airplane)/8/1x(bird)/2x(bird)x(bird)x(bird)1x(bird)/3x(bird)x(bird)/3X(archerzz3)x(bird)/4X(archerzz2)X(archer)/x(frog)1X(gun)3X(rocket) w - - 0 1",
+"Test Projectiles": "x(airplane)X(airplane)4x(airplane)/X(allseeingeye)/1x(bird)/2x(bird)x(bird)x(bird)1x(bird)/3x(bird)x(bird)/3X(archerzz3)x(bird)/4X(archerzz2)X(archer)/x(frog)1X(gun)3X(rocket) w - - 0 1",
 "Test Invincibles": "3x(banner)x(banner)/7x(nwall)/x(banner)3x(block)1X(fortress)/4K3/5x(stone)/8/1kX(block)1X(stone)/1X(block)x(block)3X(nwall) w - - 0 1",
 "Test Consumables": "4k/pppppppp/1pppppp1/2pppp2/X(bomb)2X(superbomb)/8/PPPPPPPP/4K w - - 0 1",
 "Test Diminished": "/1X(b4)5X(q4)//4X(b3)//3X(r3)/2X(r4)/7X(q3) w - - 0 1",
