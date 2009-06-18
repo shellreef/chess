@@ -2354,7 +2354,9 @@ function do_virtual_move(piece, move)
 
     piece.square = VBOARD[did.to_square.x][did.to_square.y];
     VBOARD[did.to_square.x][did.to_square.y].piece = piece;
-    VBOARD[did.from_square.x][did.from_square.y].piece = null;
+    if (did.from_square) {
+        VBOARD[did.from_square.x][did.from_square.y].piece = null;
+    }
 
     return did;
 }
@@ -4143,7 +4145,9 @@ function move_dropped_piece(piece, square, event)
         dojo.query(".recent-move-black").removeClass("recent-move-black");
         dojo.query(".recent-move-white").removeClass("recent-move-white");
         dojo.query(".dropped-square").removeClass("dropped-square");
-        dojo.addClass(from_square, "dropped-square");
+        if (from_square) { 
+            dojo.addClass(from_square, "dropped-square");
+        }
 
         realize_vboard();
         return;
@@ -4475,10 +4479,13 @@ function toggle_piece_library()
             var wp = create_piece("white", type);
             var bp = create_piece("black", type);
 
-            // TODO: Make draggable! Problem is that absolute
-            // positioning interferes with the scrolling.
-            dojo.removeClass(wp, "draggable");
-            dojo.removeClass(bp, "draggable");
+            // Set to static so can be scrolled within library area
+            // Will need to set to absolute when dragging
+            wp.style.position = "static";
+            bp.style.position = "static";
+
+            // TODO: Create another piece under when drag off, so
+            // more will always be available.
 
             var row = Builder.node("tr", [
                     Builder.node("td", {"class": "square"}, wp),
@@ -5102,6 +5109,13 @@ function sq(code, extra)
 
 //// DRAG-AND-DROP FUNCTIONS
 
+function prepare_for_dragging(target)
+{
+    DRAG.old_position_type = target.style.position;
+
+    Element.absolutize(target);
+}
+
 // Initiate drag-and-drop on mouse down, if over a draggable element
 function mousedown(event)
 {
@@ -5114,6 +5128,8 @@ function mousedown(event)
     if (target.className.indexOf("draggable") === -1) {
         return;
     }
+
+    prepare_for_dragging(target);
 
     DRAG.initial_x = event.clientX;
     DRAG.initial_y = event.clientY;
@@ -5154,10 +5170,14 @@ function touch(evt)
 
         if (target && target.className &&
                 target.className.indexOf("draggable") !== -1 && !DRAG.touching) {
+
+            prepare_for_dragging(target);
+
             // Save the offset of the touch within the current note
             DRAG.initial_left = dojo._abs(target, true).x;
             DRAG.initial_top = dojo._abs(target, true).y;
             DRAG.touching = [e.pageX - DRAG.initial_left, e.pageY - DRAG.initial_top];
+
 
             over_piece(target, {});
         }
@@ -5312,8 +5332,8 @@ function touchend(evt)
 // Return whether square should accept dropping a piece on it
 function accepts(piece, square)
 {
-    // Can never drop over same piece (not even for null moves).
-    if (piece.square.x === square.x &&
+    // Can never move to source square (not even for null moves).
+    if (piece.square && piece.square.x === square.x &&
         piece.square.y === square.y) {
         return false;
     }
@@ -5340,13 +5360,16 @@ function drop_or_revert()
         return;
     }
 
+    piece.style.position = DRAG.old_position_type;
+
     square = DROP.square;
     if (!square || !accepts(piece, square)) {
         if (!piece.style.left && !piece.style.top) {
             // Dropped where picked it up - no movement.
             // Do not revert, since would then pop out to (0,0)
             // and revert it back.
-            return;
+            piece.style.left = dojo._abs(piece, true).x;
+            piece.style.top = dojo._abs(piece, true).y;
         }
 
         // Revert
