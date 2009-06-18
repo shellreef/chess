@@ -411,6 +411,7 @@ var PIECE_TYPES = {
     kingrook: {parlett: "#king, #rook", royal: true},
 
     // Diminished pieces
+    // TODO: I don't think these are correctly blocked..
     b3: {parlett: "1X, 2X, 3X"},
     b4: {parlett: "1X, 2X, 3X, 4X"},
     b4wazir: {parlett: "#b4, #wazir"},
@@ -3032,6 +3033,7 @@ function decode_one_parlett(parlett)
             prev_rel_x = null;
             prev_rel_y = null;
 
+            // TODO: Support limit in Parlett (how?) so can support diminished pieces
             var max = Math.max(RANK_MAX, FILE_MAX);
 
             var count = 0;
@@ -3053,6 +3055,8 @@ function decode_one_parlett(parlett)
 
                 } 
 
+                // TODO: Support arbitrary directions, for nightrider and other *-rider pieces.
+                // ~1/2& should expand to a rider in 1,2; 1,-2; -1,-2; -1,-2; 2,1; ... directions.
                 rel_x += dir[0];
                 rel_y += dir[1];
 
