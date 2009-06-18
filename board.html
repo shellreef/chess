@@ -4437,6 +4437,19 @@ function show_library_images()
     }});
 }
 
+// Disable or enable game setup mode
+function set_setup_mode(on)
+{
+    // Set setup mode as opening/closing piece library, since that is what it is for
+    dojo.byId("enable_setup_mode").checked = on;
+    PREFS.setup_mode = on;
+
+    if (!on) {
+        // Exited setup mode, so calculate moves with new setup
+        calculate_moves(GAME_STATE.active_color);
+    }
+}
+
 // Show the piece library, of readily usable pieces with defined movement
 function toggle_piece_library()
 {
@@ -4447,8 +4460,7 @@ function toggle_piece_library()
     new Effect.toggle(parent, 'slide', { duration: 0.1 });
 
     // Set setup mode as opening/closing piece library, since that is what it is for
-    dojo.byId("enable_setup_mode").checked = want_setup_mode;
-    PREFS.setup_mode = want_setup_mode;
+    set_setup_mode(want_setup_mode);
 
     // Lazily generate the table. 
     lib = dojo.byId("piece-library");
@@ -5711,7 +5723,7 @@ not to implement chess AI. But having automatic moves is useful for testing. -->
  <p>
  <label for="enable_flip"><input accesskey="f" name="enable_flip" id="enable_flip" type="checkbox" onclick="flip()">Flip</label>
 
- <label for="enable_setup_mode"><input accesskey="e" name="enable_setup_mode" id="enable_setup_mode" type="checkbox" onclick="PREFS.setup_mode = this.checked">Setup</label>
+ <label for="enable_setup_mode"><input accesskey="e" name="enable_setup_mode" id="enable_setup_mode" type="checkbox" onclick="set_setup_mode(this.checked)">Setup</label>
 
  <p><select id="saved_board_menu" onchange="change_loaded_board(this)"></select>
      <button onclick="load_fen(dojo.byId('saved_board_menu').value)" accesskey="n">New Game</button>
