@@ -5311,6 +5311,13 @@ function touchend(evt)
 // Return whether square should accept dropping a piece on it
 function accepts(piece, square)
 {
+    // Can never drop over same piece (not even for null moves).
+    if (piece.square.x === square.x &&
+        piece.square.y === square.y) {
+        return false;
+    }
+
+    // Can drop anywhere
     if (PREFS.setup_mode) {
         return true;
     }
