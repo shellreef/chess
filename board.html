@@ -3668,27 +3668,37 @@ function piece_was_captured(piece, square)
 // Show captured with icons from GAME_STATE.captured
 function update_captured_piece_images(piece)
 {
+    var captured = dojo.byId("captured_piece_images");
+
+    captured.innerHTML = "";
+
     // Make miniature images. In this case it is better to specify the full
     // image size and have the browser scale it, instead of having it reference
     // a pre-scaled image, because of the higher latency involved in another request.
     var html = "";
     for (var i = 0; i < GAME_STATE.captured.white.length; i += 1) {
         var p = GAME_STATE.captured.white[i];
-        // TODO: optionally create pieces here, that can be dragged back on to the board.
+        // TODO: Allow in some games for these pieces to be dragged back to board.
+        // Currently you can only in setup mode.
         // For Shogi (but captured pieces would need to change colors), where can drop
         // captured pieces back onto the board. create_piece() then add captured class.
         html += '<img src="' + image_path_for(p.type, p.color) + '" class="captured"> ';
+
+        var piece = create_piece(p.color, p.type);
+        dojo.addClass(piece, "captured");
+        piece.style.position = "static";
+
+        captured.appendChild(piece);
     }
     for (var i = 0; i < GAME_STATE.captured.black.length; i += 1) {
         var p = GAME_STATE.captured.black[i];
-        html += '<img src="' + image_path_for(p.type, p.color) + '" class="captured"> ';
+
+        var piece = create_piece(p.color, p.type);
+        piece.style.position = "static";
+        dojo.addClass(piece, "captured");
+
+        captured.appendChild(piece);
     }
-
-    dojo.byId("captured_piece_images").innerHTML = html;
-
-    // DOM is slower
-    //var node = Builder.node("img", {src:image_path_for(piece.type, piece.color), 'class': "captured"});
-    //dojo.byId("captured_piece_images").appendChild(node);
 }
 
 // Get all the move notation texts and moves for a given piece and destination
@@ -5260,25 +5270,26 @@ function dragging_over(element, left, top)
             cell_y = 1;
         }
 
-        // TODO: lookup whether can drop here
-
         // Highlight droppable square
+        var flipped = PREFS.flipped;
+        if (!SQUARES[flipped ? 9 - cell_x : cell_x]) {
+            DROP.square = null;
+            return;
+        }
+        var square = SQUARES[flipped ? 9 - cell_x : cell_x][flipped ? 9 - cell_y : cell_y];
+        // Slow, so use cached node above
+        //var square  = dojo.query('#board-body')[0].childNodes[9 - cell_y].childNodes[cell_x];
         
-    var flipped = PREFS.flipped;
-    var square = SQUARES[flipped ? 9 - cell_x : cell_x][flipped ? 9 - cell_y : cell_y];
-    // Slow, so use cached node above
-    //var square  = dojo.query('#board-body')[0].childNodes[9 - cell_y].childNodes[cell_x];
-    
-    if (DROP.square) {
-        dojo.removeClass(DROP.square, "dropping-square");
-    }
+        if (DROP.square) {
+            dojo.removeClass(DROP.square, "dropping-square");
+        }
 
-    if (accepts(element, square)) {
-        DROP.square = square;
-        dojo.addClass(square, "dropping-square");
-    } else {
-        DROP.square = null;
-    }
+        if (accepts(element, square)) {
+            DROP.square = square;
+            dojo.addClass(square, "dropping-square");
+        } else {
+            DROP.square = null;
+        }
 
     } else {
         // Outside droppable area
@@ -5348,6 +5359,11 @@ function accepts(piece, square)
     // Can drop anywhere
     if (PREFS.setup_mode) {
         return true;
+    }
+
+    if (!piece.square) {
+        // If not in setup mode, needs a source square
+        return false;
     }
 
     var outer = IS_VALID_MOVE[piece.square.filerank];
