@@ -494,7 +494,11 @@ var PIECE_TYPES = {
     // http://chessvariants.wikidot.com/pcp:piececlopedia
  
     //hornedfalcon: {parlett: "n=x, 2>"},    // from Parlett, TODO: image
-    honorablehorse: {parlett: "~1/2>", image:"shogiknight", url:"pc:shogiknight"},//XXX incorrect
+    
+    // Despite appearances, this is not ~1/2>, since that would allow also
+    // allow the forward moves [2,-1] and [-2,1]
+    honorablehorse: {parlett: "[-1,2], [1,2]", image:"shogiknight", url:"pc:shogiknight", alt_images:["horse"]},
+
     //chineseknight: {parlett: "1//2"}, // TODO: intervening must be unblocked
     lance: {parlett: "n+>", url:"pc:lance"},
     //colonel: {parlett: "n>, n=, 2/1>, 1*", letter: "XC"}, // TODO: image
@@ -3031,8 +3035,8 @@ function decode_one_parlett(parlett)
                 for (var j = 0; j < rel_moves.length; j += 1) {
                     var move = rel_moves[j];
 
-                    if ((!dir[0] || signum(move[0]) === signum(dir[0])) &&
-                        (!dir[1] || signum(move[1]) === signum(dir[1]))) {
+                    if ((dir[0] === Infinity || signum(move[0]) === signum(dir[0])) &&
+                        (dir[1] === Infinity || signum(move[1]) === signum(dir[1]))) {
                         keep_relmoves.push(move);
                     }
                 }
