@@ -475,6 +475,9 @@ var PIECE_TYPES = {
 
     warmachineriderwazir: {parlett: "#warmachinerider, #wazir"},
     bishopwarmachinerider: {parlett: "#bishop, #warmachinerider"},
+    amazonrider: {parlett: "#queen, #nightrider"}, 
+    chancellorrider: {parlett: "#chancellor, #nightrider"},
+    archbishoprider: {parlett: "#archbishop, #nightrider", image:"cardinalrider"},
 
     //walker: {parlett: "o#wazir, c#ferz"}, // TODO: image
     tiger: {parlett: "o#bishop, c#knight"},
@@ -500,7 +503,7 @@ var PIECE_TYPES = {
     
     // Despite appearances, this is not ~1/2>, since that would allow also
     // allow the forward moves [2,-1] and [-2,1]
-    honorablehorse: {parlett: "[-1,2], [1,2]", image:"shogiknight", url:"pc:shogiknight", alt_images:["horse"]},
+    honorablehorse: {parlett: "[-1,2], [1,2]", image:["shogiknight", "horse"], url:"pc:shogiknight"},
 
     //chineseknight: {parlett: "1//2"}, // TODO: intervening must be unblocked
     lance: {parlett: "n+>", url:"pc:lance"},
@@ -555,9 +558,6 @@ var PIECE_TYPES = {
 
     // Pieces from chess-3
     // http://www.chessbase.com/newsdetail.asp?newsid=4553
-    // TODO: instead of using composite pieces, which aren't totally accurate because the
-    // extra moves are non-capturing (jous is not strictly knight + wazir, since the wazir moves can't capture!)
-    // frookbbishop, knightwazir?
     
     // rook + can move (not capture) like bishop
     tower: {parlett: "#rook, o#bishop", castle: true, letter: "T", image: "redrook"},  
@@ -4848,12 +4848,18 @@ function pc(x, y, virtual)
 // instead of having rotated images saved! Would allow anything to be rotated.
 function image_path_for(type, color)
 {
-    var base;
+    var base, image_list;
 
     assert(PIECE_TYPES[type], "image_path_for(" + type + ", " + color + "): no such piece type");
 
     // Override image name
-    base = PIECE_TYPES[type].image || type;
+    image_list = PIECE_TYPES[type].image;
+    if (image_list) {
+        // Choose first from array if is an array
+        base = dojo.isArray(image_list) ? image_list[0] : image_list;
+    } else {
+        base = type;
+    }
 
     // Rejected TODOs, lack support:
     // - pngs
