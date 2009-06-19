@@ -4470,7 +4470,12 @@ function show_library_images()
     // Map path of used image to piece type it is used for
     for (var type in PIECE_TYPES) {
         if (PIECE_TYPES.hasOwnProperty(type)) {
-            used_paths[image_path_for(type, "white")] = type;
+            // Mark all images used, including alternates
+            var paths = image_path_for(type, "white", true);
+
+            for (var i = 0; i < paths.length; i += 1) {
+                used_paths[paths[i]] = type + (i === 0 ? "" : " (alternate image)");
+            }
         }
     }
 
@@ -4843,12 +4848,12 @@ function pc(x, y, virtual)
     return virtual ? VBOARD[x][y].piece : SQUARES[x][y].firstChild;
 }
 
-// Return the path to an image for the piece of that color
-// TODO: Use .style.webkitTransform="rotate(45deg)" etc. to get rotated pieces,
-// instead of having rotated images saved! Would allow anything to be rotated.
-function image_path_for(type, color)
+// Return the path to an image for the piece of that color.
+// If all, then returns an array of all images including alternates,
+// otherwise returns preferred.
+function image_path_for(type, color, all)
 {
-    var base, image_list;
+    var bases, image_list, paths;
 
     assert(PIECE_TYPES[type], "image_path_for(" + type + ", " + color + "): no such piece type");
 
@@ -4856,10 +4861,13 @@ function image_path_for(type, color)
     image_list = PIECE_TYPES[type].image;
     if (image_list) {
         // Choose first from array if is an array
-        base = dojo.isArray(image_list) ? image_list[0] : image_list;
+        bases = dojo.isArray(image_list) ? image_list : [image_list];
     } else {
-        base = type;
+        bases = [type];
     }
+
+    // TODO: Use .style.webkitTransform="rotate(45deg)" etc. to get rotated pieces,
+    // instead of having rotated images saved! Would allow anything to be rotated.
 
     // Rejected TODOs, lack support:
     // - pngs
@@ -4869,7 +4877,12 @@ function image_path_for(type, color)
     // - Web fonts! Supported on Firefox 3.1+, Opera 10+, Safari 3.1+, IE4+
     //   See http://fonts.philip.html5.org/
     
-    return ["images/", PREFS.image_set, "/", {white:"w", black:"b"}[color], base, ".gif"].join("");
+    paths = [];
+    for (var i = 0; i < bases.length; i += 1) {
+        paths.push(["images/", PREFS.image_set, "/", {white:"w", black:"b"}[color], bases[i], ".gif"].join(""));
+    }
+
+    return all ? paths : paths[0];
 }
 
 // Decode Forsyth-Edwards Notation piece code, for example:
