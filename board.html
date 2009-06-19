@@ -378,9 +378,9 @@ var PIECE_TYPES = {
 
     // Hippogonal leapers
     banner: {parlett: "~0/0", letter: "O", image:"banner"},    // aka dummy
-    man: {parlett: "1*", letter: "M", image:"mann2", url:"pc:man"},    // same as king, but not royale (also known as commoner, guard)
+    man: {parlett: "1*", letter: "M", image:["mann2", "man", "guard", "wazirferz"], url:"pc:man"},    // same as king, but not royale (also known as commoner, guard)
     warmachine: {parlett: "~2/0", letter: "D", url:"pc:dabbabah"},  // or ~2+
-    alfil: {parlett: "~2/2", letter: "Y", image:["elephant2", "elephantrev2"], url:"pc:alfil"},       //  or ~2X
+    alfil: {parlett: "~2/2", letter: "Y", image:["elephant2", "elephantrev2", "elephant"], url:"pc:alfil"},       //  or ~2X
     threeheadmonster: {parlett: "~3/0", letter: "H"},     // aka threeleaper
     bird: {parlett: "~3/3", letter: "XT", image:["bird", "bird2"]},                // aka tripper
     camel: {parlett: "~1/3", letter: "W", image:["camel", "camel2", "camelrev2"], url:"pc:camel"},
@@ -399,7 +399,7 @@ var PIECE_TYPES = {
     //buffalo: {parlett: "~1/2, ~1/3, ~2/3", url:"pc:buffalo"},             // TODO: image
 
     // Royal pieces
-    royalknight: {parlett: "#knight", letter: "XR", royal: true},  // Knightmate chess TODO: crown on knight
+    royalknight: {parlett: "#knight", letter: "XR", royal: true, image:["royalknight", "kingknight2"]}, 
     royalpawn: {parlett: "#pawn", royal: true},
     royalrook: {parlett: "#rook", royal: true},
     royalbishop: {parlett: "#bishop", royal: true},
@@ -450,7 +450,9 @@ var PIECE_TYPES = {
     rookpawn: {parlett: "#rook, #pawn"},
     knightfers: {parlett: "#knight, #ferz", image: "knightferz"},
     knightwazir: {parlett: "#knight, #wazir"},
-    guardknight: {parlett: "#knight, #man", image:"guardknight2"},
+    knightwizard: {parlett: "#knight, #wizard", image:"horsezzmoon"},
+    horsewazir: {parlett: "#honorablehorse, #wazir"},
+    guardknight: {parlett: "#knight, #man", image:["guardknight2", "guardknight"]},
     elephantwazir: {parlett: "#elephant, #wazir"},
     elephantferzwarmachine: {parlett: "#elephant, #ferz, #warmachine"},
     camelferz: {parlett: "#camel, #ferz", image:["camelferz", "camel2ferz"]},
@@ -476,13 +478,19 @@ var PIECE_TYPES = {
     knightcamelzebra: {parlett: "#knight, #camel, #zebra"},
     knightwarmachineferz: {parlett: "#knight, #warmachine, #ferz", image:"knightdababaferz"},
     knightwazirwarmachine: {parlett: "#knight, #wazir, #warmachine"},
+    rookwarmachine: {parlett: "#rook, #warmachine", image:"rookdabbaba"},
     queenalfilwarmachine: {parlett: "#queen, #alfil, #warmachine", image:"queenalfildabbaba3"},
     wazirwarmachinealfil: {parlett: "#wazir, #dabbaba, #alfil", image:"wazirdababaalfil"},
     warmachinewazir: {parlett: "#warmachine, #wazir"},
     warmachineriderwazir: {parlett: "#warmachinerider, #wazir"},
+    warmachineferz: {parlett: "#warmachine, #ferz"},
+    warmachineferzrider: {parlett: "#warmachinerider, #ferz"},
+    wizardrider: {parlett: "#camelrider, #ferz", image:"moonrider"},
     zebracamel: {parlett: "#zebra, #camel"},
+    zebracamelrider: {parlett: "#zebra, #camelrider"},
     zebraferz: {parlett: "#zebra, #ferz"},
     zebrawazir: {parlett: "#zebra, #wazir"},
+    zebrawizard: {parlett: "#zebra, #wizard", image:"zebrazzmoon"},
 
     //walker: {parlett: "o#wazir, c#ferz"}, // TODO: image
     tiger: {parlett: "o#bishop, c#knight"},
@@ -490,7 +498,9 @@ var PIECE_TYPES = {
     canvasser: {parlett: "#camel, #rook", image:"camelrook", url:"pc:canvassr"}, // yes, url is canvassr (no e)
     carpenter: {parlett: "#knight, #warmachine", image:"knightwarmachine", url:"pc:carpentr"},
     champion: {parlett: "#wazir, #alfil, #warmachine", url:"pc:champion"},
-    //crowned_rook: {parlett: "#rook, #ferz"},       // TODO: image
+    //crownedrook: {parlett: "#rook, #ferz"},       // TODO: image
+    crownedcamel: {parlett: "#camel, #ferz"},
+    camelking: {parlett: "#camel, #king", image:"simplecamelking"},
     general: {parlett: "#wazir", royal: true, url:"pc:general", image:["general2", "general"]}, 
     kangaroo: {parlett: "#knight, #alfil", url:"pc:cangaroo"},  // Newton kangaroo, different than pc:kangaroo
     wizard: {parlett: "#camel, #ferz", image:"moon",  url:"pc:wizard"},
@@ -511,13 +521,15 @@ var PIECE_TYPES = {
     honorablehorse: {parlett: "[-1,2], [1,2]", image:["shogiknight", "horse"], url:"pc:shogiknight"},
 
     //chineseknight: {parlett: "1//2"}, // TODO: intervening must be unblocked
-    lance: {parlett: "n+>", url:"pc:lance"},
+    lance: {parlett: "n+>", url:"pc:lance", image:["lance", "lance1"]},
     //colonel: {parlett: "n>, n=, 2/1>, 1*", letter: "XC"}, // TODO: image
     //murray_lion: {parlett: "~0/2, ~2/2, c1*", letter: "XM"}, // TODO: image
     lion: {parlett: "~n*", letter: "XL", url:"pc:lion"},
     elephant: {parlett: "2X", letter: "E", image:["elephantmodern", "elephant1"], url:"pc:elephant"},  // Not a leaper, path can be blocked (unlike alfil, ~2X)
     //khohn: {parlett: "1X, 1>", letter: "XK"}, // TODO: image
     ferz: {parlett: "1X", letter: "XF", image:["ferz", "ferz2"], url:"pc:ferz"},
+    ferzf: {parlett: "1X<"},
+    ferzb: {parlett: "1X>"},
     wazir: {parlett: "1+", letter: "I", url:"pc:wazir"},
     "2moveferz": {parlett: "2X, 2+"},       // one move like a ferz, then another from that square
     "2movewazir": {parlett: "2+, 1*"},      // ..
@@ -533,13 +545,14 @@ var PIECE_TYPES = {
     allseeingeye: {parlett: "o~n/m", image:"allseeingeye2"},       // anywhere
 
     // Riders
-    nightrider: {parlett: "~1/2&", letter:"XN"},  // Wikipedia says n(1/2), but Parlett says ~1/2&
+    nightrider: {parlett: "~1/2&", letter:"XN", image:["nightrider", "knightinv"]},  // Wikipedia says n(1/2), but Parlett says ~1/2&
     alfilrider: {parlett: "~2/2&", image:"elephantrider"},  
     //elephantrider: {parlett: "2/2&", image:"elephantrider2"}, // TODO: gets blocked
     warmachinerider: {parlett: "~2/0&", image:["warmachinerider","dababbarider"]},
     camelrider: {parlett: "~1/3&"},
     alibabariderferz: {parlett: "~2/0&, ~2/2&"},
     girafferider: {parlett: "~1/4&"},
+    zebrarider: {parlett: "~2/3&"},
 
     // Projectiles
     airplane: {parlett: "#allseeingeye, {cn+<;snapback}", letter: "U", image:"plane"},  // drops bombs
@@ -686,7 +699,7 @@ var SAVED_BOARDS = {
     "Test Pieces": {
 "Test Pawns": "8/x(rookpawn)x(dragon)x(bishoppawn)x(superpawn)x(weakpawn)x(berolinapawn)x(pawnattackrook)p/8/8/4X(sergeant)/8/X(rookpawn)X(dragon)X(bishoppawn)X(superpawn)X(weakpawn)X(berolinapawn)X(pawnattackrook)P w - - 0 1",
 "Test Leapers": "K/2E1Y1H1/3M/1XT1W1XG1Z/8/3Z1N/4oo/5k w - - 0 1", // TODO: antelope, flamingo
-"Test Riders": "//4Q/4X(nightrider)/2X(alibabariderferz)/4X(warmachinerider)/2X(alfilrider)X(camelrider)/4X(girafferider) w - - 0 1",
+"Test Riders": "//4Q/4X(nightrider)/2X(alibabariderferz)/4X(warmachinerider)/2X(alfilrider)X(camelrider)2X(zebrarider)/4X(girafferider) w - - 0 1",
 "Test Amphibians": "4k/8/8/slslslsl/8/8/FFFFFFFF/4K w - - 0 1",
 "Test Royalty": "x(royalrook)x(royalknight)x(royalbishop)xjkx(royalbishop)x(royalknight)x(royalrook)/pppppppp/8/8/8/8/PPPPPPPP/X(royalrook)X(royalknight)X(royalbishop)XJKX(royalbishop)X(royalknight)X(royalrook) w KQkq - 0 1",
 "Test Projectiles": "x(airplane)X(airplane)4x(airplane)/X(allseeingeye)/1x(bird)/2x(bird)x(bird)x(bird)1x(bird)/3x(bird)x(bird)/3X(archerzz3)x(bird)/4X(archerzz2)X(archer)/x(frog)1X(gun)3X(rocket) w - - 0 1",
@@ -4474,8 +4487,9 @@ function load_starting_position(fen, replay)
 function show_library_images()
 {
     var root = "images/" + PREFS.image_set + "/";
-    var used_paths = {};
+    var used_paths = {}, count;
 
+    count = 0;
     // Map path of used image to piece type it is used for
     for (var type in PIECE_TYPES) {
         if (PIECE_TYPES.hasOwnProperty(type)) {
@@ -4484,6 +4498,7 @@ function show_library_images()
 
             for (var i = 0; i < paths.length; i += 1) {
                 used_paths[paths[i]] = type + (i === 0 ? "" : " (alternate image)");
+                count += 1;
             }
         }
     }
@@ -4493,7 +4508,9 @@ function show_library_images()
         var images = text.split("\n");
 
         document.write("<html><head><title>All piece images</title></head><body>");
-        document.write("<h1>All piece images (" + images.length + ")" + "</h1>");
+        document.write("<h1>All piece images</h1>");
+        document.write("<h2>" + count + " of " + images.length + " (" + 
+            Math.round(count / images.length * 100) + "%) defined" + "</h2>");
         document.write("<p>This is a list of all blue and white piece images available in the <b>" + PREFS.image_set + "</b> image set, including those that are not assigned to a piece. See also: <ul>");
         document.write("<li><a href=\"images/" + PREFS.image_set + "\">Directory listing</a>");
         document.write("<li><a href=\"images/" + PREFS.image_set + "/README.html\">README</a>");
