@@ -494,7 +494,7 @@ var PIECE_TYPES = {
     // http://chessvariants.wikidot.com/pcp:piececlopedia
  
     //hornedfalcon: {parlett: "n=x, 2>"},    // from Parlett, TODO: image
-    //honorablehorse: {parlett: "1/2>"},    // TODO: image
+    honorablehorse: {parlett: "~1/2>", image:"shogiknight", url:"pc:shogiknight"},//XXX incorrect
     //chineseknight: {parlett: "1//2"}, // TODO: intervening must be unblocked
     lance: {parlett: "n+>", url:"pc:lance"},
     //colonel: {parlett: "n>, n=, 2/1>, 1*", letter: "XC"}, // TODO: image
@@ -663,7 +663,7 @@ var SAVED_BOARDS = {
 "Test Projectiles": "x(airplane)X(airplane)4x(airplane)/X(allseeingeye)/1x(bird)/2x(bird)x(bird)x(bird)1x(bird)/3x(bird)x(bird)/3X(archerzz3)x(bird)/4X(archerzz2)X(archer)/x(frog)1X(gun)3X(rocket) w - - 0 1",
 "Test Invincibles": "3x(banner)x(banner)/7x(nwall)/x(banner)3x(block)1X(fortress)/4K3/5x(stone)/8/1kX(block)1X(stone)/1X(block)x(block)3X(nwall) w - - 0 1",
 "Test Consumables": "4k/pppppppp/1pppppp1/2pppp2/X(bomb)2X(superbomb)/8/PPPPPPPP/4K w - - 0 1",
-"Test Diminished": "/1X(b4)5X(q4)//4X(b3)//3X(r3)/2X(r4)/7X(q3) w - - 0 1",
+"Test Diminished": "/1X(b4)5X(q4)//4X(b3)//3X(r3)X(honorablehorse)/2X(r4)/7X(q3) w - - 0 1",
 "Test Mix 1": "X(airplane)x(airplane)/3x(pawnattackrook)x(caliph)x(pope)X(elephantwarmachine)/8/8/8/4S/X(lance)fwZ1X(pawnattackrook)/AcDeIFvT w - - 0 1",
 "Test Mix 2": "//2/1X(silvergeneral)2X(mushroom)/3X(crab)X(wizard)/4X(barc)1X(goldgeneral)//7m w - - 0 1",
 "Test Mix 3": "x(zebracamel)//3X(2moveferz)//3X(supermaharajah)1X(2movewazirferz)/2X(2movewazir) w - - 0 1"
@@ -3019,6 +3019,26 @@ function decode_one_parlett(parlett)
                     rel_moves.push([x, y, flags]);
                 }
             }
+        }
+
+        // Hippogonal can be optionally restricted by direction
+        if (directions) {
+            var keep_relmoves = [];
+
+            for (i = 0; i < directions.length; i += 1) {
+                var dir = directions[i];
+
+                for (var j = 0; j < rel_moves.length; j += 1) {
+                    var move = rel_moves[j];
+
+                    if ((!dir[0] || signum(move[0]) === signum(dir[0])) &&
+                        (!dir[1] || signum(move[1]) === signum(dir[1]))) {
+                        keep_relmoves.push(move);
+                    }
+                }
+            }
+
+            rel_moves = keep_relmoves;
         }
     } else if (directions) {
         for (i = 0; i < directions.length; i += 1) {
@@ -5467,6 +5487,12 @@ function init_dnd()
 }
 
 //// LOW-LEVEL FUNCTIONS
+
+// Return sign of number as {-1,0,1}
+function signum(n)
+{
+    return n > 0 ? 1 : (n < 0 ? -1 : 0);
+}
 
 // Get the value of a form element
 function form_value(e)
