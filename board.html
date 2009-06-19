@@ -495,6 +495,8 @@ var PIECE_TYPES = {
  
     //hornedfalcon: {parlett: "n=x, 2>"},    // from Parlett, TODO: image
     
+    nightrider: {parlett: "~1/2&", letter:"XN"},  // Wikipedia says n(1/2), but Parlett says ~1/2&
+    
     // Despite appearances, this is not ~1/2>, since that would allow also
     // allow the forward moves [2,-1] and [-2,1]
     honorablehorse: {parlett: "[-1,2], [1,2]", image:"shogiknight", url:"pc:shogiknight", alt_images:["horse"]},
@@ -567,8 +569,7 @@ var PIECE_TYPES = {
     silvergeneral: {parlett: "#ferz, [0,1]", url:"pc:silvergeneral"}
 
     // Pieces that probably won't be supported without significant coding
-    //leo: {parlett: "on*, c^" + AMP, letter:"XO"},        // no &amp; support, whatever that is
-    //knightrider: {parlett: "n(1/2)", letter:"XN"},  // no grouping support, sadly
+    //leo: {parlett: "on*, c^" + AMP, letter:"XO"},        // no locust support
     //checker: {parlett: "cn(^2X>), o1X>", promote: "checker_kinged", letter:"XY"},  // no grouping
     //checker_kinged: {parlett: "cn(^2X), o1x", letter:"XZ"},
     //spy: {parlett: "2>, 2=, (1/1)>", letter:"XS"}  // no grouping
@@ -650,6 +651,10 @@ var SAVED_BOARDS = {
 // TODO: No black pawn promotion
 "Maharajah and the Sepoys":     "rnbqkbnr/pppppppp/8/8/8/8/8/4XJ3 w kq - 0 1",
 "Milener's Chess-3 (non-random)": "rnbqkvjt/pppppppp/8/8/8/8/PPPPPPPP/RNBQKVJT w KQkq - 0 1",
+"Nightrider Chess I": "r1bx(nightrider)kb1r/pppppppp/8/8/8/8/PPPPPPPP/R1BX(nightrider)KB1R w KQkq - 0 1",
+"Nightrider Chess II": "rx(nightrider)bqkbx(nightrider)r/pppppppp/8/8/8/8/PPPPPPPP/RX(nightrider)BQKBX(nightrider)R w KQkq - 0 1",
+
+// TODO: historical chess group?
 // Shatranj, except the following rules are NOT implemented:
 // 1. Pawns can't make double moves
 // 2. Pawn only promotes to ferz
@@ -3054,9 +3059,9 @@ function decode_one_parlett(parlett)
             var new_rel_moves = [];
 
             // Nightrider-like piece
-            // TODO: expand rel_moves XXX
-            expand_directions(rel_moves, [], 3, flags, movement, new_rel_moves);
-            console.log(new_rel_moves);
+            expand_directions(rel_moves, [], limit || 5, flags, movement, new_rel_moves);
+
+            rel_moves = new_rel_moves;
         }
 
  
@@ -3112,8 +3117,8 @@ function expand_directions(directions, distances, limit, flags, movement, rel_mo
 
             } 
 
-            // TODO: Support arbitrary directions, for nightrider and other *-rider pieces.
-            // ~1/2& should expand to a rider in 1,2; 1,-2; -1,-2; -1,-2; 2,1; ... directions.
+            // Directions - these were either specified by direction vector code
+            // as in n* or hippogonally using ~1/2& (both these expand to >1 direction)
             rel_x += dir[0];
             rel_y += dir[1];
 
