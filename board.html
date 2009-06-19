@@ -545,7 +545,7 @@ var PIECE_TYPES = {
     allseeingeye: {parlett: "o~n/m", image:"allseeingeye2"},       // anywhere
 
     // Riders
-    nightrider: {parlett: "~1/2&", letter:"XN", image:["nightrider", "knightinv"]},  // Wikipedia says n(1/2), but Parlett says ~1/2&
+    nightrider: {parlett: "~1/2&", letter:"XN", image:["nightrider", "knightinv"], url:"pc:knightrider"},  // Wikipedia says n(1/2), but Parlett says ~1/2&
     alfilrider: {parlett: "~2/2&", image:"elephantrider"},  
     //elephantrider: {parlett: "2/2&", image:"elephantrider2"}, // TODO: gets blocked
     warmachinerider: {parlett: "~2/0&", image:["warmachinerider","dababbarider"]},
@@ -4694,18 +4694,30 @@ function show_piece_inspector(piece)
         misc.push("Is a castle<br>");
     }
     if (type_info.url) {
-        var url = type_info.url;
-        if (url.substr(0, 3) === "pc:") {
-            url = "http://www.chessvariants.org/piececlopedia.dir/" + url.substr(3) + ".html";
-        }
-        // TODO: Shift-click piece to open in new window
-        misc.push('<a target="_new" href="' + url + '">Details</a>');
+        misc.push("<em>For additional information, shift-click the piece</em>");
     }
 
     dojo.byId("inspector-info").innerHTML = misc.join("");
 
     inspector.style.display = "";
 }
+
+// Open an external website with more information on a piece, if any
+function open_piece_url(piece)
+{
+    var type_info = PIECE_TYPES[piece.type];
+
+    if (type_info.url) {
+        var url = type_info.url;
+        if (url.substr(0, 3) === "pc:") {
+            url = "http://www.chessvariants.org/piececlopedia.dir/" + url.substr(3) + ".html";
+        }
+        window.open(url);
+    } else {
+        //alert("No additional information is available for " + piece.type);
+    }
+}
+
 
 // Hide information on the piece shown, if any
 function hide_piece_inspector()
@@ -5278,6 +5290,10 @@ function mousedown(event)
 
     if (target.className.indexOf("draggable") === -1) {
         return;
+    }
+
+    if (event.shiftKey) {
+        open_piece_url(target);
     }
 
     DRAG.initial_x = event.clientX;
