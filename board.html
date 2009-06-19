@@ -5267,20 +5267,6 @@ function sq(code, extra)
 
 //// DRAG-AND-DROP FUNCTIONS
 
-// Get a piece ready for dragging
-function prepare_for_dragging(target)
-{
-    DRAG.old_position_type = target.style.position;
-
-    Element.absolutize(target);
-
-    // TODO: Subtract scroll offset if inside piece library? The position
-    // is relative so that the absolutely positioned pieces react to the 
-    // relatively positioned piece library (so they can be scrolled) but then
-    // when you drag near the piece library, it is as if you're dragging near the
-    // edge of the board, since there is a different origin.
-}
-
 // Initiate drag-and-drop on mouse down, if over a draggable element
 function mousedown(event)
 {
@@ -5293,8 +5279,6 @@ function mousedown(event)
     if (target.className.indexOf("draggable") === -1) {
         return;
     }
-
-    prepare_for_dragging(target);
 
     DRAG.initial_x = event.clientX;
     DRAG.initial_y = event.clientY;
@@ -5335,8 +5319,6 @@ function touch(evt)
 
         if (target && target.className &&
                 target.className.indexOf("draggable") !== -1 && !DRAG.touching) {
-
-            prepare_for_dragging(target);
 
             // Save the offset of the touch within the current note
             DRAG.initial_left = dojo._abs(target, true).x;
@@ -5530,8 +5512,6 @@ function drop_or_revert()
         // Nothing was being dragged
         return;
     }
-
-    piece.style.position = DRAG.old_position_type;
 
     square = DROP.square;
     if (!square || !accepts(piece, square)) {
