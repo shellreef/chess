@@ -2982,6 +2982,8 @@ function decode_one_parlett(parlett)
             distances.push(Infinity);
         } else if (ch === "/") {
             hippogonal = true;
+        } else if (ch === "&") {
+            movement = "rider";
         } else if (ch === " ") {
             assert(false, "relative_parlett(" + parlett + "): whitespace encountered, did you forget a comma?");
         } else {
@@ -3044,74 +3046,91 @@ function decode_one_parlett(parlett)
 
             rel_moves = keep_relmoves;
         }
-    } else if (directions) {
-        for (i = 0; i < directions.length; i += 1) {
-            var dir = directions[i];
-            var rel_x, rel_y, prev_rel_x, prev_rel_y, distance;
 
-            // Optional limit on number of steps to take of direction vector
-            if (distances.length !== 0) {
-                distance = distances[0];
-
-                assert(distances.length === 1, "relative_parlett(" + parlett + "): multiple distances given for rider, expected one or none");
-            } else {
-                distance = Infinity;
-            }
-
-            rel_x = rel_y = 0;
-            prev_rel_x = null;
-            prev_rel_y = null;
-
-            // Iterate to either given limit or maximum
-            var max = limit || Math.max(RANK_MAX, FILE_MAX);
-
-            var count = 0;
-
-            for (var j = 1; j <= max; j += 1) {
-                var these_flags = {};
-
-                // Riders get blocked. Note that you can have a non-hippogonal leaper.
-                // ~n* (lion) for example, is like a queen, but not blocked by intervening pieces.
-
-                // Blocked on a square which you CANNOT move to - riders w/ distance limits
-                if (prev_rel_x !== null && prev_rel_y !== null && 
-                        movement === "rider" && distance !== Infinity) { 
-                    // TODO: Support multiple squares. This only works for one square, for
-                    // pawn's double-moves. 2> means two forward, unblocked, and it works,
-                    // but 3> for three forward, unblocked, won't work yet.
-                    these_flags.if_unblocked_dx = prev_rel_x;
-                    these_flags.if_unblocked_dy = prev_rel_y;
-
-                } 
-
-                // TODO: Support arbitrary directions, for nightrider and other *-rider pieces.
-                // ~1/2& should expand to a rider in 1,2; 1,-2; -1,-2; -1,-2; 2,1; ... directions.
-                rel_x += dir[0];
-                rel_y += dir[1];
-
-                dojo.mixin(these_flags, flags);
-
-                // Blocked by a square which you CAN move to - riders w/ no limits except board dimensions
-                if (distance === Infinity && movement === "rider") {
-                    these_flags.if_blocked_skip = max - count - 1;
-                }
-
-                if (distance === Infinity || j === distance) {
-                    rel_moves.push([rel_x, rel_y, these_flags]);
-                    count += 1;
-
-                    if (j === distance) { 
-                        break;
-                    }
-                }
-
-                prev_rel_x = rel_x;
-                prev_rel_y = rel_y;
-            }
+        if (movement === "rider") {
+            // Nightrider-like piece
+            // TODO: expand rel_moves XXX
+            expand_directions(rel_moves, [], undefined, flags, movement, rel_moves);
         }
+
+ 
+    } else if (directions) {
+        expand_directions(directions, distances, limit, flags, movement, rel_moves);
     }
 
     return rel_moves;
+}
+
+// Expand a piece in the given directions, distances, up to
+// an optional limit, pushing the moves to rel_moves. Used for non-hippogonal
+// pieces, often riders (n*), but leapers (~n*) are also allowed.
+function expand_directions(directions, distances, limit, flags, movement, rel_moves)
+{
+    for (i = 0; i < directions.length; i += 1) {
+        var dir = directions[i];
+        var rel_x, rel_y, prev_rel_x, prev_rel_y, distance;
+
+        // Optional explicit distance instead of all in between (n)
+        // Example: 2X, can only move two diagonally, unblocked
+        if (distances.length !== 0) {
+            distance = distances[0];
+
+            assert(distances.length === 1, "expand_rider(" + distances + "): multiple distances given for rider, expected one or none");
+        } else {
+            distance = Infinity;
+        }
+
+        rel_x = rel_y = 0;
+        prev_rel_x = null;
+        prev_rel_y = null;
+
+        // Iterate to either given limit or maximum
+        var max = limit || Math.max(RANK_MAX, FILE_MAX);
+
+        var count = 0;
+
+        for (var j = 1; j <= max; j += 1) {
+            var these_flags = {};
+
+            // Riders get blocked. Note that you can have a non-hippogonal leaper.
+            // ~n* (lion) for example, is like a queen, but not blocked by intervening pieces.
+
+            // Blocked on a square which you CANNOT move to - riders w/ distance limits
+            if (prev_rel_x !== null && prev_rel_y !== null && 
+                    movement === "rider" && distance !== Infinity) { 
+                // TODO: Support multiple squares. This only works for one square, for
+                // pawn's double-moves. 2> means two forward, unblocked, and it works,
+                // but 3> for three forward, unblocked, won't work yet.
+                these_flags.if_unblocked_dx = prev_rel_x;
+                these_flags.if_unblocked_dy = prev_rel_y;
+
+            } 
+
+            // TODO: Support arbitrary directions, for nightrider and other *-rider pieces.
+            // ~1/2& should expand to a rider in 1,2; 1,-2; -1,-2; -1,-2; 2,1; ... directions.
+            rel_x += dir[0];
+            rel_y += dir[1];
+
+            dojo.mixin(these_flags, flags);
+
+            // Blocked by a square which you CAN move to - riders w/ no limits except board dimensions
+            if (distance === Infinity && movement === "rider") {
+                these_flags.if_blocked_skip = max - count - 1;
+            }
+
+            if (distance === Infinity || j === distance) {
+                rel_moves.push([rel_x, rel_y, these_flags]);
+                count += 1;
+
+                if (j === distance) { 
+                    break;
+                }
+            }
+
+            prev_rel_x = rel_x;
+            prev_rel_y = rel_y;
+        }
+    }
 }
 
 // Return an array of objects without any duplicate entries, where
