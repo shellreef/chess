@@ -4602,13 +4602,21 @@ function toggle_piece_library()
 // Show information on a piece
 function show_piece_inspector(piece)
 {
-    var symbols, type_info, misc;
+    var symbols, type_info, misc, images, paths;
     var inspector = dojo.byId("piece-inspector");
 
     type_info = PIECE_TYPES[piece.type];
 
     dojo.byId("inspector-type").innerHTML = piece.type;
-    dojo.byId("inspector-image").src = image_path_for(piece.type, piece.color);
+
+    // Show all the images, in order of preference.
+    image_html = "";
+    paths = image_path_for(piece.type, piece.color, true);
+    for (var i = 0; i < paths.length; i += 1) {
+        image_html += "<img src=\"" + paths[i] + "\"> ";
+    }
+
+    dojo.byId("inspector-image").innerHTML = image_html;
     dojo.byId("inspector-movement").innerHTML = type_info.parlett;
 
     // Symbols (letter, figurine, number) for notations
@@ -5787,7 +5795,7 @@ onclick="edit_pgn()" class="show_White">
 <p><span id="opening_name"></span>
 
 <div id="piece-inspector" style="display: none; z-index: 2">
-<p><img style="vertical-align: middle" id="inspector-image"> <span id="inspector-type" style="font-weight: bold">type</span>
+<p><span style="vertical-align: middle" id="inspector-image"></span> <span id="inspector-type" style="font-weight: bold">type</span>
 <p>Movement: <span id="inspector-movement">movement</span>
 <p>Symbols: <span id="inspector-symbols">symbols</span>
 <p><span id="inspector-info">other info</span>
