@@ -3626,6 +3626,18 @@ function init_board()
             }
         };
 
+    document.onkeyup = function(event) {
+        event = event || window.event;
+
+        if (!event.keyCode) {
+            return;
+        }
+
+        if (event.keyCode === 16) {
+            hide_piece_inspector();
+        }
+    }
+
 
     // Get board name in cookie, if any. This lets the user select
     // their favorite board, and revisit the page, and it will
