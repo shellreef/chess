@@ -2363,16 +2363,6 @@ function do_virtual_move(piece, move)
 
     did.from_square = piece.square;
 
-    // Special command for piece dragging to remove the piece
-    // off the board, in setup mode. Not reversible.
-    if (move.kill) {
-        if (did.from_square) {
-            VBOARD[did.from_square.x][did.from_square.y].piece = null;
-        }
-        did.killed = true;
-        return did;
-    }
-
     did.to_square = VBOARD[move.x][move.y];
  
     // Special case: en passant captures to an empty square
@@ -5603,7 +5593,13 @@ function drop_or_revert()
     if (!square && PREFS.setup_mode) {
         // TODO: Effect
         //new Effect.Shrink(piece);
-        do_virtual_move(piece, {kill:true});
+        
+        // It was on board, piece over itself to kill it
+        if (piece.square) {
+            do_virtual_move(piece, {x:piece.square.x, y:piece.square.y});
+        }
+        // Remove node, so leftover torn-off pieces from library
+        // that were not dragged anywhere do not accumulate.
         piece.remove();
         return;
     }
