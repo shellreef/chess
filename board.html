@@ -892,11 +892,8 @@ function load_notations()
     for (var notation in AVAILABLE_NOTATIONS) {
         if (AVAILABLE_NOTATIONS.hasOwnProperty(notation)) {
             var name = AVAILABLE_NOTATIONS[notation];
-            var option = document.createElement("option");
-            option.setAttribute("value", notation);
-            option.innerHTML = name;
 
-            menu.appendChild(option);
+            menu.appendChild(dojo.create("option", {value:notation, innerHTML:name}));
         }
     }
 
@@ -4606,21 +4603,16 @@ function toggle_piece_library()
     // royal pieces first, pieces that promote, and find what you want.
     // IE7 chokes due to the fix for http://dev.rubyonrails.org/ticket/2707
     // TODO: Find out why this table doesn't display in IE7
-    table = document.createElement("table");
-    table.setAttribute("id", "piece-library-table");
-    tbody = document.createElement("tbody");
+    table = dojo.create("table", {id:"piece-library-table"});
+    tbody = dojo.create("tbody");
     table.appendChild(tbody);
-    var r1 = document.createElement("tr");
+    var r1 = dojo.create("tr");
     tbody.appendChild(r1);
-    var c1 = document.createElement("th");
-    c1.innerHTML = "White";
+    var c1 = dojo.create("th", {innerHTML:"White"});
     r1.appendChild(c1);
-    var c2 = document.createElement("th");
-    c2.innerHTML = "Black";
+    var c2 = dojo.create("th", {innerHTML:"Black"});
     r1.appendChild(c2);
-    var c3 = document.createElement("th");
-    c3.setAttribute("style", "text-align: left");
-    c3.innerHTML = "Name";
+    var c3 = dojo.create("th", {style:"text-align: left", innerHTML:"Name"});
     r1.appendChild(c3);
 
     count = 0;
@@ -5059,10 +5051,8 @@ function create_piece(color, type)
     // Create the node
     // TODO Use a div with background-image instead, then can have arbitrary
     // characters, instead of just images, more flexible, maybe transition too.
-    piece = document.createElement("img");
-    piece.setAttribute("src", filename);
-    piece.setAttribute("class", classes.join(" "));
-    piece.setAttribute("className", classes.join(" "));
+    piece = dojo.create("img", {src:filename, "class":classes.join(" "), 
+            className:classes.join(" ")});
 
     // Property will tell name of piece. To tell what color, or if it is
     // a piece in the first place, check the class names.
