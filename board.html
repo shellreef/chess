@@ -4633,10 +4633,12 @@ function toggle_piece_library()
             var wp = create_piece("white", type);
             var bp = create_piece("black", type);
 
-            // Set to static so can be scrolled within library area
-            // Will need to set to absolute when dragging
-            wp.style.position = "static";
-            bp.style.position = "static";
+            // Not directly draggable, since these elements are absolutely 
+            // positioned inside a relatively positioned element. But keep
+            // them as pieces so you can shift-hover to open the piece
+            // inspector.
+            dojo.removeClass(wp, "draggable");
+            dojo.removeClass(bp, "draggable");
 
             // TODO: Create another piece under when drag off, so
             // more will always be available.
