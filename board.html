@@ -937,8 +937,6 @@ function edit_pgn()
 
     ORIGINAL_UI_HTML = game_ui.innerHTML;
 
-    // TODO: build dynamically using Builder.node, but it gives me a 
-    // builder.js this.NODEMAP undefined error.
     game_ui.innerHTML = "<textarea id='edited_pgn' name='edited_pgn' cols='80' rows='35'>" + save_pgn().escapeHTML() + 
         "<\/textarea>" + 
         "<button type='button' name='ok' accesskey='o' " + 
@@ -1591,7 +1589,7 @@ function ask_to_promote(piece, tieback, is_immediate)
             var notation = tieback[type].notations[form_value("output_notation")];
 
             //element = create_piece(GAME_STATE.active_color, type);
-            element = Builder.node("img", {src:image_path_for(type, piece.color), piece_type:type, notation:notation});
+            element = dojo.create("img", {src:image_path_for(type, piece.color), piece_type:type, notation:notation});
             element.onclick = function() {
                 // Finishes up the move
                 promote(piece, tieback[type].square, dojo.attr(this, "piece_type"), dojo.attr(this, "notation"), is_immediate);
@@ -2121,30 +2119,33 @@ function populate_make_a_move_list()
 
     count = own_property_count(VALID_MOVE_NOTATIONS[PREFS.input_notation]);
     if (count === 0) {
-        menu.appendChild(Builder.node("option", {value:""}, "No legal moves"));
+        menu.appendChild(dojo.create("option", {value:""}, "No legal moves"));
         return;
     }
 
-    menu.appendChild(Builder.node("option", {value:""}, "Make a move... (" + count + ")"));
+    menu.appendChild(dojo.create("option", 
+                {value:"", innerHTML:"Make a move... (" + count + ")"}));
    
     // Moves in active input notation.
-    move_group = Builder.node("optgroup", {label:active_name});
+    move_group = dojo.create("optgroup", {label:active_name});
     menu.appendChild(move_group);
 
     for (var notation in VALID_MOVE_NOTATIONS[PREFS.input_notation]) {
         if (VALID_MOVE_NOTATIONS[PREFS.input_notation].hasOwnProperty(notation)) {
-            move_group.appendChild(Builder.node("option", {value: notation}, notation));
+            move_group.appendChild(dojo.create("option", 
+                        {value: notation, innerHTML:notation}));
         }
     }
 
     // Change the input notation.
-    change_group = Builder.node("optgroup", {label:"Other notation..."});
+    change_group = dojo.create("optgroup", {label:"Other notation..."});
     menu.appendChild(change_group);
 
     for (var n in AVAILABLE_NOTATIONS) {
         if (AVAILABLE_NOTATIONS.hasOwnProperty(n) && n !== PREFS.input_notation) {
             var name = AVAILABLE_NOTATIONS[n];
-            change_group.appendChild(Builder.node("option", {value: "change_" + n}, name));
+            change_group.appendChild(dojo.create("option", 
+                        {value: "change_" + n, innerHTML:name}));
         }
     }
 
@@ -3673,7 +3674,7 @@ function init_board()
         if (SAVED_BOARDS.hasOwnProperty(group_name)) {
             var members = SAVED_BOARDS[group_name];
 
-            var group = Builder.node("optgroup", {label:group_name});
+            var group = dojo.create("optgroup", {label:group_name});
             board_menu.appendChild(group);
 
             for (var board_name in members) {
@@ -3682,7 +3683,8 @@ function init_board()
                     if (group_name === selected_board_group && board_name === selected_board_name) {
                         sel_index = index;
                     }
-                    group.appendChild(Builder.node("option", {value: fen}, board_name));
+                    group.appendChild(dojo.create("option", 
+                                {value: fen, innerHTML:board_name}));
                     index += 1;
                 }
             }
@@ -4603,12 +4605,6 @@ function toggle_piece_library()
     // TODO: sortable columns, searchable table, so can list by symbol, alphabetically,
     // royal pieces first, pieces that promote, and find what you want.
     // IE7 chokes due to the fix for http://dev.rubyonrails.org/ticket/2707
-    /*table = Builder.node("table", {id:"piece-library-table"}, [Builder.node("tr"), [
-            Builder.node("th", "White"),
-            Builder.node("th", "Black"),
-            Builder.node("th", {style: "text-align: left"}, "Name")
-            ]]);
-            */
     // TODO: Find out why this table doesn't display in IE7
     table = document.createElement("table");
     table.setAttribute("id", "piece-library-table");
