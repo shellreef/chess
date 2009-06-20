@@ -3245,7 +3245,8 @@ function set_turn(color, historical)
     GAME_STATE.active_color = new_color;
    
     // Active player in check?
-    checked = GAME_STATE.active_in_check = in_check(GAME_STATE.active_color, calculate_moves(opposite_color(new_color), true));
+    VALID_MOVES_OPP = calculate_moves(opposite_color(new_color), true);
+    checked = GAME_STATE.active_in_check = in_check(GAME_STATE.active_color, VALID_MOVES_OPP);
 
     // Note: this takes some time... is there any way to run it right AFTER the piece has
     // gone through the endeffect? This is called in onDrop.
