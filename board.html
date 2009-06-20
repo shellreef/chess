@@ -2360,8 +2360,19 @@ function do_virtual_move(piece, move)
 
     did.piece = piece;
     did.move = move;
- 
+
     did.from_square = piece.square;
+
+    // Special command for piece dragging to remove the piece
+    // off the board, in setup mode. Not reversible.
+    if (move.kill) {
+        if (did.from_square) {
+            VBOARD[did.from_square.x][did.from_square.y].piece = null;
+        }
+        did.killed = true;
+        return did;
+    }
+
     did.to_square = VBOARD[move.x][move.y];
  
     // Special case: en passant captures to an empty square
@@ -3523,6 +3534,7 @@ function flip()
 {
     label_board(!PREFS.flipped);
     load_fen(active_fen(), true);
+    // BUG: if edit board, then flip it, lose changes. TODO: fix
 }
 
 // Internally name the square cells with their (x,y) coordinates
@@ -5586,6 +5598,17 @@ function drop_or_revert()
     }
 
     square = DROP.square;
+
+    // Dragging offboard: delete in setup mode
+    if (!square && PREFS.setup_mode) {
+        // TODO: Effect
+        //new Effect.Shrink(piece);
+        do_virtual_move(piece, {kill:true});
+        piece.remove();
+        return;
+    }
+
+    // Not valid drop square: revert
     if (!square || !accepts(piece, square)) {
         if (!piece.style.left && !piece.style.top) {
             // Dropped where picked it up - no movement.
