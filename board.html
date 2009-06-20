@@ -704,7 +704,7 @@ var SAVED_BOARDS = {
     "Test Pieces": {
 "Test Pawns": "8/x(rookpawn)x(knightpawn)x(bishoppawn)x(superpawn)x(weakpawn)x(berolinapawn)x(pawnattackrook)p/8/8/4X(sergeant)/8/X(rookpawn)X(knightpawn)X(bishoppawn)X(superpawn)X(weakpawn)X(berolinapawn)X(pawnattackrook)P w - - 0 1",
 "Test Leapers": "K/2E1Y1H1/3M/1XT1W1XG1Z/8/3Z1N/4oo/5k w - - 0 1", // TODO: antelope, flamingo
-"Test Riders": "B2R//4Q/4X(nightrider)/2X(alibabariderferz)/4X(warmachinerider)/2X(alfilrider)X(camelrider)2X(zebrarider)/4X(girafferider) w - - 0 1",
+"Test Riders": "B2R//4Q/4X(nightrider)/2X(alibabariderferz)3X(stone)/5X(warmachinerider)/2X(alfilrider)X(camelrider)2X(zebrarider)/4X(girafferider) w - - 0 1",
 "Test Amphibians": "4k/8/8/slslslsl/8/8/FFFFFFFF/4K w - - 0 1",
 "Test Royalty": "x(royalrook)x(royalknight)x(royalbishop)xjkx(royalbishop)x(royalknight)x(royalrook)/pppppppp/8/8/8/8/PPPPPPPP/X(royalrook)X(royalknight)X(royalbishop)XJKX(royalbishop)X(royalknight)X(royalrook) w KQkq - 0 1",
 "Test Projectiles": "x(airplane)X(airplane)4x(airplane)/X(allseeingeye)/1x(bird)/2x(bird)x(bird)x(bird)1x(bird)/3x(bird)x(bird)/3X(archerzz3)x(bird)/4X(archerzz2)X(archer)/x(frog)1X(gun)3X(rocket) w - - 0 1",
@@ -4710,6 +4710,9 @@ function show_piece_inspector(piece)
     }
     if (type_info.castle) {
         misc.push("Is a castle<br>");
+    }
+    if (type_info.invincible) {
+        misc.push("Invincible (cannot be captured)<br>");
     }
     if (type_info.url) {
         misc.push("<em>Additional information is available by shift-clicking the piece</em>");
