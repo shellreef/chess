@@ -4626,9 +4626,10 @@ function toggle_piece_library()
             // positioned inside a relatively positioned element. But keep
             // them as pieces so you can shift-hover to open the piece
             // inspector.
-            dojo.removeClass(wp, "draggable");
-            dojo.removeClass(bp, "draggable");
+            dojo.addClass(wp, "tear-off");
+            dojo.addClass(bp, "tear-off");
 
+            /*
             // TODO: Create another piece under when drag off, so
             // more will always be available.
             wp.onmousedown = bp.onmousedown = function(event) {
@@ -4648,7 +4649,7 @@ function toggle_piece_library()
                 //tear.style.top = dojo._abs(target, true).y + "px";
  
                 dojo.body().appendChild(tear);
-            };
+            };*/
 
             var row = dojo.create("tr");
             var white_cell = dojo.create("td", {"class": "square"}, row);
@@ -5336,6 +5337,19 @@ function mousedown(event)
 
     if (event.shiftKey) {
         open_piece_url(target);
+    }
+
+    if (target.className.indexOf("tear-off") !== -1) {
+        // This is from the piece library, so allow a new copy
+        // of the piece to be torn off.
+        var tear = create_piece(target.color, target.type);
+
+        tear.style.left = dojo._abs(target, true).x + "px";
+        tear.style.top = dojo._abs(target, true).y + "px";
+
+        dojo.body().appendChild(tear);
+
+        target = tear;
     }
 
     DRAG.initial_x = event.clientX;
