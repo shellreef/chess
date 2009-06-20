@@ -574,7 +574,8 @@ var PIECE_TYPES = {
                      "[-2,0], [-4,0;if_unblocked=-2,0], [-6,0;if_unblocked=-4,0], " +
                      "[0,-2], [0,-4;if_unblocked=0,-2], [0,-6;if_unblocked=0,-4]",*/
                      invincible: true},
-    fortress: {parlett: "o#man", invincible: true},
+    fort: {parlett: "o#wazir", invincible: true},       // masculine
+    fortress: {parlett: "o#ferz", invincible: true},    // feminine (-ess, ferz like queen)
     nwall: {parlett: "o1>, o1=", invincible: true},
 
     // Consumables
@@ -707,7 +708,7 @@ var SAVED_BOARDS = {
 "Test Amphibians": "4k/8/8/slslslsl/8/8/FFFFFFFF/4K w - - 0 1",
 "Test Royalty": "x(royalrook)x(royalknight)x(royalbishop)xjkx(royalbishop)x(royalknight)x(royalrook)/pppppppp/8/8/8/8/PPPPPPPP/X(royalrook)X(royalknight)X(royalbishop)XJKX(royalbishop)X(royalknight)X(royalrook) w KQkq - 0 1",
 "Test Projectiles": "x(airplane)X(airplane)4x(airplane)/X(allseeingeye)/1x(bird)/2x(bird)x(bird)x(bird)1x(bird)/3x(bird)x(bird)/3X(archerzz3)x(bird)/4X(archerzz2)X(archer)/x(frog)1X(gun)3X(rocket) w - - 0 1",
-"Test Invincibles": "3x(banner)x(banner)/7x(nwall)/x(banner)3x(block)1X(fortress)/4K3/5x(stone)/8/1kX(block)1X(stone)/1X(block)x(block)3X(nwall) w - - 0 1",
+"Test Invincibles": "3x(banner)x(banner)/7x(nwall)/x(banner)3x(block)1X(fortress)/4K3/5x(stone)X(fort)/8/1kX(block)1X(stone)/1X(block)x(block)3X(nwall) w - - 0 1",
 "Test Consumables": "4k/pppppppp/1pppppp1/2pppp2/X(bomb)2X(superbomb)/8/PPPPPPPP/4K w - - 0 1",
 "Test Diminished": "/1X(b4)5X(q4)//4X(b3)//3X(r3)X(honorablehorse)/2X(r4)/7X(q3) w - - 0 1",
 "Test Mix 1": "X(airplane)x(airplane)/3x(pawnattackrook)x(caliph)x(pope)X(elephantwarmachine)/8/8/8/4S/X(lance)fwZ1X(pawnattackrook)/AcDeIFvT w - - 0 1",
