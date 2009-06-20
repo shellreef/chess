@@ -4585,7 +4585,7 @@ function set_setup_mode(on)
 // Show the piece library, of readily usable pieces with defined movement
 function toggle_piece_library()
 {
-    var table, lib, want_setup_mode, parent, count;
+    var table, lib, want_setup_mode, parent, i, wp, bp;
 
     parent = dojo.byId("piece-library-parent");
     want_setup_mode = parent.style.display === "none";
@@ -4616,11 +4616,11 @@ function toggle_piece_library()
     var c3 = dojo.create("th", {style:"text-align: left", innerHTML:"Name"});
     r1.appendChild(c3);
 
-    count = 0;
+    i = 0;
     for (var type in PIECE_TYPES) {
         if (PIECE_TYPES.hasOwnProperty(type)) {
-            var wp = create_piece("white", type);
-            var bp = create_piece("black", type);
+            wp = create_piece("white", type);
+            bp = create_piece("black", type);
 
             // Not directly draggable, since these elements are absolutely 
             // positioned inside a relatively positioned element. But keep
@@ -4631,6 +4631,24 @@ function toggle_piece_library()
 
             // TODO: Create another piece under when drag off, so
             // more will always be available.
+            wp.onmousedown = bp.onmousedown = function(event) {
+                var target, tear;
+               
+                // Torn off piece
+                tear = create_piece(this.color, this.type);
+
+                // TODO: position
+                
+                event = event || window.event;
+                target = event.target !== undefined ? event.target : event.srcElement;
+
+                //= target.offsetLeft;
+                //= target.offsetTop;
+                //tear.style.left = dojo._abs(target, true).x + "px";
+                //tear.style.top = dojo._abs(target, true).y + "px";
+ 
+                dojo.body().appendChild(tear);
+            };
 
             var row = dojo.create("tr");
             var white_cell = dojo.create("td", {"class": "square"}, row);
@@ -4640,12 +4658,12 @@ function toggle_piece_library()
             dojo.create("td", {innerHTML:type}, row);
     
             tbody.appendChild(row);
-            count += 1;
+            i += 1;
         }
     }
 
     lib.appendChild(table);
-    lib.appendChild(dojo.create("p", {innerHTML:count + " pieces available"}));
+    lib.appendChild(dojo.create("p", {innerHTML: i + " pieces available"}));
     lib.appendChild(dojo.create("a", {href: "#", onclick:"show_library_images()", 
                 innerHTML:"show all images (clears page)"}));
 }
