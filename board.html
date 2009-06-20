@@ -190,7 +190,7 @@ td.dropping-square-capture2 { background-color: red !important; }
 <script src="http://www.google.com/jsapi"></script>
 <script type="text/javascript">
 /*jslint bitwise: true, browser: true, eqeqeq: true, immed: true, newcap: true, nomen: true, plusplus: true, regexp: true, undef: true*/
-/*global window google form_value Hash $break Builder Event*/
+/*global window google form_value Hash $break Event*/
 
 if (!window.google) {
     alert("Google was not found. Nothing will work.");
@@ -1549,7 +1549,7 @@ function promote(piece, square, type, notation, is_immediate)
     // effect that can fade from one image to another? LikE IE page transitions.
     // http://sachiniscool.blogspot.com/2006/01/implementing-page-transitions-in.html
     // ... except when changing images. Safari has CSS animations.
-    // new Effect.Puff(piece);
+    //new Effect.Puff(piece);
     // or try CSS transitions, see CSS at the top of this document.
     //piece.style.background = image_path_for(promotes_to, piece.color);
     // or TODO: create another img, same place same time, change opacity to reveal it
@@ -4253,10 +4253,11 @@ function move_dropped_piece(piece, square, event)
     // TODO: Consider setting piece.style.position to static here, so it is 
     // static when stationary, and change it to absolute (absolutize) when dragging..
     // Any way to finish running the code AFTER the effect finishes? New effect?
-    //if (square.firstChild) {
-    //   new Effect.Squish(square.virtual ? square.piece : square.firstChild);
+    if (square.firstChild) {
+    //    new Effect.Puff(square);
+    //   new Effect.Puff(square.virtual ? square.piece : square.firstChild);
     // Consider animating opacity or width+height (with dojo.anim or CSS transitions)
-    //}
+    }
 
     // Visually rehome piece. This is a UI speed hack: after move_piece_to_square() is
     // called, realize_vboard() will finalize the board position, moving any other
