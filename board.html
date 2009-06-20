@@ -4631,18 +4631,22 @@ function toggle_piece_library()
             // TODO: Create another piece under when drag off, so
             // more will always be available.
 
-            var row = Builder.node("tr", [
-                    Builder.node("td", {"class": "square"}, wp),
-                    Builder.node("td", {"class": "square"}, bp),
-                    Builder.node("td", type)]);
+            var row = dojo.create("tr");
+            var white_cell = dojo.create("td", {"class": "square"}, row);
+            white_cell.appendChild(wp);
+            var black_cell = dojo.create("td", {"class": "square"}, row);
+            black_cell.appendChild(bp);
+            dojo.create("td", {innerHTML:type}, row);
+    
             tbody.appendChild(row);
             count += 1;
         }
     }
 
     lib.appendChild(table);
-    lib.appendChild(Builder.node("p", [count + " pieces available"]));
-    lib.appendChild(Builder.node("a", {href: "#", onclick:"show_library_images()"}, ["show all images (clears page)"]));
+    lib.appendChild(dojo.create("p", {innerHTML:count + " pieces available"}));
+    lib.appendChild(dojo.create("a", {href: "#", onclick:"show_library_images()", 
+                innerHTML:"show all images (clears page)"}));
 }
 
 // Show information on a piece
