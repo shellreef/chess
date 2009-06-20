@@ -560,6 +560,7 @@ roserook
 royalbishop
 royalknight
 royalpawn
+royalqueen
 royalrook
 sausage
 scorpion
