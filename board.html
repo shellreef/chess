@@ -279,7 +279,8 @@ var GAME_STATE = {
     recent_piece: null,         // Recently moved piece
     recent_square: null,        // Recently moved from square
     last_captured: null,        // export_captured() string _before_ current move 
-    piece_under: null           // Piece under cursor for piece inspector
+    piece_under: null,          // Piece under cursor for piece inspector
+    shift: false                // Whether shift key is pressed
 };    
 
 /// Drag and drop globals
@@ -565,7 +566,7 @@ var PIECE_TYPES = {
 
     // Invincibles
     block: {parlett: "", invincible: true},
-    // TODO: easier way to write: reversed and negatives?
+    // or simply: ~2/0& (warmachinerider)
     stone: {parlett: "[0,2], [0,4;if_unblocked=0,2], [0,6;if_unblocked=0,4], " +
                      "[2,0], [4,0;if_unblocked=2,0], [6,0;if_unblocked=4,0], " +
                      "[-2,0], [-4,0;if_unblocked=-2,0], [-6,0;if_unblocked=-4,0], " +
@@ -3622,8 +3623,12 @@ function init_board()
             // Shift opens piece inspector. Usually it is invoked on mouse
             // over if shiftKey is held down; this case catches if shift is
             // pressed while the mouse is /already/ over the piece.
-            if (event.keyCode === 16 && GAME_STATE.piece_under) {
-                show_piece_inspector(GAME_STATE.piece_under);
+            if (event.keyCode === 16) {
+                GAME_STATE.shift = true;
+                if (GAME_STATE.piece_under) {
+                    show_piece_inspector(GAME_STATE.piece_under);
+                    over_piece(GAME_STATE.piece_under, {});
+                }
             }
         };
 
@@ -3635,6 +3640,14 @@ function init_board()
         }
 
         if (event.keyCode === 16) {
+            if (GAME_STATE.shift === 1) {
+                // When releasing shift, unhighlight opponent's moves, if any
+                var save = GAME_STATE.piece_under;
+                out_piece(GAME_STATE.piece_under, {});
+                GAME_STATE.piece_under = save;
+            }
+
+            GAME_STATE.shift = false;
             hide_piece_inspector();
         }
     }
@@ -5076,12 +5089,7 @@ function highlight_moves(piece, enable)
 
     // If player is dragging a piece over another piece, don't show
     // legal moves for the piece under it.
-    if (DRAG.dragging) {
-        return null;
-    }
-
-    // If not this player's turn, no legal moves
-    if (piece.color !== GAME_STATE.active_color) {
+    if (!piece || DRAG.dragging) {
         return null;
     }
 
@@ -5094,7 +5102,22 @@ function highlight_moves(piece, enable)
     }
 
     //console.log(from_square.filerank);
-    moves = VALID_MOVES[from_square.filerank];
+   
+    if (piece.color === GAME_STATE.active_color) {
+        // Active player's pieces
+        moves = VALID_MOVES[from_square.filerank];
+    } else {
+        // Opponent's pieces -- allow seeing valid moves if it was
+        // their turn, if holding down shift.
+        if (GAME_STATE.shift) {
+            moves = VALID_MOVES_OPP[from_square.filerank];
+            GAME_STATE.shift = 1;    // showing other player's moves
+        } else {
+            return null;
+        }
+    }
+
+
     //console.log(moves);
     if (!moves) {
         return null;    
