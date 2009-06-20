@@ -3803,7 +3803,7 @@ function update_captured_piece_images(piece)
     for (var i = 0; i < GAME_STATE.captured.white.length; i += 1) {
         var p = GAME_STATE.captured.white[i];
         // TODO: Allow in some games for these pieces to be dragged back to board.
-        // Currently you can only in setup mode.
+        // Currently you can't really, even in setup mode.
         // For Shogi (but captured pieces would need to change colors), where can drop
         // captured pieces back onto the board. create_piece() then add captured class.
         html += '<img src="' + image_path_for(p.type, p.color) + '" class="captured"> ';
@@ -5398,7 +5398,6 @@ function touch(evt)
             DRAG.initial_left = dojo._abs(target, true).x;
             DRAG.initial_top = dojo._abs(target, true).y;
             DRAG.touching = [e.pageX - DRAG.initial_left, e.pageY - DRAG.initial_top];
-
 
             over_piece(target, {});
         }
