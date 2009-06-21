@@ -532,6 +532,7 @@ var PIECE_TYPES = {
     camelwarmachine: {parlett: "#camel, #warmachine"},
     camelwazir: {parlett: "#camel, #wazir", image:["camelwazir", "camel2wazir"]},
     camelbishoprider: {parlett: "#camelrider, #bishop"},
+    starrider: {parlett: "#camelrider, #knight, #antelope", url:"http://www.mayhematics.com/v/v_gm.htm", image:"knightzzstar"}, 
     camelpawn: {parlett: "#camel, #pawn"},
     camelwarmachinerider: {parlett: "#camel, #warmachinerider"},
     //camelopard: {parlett: "#camelrider, #fiveleaper", url:"http://www.mayhematics.com/v/v_gm.htm"}, // TODO: image
@@ -560,6 +561,7 @@ var PIECE_TYPES = {
     warmachineferz: {parlett: "#warmachine, #ferz"},
     warmachineferzrider: {parlett: "#warmachinerider, #ferz"},
     wizardrider: {parlett: "#camelrider, #ferz", image:"moonrider"},
+    //witch: {parlett: "#rook, #bishop, #nightrider, #camelrider, #zebrarider"}, // TODO: image
     zebracamel: {parlett: "#zebra, #camel"},
     zebracamelrider: {parlett: "#zebra, #camelrider"},
     zebraferz: {parlett: "#zebra, #ferz"},
@@ -585,11 +587,13 @@ var PIECE_TYPES = {
     camelking: {parlett: "#camel, #king", image:"simplecamelking"},
     general: {parlett: "#wazir", royal: true, url:"pc:general", image:["general2", "general"]}, 
     kangaroo: {parlett: "#knight, #alfil", url:"pc:cangaroo"},  // Newton kangaroo, different than pc:kangaroo
+    // http://www.mayhematics.com/v/v_gm.htm has a different definition of wizard
     wizard: {parlett: "#camel, #ferz", image:"moon",  url:"pc:wizard"},
     waffle: {parlett: "#wazir, #alfil", image:"elephantwazir", url:"pc:waffle"},
     fad: {parlett: "#ferz, #alfil, #warmachine", image:"elephantferzwarmachine", url:"pc:fad"},
     bede: {parlett: "#bishop, #warmachine", image:"bishopwarmachine"},
     //fibnif: {parlett: "#ferz, [1,2], [-1,2], [-1,2], [-1,-2]", url:"pc:fibnif"},  // TODO: image
+    //zurafa: {parlett: "i#giraffe, #rook"}, // TODO: image, and no rook move on initial
 
     // More complex fairy / non-intl chess pieces
     // See http://en.wikipedia.org/wiki/Fairy_chess_piece#Notable_examples
