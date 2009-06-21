@@ -447,7 +447,8 @@ var PIECE_TYPES = {
 
     // Generals, see http://www.mayhematics.com/v/v_gm.htm
     // soldier: {parlett: "1>"}, // TODO: image
-    goose: {parlett: "o1X>", url:"http://www.mayhematics.com/v/v_gm.htm", image:["goose", "ferzf"]},
+    goose: {parlett: "o1X>", url:"http://www.mayhematics.com/v/v_gm.htm", image:"goose"},
+    swan: {parlett: "1X>", image:"ferzf"},
     //drunk: {parlett: "1="}, // TODO: image
     sailor: {parlett: "1X<", image:"ferzb"}, 
     //backslider: {parlett: "1<"}, // TODO: image
@@ -4740,7 +4741,8 @@ function show_piece_inspector(piece)
     }
 
     dojo.byId("inspector-image").innerHTML = image_html;
-    dojo.byId("inspector-movement").innerHTML = type_info.parlett.replace(/&/g, "&amp;");
+    // TODO: proper escaping
+    dojo.byId("inspector-movement").innerHTML = type_info.parlett.replace(/&/g, "&amp;").replace(/</g, "&lt;");
 
     // Symbols (letter, figurine, number) for notations
     symbols = [];
