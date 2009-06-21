@@ -3031,7 +3031,7 @@ function decode_relative_explicit_move(text_move, existing_flags)
 // The moves must be filtered to determine their validity.
 function decode_one_parlett(parlett)
 {
-    var distances, directions, flags, movement, rel_moves, limit;
+    var distances, directions, flags, movement, rel_moves, limit, inner_moves;
     var hippogonal = false;
 
     flags = {};
@@ -3062,8 +3062,25 @@ function decode_one_parlett(parlett)
             // (pawn's forward move)
             flags.no_capture = true;
 
+        // Grouping
+        } else if (ch === "(") {
+            var inner_move_text = "";
+            var nest_level = 1;
+            while(i < parlett.length)
+            {
+                i += 1;
+                var chi = parlett.substr(i, 1);
+                if (chi === ")") { nest_level -= 1; }
+                if (chi === "(") { nest_level += 1; }
+                if (nest_level === 0) { break; } 
+
+                inner_move_text += chi;
+            }
+
+            inner_moves = unfiltered_moves(inner_move_text);
+
         // Extended Parlett
-      
+        
         // Include an existing piece movement, possibly with flags
         } else if (ch === "#") {
             var type = parlett.substr(i + 1);
@@ -3200,9 +3217,24 @@ function decode_one_parlett(parlett)
             rel_moves = new_rel_moves;
         }
 
- 
     } else if (directions) {
         expand_directions(directions, distances, limit, flags, movement, rel_moves);
+    }
+
+
+    // Expand grouping
+    if (inner_moves) {
+        var outer_moves = rel_moves;
+        rel_moves = [];
+
+        if (distances[0]) {
+            // Nightrider-like piece
+            expand_directions(inner_moves, [], limit || 5, flags, movement, rel_moves);
+        }
+
+        // TODO: gryphon, slip pieces
+        //console.log("OUTER",rel_moves);
+        //console.log("INNER",inner_moves);
     }
 
     return rel_moves;
