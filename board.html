@@ -425,7 +425,7 @@ var PIECE_TYPES = {
     // From piececlopedia http://www.chessvariants.org/index/mainquery.php?type=Piececlopedia&orderby=LinkText&displayauthor=1&displayinventor=1&usethisheading=Piececlopedia
     // or http://members.shaw.ca/quadibloc/chess/ch03.htm or 
     // http://www.chessvariants.com/graphics.dir/alfaerie/
-    alibaba: {parlett: "#alfil, #warmachine", letter: "L", image:"elephantwarmachine", url:"pc:alibaba"},
+    alibaba: {parlett: "~2*", letter: "L", image:"elephantwarmachine", url:"pc:alibaba"},   // or: #alfil, #warmachine
     equesrex: {parlett: "#king, #knight", image:"equesrex", royal: true},
     //centaur: {parlett: "#knight, #man", url:"pc:centaur"},         // not royal, so not an equesrex  TODO: remove cross, make bcentaur.gif?
     amazon: {parlett: "#queen, #knight", letter: "XV", url:"pc:amazon"},     // Q+N, aka superqueen
@@ -447,7 +447,7 @@ var PIECE_TYPES = {
     bishoppawn: {parlett: "#bishop, #pawn"},
     knightcamel: {parlett: "#knight, #camel"},
     elephantwarmachine: {parlett: "#elephant, #warmachine"},
-    elephantwarmachinerider: {parlett: "#elephant, #warmachine, #rider"},
+    dayrider: {parlett: "#alfilrider, #warmachinerider", image:"elephantwarmachinerider"},  // aka alibabarider
     rookpawn: {parlett: "#rook, #pawn"},
     knightfers: {parlett: "#knight, #ferz", image: "knightferz"},
     knightwazir: {parlett: "#knight, #wazir"},
