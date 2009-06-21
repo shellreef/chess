@@ -3037,8 +3037,15 @@ function decode_one_parlett(parlett)
     flags = {};
     distances = [];
     rel_moves = [];
-
     movement = "rider";
+
+    // Hippogonal riders, like the nightrider, can be specified as 
+    // either ~1/2& or n(~1/2). The first notation, due to David Parlett's
+    // _The Oxford History of Board Games_, is less flexible but more compact.
+    if (parlett.substr(parlett.length - 1) === "&") {
+        parlett = "n(" + parlett.substr(0, parlett.length - 1) + ")";
+    }
+
     for (var i = 0; i < parlett.length; i += 1) {
         var ch = parlett.substr(i, 1);
 
@@ -3141,10 +3148,6 @@ function decode_one_parlett(parlett)
             distances.push(Infinity);
         } else if (ch === "/") {
             hippogonal = true;
-        } else if (ch === "&") {
-            movement = "rider";
-            // TODO: n(...) grouping, either n or a number. 2(~1/2) double knight, makes
-            // two moves
         } else if (ch === " ") {
             assert(false, "relative_parlett(" + parlett + "): whitespace encountered, did you forget a comma?");
         } else {
@@ -3206,15 +3209,6 @@ function decode_one_parlett(parlett)
             }
 
             rel_moves = keep_relmoves;
-        }
-
-        if (movement === "rider") {
-            var new_rel_moves = [];
-
-            // Nightrider-like piece
-            expand_directions(rel_moves, [], limit || 5, flags, movement, new_rel_moves);
-
-            rel_moves = new_rel_moves;
         }
 
     } else if (directions) {
