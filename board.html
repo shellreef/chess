@@ -239,6 +239,8 @@ var EXPORT_NOTATIONS = [
 
 // Preferences, not game state.
 var PREFS = {
+    revert_time: 350,           // ms to take to revert
+
     input_notation: "SAN",
 
     // What piece images to use  - TODO: option to change
@@ -286,7 +288,6 @@ var GAME_STATE = {
 /// Drag and drop globals
 var DRAG = 
 {
-    revert_time: 350,   // ms to take to revert
     start_x: 0,
     start_y: 0,
     offset_x: 0,        
@@ -1435,8 +1436,7 @@ function mv(alg_move, is_not_immediate, notations)
 
     assert(piece_square, "mv(" + alg_move + "): illegal move");
 
-    // TODO: do some Effect.Move animation, optionally (make two functions)
-    //new Effect.Move(piece, { x: 10, y: 20, mode: 'relative' });
+    // TODO: do some moving animation, optionally (make two functions)
  
     // There is only one choice..
     var promote_to = piece_square.move.promote_to;
@@ -1561,7 +1561,6 @@ function promote(piece, square, type, notation, is_immediate)
     // effect that can fade from one image to another? LikE IE page transitions.
     // http://sachiniscool.blogspot.com/2006/01/implementing-page-transitions-in.html
     // ... except when changing images. Safari has CSS animations.
-    //new Effect.Puff(piece);
     // or try CSS transitions, see CSS at the top of this document.
     //piece.style.background = image_path_for(promotes_to, piece.color);
     // or TODO: create another img, same place same time, change opacity to reveal it
@@ -4268,8 +4267,6 @@ function move_dropped_piece(piece, square, event)
     // static when stationary, and change it to absolute (absolutize) when dragging..
     // Any way to finish running the code AFTER the effect finishes? New effect?
     if (square.firstChild) {
-    //    new Effect.Puff(square);
-    //   new Effect.Puff(square.virtual ? square.piece : square.firstChild);
     // Consider animating opacity or width+height (with dojo.anim or CSS transitions)
     }
 
@@ -5602,16 +5599,19 @@ function drop_or_revert()
 
     // Dragging offboard: delete in setup mode
     if (!square && PREFS.setup_mode) {
-        // TODO: Effect
-        //new Effect.Shrink(piece);
-        
-        // It was on board, piece over itself to kill it
-        if (piece.square) {
-            do_virtual_move(piece, {x:piece.square.x, y:piece.square.y});
-        }
-        // Remove node, so leftover torn-off pieces from library
-        // that were not dragged anywhere do not accumulate.
-        piece.remove();
+        // Shrink off into the distance
+        dojo.anim(piece, {width:0, height:0}, PREFS.revert_time, undefined, function() {
+                // It was on board, move piece over itself to kill it
+                if (piece.square) {
+                    do_virtual_move(piece, {x:piece.square.x, y:piece.square.y});
+                }
+                // Remove node, so leftover torn-off pieces from library
+                // that were not dragged anywhere do not accumulate.
+                if (piece.parentNode) {
+                    piece.remove();
+                }
+               
+            });
         return;
     }
 
@@ -5630,12 +5630,12 @@ function drop_or_revert()
             // Use webkit transforms if available; faster
             // Feature detection from http://iui.googlecode.com/svn/trunk/test/features.html
             // (detects for css transforms, hopefully close enough)
-            piece.style.webkitTransition = "left " + DRAG.revert_time + "ms linear, " + 
-                "top " + DRAG.revert_time + "ms linear";
+            piece.style.webkitTransition = "left " + PREFS.revert_time + "ms linear, " + 
+                "top " + PREFS.revert_time + "ms linear";
             piece.style.left = DRAG.initial_left + "px";
             piece.style.top  = DRAG.initial_top + "px";
         } else {
-            dojo.anim(piece, { left: DRAG.initial_left, top: DRAG.initial_top }, DRAG.revert_time);
+            dojo.anim(piece, { left: DRAG.initial_left, top: DRAG.initial_top }, PREFS.revert_time);
         }
         return;
     }
