@@ -301,7 +301,8 @@ var DRAG =
 
 var DROP = {
     area: {},           // box to detect drop areas in
-    square: null        // square dropping over
+    square: null,       // square dropping over 
+    offboard: false     // whether dropping offboard or not
 };
 
 // Moves that can be made right now, for each active piece.
@@ -5475,6 +5476,8 @@ function dragging_over(element, left, top)
     if (x > DROP.area.left && y > DROP.area.top &&
         x < DROP.area.right && y < DROP.area.bottom) {
 
+        DROP.offboard = false;
+
         // Find cell mathematically
         var cell_x = Math.ceil((x - DROP.area.left) / DROP.area.cell_width);
         var cell_y = Math.ceil((DROP.area.right - y) / DROP.area.cell_width);
@@ -5505,6 +5508,7 @@ function dragging_over(element, left, top)
 
     } else {
         // Outside droppable area
+        DROP.offboard = true;
         
         if (DROP.square) {
             dojo.removeClass(DROP.square, "dropping-square");
@@ -5598,7 +5602,7 @@ function drop_or_revert()
     square = DROP.square;
 
     // Dragging offboard: delete in setup mode
-    if (!square && PREFS.setup_mode) {
+    if (DROP.offboard && PREFS.setup_mode) {
         // Shrink off into the distance
         dojo.anim(piece, {width:0, height:0}, PREFS.revert_time, undefined, function() {
                 // It was on board, move piece over itself to kill it
