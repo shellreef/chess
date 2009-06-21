@@ -371,7 +371,7 @@ var PIECE_TYPES = {
         "o[0,2;if_unblocked=0,1;mark_ep_target=0,1], " +
         "[-1,1;if_ep_target;capture_at=-1,0], [1,1;if_ep_target;capture_at=-1,0]",
         promote: ["queen", "knight", "rook", "bishop"],
-        url:"http://www.mayhematics.com/v/v_gm.htm"
+        url:"akm"
     },
     */
 
@@ -392,8 +392,8 @@ var PIECE_TYPES = {
     steward: {parlett: "o1+, c1X"}, // aka fusilier, quadrapawn. o#wazir, c#ferz
     liapawn: {parlett: "o1>, o1=, c1X, io2>"},
 
-    //fiveriderpawn: {parlett: "#pawn", promote: ["rook", "bishop", "nightrider", "camelrider", "zebrarider"], url:"http://www.mayhematics.com/v/v_gm.htm"}, // TODO: image
-    ///freeleaperpawn: {parlett: "#pawn", promote: ["wazir", "knight", "zebra", "giraffe", "antelope"], url:"http://www.mayhematics.com/v/v_gm.htm"},
+    //fiveriderpawn: {parlett: "#pawn", promote: ["rook", "bishop", "nightrider", "camelrider", "zebrarider"], url:"akm"}, // TODO: image
+    ///freeleaperpawn: {parlett: "#pawn", promote: ["wazir", "knight", "zebra", "giraffe", "antelope"], url:"akm"},
 
     // Hippogonal leapers
     dummy: {parlett: "~0/0", letter: "O", image:"banner"},
@@ -414,7 +414,7 @@ var PIECE_TYPES = {
     // Amphibians (combined leapers)
     squirrel: {parlett: "~0/2, ~1/2, ~2/2", letter: "S", url:"pc:squirrel"},
     frog: {parlett: "~1/1, ~0/3", letter: "F"},     
-    duke: {parlett: "~0/2, ~1/1", url:"http://www.mayhematics.com/v/v_gm.htm"},      // #ferz, #warmachine
+    duke: {parlett: "~0/2, ~1/1", url:"akm"},      // #ferz, #warmachine
     //bison: {parlett: "~1/3, ~2/3", url:"pc:bison"},                     // TODO: image (camel+antelope)
     gnu: {parlett: "~1/2, ~1/3", image:"knightcamel", url:"pc:gnus"},
     //rootfiftyleaper: {parlett: "~5/5, ~7/1", url:"pc:root50"},         // TODO: image
@@ -445,6 +445,43 @@ var PIECE_TYPES = {
     kingpawn: {parlett: "#king, #pawn", royal: true},
     kingrook: {parlett: "#king, #rook", royal: true},
 
+    // Generals
+    // soldier: {parlett: "1>", url:"akm"}, // TODO: image
+    goose: {parlett: "o1X>", url:"akm", image:"goose"},
+    swan: {parlett: "1X>", image:"ferzf"},
+    //drunk: {parlett: "1=", url:"akm"}, // TODO: image
+    sailor: {parlett: "1X<", image:["ship", "ferzb"], url:"akm"}, 
+    //backslider: {parlett: "1<", url:"akm"}, // TODO: image
+    coppergeneral: {parlett: "1>, 1X>", url:"akm"},     // aka dou-sho
+    //drunkensoldier: {parlett: "1>, 1=", url:"akm"}, // TODO: image
+    //ferzwazirhunter: {parlett: "1>, 1X<", url:"akm"}, // TODO: image
+    //adjutant: {parlett: "1>, 1<", url:"akm"}, //  aka tsiu-yin TODO: image
+    //sidewinder: {parlett: "1X>, 1=", url:"akm"}, // TODO: image
+    ferz: {parlett: "1X", letter: "XF", image:["ferz", "ferz2"], url:"pc:ferz"}, // or ~1/1
+    //ferzwazirhunter: {parlett: "1X>, 1<", url:"akm"}, // TODO: image
+    drunkensailor: {parlett: "1=, 1X<", image:"shipinv", url:"akm"}, 
+    //drunkenbackslider: {parlett: "1=, 1<", url:"akm"}, // TODO: image
+    //deserter: {parlett: "1<, 1X<", url:"akm"}, // TODO: image
+    //pikeman: {parlett: "1>, 1X>, 1=", url:"akm"}, // TODO: image
+    silvergeneral: {parlett: "1>, 1X", url:"pc:silvergeneral"},   // aka gin-sho - or #ferz, [0,1]
+    //yale: {parlett: "1=, 1X>, 1<"}, // TODO: image
+    //drunkenmarine: {parlett: "1>, 1=, 1X<"}, // TODO: image
+    wazir: {parlett: "1+", letter: "I", url:"pc:wazir"},    // or ~0/1
+    //gorilla: {parlett: "1=, 1X<, 1<", url:"akm"}, // TODO: image
+    //diabolo: {parlett: "1+, 1=", url:"akm"}, // TODO: image
+    //yen: {parlett: "1X>, 1=, 1<", url:"akm"}, // TODO: image
+    //invertedsilver: {parlett: "1X+, 1<", url:"akm"}, // TODO: image
+    //drunkendeserter: {parlett: "1=, 1X<, 1<", url:"akm"}, // TODO: image
+    drunkenelephant: {parlett: "1X, 1>, 1=", url:"akm", image:"drunkelephant"},
+    goldgeneral: {parlett: "1+, 1X>, 1=, 1<", url:"pc:goldgeneral"},  // or: #wazir, [1,1], [-1,1]
+    //crane: {parlett: "1+, 1>, 1<", url:"akm"}, // aka horrible panther, mau-hau TODO: image
+    //drunkengorilla: {parlett: "1>, 1X<, 1=, 1<", url:"akm"}, // TODO: image
+    blindtiger: {parlett: "1X, 1=, 1<", url:"akm", image:"moko_blindtiger"},
+
+    "2moveferz": {parlett: "2X, 2+"},       // one move like a ferz, then another from that square
+    "2movewazir": {parlett: "2+, 1*"},      // ..
+    "2movewazirferz": {parlett: "#2moveferz, #2movewazir"},
+
     // Diminished pieces
     b3: {parlett: "nX.3"},
     b4: {parlett: "nX.4"},
@@ -456,43 +493,6 @@ var PIECE_TYPES = {
     q3: {parlett: "n*.3"},
     q4: {parlett: "n*.4"},
 
-    // Generals, see http://www.mayhematics.com/v/v_gm.htm
-    // soldier: {parlett: "1>"}, // TODO: image
-    goose: {parlett: "o1X>", url:"http://www.mayhematics.com/v/v_gm.htm", image:"goose"},
-    swan: {parlett: "1X>", image:"ferzf"},
-    //drunk: {parlett: "1="}, // TODO: image
-    sailor: {parlett: "1X<", image:["ship", "ferzb"]}, 
-    //backslider: {parlett: "1<"}, // TODO: image
-    coppergeneral: {parlett: "1>, 1X>"},     // aka dou-sho
-    //drunkensoldier: {parlett: "1>, 1="}, // TODO: image
-    //ferzwazirhunter: {parlett: "1>, 1X<"}, // TODO: image
-    //adjutant: {parlett: "1>, 1<"}, //  aka tsiu-yin TODO: image
-    //sidewinder: {parlett: "1X>, 1="}, // TODO: image
-    ferz: {parlett: "1X", letter: "XF", image:["ferz", "ferz2"], url:"pc:ferz"}, // or ~1/1
-    //ferzwazirhunter: {parlett: "1X>, 1<"}, // TODO: image
-    drunkensailor: {parlett: "1=, 1X<", image:"shipinv"}, 
-    //drunkenbackslider: {parlett: "1=, 1<"}, // TODO: image
-    //deserter: {parlett: "1<, 1X<"}, // TODO: image
-    //pikeman: {parlett: "1>, 1X>, 1="}, // TODO: image
-    silvergeneral: {parlett: "1>, 1X", url:"pc:silvergeneral"},   // aka gin-sho - or #ferz, [0,1]
-    //yale: {parlett: "1=, 1X>, 1<"}, // TODO: image
-    //drunkenmarine: {parlett: "1>, 1=, 1X<"}, // TODO: image
-    wazir: {parlett: "1+", letter: "I", url:"pc:wazir"},    // or ~0/1
-    //gorilla: {parlett: "1=, 1X<, 1<"}, // TODO: image
-    //diabolo: {parlett: "1+, 1="}, // TODO: image
-    //yen: {parlett: "1X>, 1=, 1<"}, // TODO: image
-    //invertedsilver: {parlett: "1X+, 1<"}, // TODO: image
-    //drunkendeserter: {parlett: "1=, 1X<, 1<"}, // TODO: image
-    //drunkenelephant: {parlett: "1+, 1X>, 1="}, // aka siu-zo  TODO: image 
-    goldgeneral: {parlett: "1+, 1X>, 1=, 1<", url:"pc:goldgeneral"},  // or: #wazir, [1,1], [-1,1]
-    //crane: {parlett: "1+, 1>, 1<"}, // aka horrible panther, mau-hau TODO: image
-    //drunkengorilla: {parlett: "1>, 1X<, 1=, 1<"}, // TODO: image
-    //blindtiger: {parlett: "1X, 1=, 1<"}, // TODO: image
-
-    "2moveferz": {parlett: "2X, 2+"},       // one move like a ferz, then another from that square
-    "2movewazir": {parlett: "2+, 1*"},      // ..
-    "2movewazirferz": {parlett: "#2moveferz, #2movewazir"},
-
 
     // Combined pieces (compound pieces)
     // From piececlopedia http://www.chessvariants.org/index/mainquery.php?type=Piececlopedia&orderby=LinkText&displayauthor=1&displayinventor=1&usethisheading=Piececlopedia
@@ -503,7 +503,7 @@ var PIECE_TYPES = {
     amazon: {parlett: "#queen, #knight", letter: "XV", url:"pc:amazon"},     // Q+N, aka superqueen
     amazonrider: {parlett: "#queen, #nightrider"},   // aka queen of the night
     //banshee: {parlett: "#bishop, #nightrider", url:"http://www.mayhematics.com/v/v_gm.htm"}, // TODO: image
-    chancellor: {parlett: "#rook, #knight", letter: "C", image:["chancellor", "chancellor1", "empress2, marshal2"], url:"pc:rook-knight"},   // R+N, aka empress, marshal (Capablanca, X-FEN standard)
+    chancellor: {parlett: "#rook, #knight", letter: "C", image:["chancellor", "chancellor1", "empress2", "marshal2", "rookknight2"], url:"pc:rook-knight"},   // R+N, aka empress, marshal (Capablanca, X-FEN standard)
     chancellorrider: {parlett: "#rook, #nightrider"}, // aka raven
     chancellorwazir: {parlett: "#chancellor, #wazir"},
     archbishop: {parlett: "#bishop, #knight", letter: "A", image: ["cardinal", "cardinal1", "cardinal2", "princess"], url:"pc:bishop-knight"}, // B+N, aka cardinal, princess, janus (Capablanca, X-FEN standard)
@@ -553,7 +553,13 @@ var PIECE_TYPES = {
     knightwarmachineferz: {parlett: "#knight, #warmachine, #ferz", image:"knightdababaferz"},
     knightwazirwarmachine: {parlett: "#knight, #wazir, #warmachine"},
     rookwarmachine: {parlett: "#rook, #warmachine", image:"rookdabbaba"},
+    rookelephantrider: {parlett: "#rook, #alfilrider"},
+    //rhinocamel: {parlett: "#rhino, #camel"},
+    //rhinocamelrider: {parlett: "#rhino, #camelrider"},
+    //rhinozebra: {parlett: "#rhino, #zebra"},
+    //rhinozebrarider: {parlett: "#rhino, #zebrarider"},
     //scorpion: {parlett: "#man, #grasshopper"}, 
+    //scorpionpawn: {parlett: "#scorpion, #pawn"},
     queenalfilwarmachine: {parlett: "#queen, #alfil, #warmachine", image:"queenalfildabbaba3"},
     wazirwarmachinealfil: {parlett: "#wazir, #dabbaba, #alfil", image:"wazirdababaalfil"},
     warmachinewazir: {parlett: "#warmachine, #wazir"},
@@ -628,6 +634,8 @@ var PIECE_TYPES = {
     alfilrider: {parlett: "~2/2&", image:"elephantrider"},      // aka skip-bishop
     //elephantrider: {parlett: "2/2&", image:"elephantrider2"}, // TODO: gets blocked
     warmachinerider: {parlett: "~2/0&", image:["warmachinerider","dababbarider"]}, // aka skip-rook, dabbabarider
+    squirrelrider: {parlett: "~0/2&, ~1/2&, ~2/2&"},
+
     //alibabarider: {parlett: "#alfilrider, #warmachinerider"},    // aka skip-queen TODO: image
     // TODO: slip-rook (panda), slip-bishop, slip-queen: omits second and every other even cell in path
     camelrider: {parlett: "~1/3&"},
@@ -4829,7 +4837,9 @@ function open_piece_url(piece)
 
     if (type_info.url) {
         var url = type_info.url;
-        if (url.substr(0, 3) === "pc:") {
+        if (url === "akm") { 
+            url = "http://www.mayhematics.com/v/v_gm.htm";
+        } else if (url.substr(0, 3) === "pc:") {
             url = "http://www.chessvariants.org/piececlopedia.dir/" + url.substr(3) + ".html";
         }
         window.open(url);
