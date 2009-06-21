@@ -213,9 +213,9 @@ var AVAILABLE_NOTATIONS = {
     CRAN: "Concise Reversible Algebraic Notation",//    Bb5:Nc6     e75
     FAN:  "Figurine Algebraic Notation",//              ♗xc6        ♟e5
     ICCF: "ICCF Numeric Notation",//                    2536        5755
-    coord:"Coordinate Notation",//                      B5-C6       E7-E5
+    coord:"Computer Coordinate Notation",// aka CCN     B5-C6       E7-E5
     smith:"Smith Notation",//                           b5c6n       e7e5
-    descr:"English Descriptive Notation",//             BxN         P-K4
+    descr:"English Descriptive Notation",// aka EDN     BxN         P-K4
     adesc:"Algebraic Descriptive Notation",//           BxN         P-e4
     raw:  "Fast Raw Notation"//                         /b5/c5/B    /e5/e7/p
 };
@@ -848,7 +848,8 @@ var SAVED_BOARDS = {
 "Test Getting out of Check": "rnbqkbnr/ppp1p1pp/4P3/3p3Q/5p2/8/PPPP1PPP/RNB1KBNR b KQkq - 0 4",
 "Test Check Checking": "rnbQ1bnr/ppp1kppp/8/4p3/7q/8/PPPP1PPP/RNBQKBNR b KQ - 0 5",
 "Test Parlett Move Interference": "r/8/8/1N3b2/3PP3/1P1BBN/8/8 w - - 0 17",
-"Test Captures": "8/MMMMMMMM/mmmmmmmm/8/QQQQQQQQ/qqqqqqqq/NNNNNNNN/xlxlxlxlxlxlxlxl w - -"
+"Test Captures": "8/MMMMMMMM/mmmmmmmm/8/QQQQQQQQ/qqqqqqqq/NNNNNNNN/xlxlxlxlxlxlxlxl w - -",
+"Test EPD": "r/8/8/1N3b2/3PP3/1P1BBN/8/8 w - - hmvc=0 fmvn=17"
     }
 };
 
@@ -4481,9 +4482,41 @@ function save_fen()
     return fen;
 }
 
-// Load board state in Forsyth-Edwards Notation. If replay is true, this is reloading an 
-// existing position, not loading a new game.
-// TODO: support EPD, and special rules
+// Fields to be parsed as integers instead of strings
+var EPD_INTEGER_FIELDS = {acn:1, acs:1, ce:1, dm:1, fmvn:1, hmvc:1, rc:1};
+
+// Parse the Extended Position Description (EPD) codes from the 
+// end of a pre-split EPD field, returning a dictionary.
+function parse_epd_opcodes(parts)
+{
+    var dict = {};
+
+    for (var i = 4; i < parts.length; i += 1) {
+        var part = parts[i];
+        var a = part.split("=");
+        var key, value;
+        if (a.length === 1) {
+            // Booleans: draw_accept, draw_claim, etc.
+            key = a[0];
+            value = true;
+        } else {
+            key = a.shift();
+            value = a.join("=");
+        }
+
+        if (EPD_INTEGER_FIELDS[key]) {
+            value = parseInt(value, 10);
+        }
+
+        dict[key] = value;
+    }
+    
+    return dict;
+}
+
+
+// Load board state in Forsyth-Edwards Notation (FEN) or Extended Position Description (EPD).
+// If replay is true, this is reloading an existing position, not loading a new game.
 // TODO: support any base 10 number (10 for skip ten spaces), and asterisks for filling remainder of rank with empty
 // spaces, and {} for labels, see http://play.chessvariants.org/pbm/devguide.html
 function load_fen(fen, replay)
@@ -4520,8 +4553,7 @@ function load_fen(fen, replay)
         GAME_STATE.hmvc = 0;
         GAME_STATE.fmvn = 1;
 
-        // TODO: parse EPD
-        //console.log("EPD");
+        dojo.mixin(GAME_STATE, parse_epd_opcodes(parts));
     }
 
     if (!replay) { 
