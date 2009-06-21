@@ -384,7 +384,7 @@ var PIECE_TYPES = {
     dragon: {parlett: "#pawn, #knight", image: ["dragon", "dragon2", "knightpawn", "pawnknight"], url:"pc:dragon"},   
     // TODO: other dragon, http://www.chessvariants.org/piececlopedia.dir/dragonchess_dragon.html , and rename above pawnknight
     // David's pawn
-    pawnattackrook: {parlett: "#pawn, c#rook", image:"pawn135cw", promote: ["dragon", "rookpawn"]},
+    pawnattackrook: {parlett: "#pawn, c#rook", image:["pawn135cw", "pawn135ccw"], promote: ["dragon", "rookpawn"]},
     // TODO: chinesepawn from Xianqui, http://www.chessvariants.org/piececlopedia.dir/pawn-xiangqi.html
     // 1>, but when crosses "river", can move 1=
     sergeant: {parlett: "#berolinapawn, #pawn", promote:["queen", "knight", "rook", "bishop"], resets_50move:true, url:"pc:sergeant"},  // aka graz pawn
@@ -393,7 +393,7 @@ var PIECE_TYPES = {
     liapawn: {parlett: "o1>, o1=, c1X, io2>"},
 
     //fiveriderpawn: {parlett: "#pawn", promote: ["rook", "bishop", "nightrider", "camelrider", "zebrarider"], url:"akm"}, // TODO: image
-    ///freeleaperpawn: {parlett: "#pawn", promote: ["wazir", "knight", "zebra", "giraffe", "antelope"], url:"akm"},
+    //freeleaperpawn: {parlett: "#pawn", promote: ["wazir", "knight", "zebra", "giraffe", "antelope"], url:"akm"},
 
     // Hippogonal leapers
     dummy: {parlett: "~0/0", letter: "O", image:"banner"},
@@ -445,15 +445,15 @@ var PIECE_TYPES = {
     kingpawn: {parlett: "#king, #pawn", royal: true},
     kingrook: {parlett: "#king, #rook", royal: true},
 
-    // Generals
-    // soldier: {parlett: "1>", url:"akm"}, // TODO: image
+    // Generals from http://www.mayhematics.com/v/v_gm.htm
+    soldier: {parlett: "1>", url:"akm", image:"shogipawn"},
     goose: {parlett: "o1X>", url:"akm", image:"goose"},
     swan: {parlett: "1X>", image:"ferzf"},
-    //drunk: {parlett: "1=", url:"akm"}, // TODO: image
+    drunk: {parlett: "1=", url:"akm", image:["pawn90cw", "pawn90ccw"]},
     sailor: {parlett: "1X<", image:["ship", "ferzb"], url:"akm"}, 
     //backslider: {parlett: "1<", url:"akm"}, // TODO: image
     coppergeneral: {parlett: "1>, 1X>", url:"akm"},     // aka dou-sho
-    //drunkensoldier: {parlett: "1>, 1=", url:"akm"}, // TODO: image
+    drunkensoldier: {parlett: "1>, 1=", url:"akm", image:["pawn45ccw", "pawn45cw"]}, 
     //ferzwazirhunter: {parlett: "1>, 1X<", url:"akm"}, // TODO: image
     //adjutant: {parlett: "1>, 1<", url:"akm"}, //  aka tsiu-yin TODO: image
     //sidewinder: {parlett: "1X>, 1=", url:"akm"}, // TODO: image
@@ -461,11 +461,11 @@ var PIECE_TYPES = {
     //ferzwazirhunter: {parlett: "1X>, 1<", url:"akm"}, // TODO: image
     drunkensailor: {parlett: "1=, 1X<", image:"shipinv", url:"akm"}, 
     //drunkenbackslider: {parlett: "1=, 1<", url:"akm"}, // TODO: image
-    //deserter: {parlett: "1<, 1X<", url:"akm"}, // TODO: image
-    //pikeman: {parlett: "1>, 1X>, 1=", url:"akm"}, // TODO: image
+    deserter: {parlett: "1<, 1X<", url:"akm", image:"pawninv"}, 
+    //pikeman: {parlett: "1>, 1X>, 1=", url:"akm", image:"redpawn"}, // TODO: image
     silvergeneral: {parlett: "1>, 1X", url:"pc:silvergeneral"},   // aka gin-sho - or #ferz, [0,1]
-    //yale: {parlett: "1=, 1X>, 1<"}, // TODO: image
-    //drunkenmarine: {parlett: "1>, 1=, 1X<"}, // TODO: image
+    //yale: {parlett: "1=, 1X>, 1<", image:"purplepawn"}, // TODO: image
+    //drunkenmarine: {parlett: "1>, 1=, 1X<", image:"pinkpawn"}, // TODO: image
     wazir: {parlett: "1+", letter: "I", url:"pc:wazir", image:["wazir", "1rook2", "1rook"]},    // or ~0/1
     //gorilla: {parlett: "1=, 1X<, 1<", url:"akm"}, // TODO: image
     //diabolo: {parlett: "1+, 1=", url:"akm"}, // TODO: image
