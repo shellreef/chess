@@ -571,6 +571,7 @@ sergeant
 sespearman
 shamanelephantferz
 ship
+shipinv
 shogiknight
 shogipawn
 siegeengine
