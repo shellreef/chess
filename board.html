@@ -32,7 +32,7 @@ span.player_elo { font-size: small; }
 #opening_name { font-size: small; }
 
 /* PGN */
-span.fullmove_number { font-weight: bold; }
+span.fmvn { font-weight: bold; }
 a.active_move { border-bottom: 1px dashed; }
 /*a.repeated_move { text-decoration: underline; }*/     /* goes well with dots and dashes */
 /*a.repeated_move { background-color: yellow; }*/   /* highlight */
@@ -266,8 +266,8 @@ var GAME_STATE = {
 
     ep_target: null,
 
-    halfmove_clock: 0,          // Ply since last pawn advance / capture
-    fullmove_number: 0,         // Increment after black moves
+    hmvc: 0,                    // Halfmove clock: Ply since last pawn advance / capture
+    fmvn: 0,                    // Fullmove number: Increment after black moves
 
     position_moves: {},         // Board position -> move IDs, for 3n move repetition
     position_after: [],         // Board positions at each move, for quick playback
@@ -725,7 +725,8 @@ var SAVED_BOARDS = {
 // TODO: win if promote (kraken?), allow diagonal even if not capture
 // http://en.wikipedia.org/wiki/Breakthrough_(board_game)
 //"Breakthrough": "pppppppp/pppppppp/8/8/8/8/PPPPPPPP/PPPPPPPP w - - 0 1",
-// TODO: Support Chaturanga pawns. No double move/en passant, and promotes to where started.
+// TODO: Support Chaturanga pawns. No double move/en passant, and promotes to where started, but only if piece was captured.
+// Stalemate / bare king = win for stalemating player,
 //"Indian Chess (Chaturanga)": "rnekxfenr/pppppppp/8/8/8/8/PPPPPPPP/RNEKXFENR w - 0 1",
 "Church Chess":         "bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - - 0 1",
 "Corner Chess":         "4rbqk/4rb1q/4r1bb/5rrr/RRR5/BB1R4/Q1BR4/KQBR4 w - - 0 1",
@@ -1003,7 +1004,7 @@ function email_board()
 {
     var to, subject, body, url, dots, link, link_text, ply, ply_info;
     
-    ply = encode_ply(GAME_STATE.active_color, GAME_STATE.fullmove_number) - 1;
+    ply = encode_ply(GAME_STATE.active_color, GAME_STATE.fmvn) - 1;
     ply_info = decode_ply(ply);
 
     to = "shellreef@gmail.com";
@@ -1014,9 +1015,9 @@ function email_board()
     link_text = GAME_STATE.made_moves[ply] ? GAME_STATE.made_moves[ply].notations[form_value("output_notation")] : "move";
     // Note: IE ActiveXObject for Outlook: http://www.webdeveloper.com/forum/showthread.php?t=176548
     // Got an automation error when I tried it, but it could supposedly allow HTML bodies on Windows
-    //body = ply_info.fullmove_number + ". " + dots + '<a href="' + link + '">' + link_text + '</a>';
+    //body = ply_info.fmvn + ". " + dots + '<a href="' + link + '">' + link_text + '</a>';
     // Plain text
-    body = ply_info.fullmove_number + ". " + dots + link_text + " <" + link + ">";
+    body = ply_info.fmvn + ". " + dots + link_text + " <" + link + ">";
 
     url = "mailto:" + encodeURIComponent(to) + 
         "?subject=" + encodeURIComponent(subject) + 
@@ -1121,7 +1122,7 @@ function save_pgn()
         var ply_info = decode_ply(ply);
 
         if (ply_info.color === "white") {
-            move_text += ply_info.fullmove_number + ". ";
+            move_text += ply_info.fmvn + ". ";
         }
         move_text += made.notations[EXPORT_NOTATIONS[0]];
         move_text += " ";
@@ -1331,7 +1332,7 @@ function parse_pgn(pgn)
         // Parse move text
         var tokens = dict.move_text.split(" ");
         delete dict.move_text;  // not for anyone but this function
-        var fullmove_number, outcome, moves = [], color = "white";
+        var fmvn, outcome, moves = [], color = "white";
         var in_comment = false;
 
         for (i = 0; i < tokens.length; i += 1) {
@@ -1345,7 +1346,7 @@ function parse_pgn(pgn)
                 }
                 // TODO: support annotations
             } else if (token.substring(token.length - 1) === ".") {
-                fullmove_number = parseInt(token, 10);
+                fmvn = parseInt(token, 10);
 
                 // 3... means black moves
                 if (token.substring(token.length - 3) === "...") {
@@ -1367,7 +1368,7 @@ function parse_pgn(pgn)
             } else {
                 // Move 
                 
-                var ply = encode_ply(color, fullmove_number);
+                var ply = encode_ply(color, fmvn);
                 // TODO: handle #, + for checkmate and check, part of move
                 moves[ply] = token;
 
@@ -1466,21 +1467,21 @@ function move_link(ply, text)
 // Decode ply number to color and fullmove number.
 function decode_ply(ply)
 {
-    var color, fullmove_number;
+    var color, fmvn;
 
     color = (ply % 2 === 1) ? "white" : "black";
-    fullmove_number = Math.ceil(ply / 2);
+    fmvn = Math.ceil(ply / 2);
 
-    return {color: color, fullmove_number: fullmove_number};
+    return {color: color, fmvn: fmvn};
 }
 
 // Encode color and fullmove number back to ply. Ply is useful for 
 // arrays of moves, since it is one integer, instead of integer+color.
-function encode_ply(color, fullmove_number)
+function encode_ply(color, fmvn)
 {
     var ply;
 
-    ply = fullmove_number * 2;
+    ply = fmvn * 2;
     ply -= (color === "white" ? 1 : 0);
 
     return ply;
@@ -3341,9 +3342,9 @@ function set_turn(color, historical)
     dojo.byId("status").innerHTML = ucfirst(new_color) + "'s Turn";
 
     // Move number is incremented after black moves, according to rules.
-    old_fullmove = GAME_STATE.fullmove_number;
+    old_fullmove = GAME_STATE.fmvn;
     if (color === "next" && GAME_STATE.active_color === "black") {
-        GAME_STATE.fullmove_number += 1;
+        GAME_STATE.fmvn += 1;
     }
 
     GAME_STATE.active_color = new_color;
@@ -3380,7 +3381,7 @@ function set_turn(color, historical)
     } else if (check_insufficient_material()) {
         set_check_message("Draw (material)");
         text_end = "&frac12;-&frac12;";
-    } else if (GAME_STATE.halfmove_clock >= 50) {
+    } else if (GAME_STATE.hmvc >= 50) {
         set_check_message("Draw (fifty move) claimable");
     } else {
         set_check_message("");
@@ -4123,9 +4124,9 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
 
         // If moved pawn, or was a capture, reset fifty move rule counter
         if (move.capture || PIECE_TYPES[piece.type].resets_50move) {
-            GAME_STATE.halfmove_clock = 0;
+            GAME_STATE.hmvc = 0;
         } else {
-            GAME_STATE.halfmove_clock += 1;
+            GAME_STATE.hmvc += 1;
         }
 
         var real_square = SQUARES[square.x][square.y];
@@ -4219,7 +4220,7 @@ function finish_up_move(tieback, is_immediate, promote_to, is_raw)
 
     info = tieback[promote_to];
 
-    ply = encode_ply(GAME_STATE.active_color, GAME_STATE.fullmove_number);
+    ply = encode_ply(GAME_STATE.active_color, GAME_STATE.fmvn);
   
     info.only_move = own_property_count(VALID_MOVE_NOTATIONS.SAN) === 1;
     // TODO: skip move calculation if is_raw
@@ -4258,11 +4259,11 @@ function show_move_history()
     var first = true;
 
     for (var ply = 1; ply < GAME_STATE.made_moves.length; ply += 1) {
-        var color_fullmove, color, fullmove_number, move_text, move_info, only_move;
+        var color_fullmove, color, fmvn, move_text, move_info, only_move;
 
         color_fullmove = decode_ply(ply);
         color = color_fullmove.color;
-        fullmove_number = color_fullmove.fullmove_number;
+        fmvn = color_fullmove.fmvn;
 
         move_info = GAME_STATE.made_moves[ply];
         if (!move_info) {
@@ -4272,14 +4273,14 @@ function show_move_history()
         move_text = move_info.notations[form_value("output_notation")];
         
         if (color === "white") {
-            htmls.push('<span class="fullmove_number">' + fullmove_number + '<\/span>');
+            htmls.push('<span class="fmvn">' + fmvn + '<\/span>');
             // Period goes to initial position, kind of strange, but its uninstrusive
             htmls.push(first ? move_link(0, ".") : ".");
         } else {
             // Ellipsis if black is first recorded move,
             // TODO: or intervening commentary
             if (first) {
-                htmls.push('<span class="fullmove_number">' + fullmove_number + '<\/span>');
+                htmls.push('<span class="fmvn">' + fmvn + '<\/span>');
                 htmls.push(first ? move_link(0, ".") : ".");
                 htmls.push("&hellip; ");
             }
@@ -4474,8 +4475,8 @@ function save_fen()
         fen += "-";
     }
 
-    fen += " " + GAME_STATE.halfmove_clock;
-    fen += " " + GAME_STATE.fullmove_number;
+    fen += " " + GAME_STATE.hmvc;
+    fen += " " + GAME_STATE.fmvn;
 
     return fen;
 }
@@ -4506,16 +4507,22 @@ function load_fen(fen, replay)
         GAME_STATE.ep_target = filerank2xy(parts[3]);
     }
 
-    GAME_STATE.halfmove_clock = parseInt(parts[4], 10);
-    GAME_STATE.fullmove_number = parseInt(parts[5], 10);
-
     color = {w:"white", b:"black"}[parts[1]];
+
+    if (!isNaN(parseInt(parts[4], 10))) {
+        // FEN has halfmove clock and fullmove number in 5th and 6th fields
+        GAME_STATE.hmvc = parseInt(parts[4], 10);
+        GAME_STATE.fmvn = parseInt(parts[5], 10);
+    } else {
+        // EPD (Extended Position Description), has opcodes instead
+        console.log("EPD");
+    }
 
     if (!replay) { 
         GAME_STATE.position_moves = {}; 
         GAME_STATE.position_after = [fen];  // 0th ply = initial state
 
-        var ply = encode_ply(color, GAME_STATE.fullmove_number);
+        var ply = encode_ply(color, GAME_STATE.fmvn);
         GAME_STATE.position_after[ply] = fen;
 
         GAME_STATE.ended = null; 
