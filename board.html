@@ -396,7 +396,6 @@ var PIECE_TYPES = {
     //freeleaperpawn: {parlett: "#pawn", promote: ["wazir", "knight", "zebra", "giraffe", "antelope"], url:"akm"},
 
     // Hippogonal leapers
-    dummy: {parlett: "~0/0", letter: "O", image:"banner"},
     man: {parlett: "1*", letter: "M", image:["mann2", "man", "guard", "wazirferz"], url:"pc:man"},    // same as king, but not royale (also known as commoner, guard)
     warmachine: {parlett: "~0/2", letter: "D", url:"pc:dabbabah"},  // or ~2+
     alfil: {parlett: "~2/2", letter: "Y", image:["elephant2", "elephantrev2", "elephant"], url:"pc:alfil"},       //  or ~2X
@@ -434,7 +433,7 @@ var PIECE_TYPES = {
     //hospitaler: {parlett: "~1/2, ~2/2", url:"http://www.ktn.freeuk.com/9a.htm#(3)"}, // TODO: image
     // http://www.ktn.freeuk.com/9a.htm#(3) says caliph is ~0/1, ~2/2 (wazir + alfil)
     //pterodactyl: {parlett: "~3/3, ~5/5, ~0/15", url:"http://www.ktn.freeuk.com/9a.htm#(3)"}, // TODO: image
-    halfduck: {parlett: "~1/1, ~0/2, ~0/3", url:"http://www.chessvariants.com/d.betza/chessvar/dan/rookies.html", image:["1rook", "1rook2"]}, 
+    halfduck: {parlett: "~1/1, ~0/2, ~0/3", url:"http://www.chessvariants.com/d.betza/chessvar/dan/rookies.html", image:["greatwarmachinewazir"]}, 
 
     // Royal pieces
     royalknight: {parlett: "#knight", letter: "XR", royal: true, image:["bigknightking", "royalknight", "kingknight2"]}, 
@@ -468,7 +467,7 @@ var PIECE_TYPES = {
     silvergeneral: {parlett: "1>, 1X", url:"pc:silvergeneral"},   // aka gin-sho - or #ferz, [0,1]
     //yale: {parlett: "1=, 1X>, 1<", image:"purplepawn"}, // TODO: image
     //drunkenmarine: {parlett: "1>, 1=, 1X<", image:"pinkpawn"}, // TODO: image
-    wazir: {parlett: "1+", letter: "I", url:"pc:wazir", image:["wazir"]},    // or ~0/1
+    wazir: {parlett: "1+", letter: "I", url:"pc:wazir", image:["wazir", "1rook", "1rook2"]},    // or ~0/1
     //gorilla: {parlett: "1=, 1X<, 1<", url:"akm"}, // TODO: image
     //diabolo: {parlett: "1+, 1=", url:"akm"}, // TODO: image
     //yen: {parlett: "1X>, 1=, 1<", url:"akm"}, // TODO: image
@@ -490,7 +489,7 @@ var PIECE_TYPES = {
     b4wazir: {parlett: "#b4, #wazir"},
     bw3: {parlett: "#b3, #wazir"},
     r3: {parlett: "n+.3"},
-    r4: {parlett: "n+.4", castle: true},
+    r4: {parlett: "n+.4", castle: true, image:["r4", "halfrook"]},
     r4ferz: {parlett: "#r4, #ferz"},
     alfilr4: {parlett: "#alfil, #r4"},
     mastodon: {parlett: "n*.2", url:"http://www.quadibloc.com/chess/ch0502.htm"},
@@ -606,7 +605,7 @@ var PIECE_TYPES = {
     // http://www.mayhematics.com/v/v_gm.htm has a different definition of wizard
     wizard: {parlett: "#camel, #ferz", image:"moon",  url:"pc:wizard"},
     waffle: {parlett: "#wazir, #alfil", image:"elephantwazir", url:"pc:waffle"}, // aka WA
-    fad: {parlett: "#ferz, #alfil, #warmachine", image:"elephantferzwarmachine", url:"pc:fad"},
+    fad: {parlett: "#ferz, #alfil, #warmachine", image:["elephantferzwarmachine"], url:"pc:fad"},
     bede: {parlett: "#bishop, #warmachine", image:"bishopwarmachine"},
     //zurafa: {parlett: "i#giraffe, #rook"}, // TODO: image, and no rook move on initial
 
@@ -691,17 +690,19 @@ var PIECE_TYPES = {
     // bishop + can move (not capture) 1 or 2 squares orthogonally
     vicar: {parlett: "#bishop, o2+", letter: "V", image: "yellowbishop"},
 
-    // TODO: this image is sourced from http://www.chessvariants.com/unequal.dir/cwda.html, but not included in alfaerie??
-    //chargingrook: {parlett: "n+>=, 1<, 1<X", image:"forwardrookbackwardsprince", url:"http://www.chessvariants.com/unequal.dir/cwda.html"},
-    //chargingknight: {parlett: "~1/2>, 1<, 1=", image:"forwardknightbackwardsprince", url:"http://www.chessvariants.com/unequal.dir/cwda.html"},
-    //colonel: {parlett: "n>, n=, ~1/2>, 1=", letter: "XC", url:"http://www.chessvariants.com/unequal.dir/cwda.html", image:"forwardchancellorprince"},
-    fibnif: {parlett: "#ferz, [1,2], [-1,2], [-1,2], [-1,-2]", url:"pc:fibnif", image:"wnarrowknightferz"},
+    chargingrook: {parlett: "n+>=, 1<, 1X<", image:"forwardrookbackwardsprince", url:"http://www.chessvariants.com/unequal.dir/cwda.html", castle:true},
+    fibnif: {parlett: "#ferz, [1,2], [-1,2], [1,-2], [-1,-2]", url:"pc:fibnif", image:"narrowknightferz"},
+    chargingknight: {parlett: "~1/2>, 1<, 1=", image:"forwardknightbackwardsprince", url:"http://www.chessvariants.com/unequal.dir/cwda.html"},
+    colonel: {parlett: "n>, n=, ~1/2>, 1*", letter: "XC", url:"http://www.chessvariants.com/unequal.dir/cwda.html", image:"forwardchancellorprince"},
 
     // Explicit movements
-    mushroom: {parlett: "[-1,2], [1,2], [3,1], [-3,1], [1,-1], [1,-2], [-1,-1], [-1,-2]", url:"pc:mushroom"},
     crab: {parlett: "[1,2], [-1,2], [-2,-1], [2,-1]", image: ["betzancrab", "crab2", "crab"], url:"pc:crab"},
-    barc: {parlett: "[1,-2], [-1,-2], [-2,1], [2,1]", image: ["barc2", "barc"], url:"pc:barc"}
-    // TODO: barcrider, would need to express hippogonally instead of explicitly
+    barc: {parlett: "[1,-2], [-1,-2], [-2,1], [2,1]", image: ["barc2", "barc"], url:"pc:barc"},
+    mushroom: {parlett: "[-1,2], [1,2], [3,1], [-3,1], [1,-1], [1,-2], [-1,-1], [-1,-2]", url:"pc:mushroom"},
+    sausage: {parlett: "1X, 1=, ~0/3<>, [1,2], [-1,2], [1,-2], [-1,-2]", url:"http://www.chessvariants.org/unequal.dir/pizza-kings.html", castle:true},
+    pepperoni: {parlett: "2=, 1X, 1<, 1>, ~2/2>"},
+    meatball: {parlett: "#ferz, #wazir, #alfil, #warmachine, [1,2], [-1,2]", url:"http://www.chessvariants.org/unequal.dir/pizza-kings.html"},
+
     
     // Pieces that probably won't be supported without significant coding
     //leo: {parlett: "on*, c^" + AMP, letter:"XO"},        // no locust support
@@ -713,6 +714,8 @@ var PIECE_TYPES = {
     // pieces with no notation. WinChloe supports 1400 pieces.
     //
     // TODO: pieces from http://members.shaw.ca/quadibloc/chess/ch04.htm
+    
+    dummy: {parlett: "~0/0", letter: "O", image:"banner"}
 };
 
         
@@ -790,8 +793,12 @@ var SAVED_BOARDS = {
 // TODO: new pawns to promote to pieces on each board
 "Colorbound Clobberers": "x(bede)x(waffle)x(fad)x(archbishop)kx(fad)x(waffle)x(bede)/pppppppp/8/8/8/8/PPPPPPPP/X(bede)X(waffle)X(fad)X(archbishop)KX(fad)X(waffle)X(bede) w KQkq -",
 "Remarkable Rookies": "x(r4)x(woodyrook)x(halfduck)ckx(halfduck)x(woodyrook)x(r4)/pppppppp/8/8/8/8/PPPPPPPP/X(r4)X(woodyrook)X(halfduck)CKX(halfduck)X(woodyrook)X(r4) w KQkq -",
-//TODO "Nutty Knights": 
-
+"Nutty Knights": "x(chargingrook)x(fibnif)x(chargingknight)x(colonel)kx(chargingknight)x(fibnif)x(chargingrook)/pppppppp/8/8/8/8/PPPPPPPP/X(chargingrook)X(fibnif)X(chargingknight)X(colonel)KX(chargingknight)X(fibnif)X(chargingrook) w KQkq -",
+"Amazon Army": "x(r4)nbxvkbnx(r4)/pppppppp/8/8/8/8/PPPPPPPP/X(r4)NBXVKBNX(r4) w KQkq -",
+// TODO: Cylindrical Cinders, fighting fizzes, etc.
+// http://en.wikipedia.org/wiki/Chess_with_different_armies#cite_note-2
+// http://www.chessvariants.org/unequal.dir/pizza-kings.html
+"Pizza Kings": "x(sausage)x(mushroom)x(pepperoni)x(meatball)kx(pepperoni)x(mushroom)x(sausage)/pppppppp/8/8/8/8/PPPPPPPP/X(sausage)X(mushroom)X(pepperoni)X(meatball)KX(pepperoni)X(mushroom)X(sausage) w KQkq -",
 "Fox and Geese": "8/8/8/4x(ferz)/5X(goose)/2X(goose)1X(goose)/3X(goose) w - -", // geese win by stalemating fox, solution at http://www.mayhematics.com/v/v_gm.htm
 "Knightmate Chess":    "rmbqxrbmr/pppppppp/8/8/8/8/PPPPPPPP/RMBQXRBMR w KQkq -",
 // TODO: No black pawn promotion
@@ -3215,8 +3222,8 @@ function decode_one_parlett(parlett)
                 for (var j = 0; j < rel_moves.length; j += 1) {
                     var move = rel_moves[j];
 
-                    if ((dir[0] === Infinity || signum(move[0]) === signum(dir[0])) &&
-                        (dir[1] === Infinity || signum(move[1]) === signum(dir[1]))) {
+                    if ((!dir[0] || signum(move[0]) === signum(dir[0])) &&
+                        (!dir[1] || signum(move[1]) === signum(dir[1]))) {
                         keep_relmoves.push(move);
                     }
                 }
