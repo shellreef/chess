@@ -702,6 +702,7 @@ var PIECE_TYPES = {
     panda: {parlett: "[0,-1](~2/0>&), [0,1](~2/0<&), [1,0](~2/0<<&), [-1,0](~2/0>>&)", image:["panda", "sliprook"], url:"http://www.chessvariants.org/unequal.dir/seeping-switchers.html"},
 
     slipbishop: {parlett: "[1,-1](~2/2↖&), [-1,-1](~2/2↗&), [-1,1](~2/2↘&), [1,1](~2/2↙&)"},
+    slipqueen: {parlett: "#panda, #slipbishop"},
 
     // Explicit movements
     crab: {parlett: "[1,2], [-1,2], [-2,-1], [2,-1]", image: ["betzancrab", "crab2", "crab"], url:"pc:crab"},
@@ -2954,16 +2955,16 @@ function relative_decode_direction(ch, ch2)
     // good list - since we were running out of ASCII..
     } else if (ch === "↖") {
         // ↖ diagonally left up (Extended Parlett)
-        return [[[-1, 1]], true];
+        return [[[-1, 1]], false];
     } else if (ch === "↗") {
         // ↗ diagonally right up (Extended Parlett)
-        return [[[1, 1]], true];
+        return [[[1, 1]], false];
     } else if (ch === "↘") {
         // ↘ diagonally right down (Extended Parlett)
-        return [[[1, -1]], true];
+        return [[[1, -1]], false];
     } else if (ch === "↙") {
         // ↙ diagonally left down (Extended Parlett)
-        return [[[-1, -1]], true];
+        return [[[-1, -1]], false];
 
     } else if (ch === "*") {    
         // orthogonally or diagonally (eight possible directions)
