@@ -695,6 +695,9 @@ var PIECE_TYPES = {
     chargingknight: {parlett: "~1/2>, 1<, 1=", image:"forwardknightbackwardsprince", url:"http://www.chessvariants.com/unequal.dir/cwda.html"},
     colonel: {parlett: "n>, n=, ~1/2>, 1*", letter: "XC", url:"http://www.chessvariants.com/unequal.dir/cwda.html", image:"forwardchancellorprince"},
 
+    // Not quite working.. riders not blocked (grouping if_blocked_skip problem)
+    griffon: {parlett: "[1,0](n+>), [1,0](n+<), [0,1](n+>>), [0,1](n+<<), [-1,0](n+<), [-1,0](n+>), [0,-1](n+<<), [0,-1](n+>>)", image:"gryphon", url:"pc:griffon"}, 
+
     // Explicit movements
     crab: {parlett: "[1,2], [-1,2], [-2,-1], [2,-1]", image: ["betzancrab", "crab2", "crab"], url:"pc:crab"},
     barc: {parlett: "[1,-2], [-1,-2], [-2,1], [2,1]", image: ["barc2", "barc"], url:"pc:barc"},
@@ -825,6 +828,7 @@ var SAVED_BOARDS = {
 "Test Pawns": "8/x(rookpawn)x(knightpawn)x(bishoppawn)x(superpawn)x(weakpawn)x(berolinapawn)x(pawnattackrook)p/8/2x(steward)/4X(sergeant)1X(liapawn)/8/X(rookpawn)X(knightpawn)X(bishoppawn)X(superpawn)X(weakpawn)X(berolinapawn)X(pawnattackrook)P w - -",
 "Test Leapers": "K/2E1Y1H1/3M/1XT1W1XG1Z/8/3Z1N/4oo/5k w - -", // TODO: antelope, flamingo
 "Test Riders": "B2R4/5X(barcrider)2/4Q3/4XN3/2X(alibabariderferz)3X(stone)1/3X(crabrider)1X(warmachinerider)X(squirrelrider)1/2X(alfilrider)X(camelrider)2X(zebrarider)1/4X(girafferider)3 w - - 0 1",
+"Test Complex Riders": "8/8/8/4X(griffon)x(griffon) w - -",
 "Test Amphibians": "4k/8/8/slslslsl/8/8/FFFFFFFF/4K w - -",
 "Test Royalty": "x(royalrook)x(royalknight)x(royalbishop)xjkx(royalbishop)x(royalknight)x(royalrook)/pppppppp/8/8/8/8/PPPPPPPP/X(royalrook)X(royalknight)X(royalbishop)XJKX(royalbishop)X(royalknight)X(royalrook) w KQkq -",
 "Test Projectiles": "x(airplane)X(airplane)4x(airplane)/X(allseeingeye)/1x(bird)/2x(bird)x(bird)x(bird)1x(bird)/3x(bird)x(bird)/3X(archerzz3)x(bird)/4X(archerzz2)X(archer)/x(frog)1X(gun)3X(rocket) w - -",
@@ -3252,9 +3256,22 @@ function decode_one_parlett(parlett)
             expand_directions(inner_moves, [], distances[0], flags, movement, rel_moves);
         }
 
-        // TODO: gryphon, slip pieces
-        //console.log("OUTER",rel_moves);
-        //console.log("INNER",inner_moves);
+        // Add inner and outer moves, if both were given, for gryphon, slip pieces
+        for (i = 0; i < outer_moves.length; i += 1) {
+            var outer = outer_moves[i];
+
+            for (var j = 0; j < inner_moves.length; j += 1) {
+                var inner = inner_moves[j];
+
+                // TODO: Translate if_blocked_skip!! Otherwise griffons will be broken.
+                var flags = {};
+                dojo.mixin(flags, inner_moves[2]);
+                dojo.mixin(flags, outer_moves[2]);
+
+                console.log(outer,inner);
+                rel_moves.push([outer[0] + inner[0], outer[1] + inner[1], flags]);
+            }
+        }
     }
 
     return rel_moves;
