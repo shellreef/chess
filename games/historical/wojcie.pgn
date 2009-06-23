@@ -1,0 +1,121 @@
+[Event ""]
+[Site "Poznan"]
+[Date "1931"]
+[Round ""]
+[White "Tylkowski"]
+[Black "Wojciechowski"]
+[Result "0-1"]
+
+1.f4 d5 2.e3 c5 3.Nf3 Nc6 4.Bb5 Bg4 5.O-O e6 6.d3 Be7 7.Nc3 d4 8.Nb1 Nf6
+9.e4 O-O 10.Bxc6 bxc6 11.c3 dxc3 12.Nxc3 Bxf3 13.Rxf3 Ng4 14.Kh1 Qd4
+15.Qg1 Qxg1+ 16.Kxg1 Bd8 17.Be3 Nxe3 18.Rxe3 Bb6 19.Rd1 h6 20.e5 f6
+21.exf6 Rxf6 22.Rf3 c4+ 23.d4 c5 24.d5 exd5 25.Rxd5 Kh7 26.Rd7 Rd8
+27.Rb7 Rg6 28.Rg3 Rxg3 29.hxg3 Rd2 30.Na4 Rxb2 31.Nxb2 c3 32.Rxb6 c4
+33.Rb4 a5 34.Nxc4 c2 35.Nxa5 c1Q+ 36.Kh2 Qc5 37.Rb2 Qxa5 38.g4 Qe1
+39.g3 h5 40.gxh5 Kh6 0-1
+
+[Event ""]
+[Site "Poznan"]
+[Date "1931"]
+[Round ""]
+[White "Rubinstein"]
+[Black "Wojciechowski"]
+[Result "1/2"]
+
+1.e4 e6 2.d4 d5 3.Nc3 Bb4 4.e5 c5 5.Bd2 cxd4 6.Nb5 Be7 7.Qg4 g6 8.Nxd4
+Nc6 9.Ngf3 Qb6 10.Bc3 Nh6 11.Qf4 Nf5 12.O-O-O g5 13.Qd2 Nfxd4
+14.Nxd4 Bd7 15.h4 gxh4 16.f4 Rg8 17.a4 Nxe5 18.a5 Qc7 19.Nxe6 fxe6
+20.Bxe5 Qxe5 21.fxe5 Bg5 22.Rxh4 Bxd2+ 23.Rxd2 Rh8 24.Bd3 h6 25.Rf2
+O-O-O 26.g4 Rdg8 27.Be2 Rg5 28.Rh5 Rhg8 29.Rf6 R8g6 30.Kd2 Rxh5
+31.gxh5 Rxf6 32.exf6 Be8 33.Ke3 Kc7 34.c4 dxc4 35.Bxc4 Kd6 36.Be2 Ke5
+37.b4 Kxf6 38.Kd4 Kg5 39.Ke5 Bxh5 40.Bf1 Bf3 41.Kxe6 Kf4 42.b5 h5
+43.Kd6 h4 44.Kc7 Kg3 45.a6 bxa6 46.bxa6 Bg2 47.Bxg2 Kxg2 48.Kb8 h3
+49.Kxa7 h2 50.Kb8 h1Q 51.a7 1/2
+
+[Event ""]
+[Site "Poznan"]
+[Date "1931"]
+[Round ""]
+[White "Wojciechowski"]
+[Black "Rozanski"]
+[Result "1-0"]
+
+1.Nf3 e6 2.b3 Nf6 3.Bb2 Be7 4.e3 d5 5.c4 O-O 6.Nc3 c5 7.Qc2 Nc6 8.a3 a6
+9.Bd3 h6 10.Ne2 Bd7 11.g4 Nxg4 12.Rg1 f5 13.Nf4 Nf6 14.cxd5 exd5
+15.Nxd5 Be8 16.Bc4 Bf7 17.Qxf5 Bxd5 18.Bxd5+ Qxd5 19.Rxg7+ Kxg7
+20.Qxd5 Rad8 21.Qf5 1-0
+
+[Event ""]
+[Site "Katowice"]
+[Date "1934"]
+[Round ""]
+[White "Wojciechowski"]
+[Black "Przepiorka"]
+[Result "1-0"]
+
+1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 d6 8.c3
+Na5 9.Bc2 c5 10.d4 Qc7 11.Nbd2 O-O 12.h3 cxd4 13.cxd4 Bd7 14.Nf1 Rfc8
+15.Bd3 Nc6 16.Be3 exd4 17.Nxd4 Nxd4 18.Bxd4 Be6 19.b3 Nd7 20.f4 Bf6
+21.Bxf6 Nxf6 22.Ng3 Qb6+ 23.Kh2 Rc5 24.Qf3 Rac8 25.Rad1 Qc7 26.Re2
+Rc1 27.Red2 Rxd1 28.Qxd1 Qb6 29.Bb1 Ne8 30.f5 Bd7 31.e5 Qc5 32.Qe2
+Bc6 33.e6 f6 34.Qh5 Qa7 35.Rc2 Qe7 36.Ne4 Rc7 37.Nf2 d5 38.Rc3 Nd6
+39.Rg3 Be8 40.Qd1 Bc6 41.Ng4 Kf8 42.Ne3 Ne4 43.Bxe4 dxe4 44.Qh5 Kg8
+45.Ng4 Bb7 46.Nh6+ Kh8 47.Nf7+ Kg8 48.Qh6 Qf8 49.Qxf6 e3 50.Nh6+
+1-0    
+
+[Event ""]
+[Site "Warsaw"]
+[Date "1936"]
+[Round ""]
+[White "Spielmann"]
+[Black "Wojciechowski"]
+[Result "0-1"]
+
+1.d4 Nf6 2.c4 e6 3.Nc3 Bb4 4.Qc2 Nc6 5.Nf3 O-O 6.Bg5 Re8 7.e3 d6 8.Be2
+e5 9.O-O Bxc3 10.bxc3 Qe7 11.Qb2 h6 12.Bh4 g5 13.Bg3 Ne4 14.Nd2 Nxd2
+15.Qxd2 f5 16.Rae1 Qf6 17.f4 gxf4 18.exf4 exd4 19.Bh5 Re4 20.Bf3 dxc3
+21.Qf2 Rxe1 22.Rxe1 Bd7 23.Bd5+ Kf8 24.Bh4 Qd4 25.Qxd4 Nxd4 26.Bf6 c6
+27.Bxd4 cxd5 28.Bxc3 dxc4 29.Bb4 Kf7 30.Bxd6 Be6 31.Rb1 b6 32.Be5 Rd8
+33.Rb2 Rd3 34.Kf2 Bd5 35.Ke1 Ke6 36.Bb8 Ra3 37.Be5 Kd7 38.g3 Ke6
+39.Kd2 b5 0-1
+
+[Event ""]
+[Site "Munich"]
+[Date "1936"]
+[Round ""]
+[White "Wojciechowski"]
+[Black "Weiss"]
+[Result "1-0"]
+
+1.e4 e6 2.d4 d5 3.Nc3 Bb4 4.Ne2 dxe4 5.a3 Bxc3+ 6.Nxc3 f5 7.f3 exf3
+8.Qxf3 Qh4+ 9.g3 Qxd4 10.Be3 Qg4 11.Qg2 Nf6 12.Be2 Qg6 13.O-O-O Nc6
+14.Nb5 Qf7 15.Bc5 a6 16.Bf3 Nd8 17.Qd2 Nd5 18.Bxd5 axb5 19.Rhe1 Bd7
+20.g4 Nc6 21.gxf5 Qxf5 22.Bxe6 Bxe6 23.Qd7+ 1-0    
+
+[Event ""]
+[Site "Warsaw"]
+[Date "1937"]
+[Round ""]
+[White "Najdorf"]
+[Black "Wojciechowski"]
+[Result "0-1"]
+
+1.d4 d5 2.c4 e6 3.Nf3 Nf6 4.Nc3 Be7 5.e3 O-O 6.Bd3 Nbd7 7.O-O dxc4
+8.Bxc4 c5 9.Qe2 cxd4 10.exd4 Nb6 11.Bb3 Bd7 12.Ne5 Rc8 13.Rd1 Nbd5
+14.Rd3 Re8 15.Rh3 b5 16.Bg5 h6 17.Bxh6 gxh6 18.Qd2 Ng4 19.Nxg4 Bg5
+20.Qd1 Nf4 21.Rg3 Kf8 22.Ne5 f6 23.Nf3 Nh5 24.Rh3 Nf4 25.Nxg5 hxg5
+26.Rh7 Kg8 27.Qb1 b4 28.g3 bxc3 29.gxf4 c2 30.Bxc2 f5 31.Rh5 gxf4 32.Bb3
+Kg7 33.h4 Rh8 34.Rg5+ Kf8 35.Qe1 Rxh4 36.Qb4+ Kf7 37.Rxf5+ Kg6
+38.Re5 f3 39.Qd6 Rg4+ 40.Kf1 Bb5+ 0-1
+
+[Event ""]
+[Site "Warsaw"]
+[Date "1937"]
+[Round ""]
+[White "Jagielski"]
+[Black "Wojciechowski"]
+[Result "0-1"]
+
+1.d4 e6 2.e4 d5 3.Nc3 Nf6 4.Bg5 Be7 5.Bxf6 Bxf6 6.e5 Be7 7.Qg4 O-O 8.Nf3
+f5 9.Qh3 c5 10.Ne2 Qa5+ 11.c3 Nc6 12.dxc5 Bxc5 13.Nc1 Bxf2+ 14.Kxf2
+Qb6+ 15.Kg3 Nxe5 16.Nxe5 Qe3+ 17.Kh4 Qf4+ 18.g4 Rf6 0-1

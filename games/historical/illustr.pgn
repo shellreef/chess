@@ -1,0 +1,1049 @@
+[Event ""]
+[Site "London, simultaneous"]
+[Date "1903"]
+[Round ""]
+[White "Em. Lasker"]
+[Black "Loman"]
+[Result "0-1"]
+
+1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.d4 exd4 6.O-O Be7 7.Re1
+O-O 8.e5
+Ne8 9.Bb3 Na5 10.Qxd4 Nxb3 11.axb3 d5 12.b4 c6 13.b5 cxb5 14.Nc3
+Nc7
+15.Be3 Bf5 16.Qd2 Qd7 17.Nd4 Bb4 18.Rad1 Rac8 19.Qe2 Bg6 20.f4
+Bxc3
+21.bxc3 Be4 22.Qf2 f6 23.exf6 Rxf6 24.Nb3 Ne6 25.Nd4 Rxc3 26.Rd2
+Rg6
+27.f5 Nxd4 28.fxg6 Nxc2 29.Bc5 Rxc5 30.Rxe4 Rc8 31.Rf4 Qc6
+32.Rxc2
+Qxc2 33.Qxc2 Rxc2 34.Rf8+ Kxf8 35.gxh7 Rc1+ 36.Kf2 Rc2+
+37.Kg3
+Rc3+ 38.Kg4 Rc4+ 39.Kg5 Rh4 40.Kxh4 g5+ 41.Kxg5 Kg7 0-1
+
+[Event ""]
+[Site "White to play and win"]
+[Date "Nowoje Vremja, 1899"]
+[White "A. Troitzky"]
+[Black "-"]
+[Result ""]
+[SetUp "1"]
+[FEN "8/3R4/4N3/P1b4p/6k1/8/4pP1P/6K1 w - - 0 1"]
+
+1.h3+ Kf5 2.Nd4+ Bxd4 3.Re7 Be5 4.Rxe5+ Kxe5 5.f4+ Kxf4 6.Kf2
+{and
+White wins}
+
+[Event ""]
+[Site "White to play and draw"]
+[Date "'28 Rijen', 1924"]
+[White "L. Kubbel"]
+[Black "-"]
+[Result ""]
+[SetUp "1"]
+[FEN "8/8/N1Pkn3/8/8/4B3/pPK5/8 w - - 0 1"]
+
+1.Bc5+ Ke5 2.c7 Nxc7 3.Bd4+ Kxd4 4.Nc5 Kxc5 5.b4+ Kxb4 6.Kb2
+
+[Event ""]
+[Site "White to play and win"]
+[Date "Leipziger Zeitung, 1934"]
+[White "R. Skuja & E. Giese"]
+[Black "-"]
+[Result ""]
+[SetUp "1"]
+[FEN "2r3k1/6pp/3pp1P1/1pP5/1P6/P4R2/5K2/8 w - - 0 1"]
+
+1.c6 Rxc6 2.Rf8+ Kxf8 3.gxh7 Rc2+ 4.Kg3 Rc3+ 5.Kg4 Rc4+ 6.Kg5
+Rh4
+7.Kxh4 g5+ 8.Kxg5 Kg7 9.h8=Q+ Kxh8 10.Kg6 d5 11.a4 bxa4 12.b5
+a3
+13.b6 a2 14.b7 a1=Q 15.b8=Q
+
+[Event ""]
+[Site "White to play and win"]
+[Date "Leipziger Neueste Schachnachrichten, 1937"]
+[White "J. Moravec"]
+[Black "-"]
+[Result ""]
+[SetUp "1"]
+[FEN "1R6/2pk4/1P6/8/3r4/K7/P7/8 w - - 0 1"]
+
+1.Rd8+ Kxd8 2.b7 Rb4 3.Kxb4 c5+ 4.Kb5 Kc7 5.Ka6 Kb8 6.Kb6 c4
+7.a4 c3
+8.a5 c2 9.a6 c1=Q 10.a7
+
+[Event ""]
+[Site "White to play and win"]
+[Date "Europe Echecs, 1978"]
+[White "J. Letzelter"]
+[Black "-"]
+[Result ""]
+[SetUp "1"]
+[FEN "8/p7/kpp5/6R1/1P4P1/8/1pPP2P1/3K4 w - - 0 1"]
+
+1.b5+ Kb7 2.bxc6+ Kxc6 3.Rb5 Kxb5 4.c4+ Kb4 5.Kc2 Ka3 6.Kb1
+Kb3
+7.c5 {And White will queen with check and win, either after 7...a5
+8.cxb6 or
+7...bxc5 8.g5 etc.}
+
+[Event ""]
+[Site "Amsterdam"]
+[Date "1971"]
+[White "Timman"]
+[Black "Ivkov"]
+[Result "1-0"]
+[SetUp "1"]
+[FEN "r7/2p1P1R1/3k4/1P3P1p/p6P/8/2P3P1/6K1 w - - 0 49"]
+
+49.f6 a3 50.Rg8 Rxg8 51.f7 a2 {After 51...Rxg2+ 52.Kxg2 Kxe7 Black
+wins.}
+52.fxg8=Q a1=Q+ 53.Kh2 Kxe7 54.Qg5+ 1-0
+
+[Event ""]
+[Site "White to play and draw"]
+[Date "1939"]
+[White "L. Prokes"]
+[Black "-"]
+[Result "1/2"]
+[SetUp "1"]
+[FEN "8/8/8/7K/2k5/3pp3/8/5R2 w - - 0 1"]
+
+1.Kg4 e2 2.Rc1+ Kd4 3.Kf3 d2 4.Rc4+ Kd3 5.Rd4+ Kxd4 6.Kxe2
+Kc3
+7.Kd1 Kd3 1/2
+
+[Event ""]
+[Site "White to play and win"]
+[Date "'Rustaveli-tourney', USSR, 1967"]
+[White "V. Sereda"]
+[Black "-"]
+[Result ""]
+[SetUp "1"]
+[FEN "8/2pp4/8/2Pk1P1R/2p2pK1/P2PP3/nP2p3/8 w - - 0 1"]
+
+1.Rh1 cxd3 2.Kf3 Nc1 3.c6 Kd6 4.cxd7 Kxd7 5.Rxc1 d2 6.Rxc7+ Kxc7
+7.Kxe2 fxe3 8.f6 Kd6 9.a4 {and White wins}
+
+[Event ""]
+[Site "White to play and win"]
+[Date "Shakmatniy v SSSR, 1973"]
+[White "Gurgenidze"]
+[Black "-"]
+[Result ""]
+[SetUp "1"]
+[FEN "5r1k/1p1p1p2/6PP/1K1P2N1/8/r7/2P5/8 w - - 0 1"]
+
+1.g7+ Kg8 2.Nh7 Ra5+ 3.Kb4 Ra4+ 4.Kb3 Ra3+ 5.Kb2 Ra2+ 6.Kc1
+Rxc2+ 7.Kb1 Rc1+ 8.Kb2 Rc2+ 9.Kb3 Rc3+ 10.Kb4 Rc4+ 11.Kb5
+Rc5+
+12.Kb6 {and White wins}
+
+[Event ""]
+[Site "White to play and win"]
+[Date "1st Prize 'Cantiadi-tourney', 1974"]
+[White "D. Gurgenidze"]
+[Black "-"]
+[Result ""]
+[SetUp "1"]
+[FEN "5r1k/1p1p1pR1/r2p1pPP/1K4PP/8/8/2P1P3/8 w - - 0 1"]
+
+1.Rh7+ Kg8 2.g7 Ra5+ 3.Kb4 Ra4+ 4.Kb3 Ra3+ 5.Kb2 Ra2+ 6.Kc1
+Rxc2+ 7.Kd1 Rc1+ 8.Kd2 Rc2+ 9.Kd3 Rc3+ 10.Kd4 Rc4+ 11.Kd5
+Rc5+
+12.Kxd6 Rc6+ 13.Kd5 Rc5+ 14.Kd4 Rc4+ 15.Kd3 Rc3+ 16.Kd2
+Rc2+
+17.Ke1 Rxe2+ 18.Kf1 Re1+ 19.Kf2 Re2+ 20.Kf3 Re3+ 21.Kg4 Re4+
+22.Kf5 Re5+ 23.Kxf6 Re6+ 24.Kf5 Re5+ 25.Kxe5 Re8+ 26.Kf5 Kxh7
+27.Kf6 Kg8 28.h7+ Kxh7 29.Kxf7 Re7+ 30.Kxe7 Kxg7 31.h6+ {and
+White
+wins}
+
+[Event ""]
+[Site "White to play and win"]
+[Date "Shakmatniy v SSSR, 1974"]
+[White "D. Gurgenidze"]
+[Black "-"]
+[Result ""]
+[SetUp "1"]
+[FEN "1N4br/4kPp1/6PP/8/pp3P2/8/P4r1P/6K1 w - - 0 1"]
+
+1.hxg7 Rg2+ 2.Kf1 Rf2+ 3.Ke1 Re2+ 4.Kd1 Rd2+ 5.Kc1 Rc2+
+6.Kb1
+Rb2+ 7.Ka1 Rxa2+ 8.Kb1 Rb2+ 9.Kc1 Rc2+ 10.Kd1 Rd2+ 11.Ke1
+Re2+
+12.Kf1 Rf2+ 13.Kg1 Rg2+ 14.Kxg2 Rxh2+ 15.Kxh2 Bxf7 16.gxf7
+Kxf7
+17.Nxd7 b3 18.Ne5+ Kxg7 19.Nc4 b2 20.Na3 {and White wins}
+
+[Event ""]
+[Site "White to play and win"]
+[Date "New in Chess, 1994"]
+[White "T. Krabbe & J. Timman"]
+[Black "-"]
+[Result ""]
+[SetUp "1"]
+[FEN "8/pr4B1/3p1R2/Pp1P2p1/k3p1P1/3p4/P1rPP1KR/8 w - - 0 1"]
+
+1.Bh6 dxe2 2.Rh1 e3 3.Kf3 Rc1 4.Rxc1 exd2 5.Rc4+ bxc4 6.Ke2 c3
+7.Rf1
+Rb1 8.Rxb1 c2 9.Rb4+ {and White wins}
+
+[Event ""]
+[Site "White to play and win"]
+[Date "New in Chess, 1994"]
+[White "Timman"]
+[Black "-"]
+[Result ""]
+[SetUp "1"]
+[FEN "6R1/b4p2/6np/P2P1p1k/p6B/2p3PN/Pr1p2P1/R4K2 w - - 0 1"]
+
+1.Ke2 Rb1 2.Rxb1 c2 3.Rxg6 fxg6 4.Nf4+ Kg4 5.Nh5 Kxh5 6.g4+
+fxg4
+7.Rh1 c1=Q 8.Be1+ Kg5 9.Bxd2+ {and White wins}
+
+[Event ""]
+[Site "White to play and win"]
+[Date "Schaakbulletin, 1976"]
+[White "T. Krabbe"]
+[Black "-"]
+[Result ""]
+[SetUp "1"]
+[FEN "r6k/2R4P/8/8/8/1P2PP2/6Bp/2K3N1 w - - 0 1"]
+
+1.Ne2 h1=Q+ 2.Bxh1 Ra1+ 3.Kc2 Rc1+ 4.Kd3 Rd1+ 5.Ke4 Rd4+
+6.Ke5
+Rd5+ 7.Ke6 Rd6+ 8.Kf7 Rf6+ 9.Ke8 Rf8+ 10.Ke7 Re8+ 11.Kd6
+Re6+
+12.Kc5 Re5+ 13.Kc4 Re4+ 14.Kc3 Rxe3+ 15.Kd4 Rd3+ 16.Kc5
+Rd5+
+17.Kb4 Rb5+ 18.Kc4 Rb4+ 19.Kd3 Rd4+ 20.Kc2 Rd2+ 21.Kb1
+Rb2+
+22.Kc1 Rb1+ 23.Kd2 Rd1+ 24.Ke3 Rd3+ 25.Kf2 Rxf3+ 26.Ke1
+Rf1+
+27.Kd2 Rd1+ 28.Kc3 Rd3+ 29.Kc4 Rc3+ 30.Kd5 Rd3+ 31.Kc6
+Rd6+
+32.Kb5 Rb6+ 33.Kc5 Rb5+ 34.Kd6 Rd5+ 35.Ke7 Re5+ 36.Kd7
+Rd5+
+37.Bxd5 {and es ist erreicht}
+
+[Event ""]
+[Site "Mate in 22"]
+[Date "Chess Curiosities, 1985"]
+[White "T. Krabbe"]
+[Black "-"]
+[Result ""]
+[SetUp "1"]
+[FEN "rr6/4R2p/8/3N3b/1p5p/PPpB4/1nPp1p2/1K1k2b1 w - - 0 1"]
+
+1.Ne3+ Ke1 2.Ng4+ Kd1 3.Be2+ Ke1 4.Ba6+ Kd1 5.Ne3+ Ke1
+6.Nd5+
+Kd1 7.axb4 Na4 8.Ne3+ Ke1 9.Ng4+ Kd1 10.Be2+ Ke1 11.Bb5+
+Kd1
+12.Ne3+ Ke1 13.Nd5+ Kd1 14.bxa4 Rc8 15.Ne3+ Ke1 16.Ng4+ Kd1
+17.Be2+ Ke1 18.Bc4+ Kd1 19.Ne3+ Ke1 20.Nd5+ Be2 21.Rxe2+
+Kf1
+22.Ne3 mate
+
+[Event ""]
+[Site "White to play and win"]
+[Date "2nd Prize Shakhmatniy v SSSR, 1975"]
+[White "D. Gurgenidze & V. Kalandadze"]
+[Black "-"]
+[Result ""]
+[SetUp "1"]
+[FEN "8/p3P3/rp6/kp6/1p4PK/1P6/1P5p/4r2R w - - 0 1"]
+
+1.e8=N Rg1 2.Kh5 Rf1 3.g5 Rg1 4.Kh6 Rf1 5.g6 Rg1 6.Kh7 Rf1 7.g7
+Rg1
+8.Kh8 Rf1 9.g8=Q Rg1 10.Qg7 Rf1 11.Kh7 Rg1 12.Qg6 Rf1 13.Kh6
+Rg1
+14.Qg5 Rf1 15.Kh5 Rg1 16.Qg4 Rf1 17.Kh4 Rg1 18.Qg3 Rf1 19.Nd6
+Rf4+
+20.Kh3 Rh4+ 21.Kg2 {and mate next move}
+
+[Event ""]
+[Site "Construction Task"]
+[Date "Torre i Cavallo, 1993"]
+[White "G. Ponzetto"]
+[Black "-"]
+[Result ""]
+[SetUp "1"]
+[FEN "4r1Q1/B2nr3/5b2/8/4p3/4KbNq/ppppppp1/RR3Nkn w - - 0 1"]
+
+1.Nh2+ f1=N+ 2.Rxf1+ gxf1=N+ 3.Ngxf1+ Bg5+ 4.Qxg5+ Bg2+
+5.Nf3+ exf3+ 6.Kd3+ Nc5+ 7.Qxc5+ Re3+ 8.Nxe3+ c1=N+
+9.Qxc1+
+d1=Q+ 10.Qxd1+ e1=N+ 11.Qxe1+ Bf1+ 12.Nxf1+ f2+ 13.Ne3+
+f1=Q+ 14.Qxf1+ Qxf1+ 15.Nxf1+ Re3+ 16.Nxe3+ b1=Q+
+17.Rxb1+
+axb1=Q+ 18.Nc2+ Nf2+ 19.Bxf2+
+
+[Event ""]
+[Site "Construction Task"]
+[Date "Fairy Chess Review, 1938"]
+[White "G. Leathem"]
+[Black "-"]
+[Result ""]
+[SetUp "1"]
+[FEN "K2kn2r/NP1P1PPP/1PPPnNq1/1Rr1Bb1Q/4R3/8/8/8 w - - 0 1"]
+
+1.c7+ N6xc7+ 2.bxc7+ Nxc7+ 3.dxc7+ Ke7+ 4.g8=N+ Rxg8+
+5.hxg8=N+ Qxg8+ 6.f8=B+ Qxf8+ 7.Qe8+ Qxe8+ 8.d8=Q+
+Qxd8+
+9.c8=N+ Rxc8+ 10.bxc8=N+ Qxc8+ 11.Bb8+ Bxe4+ 12.Nd5+
+Bxd5+
+13.Nc6+ Bxc6+ 14.Rb7+ Bxb7+
+
+[Event ""]
+[Site "Construction Task"]
+[Date "Schaakbulletin, 1978"]
+[White "C. Van de Loo"]
+[Black "-"]
+[Result ""]
+[SetUp "1"]
+[FEN "8/2rprp2/2ppkpp1/5Rq1/2PPK1B1/1b1n1N2/Q4B2/3n1R2 w - - 0
+1"]
+
+1.d5+ cxd5+ 2.cxd5+ Bxd5+ 3.Rxd5+ f5+ 4.Rxf5+ d5+ 5.Rxd5+
+f5+
+6.Rxf5+ d5+ 7.Rxd5+ Kf7+ 8.Be6+ Rxe6+ 9.Ne5+ Rxe5+
+10.Rxe5+
+Rc4+ 11.Bd4+ N3f2+ 12.Rxf2+ Nxf2+ 13.Qxf2+ Qf5+ 14.Qxf5+
+gxf5+
+15.Rxf5+
+
+[Event ""]
+[Site "Construction Task"]
+[Date "Schaakbulletin, 1978"]
+[White "H. Gieske"]
+[Black "-"]
+[Result ""]
+[SetUp "1"]
+[FEN "2qr4/2p1p1b1/1ppkpp2/2R5/1B1KPPbr/2n1N2N/6BQ/2n1R3 w -
+- 0 1"]
+
+1.e5+ fxe5+ 2.fxe5+ Bxe5+ 3.Rxe5+ c5+ 4.Rxc5+ e5+ 5.Rxe5+
+c5+
+6.Rxc5+ e5+ 7.Rxe5+ Qc5+ 8.Bxc5+ bxc5+ 9.Rxc5+ Ke6+
+10.Bd5+
+Rxd5+ 11.Nxd5+ N3e2+ 12.Rxe2+ Nxe2+ 13.Qxe2+ Bxe2+
+14.N3f4+
+Rxf4+ 15.Nxf4+
+
+[Event ""]
+[Site "Construction Task"]
+[Date "Schaakbulletin, 1978"]
+[White "G. Rol"]
+[Black "-"]
+[Result ""]
+[SetUp "1"]
+[FEN "4r1R1/1rB4P/2nQ4/3n4/bN5q/Np1pb3/3p1ppp/k2K3R w - - 0 1"]
+
+1.h8=Q+ Nc3+ 2.Qxc3+ b2+ 3.N3c2+ Bxc2+ 4.Nxc2+ dxc2+
+5.Ke2+
+g1=N+ 6.Rxg1+ hxg1=N+ 7.Rxg1+ f1=Q+ 8.Rxf1+ Qe1+
+9.Rxe1+
+d1=Q+ 10.Rxd1+ c1=N+ 11.Qxc1+ bxc1=N+ 12.Rxc1+ Bxc1+
+13.Qe5+ Rxe5+ 14.Bxe5+ Nd4+ 15.Bxd4+ Rb2+ 16.Bxb2+
+
+[Event ""]
+[Site "Construction Task"]
+[Date "British Chess Magazine, 1956"]
+[White "A. J. Roycroft"]
+[Black "-"]
+[Result ""]
+[SetUp "1"]
+[FEN "2r5/NP6/pp2p3/RBb3q1/1QK1nknr/1RPPNP2/3P1Pb1/6B1 w - -
+0 1"]
+
+1.b8=Q+ Nd6+ 2.Qxd6+ Ne5+ 3.Qxe5+ Kxe5+ 4.Ng4+ Qxg4+
+5.f4+
+Qxf4+ 6.d4+ Qxd4+ 7.cxd4+ Bxd4+ 8.Nc6+ Rxc6+ 9.Qc5+
+Bxc5+
+10.f4+ Rxf4+ 11.d4+ Rxd4+ 12.Bxd4+ Bxd4+ 13.Bxc6+ b5+
+14.Raxb5+
+axb5+ 15.Rxb5+ Bd5+ 16.Rxd5+ exd5+
+
+[Event ""]
+[Site "Construction Task"]
+[Date "Feenschach, 1974"]
+[White "W. Frangen"]
+[Black "-"]
+[Result ""]
+[SetUp "1"]
+[FEN "3rB3/2p1pNP1/1pp2p2/R1Pb4/1R1K2kr/n1nPPNP1/4P2b/5Qq1 w
+- - 0
+1"]
+1.g8=Q+ Kf5+ 2.g4+ Qxg4+ 3.e4+ Bxe4+ 4.Bd7+ Rxd7+
+5.Nd6+
+Rxd6+ 6.Qd5+ Bxd5+ 7.e4+ Qxe4+ 8.dxe4+ Bxe4+ 9.cxd6+
+Nab5+
+10.Rbxb5+ c5+ 11.Rxc5+ e5+ 12.Rxe5+ fxe5+ 13.Nxe5+ Bf3+
+14.Ng4+
+Nb5+ 15.Qxb5+ c5+ 16.Qxc5+ bxc5+ 17.Rxc5+ Be5+ 18.Rxe5+
+
+[Event ""]
+[Site "Amsterdam"]
+[Date "1995"]
+[Round ""]
+[White "Piket"]
+[Black "Kasparov"]
+[Result "1-0"]
+
+1.d2-d4 Ng8-f6 2.c2-c4 g7-g6 3.Nb1-c3 d7-d5 4.Ng1-f3 Bf8-g7
+5.Qd1-b3
+d5xc4 6.Qb3xc4 O-O 7.e2-e4 Nb8-a6 8.Bf1-e2 c7-c5 9.d4-d5 e7-e6
+10.O-O
+e6xd5 11.e4xd5 Rf8-e8 12.Rf1-d1 Bc8-f5 13.d5-d6 h7-h6 14.Bc1-f4
+Nf6-d7
+15.Rd1-d2 Na6-b4 16.Qc4-b3 Bf5-e6 17.Be2-c4 Nd7-b6 18.Bc4xe6
+Re8xe6
+19.Nc3-a4 Re6-e4 20.Bf4-g3 Nb6-c4 21.Na4xc5 Nc4xd2 22.Nf3xd2
+Re4-e2
+23.Qb3xb4 a7-a5 24.Qb4xb7 Re2xd2 25.d6-d7 Rd2xb2 26.Qb7-d5
+Rb2-b5
+27.Ra1-d1 Bg7-f8 28.Bg3-d6 Bf8xd6 29.Qd5xd6 Ra8-b8 30.h2-h3
+Rb5-b1
+31.Rd1xb1 Rb8xb1+ 32.Kg1-h2 Rb1-b6 33.Qd6-e5 Kg8-f8 34.Qe5-h8+
+Kf8-e7 35.Qh8-e5+ Ke7-f8 36.f2-f4 h6-h5 37.Qe5-d5 h5-h4 38.Qd5-e5
+g6-g5
+39.Qe5-h8+ Kf8-e7 40.Qh8-e5+ Ke7-f8 41.f4xg5 
+                           1-0    
+
+[Event ""]
+[Site "White to play and win"]
+[Date "1991"]
+[White "L. Stiller & computer"]
+[Black "-"]
+[Result "1-0"]
+[SetUp "1"]
+[FEN "6N1/5KR1/2n5/8/8/8/2n5/1k6 w - - 0 1"]
+
+1.Ke6 N6b4 2.Ke5 Nd3+ 3.Ke4 Nf2+ 4.Kf3 Nd3 5.Ke2 Ncb4 6.Ke3
+Kb2
+7.Kd4 Nf4 8.Kc4 Nbd5 9.Rh7 Ne3+ 10.Kd4 Nc2+ 11.Ke4 Ne6 12.Ke5
+Ng5
+13.Rh5 Ne1 14.Kf5 Ngf3 15.Ke4 Nd2+ 16.Ke3 Nb3 17.Rh1 Nc2+
+18.Kd3
+Nc1+ 19.Ke4 Nb3 20.Rh3 Nc5+ 21.Ke5 Ne1 22.Nf6 Ned3+ 23.Kd6
+Nb7+
+24.Kc7 Nbc5 25.Kc6 Kc2 26.Rh2+ Kb3 27.Kd5 Kb4 28.Kd4 Nf4
+29.Rh4
+Kb5 30.Ne8 Nb3+ 31.Ke4 Ng6 32.Rh7 Nc5+ 33.Kd4 Nf4 34.Nd6+
+Kc6
+35.Rh6 Nb3+ 36.Ke4 Ne6 37.Ke5 Ned4 38.Rh3 Nc5 39.Nc8 Nc2
+40.Rc3 Nb4
+41.Kd4 Nba6 42.Rc2 Kd7 43.Nb6+ Kd6 44.Nc4+ Kc6 45.Ne3 Kd6
+46.Nf5+
+Ke6 47.Ng7+ Kf7 48.Nh5 Ne6+ 49.Ke5 Nb4 50.Re2 Nd3+ 51.Ke4
+Nb4
+52.Rb2 Kg6 53.Ng3 Ng5+ 54.Kd4 Ne6+ 55.Kc4 Na6 56.Rf2 Ng5
+57.Rf1
+Nc7 58.Ne2 Nf7 59.Nf4+ Kg5 60.Kd4 Nb5+ 61.Kc5 Nbd6 62.Ne6+
+Kg6
+63.Nf8+ Kg5 64.Kd5 Nf5 65.Rb1 Ng3 66.Rb7 Nh6 67.Rg7+ Kf4
+68.Ne6+
+Kf3 69.Rb7 Nh5 70.Rb4 Nf6+ 71.Kd4 Nh5 72.Kd3 Ng4 73.Ng5+ Kg3
+74.Ne4+ Kh4 75.Ra4 Nf4+ 76.Kd4 Ne6+ 77.Kd5 Nf4+ 78.Kd6 Nh3
+79.Ra8
+Ngf2 80.Nc5 Kg5 81.Ke5 Ng4+ 82.Kd4 Nf4 83.Ne4+ Kg6 84.Ra6+
+Kf5
+85.Ra5+ Ke6 86.Nc5+ Ke7 87.Ra7+ Kf6 88.Ke4 Kg5 89.Ra5 Nh5
+90.Ne6+
+Kg6 91.Rb5 Kf7 92.Nc5 Ke7 93.Rb2 Kd6 94.Nb7+ Ke7 95.Ra2 Ng7
+96.Re2
+Kd7 97.Rg2 Ne8 98.Kf4 Ngf6 99.Ke5 Ke7 100.Re2 Kd7 101.Na5 Ng4+
+102.Kf5 Nh6+ 103.Kg6 Ng8 104.Nc4 Nc7 105.Kf7 Nh6+ 106.Kf6
+Ng8+
+107.Ke5 Ne7 108.Rd2+ Kc6 109.Rc2 Na6 110.Ne3+ Kd7 111.Rd2+
+Kc6
+112.Rd6+ Kb5 113.Rh6 Nc8 114.Kd4 Nb4 115.Rh5+ Kc6 116.Nc4
+Ne7
+117.Rh6+ Kc7 118.Rh7 Kd7 119.Ke5 Nbd5 120.Nd6 Kc6 121.Ne4
+Ng6+
+122.Kf5 Nf8 123.Rh6+ Kc7 124.Rh1 Nd7 125.Rb1 Nb8 126.Ke5 Ne3
+127.Kd4 Nf5+ 128.Kd5 Ne3+ 129.Kc5 Nd7+ 130.Kd4 Ng4 131.Rc1+
+Kd8
+132.Re1 Ngf6 133.Ng5 Kc7 134.Nf7 Nf8 135.Rf1 Ng4 136.Rg1 Nf6
+137.Re1
+Kd7 138.Ke5 Ne8 139.Nh8 Ke7 140.Kd5+ Kd7 141.Rf1 Nc7+ 142.Ke5
+Nfe6
+143.Ng6 Nc5 144.Rb1 Kc6 145.Ne7+ Kd7 146.Nf5 Kc6 147.Nd4+
+Kd7
+148.Rd1 N7a6 149.Nf5+ Kc6 150.Rh1 Nb4 151.Rh6+ Kd7 152.Kd4
+Ne6+
+153.Kc4 Na6 154.Rh7+ Kc6 155.Rh1 Nac7 156.Rd1 Ne8 157.Ne7+
+Kc7
+158.Kd5 Nf8 159.Ng8 Kd7 160.Kc5+ Ke6 161.Re1+ Kd7 162.Re7+
+Kd8
+163.Ra7 Nd7+ 164.Kc6 Ne5+ 165.Kd5 Ng6 166.Rh7 Nc7+ 167.Kc6
+Ne5+
+168.Kd6 Nc4+ 169.Kc5 Ne5 170.Rh5 Nf7 171.Kc6 Ne6 172.Ra5 Ke8
+173.Nf6+ Ke7 174.Nd5+ Kf8 175.Kd7 Nd4 176.Nf4 Nh6 177.Rd5
+Ndf5
+178.Ke6 Ng7+ 179.Kf6 Ng8+ 180.Ke5 Nh6 181.Ra5 Ng4+ 182.Kd4
+Kf7
+183.Ra7+ Kf6 184.Ke4 Ne8 185.Ra6+ Kg7 186.Rb6 Ngf6+ 187.Kf5
+Nd7
+188.Ne6+ Kf7 189.Ng5+ Kf8 190.Ra6 Ng7+ 191.Kg6 Ne5+ 192.Kh7
+Ne8
+193.Re6 Nf7 194.Nf3 Nfd6 195.Kg6 Nf5 196.Re1 Ne7+ 197.Kg5 Kf7
+198.Ne5+ Kg7 199.Ng4 Kf8 200.Nh6 Nd5 201.Nf5 Kf7 202.Re2 Nb6
+203.Re7+ Kf8 204.Re1 Nd5 205.Re5 Nb6 206.Kg6 Nc7 207.Nd6 Nbd5
+208.Re1 Ne6 209.Kf5 Nec7 210.Ke5 Nb4 211.Rf1+ Ke7 212.Rf7+ Kd8
+213.Nb7+ Kc8 214.Nc5 Nb5 215.Rg7 Kd8 216.Rb7 Nc6+ 217.Ke6
+Kc8
+218.Rh7 Nb4 219.Na4 Na6 220.Kd5 Nbc7+ 221.Kd6 Ne8+ 222.Ke7
+Nec7
+223.Rh6 Nb8 224.Nb6+ Kb7 225.Nc4 Nc6+ 226.Kd6 Nb4 227.Rh8
+Nba6
+228.Rh7 Kc8 229.Na5 Kd8 230.Nc6+ Kc8 231.Ne7+ Kd8 232.Nd5
+Ne8+
+233.Kc6 Nb8+ 234.Kb5 Nd6+ 235.Kc5 Nc8 236.Rh8+ Kd7 237.Nf6+
+Kc7
+238.Rh7+ Kd8 239.Rb7 Na6+ 240.Kc6 Ne7+ 241.Kb6 Nb4 242.Rd7+
+Kc8
+243.Rxe7 Nd5+ 244.Nxd5 Kd8 245.Kc6 Kc8 246.Re8 1-0
+
+[Event ""]
+[Site "White to play and win"]
+[Date "1991"]
+[White "L. Stiller & computer"]
+[Black "-"]
+[Result "1-0"]
+[SetUp "1"]
+[FEN "8/K7/2nn4/8/8/1B1k4/1R6/8 w - - 0 1"]
+
+1.Ka6 Nb4+ 2.Ka5 Nc6+ 3.Ka4 Nc4 4.Rh2 Nb6+ 5.Ka3 Nc4+ 6.Ka2
+Nb4+
+7.Ka1 Ne5 8.Kb2 Nc4+ 9.Kc1 Kc3 10.Bd1 Nd3+ 11.Kb1 Nd2+
+12.Ka1
+Nb3+ 13.Ka2 Nbc5 14.Ka3 Nb4 15.Rh3+ Nbd3 16.Bg4 Kd4 17.Bf5
+Nf2
+18.Rh6 Nfd3 19.Ka2 Ke5 20.Bg6 Kd4 21.Kb1 Kc3 22.Bh7 Kd2
+23.Rh2+ Kc3
+24.Bg8 Kd4 25.Kc2 Nb4+ 26.Kd1 Ne4 27.Be6 Ke3 28.Bf5 Nd5 29.Kc1
+Nd6
+30.Bd7 Kd4 31.Kb2 Ne3 32.Rh4+ Kd5 33.Ba4 Ndf5 34.Rh8 Nd6
+35.Rh5+
+Kd4 36.Bc6 Ndc4+ 37.Kb3 Nd2+ 38.Kb4 Ne4 39.Ba8 Nc2+ 40.Kb5
+Ne3
+41.Kc6 Nf6 42.Rh4+ Ke5 43.Kc5 Nd7+ 44.Kb5 Nf6 45.Bh1 Nf5
+46.Ra4
+Nd6+ 47.Kc5 Nfe4+ 48.Kc6 Ng3 49.Bg2 Nde4 50.Ra8 Kd4 51.Rd8+
+Ke5
+52.Rd5+ Kf4 53.Ra5 Nc3 54.Kc5 Nf5 55.Bc6 Ne3 56.Kd4 Ne2+
+57.Kd3
+Nc1+ 58.Kc3 Ne2+ 59.Kb4 Nf5 60.Ba8 Neg3 61.Kc3 Ne4+ 62.Kd3
+Ng5
+63.Bc6 Nf7 64.Ra4+ Ke5 65.Ra7 N5d6 66.Ra8 Kf4 67.Ra4+ Ke5
+68.Bd7
+Nb7 69.Re4+ Kd6 70.Rd4+ Ke5 71.Bc6 Nbd6 72.Bg2 Nf5 73.Re4+
+Kd6
+74.Ra4 Ke5 75.Bh3 Ng3 76.Rg4 Nf5 77.Re4+ Kf6 78.Re1 N7d6
+79.Re2 Kg7
+80.Re5 Kf6 81.Rd5 Ke6 82.Rc5 Kf6 83.Ke2 Nd4+ 84.Ke3 Ne6 85.Rd5
+Nc4+
+86.Kf2 Ng7 87.Ke2 Ne6 88.Rf5+ Ke7 89.Kd3 Nb2+ 90.Kc3 Na4+
+91.Kb4
+Nac5 92.Kc4 Nd7 93.Ra5 Nb6+ 94.Kc3 Nc5 95.Kb4 Nd3+ 96.Kb5
+Nd5
+97.Bf5 N3f4 98.Kc6 Kf6 99.Bb1 Ne3 100.Ra6 Ne2 101.Kd7+ Ke5
+102.Re6+
+Kf4 103.Re4+ Kf3 104.Re8 Ng3 105.Ke6 Nef1 106.Bc2 Kf4 107.Rf8+
+Ke3
+108.Re8 Nh2 109.Ra8 Ngf1 110.Ra3+ Kf4 111.Bd1 Nd2 112.Kd5 Nhf1
+113.Kd4 Ng3 114.Ra4 Nde4 115.Kd5 Ke3 116.Ke5 Kd2 117.Bh5 Nc5
+118.Ra2+ Ke3 119.Bg6 Nd7+ 120.Kd6 Nf6 121.Ra3+ Kf4 122.Ra4+
+Kg5
+123.Bd3 Ng4 124.Ba6 Nf5+ 125.Ke6 Ng7+ 125.Kf7 Nf5 127.Be2
+Ngh6+
+128.Ke6 Ng3 129.Bd1 Ngf5 130.Rb4 Ne3 131.Bf3 Nef5 132.Bg2 Ng7+
+133.Kd5 Nh5 134.Rb5 Kf4 135.Ke6 Ng3 136.Rb4+ Kg5 137.Bh3 Ne2
+138.Ke5 Ng3 139.Ra4 Ne2 140.Be6 Ng3 141.Bd7 Nf7+ 142.Kd4 Nd6
+143.Bh3 Ndf5+ 144.Ke5 Nh6 145.Ra5 Kh4 146.Bg2 Kg5 147.Ba8
+Ng4+
+158.Ke6+ Kf4 149.Ra3 Nh2 150.Bb7 Ne2 151.Ra4+ Ke3 152.Re4+
+Kf2
+153.Kd6 Nf3 154.Re8 Ned4 155.Kc5 Kg3 156.Be4 Ne2 157.Bc2 Nf4
+158.Kc4
+Kf2 159.Ba4 Ng6 160.Kd5 Ng5 161.Kd4 Nf4 162.Bc6 Nf3+ 163.Ke4
+Ne6
+164.Re7 Nc5+ 165.Kd5 Nb3 166.Be8 Nbd2 167.Bh5 Kg3 168.Re3 Kf2
+169.Rd3 Ke2 170.Rc3 Kf2 171.Bg4 Kg2 172.Rd3 Kf2 173.Ke6 Ke2
+174.Ra3
+Kf2 175.Kf5 Nd4+ 176.Kg5 Nf1 177.Rd3 Ne2 178.Rf3+ Ke1 179.Bh5
+Nd4
+180.Ra3 Ne2 181.Ra7 Nfg3 182.Bg6 Kd2 183.Rb7 Ke3 184.Kg4 Nf1
+185.Rh7
+Nd2 186.Re7+ Kf2 187.Bd3 Nc1 188.Ba6 Ndb3 189.Kf4 Nc5 190.Bb5
+N1d3+
+191.Kf5 Nb4 192.Re8 Kf3 193.Be2+ Kf2 194.Bh5 Kg3 195.Re3+ Kf2
+196.Re2+ Kg3 197.Rd2 Nc6 198.Rd6 Nb4 199.Ke5 Nbd3+ 200.Kd4
+Nf4
+201.Bf7 Ncd3 202.Ra6 Nf2 203.Ra3+ Kh4 204.Ke3 N2h3 205.Bb3 Kg5
+206.Ke4 Kh4 207.Ba4 Nh5 208.Bc2 Ng7 209.Bb3 Nh5 210.Ra4 Kg5
+211.Kf3
+Ng1+ 212.Kf2 Nh3+ 213.Kg2 N3f4+ 214.Kf3 Nh3 215.Ra5+ Kh6
+216.Ra6+ Kg5 217.Be6 N3f4 218.Ra5+ Kh6 219.Bf7 Ng6 220.Ra6
+Nhf4
+221.Kg4 Kg7 222.Be8 Kh7 223.Bxg6+ Nxg6 224.Kg5 Nf8 225.Kf6
+Nd7+
+226.Ke7 Ne5 227.Ke6 Nf3 228.Kf5 Nh4+ 229.Kg5 Nf3+ 230.Kg4 Nd4
+231.Kf4 Ne2+ 232.Kg5 Kg7 233.Ra7+ Kg8 234.Rc7 Kf8 235.Kf6 Kg8
+236.Rg7+ Kf8 237.Rf7+ Kg8 238.Kg6 Nd4 239.Rf6 Ne2 240.Rf3 Nd4
+241.Rc3 Kf8 242.Kf6 Ke8 243.Re3+ Kd7 244.Rd3 Kc6 245.Rxd4 Kc5
+246.Ke5 Kc6 247.Rd5 Kc7 248.Rd6 Kb7 249.Ke6 Kc8 250.Rc6+ Kb7
+251.Kd7 Kb8 252.Rc7 Ka8 253.Kc6 Kb8 254.Kb6 Ka8 255.Rc8 1-0
+
+[Event ""]
+[Site "Moscow"]
+[Date "1949"]
+[Round ""]
+[White "Flohr"]
+[Black "Geller"]
+[Result "0-1"]
+
+1.d2-d4 Ng8-f6 2.c2-c4 g7-g6 3.Nb1-c3 Bf8-g7 4.e2-e4 d7-d6 5.Ng1-f3
+O-O
+6.Bf1-e2 e7-e5 7.d4xe5 d6xe5 8.Qd1xd8 Rf8xd8 9.Bc1-g5 Nb8-d7
+10.Nc3-d5
+c7-c6 11.Nd5-e7+ Kg8-f8 12.Ne7xc8 Rd8xc8 13.Nf3-d2 Nd7-c5
+14.f2-f3
+Kf8-e8 15.Bg5-e3 Bg7-f8 16.Be3xc5 Bf8xc5 17.Nd2-b3 Bc5-b4+
+18.Ke1-d1
+a7-a5 19.a2-a3 Bb4-e7 20.a3-a4 Nf6-d7 21.Kd1-c2 Nd7-f8 22.Ra1-c1
+Nf8-e6
+23.Kc2-b1 Be7-c5 24.g2-g3 Ra8-a6 25.Be2-f1 Ra6-b6 26.Kb1-c2 Rb6-b4
+27.Bf1-h3 Rb4xc4+ 28.Kc2-b1 Rc4xc1+ 29.Rh1xc1 Bc5-b4 30.Nb3-c5
+Bb4xc5 31.Bh3xe6 f7xe6 32.Rc1xc5 b7-b6 33.Rc5xe5 Ke8-f7 34.Re5-g5
+Rc8-d8 35.Kb1-c2 Rd8-d4 36.b2-b3 Kf7-f6 37.h2-h4 e6-e5 38.Rg5-g4
+b6-b5
+39.a4xb5 c6xb5 40.Kc2-c3 a5-a4 41.b3xa4 b5xa4 42.f3-f4 Rd4xe4
+43.Kc3-d3
+Kf6-g7 44.h4-h5 a4-a3 45.Kd3xe4 a3-a2 46.h5xg6 h7xg6 47.Rg4-g5
+a2-a1Q
+48.Rg5xe5 Qa1-c3 49.Re5-g5 Kg7-f6 50.Ke4-d5 Qc3-d3+ 51.Kd5-c5
+Kf6-f7
+52.Kc5-c6 Qd3-d4 53.Kc6-b5 Qd4-c3 54.Kb5-b6 Qc3-c4 55.Kb6-b7
+Qc4-e6
+56.Kb7-c7 Kf7-f6 57.Kc7-b7 Qe6-d6 58.Kb7-c8 Qd6-c6+ 59.Kc8-d8
+Qc6-b7
+60.Rg5-e5 Qb7-b6+ 61.Kd8-c8 Kf6-f7 
+                           0-1    
+
+[Event ""]
+[Site "Moscow m5"]
+[Date "1965"]
+[Round ""]
+[White "Geller"]
+[Black "Smyslov"]
+[Result "1-0"]
+
+1.d2-d4 Ng8-f6 2.c2-c4 g7-g6 3.Nb1-c3 d7-d5 4.c4xd5 Nf6xd5 5.e2-e4
+Nd5xc3
+6.b2xc3 Bf8-g7 7.Bf1-c4 c7-c5 8.Ng1-e2 O-O 9.O-O Nb8-c6 10.Bc1-e3
+Qd8-c7
+11.Ra1-c1 Rf8-d8 12.f2-f4 e7-e6 13.Kg1-h1 b7-b6 14.f4-f5 Nc6-a5
+15.Bc4-d3
+e6xf5 16.e4xf5 Bc8-b7 17.Qd1-d2 Rd8-e8 18.Ne2-g3 Qc7-c6 19.Rf1-f2
+Ra8-d8
+20.Be3-h6 Bg7-h8 21.Qd2-f4 Rd8-d7 22.Ng3-e4 c5-c4 23.Bd3-c2 Rd7-e7
+24.Rc1-f1 Re7xe4 25.f5xg6 f7-f6 26.Qf4-g5 Qc6-d7 27.Kh1-g1 Bh8-g7
+28.Rf2xf6 Re4-g4 29.g6xh7+ Kg8-h8 30.Bh6xg7+ Qd7xg7 31.Qg5xg4 
+                           1-0
+
+[Event "'Schaken op het Spui' blitz 15 0"]
+[Site "Amsterdam"]
+[Date "1991.09.01"]
+[Round ""]
+[White "Krabbe"]
+[Black "NN"]
+[Result "1-0"]
+
+1.e4 e5 2.Nf3 Nf6 3.Nc3 Bb4 4.Bc4 O-O 5.O-O d6 6.d3 Bg4 7.Bg5 c6
+8.Qe2
+a6 9.Nd1 Nbd7 10.Ne3 Be6 11.Nf5 Bxf5 12.exf5 d5 13.Bb3 Qc7 14.Kh1
+Bd6
+15.g4 Nxg4 16.Rg1 e4 17.dxe4 dxe4 18.Rxg4 exf3 19.Qxf3 Ne5 20.Bf6
+g6
+21.fxg6 hxg6 22.Qh3 1-0
+
+[Event "'Schaken op het Spui' blitz 15 0"]
+[Site "Amsterdam"]
+[Date "1991.09.01"]
+[Round ""]
+[White "Krabbe"]
+[Black "NN"]
+[Result "1-0"]
+
+1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4 d6 5.Nc3 Nf6 6.Be3 a6 7.f3 e6
+8.Bc4
+Be7 9.Qd2 Qc7 10.Bb3 O-O 11.O-O-O Na5 12.g4 Nxb3+ 13.axb3 Nd7
+14.Nf5 exf5 15.Nd5 Qd8 16.gxf5 Ne5 17.f4 Ng4 18.Bb6 Qd7 19.Bd4
+Qd8
+20.Rhg1 Nf6 21.Rxg7+ Kxg7 22.Rg1+ Kh8 23.Nxe7 Qxe7 24.Qg2 1-0
+
+[Event "'Schaken op het Spui'"]
+[Site "Amsterdam"]
+[Date "1991.09.01"]
+[Round ""]
+[White "Anand, blindsim 5"]
+[Black "Krabbe"]
+[Result "1/2-1/2"]
+
+1.Nf3 d5 2.g3 c6 3.Bg2 Nf6 4.O-O Bf5 5.d3 e6 6.Nbd2 Be7 7.h3 h6
+8.b3 O-O
+9.Bb2 a5 10.e3 a4 11.Qe2 Na6 12.a3 axb3 13.cxb3 Nc5 14.Ne1 Qb6
+15.e4
+Bh7 16.b4 Na4 17.Be5 Qb5 18.exd5 cxd5 19.Nb3 Rfc8 20.Nd4 Qb6
+21.Ndf3
+Nd7 22.Bd4 Qb5 23.Ne5 Bf6 24.f4 Nxe5 25.fxe5 Bd8 26.Qf2 Bg6
+27.Kh2 Bb6
+28.Bxb6 Nxb6 29.Ra2 Rc3 30.h4 Raxa3 31.Rxa3 Rxa3 32.g4 h5
+33.gxh5 Bxh5
+34.Bf3 Bg6 35.h5 Bxd3 36.Nxd3 Qxd3 37.Bg2 Nc4 38.Qxf7+ Kh7
+39.Qxe6
+Qg3+ 40.Kg1 Ne3 {adjudicated as a draw by Timman} 1/2
+
+[Event ""]
+[Site "Amsterdam"]
+[Date "1967"]
+[Round ""]
+[White "Timman, J."]
+[Black "Krabbe"]
+[Result "1/2-1/2"]
+
+1.d2-d4 d7-d5 2.Ng1-f3 Ng8-f6 3.Bc1-g5 e7-e6 4.Nb1-d2 Bf8-e7 5.e2-e3
+b7-b6
+6.c2-c3 Bc8-b7 7.Nf3-e5 O-O 8.Bf1-d3 Nb8-d7 9.f2-f4 h7-h6 10.h2-h4
+c7-c5
+11.Qd1-e2 Nd7xe5 12.f4xe5 Nf6-e4 13.Bg5xe7 Qd8xe7 14.Rh1-h3 a7-a5
+15.g2-g4 g7-g6 16.Qe2-g2 Ne4xd2 17.Ke1xd2 Bb7-a6 18.Bd3-c2 Kg8-g7
+19.g4-g5 h6-h5 20.Qg2-f2 Rf8-c8 21.Qf2-f6+ Qe7xf6 22.g5xf6+
+Kg7-h6
+23.Rh3-g3 Rc8-g8 24.Ra1-g1 Ra8-c8 25.Rg3-g5 Rc8-c7 26.Bc2-d1
+Rg8-f8
+27.Bd1-f3 Ba6-b7 28.Bf3-e2 Bb7-a8 29.Be2-d3 Rf8-g8 30.Kd2-e2 Ba8-b7
+31.Ke2-f3 Bb7-a8 32.Kf3-f4 Rc7-c8 33.Bd3-a6 Rc8-d8 34.Ba6-e2
+Rg8-h8
+35.b2-b3 Ba8-b7 36.a2-a3 Rd8-a8 37.c3-c4 Rh8-d8 38.c4xd5 Bb7xd5
+39.Be2-d3 Rd8-g8 40.Bd3-e4 Ra8-d8 41.Rg1-c1 c5xd4 42.e3xd4 Bd5xe4
+43.Kf4xe4 Rd8-c8 44.Rg5-g1 Rc8xc1 45.Rg1xc1 g6-g5 46.Rc1-g1 g5-g4
+47.d4-d5 e6xd5+ 48.Ke4-f5 Rg8-c8 49.Rg1-f1 Rc8-c6 50.a3-a4 d5-d4
+51.Kf5-e4 Rc6-c3 52.Rf1-f5 Rc3xb3 53.Ke4xd4 Rb3-f3 54.Rf5-g5 Rf3-f1
+55.Rg5-g7 Rf1-d1+ 56.Kd4-e4 Rd1-e1+ 57.Ke4-d5 Re1-d1+ 58.Kd5-c6
+b6-b5
+59.Rg7xf7 b5xa4 60.Rf7-d7 Rd1-c1+ 61.Kc6-d6 a4-a3 62.Kd6-e7 a3-a2
+63.f6-f7 Rc1-c8 64.Rd7-d1 Kh6-g7 65.e5-e6 Rc8-a8 66.Rd1-a1 Ra8-a7+
+67.Ke7-d6 Kg7-f8 68.Ra1xa2 Ra7-a6+ 69.Kd6-d5 Kf8-e7 70.Ra2-f2
+Ra6-a8
+71.Rf2-b2 a5-a4 72.Kd5-e5 Ra8-a5+ 73.Ke5-f4 Ra5-a8 74.Kf4-f5
+Ra8-a5+
+75.Kf5-g6 Ra5-a8 76.Kg6-g7 Ke7xe6 77.Rb2-e2+ Ke6-f5 78.f7-f8Q+
+Ra8xf8
+79.Kg7xf8 Kf5-f4 80.Kf8-f7 Kf4-g3 81.Kf7-g6 Kg3xh4 82.Re2-h2+
+Kh4-g3
+83.Rh2xh5 a4-a3 84.Rh5-a5 Kg3-f2 85.Ra5-f5+ Kf2-e2 86.Rf5-e5+
+Ke2-f2
+1/2
+
+[Event "Preliminaries Dutch championship"]
+[Site "Amsterdam"]
+[Date "1938"]
+[Round ""]
+[White "De Ronde"]
+[Black "Kamstra"]
+[Result "1-0"]
+
+1.c2-c4 Ng8-f6 2.Nb1-c3 g7-g6 3.e2-e4 d7-d6 4.d2-d4 Bf8-g7 5.f2-f3
+Nb8-d7
+6.Bc1-e3 e7-e5 7.d4-d5 a7-a5 8.Qd1-d2 b7-b6 9.g2-g4 Nd7-c5
+10.Ng1-e2 h7-h5
+11.g4-g5 Nf6-d7 12.Qd2-c2 Nd7-b8 13.O-O-O Nb8-a6 14.a2-a3 Bc8-d7
+15.Kc1-b1 O-O 16.Ne2-c1 Qd8-e7 17.Bf1-e2 Rf8-e8 18.Rd1-g1 Qe7-d8
+19.h2-h3 Qd8-c8 20.Be2-f1 Re8-e7 21.Rh1-h2 Qc8-b7 22.Bf1-d3 Nc5xd3
+23.Nc1xd3 Na6-c5 24.a3-a4 Qb7-c8 25.Nd3-f2 Nc5-a6 26.Qc2-d1
+Na6-b4
+27.Nc3-b5 Qc8-b7 28.Be3-d2 Nb4-a6 29.Qd1-e1 Na6-c5 30.Bd2-e3
+Nc5xa4
+31.Nf2-g4 h5xg4 32.h3xg4 Re7-e8 33.Qe1-h4 Kg8-f8 34.Qh4-h7 Na4-c5
+35.Nb5-d4 e5xd4 36.Qh7xg7+ Kf8xg7 37.Be3xd4+ Re8-e5 38.f3-f4
+Nc5xe4
+39.f4xe5 Ne4xg5 40.e5-e6+ f7-f6 41.Rg1-f1 Ra8-f8 42.e6xd7 Qb7-b8
+43.Rf1xf6 Rf8xf6 44.Rh2-f2 Ng5-e4 45.Rf2xf6 Qb8-d8 46.g4-g5 Ne4xg5
+47.Rf6xd6+ Kg7-f8 48.Bd4-f6 c7xd6 49.Bf6xd8 Ng5-f7 50.Bd8-f6 1-0   
+
+
+[Event ""]
+[Site "Amsterdam"]
+[Date "1954"]
+[Round ""]
+[White "Heidenfeld"]
+[Black "Roele"]
+[Result "0-1"]
+
+1.e2-e4 e7-e5 2.Nb1-c3 Ng8-f6 3.f2-f4 d7-d5 4.f4xe5 Nf6xe4 5.d2-d3
+Ne4xc3
+6.b2xc3 Bf8-e7 7.Ng1-f3 O-O 8.Bf1-e2 c7-c5 9.d3-d4 Nb8-c6 10.O-O
+f7-f6
+11.Bc1-f4 g7-g5 12.e5xf6 g5xf4 13.f6xe7 Qd8xe7 14.Be2-d3 c5-c4
+15.Rf1-e1
+Qe7-a3 16.Bd3xh7+ Kg8xh7 17.Nf3-g5+ Kh7-g6 18.Ng5-e6 Bc8xe6
+19.Re1xe6+ Kg6-f5 20.Re6-h6 Qa3xc3 21.Qd1-h5+ Kf5-e4 22.Ra1-d1
+Ra8-e8
+23.Qh5-g6+ Ke4-e3 24.Rh6-h3+ f4-f3 25.Rh3xf3+ Ke3-e2 26.Rf3xc3
+Ke2xd1
+27.h2-h4 Nc6xd4 28.Kg1-h2 Nd4-e2 29.Rc3-f3 d5-d4 30.h4-h5 Rf8xf3
+31.g2xf3 Re8-e3 32.Qg6-f5 d4-d3 33.c2xd3 c4-c3 34.Qf5-c5 Re3xf3
+35.h5-h6
+Rf3-f6 36.Qc5-g5 Rf6-f2+ 37.Kh2-h3 Ne2-f4+ 38.Kh3-g4 Rf2-g2+
+39.Kg4-f5
+Rg2xg5+ 40.Kf5xg5 c3-c2 41.h6-h7 c2-c1Q 42.h7-h8Q Nf4xd3+ 
+                           0-1    
+
+[Event ""]
+[Site "Elista ol"]
+[Date "1998"]
+[Round ""]
+[White "Moussa"]
+[Black "Kakageldyev"]
+[Result "0-1"]
+
+1.d2-d4 g7-g6 2.c2-c4 Bf8-g7 3.e2-e4 d7-d6 4.Nb1-c3 Ng8-f6 5.f2-f3
+O-O
+6.Bc1-e3 a7-a6 7.Qd1-d2 c7-c6 8.Bf1-d3 b7-b5 9.a2-a3 b5xc4 10.Bd3xc4
+d6-d5
+11.e4xd5 c6xd5 12.Bc4-a2 Nb8-c6 13.Ng1-e2 Nc6-a5 14.O-O Na5-c4
+15.Ba2xc4 d5xc4 16.Ra1-c1 Ra8-b8 17.Nc3-a4 Nf6-d5 18.Be3-f2 Nd5-b6
+19.Na4-c5 Qd8-d5 20.Rf1-d1 Rf8-d8 21.Ne2-c3 Qd5-c6 22.Qd2-e2
+Nb6-d5
+23.Nc3-a4 Nd5-f4 24.Qe2xc4 Bc8-b7 25.Nc5xb7 Qc6xb7 26.b2-b4
+Rb8-a8
+27.Kg1-f1 Qb7-b5 28.Na4-c5 e7-e5 29.g2-g3 Nf4-h3 30.d4-d5 Nh3xf2
+31.Kf1xf2 Qb5-b6 32.Kf2-g2 a6-a5 33.Rc1-c2 a5xb4 34.a3xb4 Bg7-f8
+35.Nc5-d3 Rd8-e8 36.Rd1-e1 Bf8-g7 37.Qc4-c5 Qb6-b7 38.Qc5-c6
+Qb7-a7
+39.Qc6-c5 Qa7-a3 40.Nd3-f2 Bg7-f8 41.d5-d6 Re8-e6 42.Rc2-d2 Ra8-d8
+43.Re1-d1 Qa3-a8 44.b4-b5 Rd8-c8 45.Qc5-d5 Qa8-b8 46.Nf2-e4 Rc8-d8
+47.Qd5-c6 Rd8-c8 48.Qc6-d7 Rc8-c4 49.Rd1-a1 Qb8-c8 50.Qd7xc8
+Rc4xc8
+51.b5-b6 Rc8-b8 52.d6-d7 Bf8-e7 53.b6-b7 Re6-b6 54.Ra1-a8 Rb6xb7
+55.d7-d8Q+ Be7xd8 56.Rd2xd8+ Rb8xd8 57.Ra8xd8+ Kg8-g7
+58.Rd8-d2
+Rb7-c7 59.Ne4-f2 Rc7-c4 60.Rd2-e2 f7-f6 61.Re2-d2 Rc4-c7 62.Kg2-f1
+h7-h5
+63.Kf1-e2 Kg7-f7 64.Nf2-e4 Kf7-e7 65.Rd2-a2 g6-g5 66.Ke2-e3 g5-g4
+67.f3xg4 h5xg4 68.Ra2-a5 Rc7-b7 69.Ne4-c5 Rb7-c7 70.Ra5-b5 Ke7-d6
+71.Nc5-e4+ Kd6-e7 72.Rb5-b6 f6-f5 73.Ne4-d6 Rc7-c3+ 74.Ke3-e2
+Rc3-c2+
+75.Ke2-d3 Rc2-f2 76.Kd3-e3 Rf2-f3+ 77.Ke3-e2 f5-f4 78.Nd6-f5+
+Ke7-d7
+79.Rb6-d6+ Kd7-c7 80.Rd6-e6 Rf3-a3 81.Re6xe5 f4-f3+ 82.Ke2-f1
+Ra3-a2
+83.Re5-e4 Ra2-a1+ 84.Kf1-f2 Ra1-a2+ 85.Kf2-e3 Ra2-a3+ 86.Ke3-d4
+f3-f2
+87.Nf5-e3 Ra3xe3 88.Kd4xe3 f2-f1Q 89.Re4xg4 Qf1-g1+ 90.Ke3-f3
+Qg1-h1+
+91.Kf3-f4 Qh1xh2 92.Rg4-h4 Qh2-f2+ 93.Kf4-g4 Kc7-d7 94.Kg4-h3
+Qf2-g1
+95.Rh4-f4 Kd7-e6 96.Kh3-g4 Qg1-g2 97.Kg4-h4 Ke6-e5 98.Kh4-g4
+Qg2-h1
+99.Rf4-f2 Ke5-d4 100.Rf2-f5 Kd4-e4 101.Rf5-f2 Ke4-e3 102.Rf2-f4
+Qh1-g2
+103.Kg4-h4 Qg2-h2+ 104.Kh4-g4 Qh2-h1 105.Rf4-f5 Qh1-c6
+106.Rf5-f4
+Qc6-d7+ 107.Kg4-h4 Qd7-c8 108.Rf4-f1 Qc8-h8+ 109.Kh4-g4
+Qh8-c8+
+110.Kg4-h4 Ke3-e4 111.Rf1-f4+ Ke4-e5 112.Rf4-f2 Qc8-d8+
+113.Kh4-h3
+Qd8-d7+ 114.Kh3-h4 Qd7-h7+ 115.Kh4-g4 Qh7-g6+ 116.Kg4-h3
+Qg6-h5+
+117.Kh3-g2 Ke5-e4 118.Rf2-f1 Ke4-e3 119.Rf1-e1+ Ke3-d3 120.Re1-f1
+Kd3-e2 121.Rf1-f4 Ke2-e3 122.Rf4-h4 Qh5-d5+ 123.Kg2-h2 Qd5-d2+
+124.Kh2-h3 Ke3-f2 125.Rh4-f4+ Kf2-g1 126.Rf4-h4 Qd2-d7+
+127.Rh4-g4
+Qd7-e6 0-1
+
+[Event "Living pieces"]
+[Site "Heerenveen"]
+[Date "1964"]
+[Round ""]
+[White "Donner"]
+[Black "O'Kelly"]
+[Result "1/2-1/2"]
+
+1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 d6 6.Bg5 e6 7.Qd2 a6
+8.O-O-O h6 9.Bh4 Nxe4 10.Qf4 Ng5 11.Nxc6 bxc6 12.Qa4 Qb6 13.f4
+Nh7
+14.f5 Be7 15.Ne4 Rb8 16.Qa3 Qb4 17.Qxb4 Rxb4 18.Bxe7 Kxe7
+19.Nxd6 a5
+20.Bc4 Rd8 21.a3 Rb8 22.Nxc8+ Rbxc8 23.fxe6 Rxd1+ 24.Rxd1 
+                           1/2    
+
+[Event "Championship of Castilia"]
+[Site "Madrid"]
+[Date "1933"]
+[Round ""]
+[White "Ortueta"]
+[Black "Sanz"]
+[Result "0-1"]
+
+1.e2-e4 e7-e6 2.d2-d3 d7-d5 3.Nb1-c3 Ng8-f6 4.e4-e5 Nf6-d7 5.f2-f4
+Bf8-b4
+6.Bc1-d2 O-O 7.Ng1-f3 f7-f6 8.d3-d4 c7-c5 9.Nc3-b5 f6xe5 10.d4xe5
+Rf8xf4
+11.c2-c3 Rf4-e4+ 12.Bf1-e2 Bb4-a5 13.O-O Nd7xe5 14.Nf3xe5 Re4xe5
+15.Bd2-f4 Re5-f5 16.Be2-d3 Rf5-f6 17.Qd1-c2 h7-h6 18.Bf4-e5 Nb8-d7
+19.Be5xf6 Nd7xf6 20.Rf1xf6 Qd8xf6 21.Ra1-f1 Qf6-e7 22.Bd3-h7+
+Kg8-h8
+23.Qc2-g6 Bc8-d7 24.Rf1-f7 Qe7-g5 25.Qg6xg5 h6xg5 26.Rf7xd7
+Kh8xh7
+27.Rd7xb7 Ba5-b6 28.c3-c4 d5xc4 29.Nb5-c3 Ra8-d8 30.h2-h3 Rd8-d2
+31.Nc3-a4 Rd2xb2 32.Na4xb2 c4-c3 33.Rb7xb6 c5-c4 34.Rb6-b4 a7-a5
+35.Nb2xc4 c3-c2 0-1
+
+[Event ""]
+[Site "Poznan"]
+[Date "1931"]
+[Round ""]
+[White "Tylkowski"]
+[Black "Wojciechowski"]
+[Result "0-1"]
+
+1.f2-f4 d7-d5 2.e2-e3 c7-c5 3.Ng1-f3 Nb8-c6 4.Bf1-b5 Bc8-g4 5.O-O
+e7-e6
+6.d2-d3 Bf8-e7 7.Nb1-c3 d5-d4 8.Nc3-b1 Ng8-f6 9.e3-e4 O-O
+10.Bb5xc6
+b7xc6 11.c2-c3 d4xc3 12.Nb1xc3 Bg4xf3 13.Rf1xf3 Nf6-g4 14.Kg1-h1
+Qd8-d4
+15.Qd1-g1 Qd4xg1+ 16.Kh1xg1 Be7-d8 17.Bc1-e3 Ng4xe3 18.Rf3xe3
+Bd8-b6
+19.Ra1-d1 h7-h6 20.e4-e5 f7-f6 21.e5xf6 Rf8xf6 22.Re3-f3 c5-c4+
+23.d3-d4
+c6-c5 24.d4-d5 e6xd5 25.Rd1xd5 Kg8-h7 26.Rd5-d7 Ra8-d8 27.Rd7-b7
+Rf6-g6
+28.Rf3-g3 Rg6xg3 29.h2xg3 Rd8-d2 30.Nc3-a4 Rd2xb2 31.Na4xb2
+c4-c3
+32.Rb7xb6 c5-c4 33.Rb6-b4 a7-a5 34.Nb2xc4 c3-c2 35.Nc4xa5 c2-c1Q+
+36.Kg1-h2 Qc1-c5 37.Rb4-b2 Qc5xa5 38.g3-g4 Qa5-e1 39.g2-g3 h6-h5
+40.g4xh5 Kh7-h6 {and after 15 more moves, White resigned} 0-1
+
+[Event ""]
+[Site "Hamburg"]
+[Date "1910"]
+[Round ""]
+[White "Roesch"]
+[Black "Schlage"]
+[Result "0-1"]
+
+1.e2-e4 e7-e5 2.Ng1-f3 Nb8-c6 3.Bf1-b5 a7-a6 4.Bb5-a4 Ng8-f6
+5.Qd1-e2
+b7-b5 6.Ba4-b3 Bf8-e7 7.c2-c3 O-O 8.O-O d7-d5 9.e4xd5 Nf6xd5
+10.Nf3xe5
+Nd5-f4 11.Qe2-e4 Nc6xe5 12.Qe4xa8 Qd8-d3 13.Bb3-d1 Bc8-h3
+14.Qa8xa6
+Bh3xg2 15.Rf1-e1 Qd3-f3 16.Bd1xf3 Ne5xf3+ 
+                           0-1
+
+[Event "?"]
+[Site "Mate in 262"]
+[Date "2000"]
+[White "Ken Thompson & Peter Karrer"]
+[Black "-"]
+[Result "1-0"]
+[SetUp "1"]
+[FEN "1N6/1RK5/5n2/8/8/8/5n2/6k1 w - - 0 1"]
+
+1.Kd6 Nf6-g4 2.Kd5 Ne3+ 3.Kd4 Nc2+ 4.Kc3 Ne3 5.Kd2 Nf2-g4
+6.Kd3 Kg2
+7.Ke4 Nc4 8.Kf4 Ng4-e5 9.Ra7 Nd3+ 10.Ke4 Nf2+ 11.Kd4 Nd6
+12.Kd5 Nb5
+13.Ra5 Nd1 14.Kc5 Nb5-c3 15.Kc4 Ne2 16.Kd3 Ng3 17.Ra1 Nf2+
+18.Ke3
+Nf1+ 19.Kd4 Ng3 20.Ra3 Nf5+ 21.Kd5 Nd1 22.Nc6 Nd1-e3+ 23.Ke6
+Ng7+
+24.Kf7 Ng7-f5 25.Kf6 Kf2 26.Ra2+ Kf3 27.Ke5 Kg4 28.Ke4 Nc4
+29.Ra4 Kg5
+30.Nd8 Ng3+ 31.Kd4 Nb6 32.Ra7 Nf5+ 33.Ke4 Nc4 34.Ne6+ Kf6
+35.Ra6
+Ng3+ 36.Kd4 Nd6 37.Kd5 Nd6-e4 38.Ra3 Nf5 39.Nf8 Nf2 40.Rf3 Ng4
+41.Ke4 Ngh6 42.Rf2 Ke7 43.Ng6+ Ke6 44.Nf4+ Kf6 45.Nd3 Ke6
+46.Nc5+
+Kd6 47.Nb7+ Kc7 48.Na5 Nd6+ 49.Kd5 Ng4 50.Rd2 Ne3+ 51.Kd4
+Ng4
+52.Rg2 Kb6 53.Nb3 Nb5+ 54.Ke4 Nd6+ 55.Kf4 Nh6 56.Rc2 Nb5
+57.Rc1
+Nf7 58.Nd2 Nc7 59.Nc4+ Kb5 60.Ke4 Ng5+ 61.Kf5 Ng5-e6 62.Nd6+
+Kb6
+63.Nc8+ Kb5 64.Ke5 Nc5 65.Rg1 Nb3 66.Rg7 Na6 67.Rb7+ Kc4
+68.Nd6+
+Kc3 69.Rg7 Na5 70.Rg4 Nc6+ 71.Ke4 Na5 72.Ke3 Nb4 73.Nb5+ Kb3
+74.Nd4+ Ka4 75.Rh4 Nc4+ 76.Ke4 Nd6+ 77.Ke5 Nc4+ 78.Ke6 Na3
+79.Rh8
+Nb4-c2 80.Nf5 Kb5 81.Kd5 Nb4+ 82.Ke4 Nc4 83.Nd4+ Kb6 84.Rh6+
+Kc5
+85.Rh5+ Kd6 86.Nf5+ Kd7 87.Rh7+ Kc6 88.Kd4 Kb5 89.Rh5 Na5
+90.Nd6+
+Kb6 91.Rg5 Kc7 92.Nf5 Kd7 93.Rg2 Ke6 94.Ng7+ Kd7 95.Rh2 Nb7
+96.Rd2
+Ke7 97.Rb2 Nd8 98.Kc4 Nb4-c6 99.Kd5 Kd7 100.Rd2 Ke7 101.Nh5
+Nb4+
+102.Kc5 Na6+ 103.Kb6 Nb8 104.Nf4 Nf7 105.Kc7 Na6+ 106.Kc6
+Nb8+
+107.Kd5 Nd7 108.Re2+ Kf6 109.Rf2 Nb6+ 110.Kc6 Nc4 111.Nd5+
+Kg5
+112.Ne7 Nh6 113.Kd5 Ne5 114.Rf1 Nd7 115.Rg1+ Kf4 116.Ng6+ Kf5
+117.Kd6 Nf6 118.Nh4+ Ke4 119.Re1+ Kd3 120.Ke5 Nd7+ 121.Ke6
+Nc5+
+122.Kd5 Nd7 123.Rd1+ Ke3 124.Rf1 Nb6+ 125.Ke6 Nc4 126.Ng2+
+Ke2
+127.Rf4 Nb2 128.Rb4 Nd1 129.Ke5 Nf7+ 130.Kf6 Nd8 131.Nf4+ Kf3
+132.Nd5 Nc6 133.Rc4 Na5 134.Ra4 Nc6 135.Ke6 Nb2 136.Rh4 Nd3
+137.Kf5
+Ke2 138.Rc4 Nde5 139.Rc3 Kd2 140.Rh3 Nc4 141.Kf4 Nd4 142.Ke4
+Ne2
+143.Rh2 Kd1 144.Rf2 Ke1 145.Rg2 Kd1 146.Kd3 Nb2+ 147.Ke3 Nc4+
+148.Kf2 Ne5 149.Rg5 Nc4 150.Rg4 Na3 151.Kf3 Nc2 152.Ke4 Kd2
+153.Rg2
+Nd4 154.Nf4 Kd1 155.Nh5 Nc2 156.Rf2 Na3 157.Kd3 Nc1+ 158.Ke3
+Nc2+
+159.Ke4 Ne2 160.Rf3 Nb4 161.Rh3 Nc1 162.Rh2 Ne2 163.Ng7 Nc3+
+164.Ke5 Nb1 165.Ne6 Nd2 166.Rh3 Nc6+ 167.Kd6 Nb4 168.Kc5 Na2
+169.Kd4 Nc1 170.Rh7 Ke2 171.Rh2+ Kf3 172.Rh5 Ke2 173.Re5+ Kd1
+174.Rf5 Ne2+ 175.Kd3 Nc1+ 176.Ke3 Nc4+ 177.Kd4 Nb2 178.Rg5
+Nb2-d3
+179.Rg7 Ke2 180.Ng5 Ne1 181.Rf7 Kd1 182.Ne4 Ne2+ 183.Kc4 Ng2
+184.Rd7+ Ke1 185.Ra7 Kd1 186.Ra1+ Kc2 187.Ra2+ Kd1 188.Rd2+
+Ke1
+189.Rb2 Kd1 190.Ng5 Ne1 191.Rb1+ Nc1 192.Kc3 Ned3 193.Ne4 Ke2
+194.Kd4 Kd1 195.Rb8 Ne1 196.Rd8 Ke2 197.Nc5 Kf3 198.Rf8+ Ke2
+199.Rf7
+Na2 200.Re7+ Kd1 201.Nb3 Nb4 202.Re4 Ng2 203.Na5 Nc2+
+204.Kd3 Nge3
+205.Nb3 Nf1 206.Re8 Ne1+ 207.Kc3 Nf3 208.Nc5 Ng3 209.Kd3 Ne1+
+210.Ke3 Nc2+ 211.Kf2 Nf5 212.Rd8+ Kc1 213.Ke2 Ng3+ 214.Kf3
+Nf5
+215.Rd7 Nf5-d4+ 216.Ke4 Kb2 217.Kd3 Nc6 218.Rd6 Ne5+ 219.Ke4
+Nc4
+220.Rd3 Na5 221.Na4+ Ka2 222.Rc3 Na1 223.Rh3 Na1-b3 224.Kd3
+Ka3
+225.Rh4 Nc6 226.Kc3 Ncd4 227.Nb6 Ne2+ 228.Kc2 Ne2-d4+ 229.Kd3
+Kb4
+230.Nc8 Kb5 231.Kc3 Kc6 232.Rh5 Kc7 233.Ne7 Kd6 234.Nd5 Kc5
+235.Nb4+ Kd6 236.Rd5+ Kc7 237.Kc4 Kc8 238.Nd3 Kb7 239.Rd7+
+Kc6
+240.Ne5+ Kb6 241.Rf7 Ne6 242.Kxb3 Kc5 243.Rd7 Nd4+ 244.Kc3
+Ne2+
+245.Kd3 Nf4+ 246.Ke4 Ne6 247.Rd5+ Kb4 248.Rd6 Nc5+ 249.Kd5
+Na4
+250.Kd4 Ka5 251.Rd7 Ka6 252.Nc4 Kb5 253.Ra7 Kc6 254.Rxa4 Kd7
+255.Ra6
+Ke8 256.Ra7 Kd8 257.Rb7 Kc8 258.Rg7 Kd8 259.Nb6 Ke8 260.Ke5
+Kf8
+261.Kf6 Ke8 262.Rg8# {and maybe Mr ChessTutor will tell me why this
+last
+move does not appear in the move-list} 1-0
+
+
