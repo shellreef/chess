@@ -728,17 +728,61 @@ var PIECE_TYPES = {
 };
 
         
-var DEFAULT_BOARD_GROUP = "Orthodox Chess & Variants";
+var DEFAULT_BOARD_GROUP = "Recognized";
 var DEFAULT_BOARD_NAME = "FIDE Chess";
 
 // Saved board setups in FEN
 var SAVED_BOARDS = {
-    "Orthodox Chess & Variants": {
+    "Recognized": {
+"FIDE Chess": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -"
+
+// TODO: chess960, historical "variants"
+
+// Shatranj, except the following rules are NOT implemented:
+// 1. Pawns can't make double moves
+// 2. Pawn only promotes to ferz
+// 3. Stalemating your opponent wins
+// 4. Taking the last piece of your opponent wins, unless your opponent
+//    can take your last non-king piece too, in which case the game is drawn
+//"Shatranj (Not Quite)":     "rnykxfynr/pppppppp/8/8/8/8/PPPPPPPP/RNYKXFYNR w - -"
+
+    },
+
+    "New Pieces": {
+"Amazon Chess":         "rnbxvkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBXVKBNR w KQkq -",
+"Berolina Chess": "rnbqkbnr/xbxbxbxbxbxbxbxb/8/8/8/8/XBXBXBXBXBXBXBXB/RNBQKBNR w KQkq -",
+"Commoner Chess":     "rnbqmbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQMBNR w KQkq -",
+"Knightmate Chess":    "rmbqxrbmr/pppppppp/8/8/8/8/PPPPPPPP/RMBQXRBMR w KQkq -",
+// TODO: No black pawn promotion
+"Maharajah and the Sepoys":     "rnbqkbnr/pppppppp/8/8/8/8/8/4XJ3 w kq -",
+"Milener's Chess-3 (non-random)": "rnbqkvjt/pppppppp/8/8/8/8/PPPPPPPP/RNBQKVJT w KQkq -",
+"Nightrider Chess I": "r1bx(nightrider)kb1r/pppppppp/8/8/8/8/PPPPPPPP/R1BX(nightrider)KB1R w KQkq -",
+"Nightrider Chess II": "rx(nightrider)bqkbx(nightrider)r/pppppppp/8/8/8/8/PPPPPPPP/RX(nightrider)BQKBX(nightrider)R w KQkq -",
+"Fox and Geese": "8/8/8/4x(ferz)/5X(goose)/2X(goose)1X(goose)/3X(goose) w - -", // geese win by stalemating fox, solution at http://www.mayhematics.com/v/v_gm.htm
+"Sniper Chess": "x(rookni)x(kniroo)x(bishkni)qkx(bishroo)x(knibis)x(roobis)/pppppppp/8/8/8/8/PPPPPPPP/X(rookni)X(kniroo)X(bishkni)QKX(bishroo)X(knibis)X(roobis) w KQkq -"
+
+},
+
+    "Chess with Different Armies": {
+// Chess with Different Armies http://www.chessvariants.com/unequal.dir/cwda.html
+// TODO: Choose each? Colorbound Clobberers vs. Remarkable Rookies, randomized, etc.
+// TODO: new pawns to promote to pieces on each board
+"Colorbound Clobberers": "x(bede)x(waffle)x(fad)x(archbishop)kx(fad)x(waffle)x(bede)/pppppppp/8/8/8/8/PPPPPPPP/X(bede)X(waffle)X(fad)X(archbishop)KX(fad)X(waffle)X(bede) w KQkq -",
+"Remarkable Rookies": "x(r4)x(woodyrook)x(halfduck)ckx(halfduck)x(woodyrook)x(r4)/pppppppp/8/8/8/8/PPPPPPPP/X(r4)X(woodyrook)X(halfduck)CKX(halfduck)X(woodyrook)X(r4) w KQkq -",
+"Nutty Knights": "x(chargingrook)x(fibnif)x(chargingknight)x(colonel)kx(chargingknight)x(fibnif)x(chargingrook)/pppppppp/8/8/8/8/PPPPPPPP/X(chargingrook)X(fibnif)X(chargingknight)X(colonel)KX(chargingknight)X(fibnif)X(chargingrook) w KQkq -",
+"Amazon Army": "x(r4)nbxvkbnx(r4)/pppppppp/8/8/8/8/PPPPPPPP/X(r4)NBXVKBNX(r4) w KQkq -",
+
+// TODO: Cylindrical Cinders, fighting fizzes, etc.
+// http://en.wikipedia.org/wiki/Chess_with_different_armies#cite_note-2
+// http://www.chessvariants.org/unequal.dir/pizza-kings.html
+"Pizza Kings": "x(sausage)x(mushroom)x(pepperoni)x(meatball)kx(pepperoni)x(mushroom)x(sausage)/pppppppp/8/8/8/8/PPPPPPPP/X(sausage)X(mushroom)X(pepperoni)X(meatball)KX(pepperoni)X(mushroom)X(sausage) w KQkq -"
+    },
+
+    "Orthodox Variants": {
 // Standard chess and variants using no new pieces.  
 // Sources:
 // http://www.pathguy.com/chess/ChessVar.htm
 // http://www.chessclub.com/helpcenter/tips/wild.html
-"FIDE Chess": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -",
 "Advance Chess":        "rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq -",
 "Atheist Chess": "rn1qk1nr/pppppppp/8/8/8/8/PPPPPPPP/RN1QK1NR w KQkq -",
 // TODO: win if promote (kraken?), allow diagonal even if not capture
@@ -793,41 +837,6 @@ var SAVED_BOARDS = {
 "Wild Chess 19":        "8/6k1/4p3/4N3/8/6K1/7N/8 w - -"
     },
 
-"New Pieces": {
-"Amazon Chess":         "rnbxvkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBXVKBNR w KQkq -",
-"Berolina Chess": "rnbqkbnr/xbxbxbxbxbxbxbxb/8/8/8/8/XBXBXBXBXBXBXBXB/RNBQKBNR w KQkq -",
-"Commoner Chess":     "rnbqmbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQMBNR w KQkq -",
-// Chess with Different Armies http://www.chessvariants.com/unequal.dir/cwda.html
-// TODO: Choose each? Colorbound Clobberers vs. Remarkable Rookies, randomized, etc.
-// TODO: new pawns to promote to pieces on each board
-"Colorbound Clobberers": "x(bede)x(waffle)x(fad)x(archbishop)kx(fad)x(waffle)x(bede)/pppppppp/8/8/8/8/PPPPPPPP/X(bede)X(waffle)X(fad)X(archbishop)KX(fad)X(waffle)X(bede) w KQkq -",
-"Remarkable Rookies": "x(r4)x(woodyrook)x(halfduck)ckx(halfduck)x(woodyrook)x(r4)/pppppppp/8/8/8/8/PPPPPPPP/X(r4)X(woodyrook)X(halfduck)CKX(halfduck)X(woodyrook)X(r4) w KQkq -",
-"Nutty Knights": "x(chargingrook)x(fibnif)x(chargingknight)x(colonel)kx(chargingknight)x(fibnif)x(chargingrook)/pppppppp/8/8/8/8/PPPPPPPP/X(chargingrook)X(fibnif)X(chargingknight)X(colonel)KX(chargingknight)X(fibnif)X(chargingrook) w KQkq -",
-"Amazon Army": "x(r4)nbxvkbnx(r4)/pppppppp/8/8/8/8/PPPPPPPP/X(r4)NBXVKBNX(r4) w KQkq -",
-// TODO: Cylindrical Cinders, fighting fizzes, etc.
-// http://en.wikipedia.org/wiki/Chess_with_different_armies#cite_note-2
-// http://www.chessvariants.org/unequal.dir/pizza-kings.html
-"Pizza Kings": "x(sausage)x(mushroom)x(pepperoni)x(meatball)kx(pepperoni)x(mushroom)x(sausage)/pppppppp/8/8/8/8/PPPPPPPP/X(sausage)X(mushroom)X(pepperoni)X(meatball)KX(pepperoni)X(mushroom)X(sausage) w KQkq -",
-"Fox and Geese": "8/8/8/4x(ferz)/5X(goose)/2X(goose)1X(goose)/3X(goose) w - -", // geese win by stalemating fox, solution at http://www.mayhematics.com/v/v_gm.htm
-"Knightmate Chess":    "rmbqxrbmr/pppppppp/8/8/8/8/PPPPPPPP/RMBQXRBMR w KQkq -",
-// TODO: No black pawn promotion
-"Maharajah and the Sepoys":     "rnbqkbnr/pppppppp/8/8/8/8/8/4XJ3 w kq -",
-"Milener's Chess-3 (non-random)": "rnbqkvjt/pppppppp/8/8/8/8/PPPPPPPP/RNBQKVJT w KQkq -",
-"Nightrider Chess I": "r1bx(nightrider)kb1r/pppppppp/8/8/8/8/PPPPPPPP/R1BX(nightrider)KB1R w KQkq -",
-"Nightrider Chess II": "rx(nightrider)bqkbx(nightrider)r/pppppppp/8/8/8/8/PPPPPPPP/RX(nightrider)BQKBX(nightrider)R w KQkq -",
-
-// TODO: historical chess group?
-// Shatranj, except the following rules are NOT implemented:
-// 1. Pawns can't make double moves
-// 2. Pawn only promotes to ferz
-// 3. Stalemating your opponent wins
-// 4. Taking the last piece of your opponent wins, unless your opponent
-//    can take your last non-king piece too, in which case the game is drawn
-//"Shatranj (Not Quite)":     "rnykxfynr/pppppppp/8/8/8/8/PPPPPPPP/RNYKXFYNR w - -",
-
-"Sniper Chess": "x(rookni)x(kniroo)x(bishkni)qkx(bishroo)x(knibis)x(roobis)/pppppppp/8/8/8/8/PPPPPPPP/X(rookni)X(kniroo)X(bishkni)QKX(bishroo)X(knibis)X(roobis) w KQkq -"
-
-},
     "Chess Openings": {
     },
 
