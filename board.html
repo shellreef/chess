@@ -5850,8 +5850,7 @@ function drop_or_revert()
             // Dropped where picked it up - no movement.
             // Do not revert, since would then pop out to (0,0)
             // and revert it back.
-            piece.style.left = dojo._abs(piece, true).x;
-            piece.style.top = dojo._abs(piece, true).y;
+            return;
         }
 
         // Revert
