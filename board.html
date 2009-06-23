@@ -252,7 +252,9 @@ var PREFS = {
     skill: 100,                 // engine strength, 0-100
 
     flipped: false,             // True if from black's perspective instead of white
-    setup_mode: false           // Setup pieces, instead of playing game
+    setup_mode: false,          // Setup pieces, instead of playing game
+
+    saved_games_path: "games/"
 };
 
 
@@ -727,7 +729,6 @@ var PIECE_TYPES = {
     dummy: {parlett: "~0/0", letter: "O", image:"banner"}
 };
 
-        
 var DEFAULT_BOARD_GROUP = "Recognized";
 var DEFAULT_BOARD_NAME = "FIDE Chess";
 
@@ -3670,6 +3671,21 @@ function check_repetition(ply)
     return null;
 }
 
+//// REMOTE SAVED GAME FUNCTIONS
+//
+// TODO: parse games in PGNs, offer to load
+function game_file_list()
+{
+    dojo.xhrGet({url: PREFS.saved_games_path + "index",
+        load:function(text) {
+            var array = text.split("\n");
+            var browser = dojo.byId("game-browser");
+
+            browser.style.display = "";
+            browser.innerHTML = array.join("<br>");
+        }});
+}
+
 //// BOARD FUNCTIONS
 
 // TODO: a "board lab", where can drag pieces onto board in arbitrary
@@ -6208,6 +6224,9 @@ not to implement chess AI. But having automatic moves is useful for testing. -->
  <div id="piece-library-parent" style="display: none">
  <div id="piece-library" style="width: 600px; height: 325px; overflow: auto; position: relative"> </div>
  </div>
+ <!-- end piece library -->
+
+ <div id="game-browser" style="display: none"></div>
 
   <div id="captured_piece_images" style="width: 250px;"></div>
   <div id="moves_container" style="width: 500px; text-align: justify">
