@@ -2648,25 +2648,31 @@ function movement_diagram(moves)
     }
 
     // Origin
-    board[0][0] = "<b>O</b>";
+    board[0][0] = "O";
 
     // Mark moves
     for (var i = 0; i < moves.length; i += 1) {
         var move = moves[i];
         var ch = "x";
 
+        if (!board[-move[1]]) {
+            // Invalid move
+            continue;
+        }
+
+        // Flip directions
         board[-move[1]][move[0]] = ch;
     }
 
     // Stringify
     text = "";
     for (var x = -FILE_MAX; x <= FILE_MAX; x += 1) {
-        text += "<span style='position: relative; top: -20pt'>";
+        text += "<p style='margin-top: -10pt'>";
         for (var y = -RANK_MAX; y <= RANK_MAX; y += 1) {
             var ch = board[x][y];
             text += ch === " " ? "&nbsp;" : ch;
         }
-        text += "</span><br>";
+        text += "</p>";
     }
 
 
