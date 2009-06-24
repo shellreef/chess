@@ -4934,7 +4934,7 @@ function toggle_piece_library()
 
     parent = dojo.byId("piece-library-parent");
     want_setup_mode = parent.style.display === "none";
-    new Effect.toggle(parent, 'slide', { duration: 0.1 });
+    toggle(dojo.byId(parent));
 
     // Set setup mode as opening/closing piece library, since that is what it is for
     set_setup_mode(want_setup_mode);
@@ -6018,6 +6018,18 @@ function init_dnd()
 
 //// LOW-LEVEL FUNCTIONS
 
+// Toggle display of an element
+function toggle(element)
+{
+    //new Effect.toggle(element, 'slide', { duration: 0.1 });
+
+    var old = element.style.display;
+
+    element.style.display = old === "none" ? "" : "none";
+}
+
+
+
 // Return sign of number as {-1,0,1}
 function signum(n)
 {
@@ -6264,7 +6276,7 @@ onclick="edit_pgn()" class="show_White">
 </div>
 
 <!-- TODO: disclosure triangles -->
-<p><a href="#" onclick="new Effect.toggle('controls', 'slide', { duration: 0.1 })">controls</a> | 
+<p><a href="#" onclick="var _c=dojo.byId('controls');_c.style.display=_c.style.display==='none'?'':'none'">controls</a> | 
 <a href="#" onclick="toggle_piece_library();">pieces</a>
 
 <div id="controls" style="display: none; border-left: 2px solid blue">
