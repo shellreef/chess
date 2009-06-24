@@ -206,6 +206,7 @@ if (!window.google) {
  * direct paths but neither prototype nor scriptaculous are minified.. others are though. Maybe just use raw JS. */
 /* TODO: http://compressorrater.thruhere.net/ */
 google.load("prototype", "1.6.0.3");
+//google.load("scriptaculous", "1.8.2");
 
 // Chess movement notations, in descending precedence. 
 // For more info see http://en.wikipedia.org/wiki/Chess_notation
@@ -3085,7 +3086,7 @@ function parse_flags(text, flags)
         flags = {};
     }
 
-    if (Object.isArray(text)) {
+    if (dojo.isArray(text)) {
         flags_text = text;
     } else {
         flags_text = text.split(";");
@@ -5580,7 +5581,7 @@ function xy2filerank(x, y)
 function xy2descriptive(color, xy)
 {
     var x, y;
-    if (Object.isArray(xy)) {
+    if (dojo.isArray(xy)) {
         x = xy[0];
         y = xy[1];
     } else if (xy.x && xy.y) {
@@ -5603,7 +5604,7 @@ function xy2adescriptive(color, xy)
 {
     var x, y;
  
-    if (Object.isArray(xy)) {
+    if (dojo.isArray(xy)) {
         x = xy[0];
         y = xy[1];
     } else if (xy.x && xy.y) {
