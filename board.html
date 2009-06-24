@@ -183,6 +183,13 @@ td.dropping-square-capture2 { background-color: red !important; }
     -webkit-box-shadow: 0 1px 20px rgba(0, 0, 0, 0.9); 
 }
 
+#inspector-diagram {
+    line-height: 8pt; 
+    white-space: pre; 
+    font-family: Courier; 
+    font-size: 8pt;
+}
+
 </style>
 <!--<script type='text/javascript' src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'></script>-->
 <script src="http://o.aolcdn.com/dojo/1.3.1/dojo/dojo.xd.js"></script>
@@ -2630,25 +2637,33 @@ function piece_moved(piece)
 //// PARLETT NOTATION FUNCTIONS
 
 // Convert an unfiltered moves array into a textual graphical representation
-function show_unfiltered(moves)
+function movement_diagram(moves)
 {
     var board = {}, text;
 
-    for (var x = -FILE_MAX; x < FILE_MAX; x += 1) {
+    // Empty board
+    for (var x = -FILE_MAX; x <= FILE_MAX; x += 1) {
         board[x] = {};
-        for (var y = -RANK_MAX; y < RANK_MAX; y += 1) {
+        for (var y = -RANK_MAX; y <= RANK_MAX; y += 1) {
             board[x][y] = " ";
         }
     }
 
+    // Origin
+    board[0][0] = "o";
+
+    // Mark moves
     for (var i = 0; i < moves.length; i += 1) {
         var move = moves[i];
+        var ch = "x";
 
-        board[move[0]][move[1]] = "x";
+        board[-move[1]][move[0]] = ch;
     }
 
-    for (var x = -FILE_MAX; x < FILE_MAX; x += 1) {
-        for (var y = -RANK_MAX; y < RANK_MAX; y += 1) {
+    // Stringify
+    text = "";
+    for (var x = -FILE_MAX; x <= FILE_MAX; x += 1) {
+        for (var y = -RANK_MAX; y <= RANK_MAX; y += 1) {
             text += board[x][y];
         }
         text += "\n";
@@ -3363,7 +3378,7 @@ function expand_directions(directions, distances, limit, flags, movement, rel_mo
         if (distances.length !== 0) {
             distance = distances[0];
 
-            assert(distances.length === 1, "expand_rider(" + distances + "): multiple distances given for rider, expected one or none");
+            assert(distances.length === 1, "expand_directions(" + distances + "): multiple distances given for rider, expected one or none");
         } else {
             distance = Infinity;
         }
@@ -3381,7 +3396,7 @@ function expand_directions(directions, distances, limit, flags, movement, rel_mo
             var these_flags = {};
 
             // Riders get blocked. Note that you can have a non-hippogonal leaper.
-            // ~n* (lion) for example, is like a queen, but not blocked by intervening pieces.
+            // ~n* for example, is like a queen, but not blocked by intervening pieces.
 
             // Blocked on a square which you CANNOT move to - riders w/ distance limits
             if (prev_rel_x !== null && prev_rel_y !== null && 
@@ -4991,6 +5006,8 @@ function show_piece_inspector(piece)
     // TODO: proper escaping
     dojo.byId("inspector-movement").innerHTML = type_info.parlett.replace(/&/g, "&amp;").replace(/</g, "&lt;");
 
+    dojo.byId("inspector-diagram").innerHTML = movement_diagram(unfiltered_moves(type_info.parlett));
+
     // Symbols (letter, figurine, number) for notations
     symbols = [];
     if (type_info.letter) {
@@ -6213,7 +6230,8 @@ onclick="edit_pgn()" class="show_White">
 <p><span style="vertical-align: middle" id="inspector-image"></span> <span id="inspector-type" style="font-weight: bold">type</span>
 <p>Movement: <span id="inspector-movement">movement</span>
 <p>Symbols: <span id="inspector-symbols">symbols</span>
-<p><span id="inspector-info">other info</span>
+<p><span id="inspector-info">other info</span><br>
+<span id="inspector-diagram"></span>
 </div>
 
 <!-- TODO: disclosure triangles -->
