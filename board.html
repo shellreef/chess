@@ -2629,6 +2629,36 @@ function piece_moved(piece)
 
 //// PARLETT NOTATION FUNCTIONS
 
+// Convert an unfiltered moves array into a textual graphical representation
+function show_unfiltered(moves)
+{
+    var board = {}, text;
+
+    for (var x = -FILE_MAX; x < FILE_MAX; x += 1) {
+        board[x] = {};
+        for (var y = -RANK_MAX; y < RANK_MAX; y += 1) {
+            board[x][y] = " ";
+        }
+    }
+
+    for (var i = 0; i < moves.length; i += 1) {
+        var move = moves[i];
+
+        board[move[0]][move[1]] = "x";
+    }
+
+    for (var x = -FILE_MAX; x < FILE_MAX; x += 1) {
+        for (var y = -RANK_MAX; y < RANK_MAX; y += 1) {
+            text += board[x][y];
+        }
+        text += "\n";
+    }
+
+
+    return text;
+}
+
+
 // Get the unfiltered, relative moves for a Parlett string.
 // Warning: do not modify the moves! Otherwise other moves will get confused.
 var PARLETT_CACHE = {};
