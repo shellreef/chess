@@ -2728,7 +2728,7 @@ function unfiltered_moves(parlett)
     rel_moves = without_dupes(rel_moves);
 
     PARLETT_CACHE[parlett] = rel_moves;
-    //PARLETT_CACHE[parlett] = Object.toJSON(rel_moves);
+    //PARLETT_CACHE[parlett] = dojo.toJson(rel_moves);
 
     return rel_moves;
 }
@@ -3476,6 +3476,9 @@ function expand_directions(directions, distances, limit, flags, movement, rel_mo
 // modified to use Prototype's Hash, won't do because the keys will be 
 // converted to strings. But at least the ugliness is confined to this function.
 // Note: flags also differentiate a move.
+//
+// TODO: Find out the griffon - each pair of rays overlap, but only one 
+// rider ray gets blocked, since they are from the same square.
 function without_dupes(a)
 {
     var hash = {};
@@ -3483,14 +3486,14 @@ function without_dupes(a)
 
     for (var i = 0; i < a.length; i += 1) {
         // Add if not a dupe
-        if (!hash[Object.toJSON(a[i])]) {
+        if (!hash[dojo.toJson(a[i])]) {
             result.push(a[i]);
         }
 
         // Record that this element was added. Converts to a string,
         // unfortunately, so can't just use own_properties() after filling 
         // in the hash.
-        hash[Object.toJSON(a[i])] = true;
+        hash[dojo.toJson(a[i])] = true;
     }
 
     return result;
