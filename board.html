@@ -184,6 +184,7 @@ td.dropping-square-capture2 { background-color: red !important; }
 }
 
 #inspector-diagram {
+    margin-top: 10pt;
     font-family: Courier; 
     font-size: 7pt;
 }
@@ -2653,11 +2654,30 @@ function movement_diagram(moves)
     // Mark moves
     for (var i = 0; i < moves.length; i += 1) {
         var move = moves[i];
-        var ch = "x";
+        var ch;
 
         if (!board[-move[1]]) {
             // Invalid move
             continue;
+        }
+
+        // Basic movement - leaper or rider
+        if (move[2].if_blocked_skip) {
+            // might block (rider)
+            ch = "x";
+        } else {
+            // probably a leaper
+            ch = "+";
+        }
+
+        if (move[2].capture_only) {
+            ch = "c";
+        }
+        if (move[2].no_capture) {
+            ch = "m";
+        }
+        if (move[2].initial_only) {
+            ch = "i";
         }
 
         // Flip directions
@@ -6236,8 +6256,8 @@ onclick="edit_pgn()" class="show_White">
 <p><span style="vertical-align: middle" id="inspector-image"></span> <span id="inspector-type" style="font-weight: bold">type</span>
 <p>Movement: <span id="inspector-movement">movement</span>
 <p>Symbols: <span id="inspector-symbols">symbols</span>
-<p><span id="inspector-info">other info</span><br>
-<span id="inspector-diagram"></span>
+<p><span id="inspector-info">other info</span>
+<p><span id="inspector-diagram"></span>
 </div>
 
 <!-- TODO: disclosure triangles -->
