@@ -2671,12 +2671,15 @@ function movement_diagram(moves)
             ch = "c";
         }
         if (move[2].no_capture) {
-            ch = "m";
+            ch = "m";   // move only, no capture
         }
         if (move[2].initial_only) {
             ch = "i";
         }
-
+        if (move[2].if_unblocked_dx) {
+            ch = "u";   // unblocked
+        }
+    
         // Flip directions
         board[-move[1]][move[0]] = ch;
     }
