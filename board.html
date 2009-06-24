@@ -206,7 +206,6 @@ if (!window.google) {
  * direct paths but neither prototype nor scriptaculous are minified.. others are though. Maybe just use raw JS. */
 /* TODO: http://compressorrater.thruhere.net/ */
 google.load("prototype", "1.6.0.3");
-//google.load("scriptaculous", "1.8.2");
 
 // Chess movement notations, in descending precedence. 
 // For more info see http://en.wikipedia.org/wiki/Chess_notation
@@ -3857,16 +3856,6 @@ function label_board(flipped)
             square.descriptive.white = xy2descriptive("white", [x, y]);
             square.descriptive.black = xy2descriptive("black", [x, y]);
 
-            /*
-            Event.observe(square, "click", function() {
-                        // TODO: tap-to-move, as an alternative to dragging
-                        if (DRAG.dragging) {
-                            alert(1);
-                            //function move_dropped_piece(piece, square, event)
-                        }
-                    });
-            */
-
             SQUARES[x][y] = square;
 
             // Virtual, in-memory board
@@ -5430,9 +5419,8 @@ function create_piece(color, type)
 
     // Highlight/unhighlight legal moves on mouse over, like Chess with Friends.
     // Yahoo Games does this too, but uses a yellow outline.
-    Event.observe(piece, "mouseover", function(event) { over_piece(piece, event); });
-
-    Event.observe(piece, "mouseout", function(event) { out_piece(piece, event); });
+    piece.onmouseover = function(event) { over_piece(piece, event); };
+    piece.onmouseout = function(event) { out_piece(piece, event); };
 
     // Make all new pieces draggable. I tried only making the active color's
     // pieces draggable, but then in Safari they can still be selected like text,
@@ -5958,6 +5946,7 @@ function drop_or_revert()
             // Dropped where picked it up - no movement.
             // Do not revert, since would then pop out to (0,0)
             // and revert it back.
+            // TODO: tap-to-move, as an alternative to dragging
             return;
         }
 
