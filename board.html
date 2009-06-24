@@ -2648,9 +2648,6 @@ function movement_diagram(moves)
         }
     }
 
-    // Origin
-    board[0][0] = "O";
-
     // Mark moves
     for (var i = 0; i < moves.length; i += 1) {
         var move = moves[i];
@@ -2683,6 +2680,9 @@ function movement_diagram(moves)
         // Flip directions
         board[-move[1]][move[0]] = ch;
     }
+
+    // Origin
+    board[0][0] = "O";
 
     // Stringify
     text = "";
