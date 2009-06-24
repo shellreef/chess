@@ -1481,7 +1481,7 @@ function load_ply(ply)
 
     load_fen(GAME_STATE.position_after[ply], true);
 
-    dojo.byId("ply_" + ply).addClass("active_move");
+    dojo.addClass(dojo.byId("ply_" + ply), "active_move");
 
     set_next_back_accesskeys(ply);
 }
@@ -1790,8 +1790,8 @@ function in_check(victim_color, all_moves)
         if (all_moves.hasOwnProperty(filerank)) {
             var moves = all_moves[filerank];
 
-            moves.each(function(move) {
-                royals.each(function(royal) {
+            dojo.forEach(moves, function(move) {
+                dojo.forEach(royals, function(royal) {
                     var square = royal.square;
 
                     if (move.x === square.x && move.y === square.y) { 
@@ -1811,7 +1811,7 @@ function in_check(victim_color, all_moves)
 // Note: only do this if not hypothetical.
 function calculate_notations(color, piece, moves, starting_filerank, ps, square_from)
 {
-    moves.each(function(move) {
+    dojo.forEach(moves, function(move) {
         var square = VBOARD[move.x][move.y];
 
         // Building blocks
@@ -4502,7 +4502,7 @@ function show_move_history()
     dojo.byId("move_history").innerHTML = htmls.join("");
 
     // Last ply
-    $$("a.active_move").each(function(m) {
+    dojo.query("a.active_move").forEach(function(m) {
             dojo.removeClass(m, "active_move");
         });
 
@@ -4531,7 +4531,7 @@ function mark_repeated_moves(reps)
     for (var i = 0; i < reps.length; i += 1) {
         var ply = reps[i];
 
-        $$("a#ply_" + ply).each(setcolor);
+        dojo.query("a#ply_" + ply).forEach(setcolor);
     }
 }
 
@@ -5478,7 +5478,7 @@ function highlight_moves(piece, enable)
         return null;    
     }
 
-    moves.each(function(move) {
+    dojo.forEach(moves, function(move) {
         var x, y, flags, to_square;
         
         x = move.x;
@@ -5505,7 +5505,7 @@ function highlight_moves(piece, enable)
 // some reason, highlight_moves(piece, false) does not unhighlight, maybe the piece changed..
 function unhighlight_all()
 {
-    $$("td.legal-move-white", "td.legal-move-black").each(function(square) {
+    dojo.query("td.legal-move-white, td.legal-move-black").forEach(function(square) {
         dojo.removeClass(square, "legal-move-white");
         dojo.removeClass(square, "legal-move-black");
     });
