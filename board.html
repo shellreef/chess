@@ -184,10 +184,11 @@ td.dropping-square-capture2 { background-color: red !important; }
 }
 
 #inspector-diagram {
-    line-height: 8pt; 
+    line-height: 50%; 
+    letter-spacing: 50%;
     white-space: pre; 
     font-family: Courier; 
-    font-size: 8pt;
+    font-size: 7pt;
 }
 
 </style>
@@ -2650,7 +2651,7 @@ function movement_diagram(moves)
     }
 
     // Origin
-    board[0][0] = "o";
+    board[0][0] = "<b>O</b>";
 
     // Mark moves
     for (var i = 0; i < moves.length; i += 1) {
@@ -2666,7 +2667,8 @@ function movement_diagram(moves)
         for (var y = -RANK_MAX; y <= RANK_MAX; y += 1) {
             text += board[x][y];
         }
-        text += "\n";
+        //text += "\n";
+        text += "<br>";
     }
 
 
