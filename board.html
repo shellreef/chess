@@ -474,7 +474,7 @@ var PIECE_TYPES = {
     silvergeneral: {parlett: "1>, 1X", url:"pc:silvergeneral"},   // aka gin-sho - or #ferz, [0,1]
     //yale: {parlett: "1=, 1X>, 1<", image:"purplepawn"}, // TODO: image
     //drunkenmarine: {parlett: "1>, 1=, 1X<", image:"pinkpawn"}, // TODO: image
-    wazir: {parlett: "1+", letter: "I", url:"pc:wazir", image:["wazir", "1rook", "1rook2"]},    // or ~0/1
+    wazir: {parlett: "1+", letter: "I", url:"pc:wazir", image:["wazir", "1rook2"]},    // or ~0/1
     //gorilla: {parlett: "1=, 1X<, 1<", url:"akm"}, // TODO: image
     //diabolo: {parlett: "1+, 1=", url:"akm"}, // TODO: image
     //yen: {parlett: "1X>, 1=, 1<", url:"akm"}, // TODO: image
@@ -494,15 +494,20 @@ var PIECE_TYPES = {
     b3: {parlett: "nX.3"},
     b4: {parlett: "nX.4"},
     b4wazir: {parlett: "#b4, #wazir"},
+    b4nd: {parlett: "#b4, #elephant", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/b4nd.html"},
     bw3: {parlett: "#b3, #wazir"},
+    r2: {parlett: "n+.2", image:"1rook", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/shortrook.html"},
     r3: {parlett: "n+.3"},
     r4: {parlett: "n+.4", castle: true, image:["r4", "halfrook"]},
+    //r5: {parlett: "n+.5", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/shortrook.html"}, // TODO: image
+    //r6: {parlett: "n+.6", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/shortrook.html"}, // TODO: image
+    fourfer: {parlett: "#r4, 1X", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/fr4.html"},
     r4ferz: {parlett: "#r4, #ferz"},
+    n2r4: {parlett: "#r4, 2(~1/2)"},
     alfilr4: {parlett: "#alfil, #r4"},
     mastodon: {parlett: "n*.2", url:"http://www.quadibloc.com/chess/ch0502.htm"},
     q3: {parlett: "n*.3"},
     q4: {parlett: "n*.4"},
-
 
     // Combined pieces (compound pieces)
     // From piececlopedia http://www.chessvariants.org/index/mainquery.php?type=Piececlopedia&orderby=LinkText&displayauthor=1&displayinventor=1&usethisheading=Piececlopedia
@@ -560,6 +565,7 @@ var PIECE_TYPES = {
     elephantknightrider: {parlett: "#elephant, #nightrider"},
     elephantknightwazir: {parlett: "#elephant, #knight, #wazir"},
     elephantwizard: {parlett: "#elephant, #wizard", image:"elephantzzmoon"},
+    //fibnifrook: {parlett: "#fibnif, #rook"}, // TODO: image
     giraffeferz: {parlett: "#giraffe, #ferz"},
     giraffewazir: {parlett: "#giraffe, #wazir"},
     knightcamelzebra: {parlett: "#knight, #camel, #zebra"},
@@ -697,10 +703,16 @@ var PIECE_TYPES = {
     // bishop + can move (not capture) 1 or 2 squares orthogonally
     vicar: {parlett: "#bishop, o2+", letter: "V", image: "yellowbishop"},
 
+    // Ralph Betza's crazy pieces
     chargingrook: {parlett: "n+>=, 1<, 1X<", image:"forwardrookbackwardsprince", url:"http://www.chessvariants.com/unequal.dir/cwda.html", castle:true},
     fibnif: {parlett: "#ferz, [1,2], [-1,2], [1,-2], [-1,-2]", url:"pc:fibnif", image:"narrowknightferz"},
     chargingknight: {parlett: "~1/2>, 1<, 1=", image:"forwardknightbackwardsprince", url:"http://www.chessvariants.com/unequal.dir/cwda.html"},
     colonel: {parlett: "n>, n=, ~1/2>, 1*", letter: "XC", url:"http://www.chessvariants.com/unequal.dir/cwda.html", image:"forwardchancellorprince"},
+    //furlrulbakking: {parlett: "n=, n>, 1<, 1<X", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/frlrrlbk.html"}, // TODO: image, from http://mafiascum.net/cgi-bin/wiki.pl/SandBox?
+    //forfnifbakking: {parlett: "~1/2>, 1<, 1<X", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/fhnrlbk.html"}, // TODO: image, verify
+    //forfnifurlrurking: {parlett: "~1/2>, n=, n>, 1*", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/fhnfrlrk.html"}, // TODO: image
+  
+    
 
     // TODO: diagonal squares occupied need to block both rays
     griffon: {parlett: "[1,0](n+>), [1,0](n+<), [0,1](n+>>), [0,1](n+<<), [-1,0](n+<), [-1,0](n+>), [0,-1](n+<<), [0,-1](n+>>)", 
