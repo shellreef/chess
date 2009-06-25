@@ -712,8 +712,9 @@ var PIECE_TYPES = {
     //forfnifbakking: {parlett: "~1/2>, 1<, 1<X", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/fhnrlbk.html"}, // TODO: image, verify
     //forfnifurlrurking: {parlett: "~1/2>, n=, n>, 1*", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/fhnfrlrk.html"}, // TODO: image
   
+   
+    // Complex riders
     
-
     // TODO: diagonal squares occupied need to block both rays
     griffon: {parlett: "[1,0](n+>), [1,0](n+<), [0,1](n+>>), [0,1](n+<<), [-1,0](n+<), [-1,0](n+>), [0,-1](n+<<), [0,-1](n+>>)", 
         image:"gryphon", url:"pc:griffon"}, 
@@ -722,6 +723,9 @@ var PIECE_TYPES = {
 
     slipbishop: {parlett: "[1,-1](~2/2↖&), [-1,-1](~2/2↗&), [-1,1](~2/2↘&), [1,1](~2/2↙&)"},
     slipqueen: {parlett: "#panda, #slipbishop"},
+
+    // TODO
+    //crookedbishop: {parlett: "n\\↖↗\\", url:"pc:crookedbishop"}, // TODO
 
     // Explicit movements
     crab: {parlett: "[1,2], [-1,2], [-2,-1], [2,-1]", image: ["betzancrab", "crab2", "crab"], url:"pc:crab"},
@@ -882,7 +886,7 @@ var SAVED_BOARDS = {
 "Test Diminished": "/1X(b4)5X(q4)//4X(b3)//3X(r3)X(honorablehorse)/2X(r4)/7X(q3) w - -",
 "Test Mix 1": "X(airplane)x(airplane)/3x(pawnattackrook)x(caliph)x(pope)X(elephantwarmachine)/8/8/8/4S/X(lance)fwZ1X(pawnattackrook)/AcDeIFvT w - -",
 "Test Mix 2": "//2/1X(silvergeneral)2X(mushroom)/3X(crab)X(wizard)/4X(barc)1X(goldgeneral)//7m w - -",
-"Test Mix 3": "x(zebracamel)//3X(2moveferz)//3X(supermaharajah)1X(2movewazirferz)/2X(2movewazir) w - -"
+"Test Mix 3": "x(zebracamel)//3X(2moveferz)//3X(bishop)1X(2movewazirferz)/2X(2movewazir) w - -"
     },
 
     "Test Rules": {
@@ -3294,6 +3298,25 @@ function decode_one_parlett(parlett)
             // Only one digit for now
             limit = parseInt(parlett.substr(i + 1, 1), 10);
             i += 1;
+
+        // TODO: alternating rider directions, for crooked bishop and more
+        } else if (ch === "\\") {
+            var inner;
+            
+            inner = "";
+            while(i < parlett.length)
+            {
+                i += 1;
+                var cho = parlett.substr(i, 1);
+                if (cho === "\\") { break; }
+
+                inner += cho;
+            }
+          
+            console.log("INNER",inner);
+            // TODO: decode directions, make into array
+            // try to unify with directions, array of array
+            // then have expand_directions cycle through
 
         // Standard Parlett
         } else if (/[0-9]/.test(ch)) {
