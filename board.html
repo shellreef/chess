@@ -3432,6 +3432,10 @@ function expand_directions(directions, distances, limit, flags, movement, rel_mo
                 // TODO: Support multiple squares. This only works for one square, for
                 // pawn's double-moves. 2> means two forward, unblocked, and it works,
                 // but 3> for three forward, unblocked, won't work yet.
+                assert(distance === 2,
+                        "expand_directions: sorry, only a fixed distance of 2 is " + 
+                        "currently supported for riders");
+
                 these_flags.if_unblocked_dx = prev_rel_x;
                 these_flags.if_unblocked_dy = prev_rel_y;
 
