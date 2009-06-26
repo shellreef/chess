@@ -5043,7 +5043,7 @@ function toggle_piece_library()
 // Show information on a piece
 function show_piece_inspector(piece)
 {
-    var symbols, type_info, misc, images, paths;
+    var symbols, type_info, misc, images, paths, diagram;
     var inspector = dojo.byId("piece-inspector");
 
     type_info = PIECE_TYPES[piece.type];
@@ -6302,7 +6302,7 @@ onclick="edit_pgn()" class="show_White">
 <p>Movement: <span id="inspector-movement">movement</span>
 <p>Symbols: <span id="inspector-symbols">symbols</span>
 <p><span id="inspector-info">other info</span>
-<p><span id="inspector-diagram"></span>
+<p><div id="inspector-diagram"></div>
 </div>
 
 <!-- TODO: disclosure triangles -->
