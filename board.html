@@ -3699,7 +3699,14 @@ function set_copyable_link()
 
     url = make_copyable_link(fen) + captured + last_move + perspective;
     dojo.byId("copyable_link").href = url;
-    CLIPBOARD.setText(email_board(true));
+
+    if (document.URL.indexOf("file:") === 0) {
+        dojo.byId("copy_link").onclick = function() {
+            prompt("Manually copy this:", email_board(true));
+        };
+    } else {
+        CLIPBOARD.setText(email_board(true));
+    }
 }
 
 // Make a URL that can be clicked to go to this board state
@@ -4004,9 +4011,13 @@ function init_board()
         }
     }
 
-    // For some reason, copying with ZeroClipboard doesn't work with local files
-    CLIPBOARD = new ZeroClipboard.Client();
-    CLIPBOARD.glue(dojo.byId("copy_link"));
+    if (document.URL.indexOf("file:") === 0) {
+        // For some reason, copying with ZeroClipboard doesn't work with local files
+        ;
+    } else {
+        CLIPBOARD = new ZeroClipboard.Client();
+        CLIPBOARD.glue(dojo.byId("copy_link"));
+    }
 
     // Get board name in cookie, if any. This lets the user select
     // their favorite board, and revisit the page, and it will
