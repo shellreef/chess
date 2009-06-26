@@ -205,6 +205,7 @@ div.inspector-diagram-cell {
 <!--<script type='text/javascript' src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'></script>-->
 <script src="http://o.aolcdn.com/dojo/1.3.1/dojo/dojo.xd.js"></script>
 <!--<script src="http://o.aolcdn.com/dojo/1.3.1/dojo/dojo.xd.js.uncompressed.js"></script>-->
+<script src="ZeroClipboard.js"></script>
 <script src="http://www.google.com/jsapi"></script>
 <script type="text/javascript">
 /*jslint bitwise: true, browser: true, eqeqeq: true, immed: true, newcap: true, nomen: true, plusplus: true, regexp: true, undef: true*/
@@ -331,11 +332,13 @@ var VALID_MOVES_OPP = null;         // Moves opponent could make, if it was thei
 var VALID_MOVE_NOTATIONS = null;    // Map SAN, LAN, MAN, RAN, CRAN, FAN, coord, desc, Smith etc. -> [piece, square]
 var ALT_MOVE_NOTATIONS = null;      // Same as above, but non-canonical, longer forms (Nb1c3 when Nc3 would do, etc.)
 
+
 // Board 
 var RANK_MAX = 8;
 var FILE_MAX = 8;
 var SQUARES = null;                 // Get table cell square node by rank and file
 var VBOARD = null;                  // Virtual in-memory board
+var CLIPBOARD = null;               // ZeroClipboard instance
 
 var AMP = String.fromCharCode(38);  // To avoid "not well-formed"
 
@@ -3658,7 +3661,7 @@ function set_copyable_link()
     var fen, captured;
     var last = GAME_STATE.position_after.slice(-1)[0];
     var prior = GAME_STATE.position_after.slice(-2)[0];
-    var perspective;
+    var perspective, url;
 
     // TODO: up to N last moves
     var last_move = GAME_STATE.made_moves.slice(-1)[0];
@@ -3689,9 +3692,9 @@ function set_copyable_link()
     // Flipped if black's turn
     perspective = GAME_STATE.active_color === "black" ? ";f=1" : "";
 
-    // TODO: also include c=, like Captured tag, so can know what was captured
-    
-    dojo.byId("copyable_link").href = make_copyable_link(fen) + captured + last_move + perspective;
+    url = make_copyable_link(fen) + captured + last_move + perspective;
+    dojo.byId("copyable_link").href = url;
+    CLIPBOARD.setText(url);
 }
 
 // Make a URL that can be clicked to go to this board state
@@ -3996,6 +3999,12 @@ function init_board()
         }
     }
 
+    CLIPBOARD = new ZeroClipboard.Client();
+    console.log(CLIPBOARD);
+    CLIPBOARD.addEventListener("onLoad", function(c) { console.log("load",c); });
+    CLIPBOARD.addEventListener("load", function(c) { console.log("load",c); });
+    CLIPBOARD.addEventListener("complete", function(c,t) { console.log("complete",c,t); });
+    CLIPBOARD.glue("copy_link");
 
     // Get board name in cookie, if any. This lets the user select
     // their favorite board, and revisit the page, and it will
@@ -4044,7 +4053,6 @@ function init_board()
     if (!load_from_query_string()) {
         load_fen(fen);
     }
-
 
 }
 
@@ -6306,7 +6314,7 @@ onclick="edit_pgn()" class="show_White">
 <span id="promote_container"></span>
 </p>
 
-<p><a id="copyable_link">copyable link</a> (<a href="#" onclick="email_board()">email</a>)
+<p><a id="copyable_link">link</a> (<span id="copy_link">copy</span>, <a href="#" onclick="email_board()">email</a>)
 <p><span id="opening_name"></span>
 
 <div id="piece-inspector" style="display: none; z-index: 2">
