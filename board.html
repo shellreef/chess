@@ -180,13 +180,25 @@ td.dropping-square-capture2 { background-color: red !important; }
      */
     width: 600px;
 
+    /* Had to set this explicitly since inspector-diagram is positioned relatively
+     * and won't expand the cell. */
+    height: 450px;
+
     -webkit-box-shadow: 0 1px 20px rgba(0, 0, 0, 0.9); 
 }
 
 #inspector-diagram {
     margin-top: 10pt;
-    font-family: Courier; 
+    font-family: Courier, Courier New; 
     font-size: 7pt;
+    position: relative;
+}
+
+div.inspector-diagram-cell {
+    width: 10px; 
+    height: 10px; 
+    position: absolute; 
+    //TODOborder: 1px solid white;
 }
 
 </style>
@@ -2653,7 +2665,7 @@ function piece_moved(piece)
 // Convert an unfiltered moves array into a textual graphical representation
 function movement_diagram(moves)
 {
-    var board = {}, text;
+    var board = {}, texts;
 
     // Empty board
     for (var x = -FILE_MAX; x <= FILE_MAX; x += 1) {
@@ -2703,18 +2715,18 @@ function movement_diagram(moves)
     board[0][0] = "O";
 
     // Stringify
-    text = "";
+    texts = [];
     for (var x = -FILE_MAX; x <= FILE_MAX; x += 1) {
-        text += "<p style='margin-top: -10pt'>";
         for (var y = -RANK_MAX; y <= RANK_MAX; y += 1) {
             var ch = board[x][y];
-            text += ch === " " ? "&nbsp;" : ch;
+            var top = (x + FILE_MAX) * 10;
+            var left = (y + RANK_MAX) * 10;
+            texts.push("<div class='inspector-diagram-cell' style='top:" + top + "px; left: " + left + "px;'>" + ch + "</div>");
         }
-        text += "</p>";
     }
 
 
-    return text;
+    return texts.join("");
 }
 
 
