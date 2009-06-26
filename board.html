@@ -1090,7 +1090,8 @@ function load_notations()
 }
 
 // Open a mail message with a link to the board state
-function email_board()
+// If get_text, then return the email body instead
+function email_board(get_text)
 {
     var to, subject, body, url, dots, link, link_text, ply, ply_info;
     
@@ -1108,6 +1109,10 @@ function email_board()
     //body = ply_info.fmvn + ". " + dots + '<a href="' + link + '">' + link_text + '</a>';
     // Plain text
     body = ply_info.fmvn + ". " + dots + link_text + " <" + link + ">";
+
+    if (get_text) {
+        return body;
+    }
 
     url = "mailto:" + encodeURIComponent(to) + 
         "?subject=" + encodeURIComponent(subject) + 
@@ -3694,7 +3699,7 @@ function set_copyable_link()
 
     url = make_copyable_link(fen) + captured + last_move + perspective;
     dojo.byId("copyable_link").href = url;
-    CLIPBOARD.setText(url);
+    CLIPBOARD.setText(email_board(true));
 }
 
 // Make a URL that can be clicked to go to this board state
