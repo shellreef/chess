@@ -5394,13 +5394,15 @@ function create_piece_by_letter(name)
 // Called when mouse is over a piece
 function over_piece(piece, event) 
 {
+    event = event || window.event;
+    
     var square = highlight_moves(piece, true);
     // for debugging
     //piece.setStyle({border: '1px solid black'});
     if (square) {
         dojo.addClass(square, "recent-move-" + square.color);
     }
-   
+ 
     if (event.shiftKey) {
         show_piece_inspector(piece);
     }
@@ -5410,6 +5412,8 @@ function over_piece(piece, event)
 // Called when mouse is no longer over a piece
 function out_piece(piece, event)
 {
+    event = event || window.event;
+
     var square = highlight_moves(piece, false);
     //piece.setStyle({border: 'none'});
     if (square) {
