@@ -3999,12 +3999,9 @@ function init_board()
         }
     }
 
+    // For some reason, copying with ZeroClipboard doesn't work with local files
     CLIPBOARD = new ZeroClipboard.Client();
-    console.log(CLIPBOARD);
-    CLIPBOARD.addEventListener("onLoad", function(c) { console.log("load",c); });
-    CLIPBOARD.addEventListener("load", function(c) { console.log("load",c); });
-    CLIPBOARD.addEventListener("complete", function(c,t) { console.log("complete",c,t); });
-    CLIPBOARD.glue("copy_link");
+    CLIPBOARD.glue(dojo.byId("copy_link"));
 
     // Get board name in cookie, if any. This lets the user select
     // their favorite board, and revisit the page, and it will
@@ -6314,7 +6311,7 @@ onclick="edit_pgn()" class="show_White">
 <span id="promote_container"></span>
 </p>
 
-<p><a id="copyable_link">link</a> (<span id="copy_link">copy</span>, <a href="#" onclick="email_board()">email</a>)
+<p><a id="copyable_link">link</a> (<span onclick="alert('You need to click higher up (the cursor should turn to a hand).')" id="copy_link">copy</span>, <a href="#" onclick="email_board()">email</a>)
 <p><span id="opening_name"></span>
 
 <div id="piece-inspector" style="display: none; z-index: 2">
