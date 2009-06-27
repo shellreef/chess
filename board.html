@@ -1147,22 +1147,20 @@ function restore_edit()
 // Return a string of color-coded captured piece codes, or null if none.
 function export_captured()
 {
-    var captured = "";
-    var captured_count = 0;
+    var captureds = [];
+
     for (var i = 0; i < GAME_STATE.captured.white.length; i += 1) {
         var p = GAME_STATE.captured.white[i];
-        captured += color_piece_prefix(p);
-        captured_count += 1;
+        captureds.push(color_piece_prefix(p));
     }
     for (i = 0; i < GAME_STATE.captured.black.length; i += 1) {
         var p = GAME_STATE.captured.black[i];
-        captured += color_piece_prefix(p);
-        captured_count += 1;
+        captureds.push(color_piece_prefix(p));
     }
-    if (captured_count) {
-        return captured;
-    } else {
+    if (captureds.length === 0) {
         return null;
+    } else {
+        return captureds.join("");
     }
 }
 
