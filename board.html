@@ -1181,7 +1181,7 @@ function import_captured(captured)
 // Export game as PGN.
 function save_pgn()
 {
-    var pgn = "", dict, captured;
+    var pgns = [], dict, captured;
     var tags = ["White", "WhiteElo", "Black", "BlackElo", "Event", "Round", "Site", "Date", "Time"];
   
     // PGN header information
@@ -1234,23 +1234,20 @@ function save_pgn()
     // Alternate moves, in tag
     for (notation in other_move_texts) {
         if (other_move_texts.hasOwnProperty(notation)) {
-            var text = "";
+            var texts = [];
             for (ply = 1; ply < other_move_texts[notation].length; ply += 1) {
-                text += other_move_texts[notation][ply] + " ";
+                texts.push(other_move_texts[notation][ply] + " ");
             }
 
-            dict["Moves_" + notation] = text;
+            dict["Moves_" + notation] = texts.join("");
         }
     }
 
    
-    pgn = output_pgn_dict(dict);
+    pgns.push(output_pgn_dict(dict));
+    pgns.push(move_texts.join(""));
 
-    pgn += "\n";
-    pgn += move_texts.join("");
-
-   
-    return pgn;
+    return pgns.join("\n");
 }
 
 // Reload PGN after editing it.
