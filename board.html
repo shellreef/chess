@@ -330,6 +330,7 @@ var DROP = {
 // Moves that can be made right now, for each active piece.
 var VALID_MOVES = null;             // Keyed by filerank of source, array of moves, x, y and any flags
 var IS_VALID_MOVE = null;           // Keyed by filerank of source, then filerank of dest
+var BLOCKED_MOVES = null;           // Cannot move there
 var VALID_MOVES_OPP = null;         // Moves opponent could make, if it was their turn (attacking)
 var VALID_MOVE_NOTATIONS = null;    // Map SAN, LAN, MAN, RAN, CRAN, FAN, coord, desc, Smith etc. -> [piece, square]
 var ALT_MOVE_NOTATIONS = null;      // Same as above, but non-canonical, longer forms (Nb1c3 when Nc3 would do, etc.)
@@ -943,7 +944,7 @@ var SAVED_BOARDS = {
 "Test Check Checking": "rnbQ1bnr/ppp1kppp/8/4p3/7q/8/PPPP1PPP/RNBQKBNR b KQ - 0 5",
 "Test Parlett Move Interference": "r/8/8/1N3b2/3PP3/1P1BBN/8/8 w - - 0 17",
 "Test Captures": "8/MMMMMMMM/mmmmmmmm/8/QQQQQQQQ/qqqqqqqq/NNNNNNNN/xlxlxlxlxlxlxlxl w - -",
-"Test Guarding": "rnbqkbnr/pppppppp/8/8/8/5N/PPPPPPPP/RNBQKB1R b KQkq -",
+"Test Guarding": "8/8/8/2P/3P/4B/3P/ w KQkq -",
 "Test Extended Position Description": "r/8/8/1N3b2/3PP3/1P1BBN/8/8 w - - hmvc=0 fmvn=17"
     }
 };
@@ -2203,7 +2204,7 @@ function disambiguate_notations(notations)
 // This operates on VBOARD only, for speed. Use make_vboard() before if needed.
 function calculate_moves(color, is_hypothetical)
 {
-    var valid_moves = {}, is_valid_move = {};
+    var valid_moves = {}, is_valid_move = {}, blocked_moves = {};
     var possible_notations, notation, raw_notations = {};
 
     if (!is_hypothetical) { 
@@ -2223,7 +2224,7 @@ function calculate_moves(color, is_hypothetical)
     // Look at all the active pieces
     for (var x = 1; x <= FILE_MAX; x += 1) {
         for (var y = 1; y <= RANK_MAX; y += 1) {
-            var starting_filerank, square_from, moves, piece;
+            var starting_filerank, square_from, moves, moves_all, piece;
 
             square_from = VBOARD[x][y];
             piece = square_from.piece;
@@ -2237,7 +2238,8 @@ function calculate_moves(color, is_hypothetical)
             // as a hash key, class name for droppables, and also for notations.
             starting_filerank = square_from.filerank;
 
-            moves = filtered_moves(piece, color, is_hypothetical);
+            moves_all = filtered_moves(piece, color, is_hypothetical);
+            moves = moves_all.legal;
             if (!is_hypothetical) {
                 // Fills in possible_notations with possibly-ambiguous move notations in each system
                 calculate_notations(color, piece, moves, starting_filerank, possible_notations, square_from);
@@ -2253,6 +2255,10 @@ function calculate_moves(color, is_hypothetical)
                 dojo.forEach(moves, function(m) {
                     is_valid_move[starting_filerank][xy2filerank([m.x, m.y])] = m;
                 });
+            }
+
+            if (blocked_moves.length !== 0) {
+                blocked_moves[starting_filerank] = moves_all.blocked;
             }
 
             //console.log(starting_filerank, moves);
@@ -2277,6 +2283,7 @@ function calculate_moves(color, is_hypothetical)
 
         // For reals.
         VALID_MOVES = valid_moves;
+        BLOCKED_MOVES = blocked_moves;
         IS_VALID_MOVE = is_valid_move;
     }
     
@@ -2790,7 +2797,7 @@ function unfiltered_moves(parlett)
 // Get the legal moves for a piece.
 function filtered_moves(piece, color, is_hypothetical)
 {
-    var parlett, rel_moves, moves, start, blocked;
+    var parlett, rel_moves, moves, blocked_moves, start, blocked;
     var start_x, start_y, piece_info;
 
     start = piece.square;
@@ -2808,6 +2815,7 @@ function filtered_moves(piece, color, is_hypothetical)
 
     // Absolutize and find what is allowed
     moves = [];
+    blocked_moves = [];
     blocked = {};
     for (var i = 0; i < rel_moves.length; i += 1) {
         var rel_x, rel_y, flags, abs_move, x, y;
@@ -2855,8 +2863,13 @@ function filtered_moves(piece, color, is_hypothetical)
                 i += flags.if_blocked_skip;
             }
 
-            // Can't move to self-occupied square OR invincible pieces
-            if (capture_piece.color === color || PIECE_TYPES[capture_piece.type].invincible) {
+            // Can't move to self-occupied square
+            if (capture_piece.color === color) {
+                blocked_moves.push(abs_move);    // to indicate we are guarding this piece
+                continue;
+            }
+            // Can't move to invincible piece
+            if (PIECE_TYPES[capture_piece.type].invincible) {
                 continue;
             }
 
@@ -3050,7 +3063,7 @@ function filtered_moves(piece, color, is_hypothetical)
         }
     }
 
-    return moves;
+    return {legal:moves, blocked:blocked_moves};
 }
 
 // Return an array of [direction vectors, ch2 consumed]. The vectors
@@ -5593,6 +5606,8 @@ function highlight_moves(piece, enable)
     if (piece.color === GAME_STATE.active_color) {
         // Active player's pieces
         moves = VALID_MOVES[from_square.filerank];
+        // TODO: Show squares guarding
+        moves = BLOCKED_MOVES[from_square.filerank];//XYZ
     } else {
         // Opponent's pieces -- allow seeing valid moves if it was
         // their turn, if holding down shift.
