@@ -330,8 +330,9 @@ var DROP = {
 // Moves that can be made right now, for each active piece.
 var VALID_MOVES = null;             // Keyed by filerank of source, array of moves, x, y and any flags
 var IS_VALID_MOVE = null;           // Keyed by filerank of source, then filerank of dest
-var BLOCKED_MOVES = null;           // Cannot move there
+var BLOCKED_MOVES = null;           // Moves that would be valid except they're blocked
 var VALID_MOVES_OPP = null;         // Moves opponent could make, if it was their turn (attacking)
+var BLOCKED_MOVES_OPP = null;       // Opponent's blocked moves
 var VALID_MOVE_NOTATIONS = null;    // Map SAN, LAN, MAN, RAN, CRAN, FAN, coord, desc, Smith etc. -> [piece, square]
 var ALT_MOVE_NOTATIONS = null;      // Same as above, but non-canonical, longer forms (Nb1c3 when Nc3 would do, etc.)
 
@@ -2287,7 +2288,7 @@ function calculate_moves(color, is_hypothetical)
         IS_VALID_MOVE = is_valid_move;
     }
     
-    return valid_moves;
+    return {moves:valid_moves, blocked:blocked_moves};
 }
 
 // Get the number of properties an object has on its own.
@@ -2658,7 +2659,7 @@ function would_check(piece, move, color)
 
     // TODO: This is a lot of calculation to do, see if can speed it up
     all_moves = calculate_moves(opposite_color(color), true);
-    checked = in_check(color, all_moves);
+    checked = in_check(color, all_moves.moves);
 
     // Restore move
     undo_virtual_move(did); 
@@ -3628,7 +3629,9 @@ function set_turn(color, historical)
     GAME_STATE.active_color = new_color;
    
     // Active player in check?
-    VALID_MOVES_OPP = calculate_moves(opposite_color(new_color), true);
+    var all_opp = calculate_moves(opposite_color(new_color), true);
+    VALID_MOVES_OPP = all_opp.moves;
+    BLOCKED_MOVES_OPP = all_opp.blocked;
     checked = GAME_STATE.active_in_check = in_check(GAME_STATE.active_color, VALID_MOVES_OPP);
 
     // Note: this takes some time... is there any way to run it right AFTER the piece has
@@ -5613,6 +5616,7 @@ function highlight_moves(piece, enable)
         // their turn, if holding down shift.
         if (GAME_STATE.shift) {
             moves = VALID_MOVES_OPP[from_square.filerank];
+            moves = BLOCKED_MOVES_OPP[from_square.filerank];//XYZ
             GAME_STATE.shift = 1;    // showing other player's moves
         } else {
             return null;
