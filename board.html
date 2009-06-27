@@ -302,7 +302,9 @@ var GAME_STATE = {
     recent_square: null,        // Recently moved from square
     last_captured: null,        // export_captured() string _before_ current move 
     piece_under: null,          // Piece under cursor for piece inspector
-    shift: false                // Whether shift key is pressed
+    shift: false,               // Whether shift key is pressed
+    update_custom: false,       // Whether custom movement field is focused and being typed in
+    alert_assert: true          // Whether to alert assertion errors
 };    
 
 /// Drag and drop globals
@@ -480,7 +482,7 @@ var PIECE_TYPES = {
     //ferzwazirhunter: {parlett: "1>, 1X<", url:"akm"}, // TODO: image
     //adjutant: {parlett: "1>, 1<", url:"akm"}, //  aka tsiu-yin TODO: image
     //sidewinder: {parlett: "1X>, 1=", url:"akm"}, // TODO: image
-    ferz: {parlett: "1X", letter: "XF", image:["ferz", "ferz2"], url:"pc:ferz"}, // or ~1/1
+    ferz: {parlett: "1X", letter: "XF", image:["ferz", "ferz2", "1bishop"], url:"pc:ferz"}, // or ~1/1
     //wazirferzhunter: {parlett: "1X>, 1<", url:"akm"}, // TODO: image
     drunkensailor: {parlett: "1=, 1X<", image:"shipinv", url:"akm"}, 
     //drunkenbackslider: {parlett: "1=, 1<", url:"akm"}, // TODO: image
@@ -762,7 +764,10 @@ var PIECE_TYPES = {
     //
     // TODO: pieces from http://members.shaw.ca/quadibloc/chess/ch04.htm
     
-    dummy: {parlett: "~0/0", letter: "O", image:"banner"}
+
+    dummy: {parlett: "~0/0", letter: "O", image:"banner"},
+
+    custom: {parlett: "", image: "hexagon"}
 };
 
 var DEFAULT_BOARD_GROUP = "Recognized";
@@ -1202,7 +1207,7 @@ function save_pgn()
     }
 
     // Non-standard: current board state. The standard tags are FEN and SetUp, for starting position only.
-    dict.CurrentFEN = save_fen(); ////active_fen();
+    dict.CurrentFEN = save_fen(); 
 
     // Generate move text (not in a tag) 
     var move_texts = [];
@@ -3674,41 +3679,50 @@ function set_turn(color, historical)
 }
 
 // Update the copyable link that goes to the board state
-function set_copyable_link()
+// If this_position, then exports the current board state, otherwise,
+// exports the previous board state plus the last move.
+function set_copyable_link(this_position)
 {
-    var fen, captured;
-    var last = GAME_STATE.position_after.slice(-1)[0];
-    var prior = GAME_STATE.position_after.slice(-2)[0];
-    var perspective, url;
+    var fen, captured, last, prior, perspective, url;
 
-    // TODO: up to N last moves
-    var last_move = GAME_STATE.made_moves.slice(-1)[0];
+    if (this_position) {
+        fen = save_fen();
+        captured = export_captured();
+        perspective = GAME_STATE.flipped;
+    } else {
+        last = GAME_STATE.position_after.slice(-1)[0];
+        prior = GAME_STATE.position_after.slice(-2)[0];
 
-    if (last_move) {
-        // Store the previous move and the board state _before_ the move,
-        // so it can be made.
-        last_move = ";m=" + last_move.notations[form_value("output_notation")];
-        if (!prior) {
-            // No move has been made yet
-            dojo.byId("copyable_link").href = document.URL;
-            return;
+        // TODO: up to N last moves
+        var last_move = GAME_STATE.made_moves.slice(-1)[0];
+
+        if (last_move) {
+            // Store the previous move and the board state _before_ the move,
+            // so it can be made.
+            last_move = ";m=" + last_move.notations[form_value("output_notation")];
+            if (!prior) {
+                // No move has been made yet
+                dojo.byId("copyable_link").href = document.URL;
+                return;
+            }
+
+            fen = prior;
+        } else {
+            last_move = "";
+            fen = last;
         }
 
-        fen = prior;
-    } else {
-        last_move = "";
-        fen = last;
+        captured = GAME_STATE.last_captured;
+
+        // Flipped if black's turn
+        perspective = GAME_STATE.active_color === "black" ? ";f=1" : "";
     }
 
-    captured = GAME_STATE.last_captured;
     if (captured) {
         captured = ";c=" + captured;
     } else {
         captured = "";
     }
-
-    // Flipped if black's turn
-    perspective = GAME_STATE.active_color === "black" ? ";f=1" : "";
 
     url = make_copyable_link(fen) + captured + last_move + perspective;
     dojo.byId("copyable_link").href = url;
@@ -3906,7 +3920,7 @@ function make_vboard()
 function flip()
 {
     label_board(!PREFS.flipped);
-    load_fen(active_fen(), true);
+    load_fen(save_fen(), true);
     // BUG: if edit board, then flip it, lose changes. TODO: fix
 }
 
@@ -4002,6 +4016,7 @@ function init_board()
                     over_piece(GAME_STATE.piece_under, {});
                 }
             }
+
         };
 
     document.onkeyup = function(event) {
@@ -4011,6 +4026,7 @@ function init_board()
             return;
         }
 
+        // Releasing shift closes piece inspector
         if (event.keyCode === 16) {
             if (GAME_STATE.shift === 1) {
                 // When releasing shift, unhighlight opponent's moves, if any
@@ -4022,6 +4038,32 @@ function init_board()
             GAME_STATE.shift = false;
             hide_piece_inspector();
         }
+
+        // If typing in custom movement field, update it
+        if (GAME_STATE.update_custom) {
+            var control = dojo.byId("custom-movement");
+            var custom_pieces = dojo.query(".custom.piece");
+            var should_alert = GAME_STATE.alert_assert;
+
+            unhighlight_all();
+
+            PIECE_TYPES.custom.parlett = control.value;
+            GAME_STATE.alert_assert = false;
+            try {
+                calculate_moves(GAME_STATE.active_color);
+                control.style.backgroundColor = "";
+                dojo.attr(control, "title", "");
+            } catch(err) {
+                control.style.backgroundColor = "red";
+                dojo.attr(control, "title", "Error: " + err);
+            }
+            for (var i = 0; i < custom_pieces.length; i += 1) {
+                highlight_moves(custom_pieces[i], true);
+            }
+
+            GAME_STATE.alert_assert = should_alert;
+        }
+
     }
 
     if (document.URL.indexOf("file:") === 0) {
@@ -4657,6 +4699,7 @@ function move_dropped_piece(piece, square, event)
         }
 
         realize_vboard();
+        set_copyable_link(true);    // this board state
         return;
     }
 
@@ -5030,33 +5073,15 @@ function toggle_piece_library()
             dojo.addClass(wp, "tear-off");
             dojo.addClass(bp, "tear-off");
 
-            /*
-            // TODO: Create another piece under when drag off, so
-            // more will always be available.
-            wp.onmousedown = bp.onmousedown = function(event) {
-                var target, tear;
-               
-                // Torn off piece
-                tear = create_piece(this.color, this.type);
-
-                // TODO: position
-                
-                event = event || window.event;
-                target = event.target !== undefined ? event.target : event.srcElement;
-
-                //= target.offsetLeft;
-                //= target.offsetTop;
-                //tear.style.left = dojo._abs(target, true).x + "px";
-                //tear.style.top = dojo._abs(target, true).y + "px";
- 
-                dojo.body().appendChild(tear);
-            };*/
-
             var row = dojo.create("tr");
             var white_cell = dojo.create("td", {"class": "square"}, row);
             white_cell.appendChild(wp);
             var black_cell = dojo.create("td", {"class": "square"}, row);
             black_cell.appendChild(bp);
+
+            if (type === "custom") {
+                type = "custom: <input id='custom-movement' onfocus='GAME_STATE.update_custom = true;' onblur='GAME_STATE.update_custom = false'>";
+            }
             dojo.create("td", {innerHTML:type}, row);
     
             tbody.appendChild(row);
@@ -6192,7 +6217,10 @@ AssertException.prototype.toString = function() {
 function assert(expression, message)
 {
     if (!expression) {
-        alert(message);
+        if (GAME_STATE.alert_assert) {
+            alertalert(message);
+        }
+
         if (window.console && console.trace) {
             // Give a stack trace for Firebug
             console.trace();
