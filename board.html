@@ -1481,23 +1481,39 @@ function parse_pgn(pgn)
 // Export a PGN tag dictionary to PGN format, opposite of parse_pgn.
 function output_pgn_dict(dict)
 {
-    var pgn, quoted_value;
+    var lines, quoted_value, have_key, keys;
 
-    pgn = "";
-    // TODO: Use a hash table, avoid for..in
+    // PGN Seven Tag Roster (STR) appears first
+    keys = ["Event", "Site", "Date", "Round", "White", "Black", "Result"];
+    have_key = {Event:1, Site:1, Date:1, Round:1, White:1, Black:1, Result:1};
+
+    // Other keys
     for (var key in dict) {
         if (dict.hasOwnProperty(key)) {
-            var value = dict[key];
-
-            // TODO: unparenthetize, uncommaify, etc. .. or just set attributes
-            // to exactly what we want in load_pgn(), then fetch it.
-            // TODO: rules for quoting values?
-            quoted_value = '"' + value + '"';
-            pgn += "[" + key + " " + quoted_value + "]\n";
+            if (!have_key[key]) {
+                keys.push(key);
+                have_key[key] = 1;
+            }
         }
     }
 
-    return pgn;
+    lines = [];
+    for (var i = 0; i < keys.length; i += 1) {
+        var key = keys[i];
+        var value = dict[key];
+
+        if (value === undefined) {
+            value = "?";
+        }
+
+        // TODO: unparenthetize, uncommaify, etc. .. or just set attributes
+        // to exactly what we want in load_pgn(), then fetch it.
+        // TODO: rules for quoting values?
+        quoted_value = '"' + value + '"';
+        lines.push("[" + key + " " + quoted_value + "]");
+    }
+
+    return lines.join("\n");
 }
 
 
