@@ -1205,7 +1205,7 @@ function save_pgn()
     dict.CurrentFEN = save_fen(); ////active_fen();
 
     // Generate move text (not in a tag) 
-    var move_text = "";
+    var move_texts = [];
     var other_move_texts = {};
     for (var ply = 1; ply < GAME_STATE.made_moves.length; ply += 1) {
         var made = GAME_STATE.made_moves[ply];
@@ -1217,10 +1217,10 @@ function save_pgn()
         var ply_info = decode_ply(ply);
 
         if (ply_info.color === "white") {
-            move_text += ply_info.fmvn + ". ";
+            move_texts.push(ply_info.fmvn + ". ");
         }
-        move_text += made.notations[EXPORT_NOTATIONS[0]];
-        move_text += " ";
+        move_texts.push(made.notations[EXPORT_NOTATIONS[0]]);
+        move_texts.push(" ");
 
         for (var i = 1; i < EXPORT_NOTATIONS.length; i += 1) {
             var notation = EXPORT_NOTATIONS[i];
@@ -1247,7 +1247,7 @@ function save_pgn()
     pgn = output_pgn_dict(dict);
 
     pgn += "\n";
-    pgn += move_text;
+    pgn += move_texts.join("");
 
    
     return pgn;
