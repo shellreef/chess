@@ -494,7 +494,7 @@ var PIECE_TYPES = {
     ferz: {parlett: "1X", letter: "XF", image:["ferz", "ferz2", "1bishop"], url:"pc:ferz"}, // or ~1/1
     //wazirferzhunter: {parlett: "1X>, 1<", url:"akm"}, // TODO: image
     drunkensailor: {parlett: "1=, 1X<", image:"shipinv", url:"akm"}, 
-    //drunkenbackslider: {parlett: "1=, 1<", url:"akm"}, // TODO: image
+    //drunkenbackslider: {parlett: "1=, 1<", url:"akm"}, // TODO: image, aka reverse silver
     deserter: {parlett: "1<, 1X<", url:"akm", image:"pawninv"}, 
     //pikeman: {parlett: "1>, 1X>, 1=", url:"akm", image:"redpawn"}, // TODO: image
     silvergeneral: {parlett: "1>, 1X", url:"pc:silvergeneral"},   // aka gin-sho - or #ferz, [0,1]
@@ -510,7 +510,7 @@ var PIECE_TYPES = {
     goldgeneral: {parlett: "1+, 1X>, 1=, 1<", url:"pc:goldgeneral"},  // or: #wazir, [1,1], [-1,1]
     //crane: {parlett: "1+, 1>, 1<", url:"akm"}, // aka horrible panther, mau-hau TODO: image
     //drunkengorilla: {parlett: "1>, 1X<, 1=, 1<", url:"akm"}, // TODO: image
-    blindtiger: {parlett: "1X, 1=, 1<", url:"akm", image:"moko_blindtiger"},
+    blindtiger: {parlett: "1X, 1=, 1<", url:"akm", image:"moko_blindtiger"}, // aka reverse gold
 
     "2moveferz": {parlett: "2X, 2+"},       // one move like a ferz, then another from that square
     "2movewazir": {parlett: "2+, 1*"},      // ..
@@ -528,6 +528,9 @@ var PIECE_TYPES = {
     //r5: {parlett: "n+.5", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/shortrook.html"}, // TODO: image
     //r6: {parlett: "n+.6", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/shortrook.html"}, // TODO: image
     fourfer: {parlett: "#r4, 1X", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/fr4.html"},
+    narrowknight: {parlett: "[1,2], [1,-2], [-1,2], [-1,-2]"},
+    wideknight: {parlett: "[2,1], [2,-1], [-2,1], [-2,-1]"},
+
     r4ferz: {parlett: "#r4, #ferz"},
     n2r4: {parlett: "#r4, 2(~1/2)"},
     alfilr4: {parlett: "#alfil, #r4"},
