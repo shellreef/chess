@@ -815,7 +815,7 @@ var SAVED_BOARDS = {
 
 // King is khun, not actually shah, but it behaves the same (no castling)
 // Counting rules on http://en.wikipedia.org/wiki/Makruk are not implemented
-"Thai Chess (Makruk)": "rnx(silvergeneral)x(ferz)x(shah)x(silvergeneral)nr/8/x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)/8/8/X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)/8/RNX(silvergeneral)X(shah)X(ferz)X(silvergeneral)NR w - -",
+"Thai Chess (Makruk)": "rnx(silvergeneral)x(ferz)x(shah)x(silvergeneral)nr/8/x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)/8/8/X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)/8/RNX(silvergeneral)X(shah)X(ferz)X(silvergeneral)NR w - -",
 "FIDE Chess": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -",
 "Berolina Chess": "rnbqkbnr/xbxbxbxbxbxbxbxb/8/8/8/8/XBXBXBXBXBXBXBXB/RNBQKBNR w KQkq -"
 // TODO: Modern variants
@@ -940,7 +940,7 @@ var SAVED_BOARDS = {
 "Test Stalemate (half-win)":     "k7/2Q5/8/8/p7/1P6/8/8 w KQkq - fmvn=5 stalemate=halfwin",
 "Test Stalemate (loss)":     "k7/2Q5/8/8/p7/1P6/8/8 w KQkq - fmvn=5 stalemate=loss",
 "Test Remove Check by Capture":     "4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5",
-"Test Promotion":     "K/1X(fiveriderpawn)1X(ccpawn)X(rrpawn)X(nnpawn)X(pkpawn)/8/PX(makrukpawn)/8/8/pppppppp/7k w - -",
+"Test Promotion":     "K/1X(fiveriderpawn)1X(ccpawn)X(rrpawn)X(nnpawn)X(pkpawn)/8/PX(makrukpawn)/5X(makrukpawn)/8/pppppppp/7k w - -",
 "Test Promotion to Rook": "8/k1P5/p7/P3K3/8/8/8/8 w - - 0 53", // from http://chessteacher.110mb.com/2008/10/22/minor-promotion/
 "Test Promotion to Bishop": "8/5P1k/5K1p/7P/8/8/8/8 w - - 0 51",
 "Test En Passant (alone)":     "8/8/8/3pP3/8/8/8/8 w - d6",
@@ -1752,10 +1752,10 @@ function should_promote(piece)
     square = piece.square;
 
     // Get rank from player's perspective (as in descriptive notation, not algebraic)
-    relative_rank = GAME_STATE.active_color === "white" ? square.y : 9 - square.y;
+    relative_rank = GAME_STATE.active_color === "white" ? square.y : (RANK_MAX + 1) - square.y;
 
-    // Default to 8th rank
-    promotion_rank = PIECE_TYPES[piece.type].promotion_rank || 8;
+    // Default to last rank
+    promotion_rank = PIECE_TYPES[piece.type].promotion_rank || RANK_MAX;
 
     return relative_rank === promotion_rank;
 }
@@ -1763,19 +1763,20 @@ function should_promote(piece)
 // Return whether the move would cause the piece to promote
 function would_promote(piece, move)
 {
+    var relative_rank, promotion_rank;
+
     // Does it promote?
     if (!PIECE_TYPES[piece.type].promote) {
         return false;
     }
 
-    // Will it be on the last rank?
-    if (GAME_STATE.active_color === "white") {
-        return move.y === 8;    // 8th rank
-    } else if (GAME_STATE.active_color === "black") {
-        return move.y === 1;    // 1st rank
-    } else {
-        assert(false, "would_promote(" + piece + "): unknown active color");
-    }
+     // Get rank from player's perspective (as in descriptive notation, not algebraic)
+    relative_rank = GAME_STATE.active_color === "white" ? move.y : (RANK_MAX + 1) - move.y;
+
+    // Default to last rank
+    promotion_rank = PIECE_TYPES[piece.type].promotion_rank || RANK_MAX;
+
+    return relative_rank === promotion_rank;
 }
 
 
