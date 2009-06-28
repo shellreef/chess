@@ -486,14 +486,15 @@ var PIECE_TYPES = {
     kingrook: {parlett: "#king, #rook", royal: true},
 
     // Generals from http://www.mayhematics.com/v/v_gm.htm
-    soldier: {parlett: "1>", url:"akm", image:"shogipawn"},
+    soldier: {parlett: "1>", url:"akm", image:"shogipawn"}, // TODO: shogi pawn promotion, and a non-promoting variant
+    chinesepawn: {parlett: "1>", url:"http://en.wikipedia.org/wiki/Xiangqi", promote:["advancedsoldier"], promotion_rank:6}, // TODO
     goose: {parlett: "o1X>", url:"akm", image:"goose"},
     swan: {parlett: "1X>", image:"ferzf"},
     drunk: {parlett: "1=", url:"akm", image:["pawn90cw", "pawn90ccw"]},
     sailor: {parlett: "1X<", image:["ship", "ferzb"], url:"akm"}, 
     backslider: {parlett: "1<", url:"akm"}, 
     coppergeneral: {parlett: "1>, 1X>", url:"akm"},     // aka dou-sho
-    drunkensoldier: {parlett: "1>, 1=", url:"akm", image:["pawn45ccw", "pawn45cw"]}, 
+    advancedsoldier: {parlett: "1>, 1=", url:"akm", image:["pawn45ccw", "pawn45cw"]},  // for Xiangqi after passing the river, aka drunken soldier TODO: better image, more similar to chinesepawn
     //ferzwazirhunter: {parlett: "1>, 1X<", url:"akm"}, // TODO: image
     //adjutant: {parlett: "1>, 1<", url:"akm"}, //  aka tsiu-yin TODO: image
     //sidewinder: {parlett: "1X>, 1=", url:"akm"}, // TODO: image
