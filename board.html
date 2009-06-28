@@ -3074,74 +3074,86 @@ function filtered_moves(piece, color, is_hypothetical)
     return {legal:moves, blocked:blocked_moves};
 }
 
-// Return an array of [direction vectors, ch2 consumed]. The vectors
-// are positive for forward, negative for backwards.
+// Return {vectors, consumed}. The vectors are positive for forward, 
+// negative for backwards. Consumed is number of characters, 1 or 2.
 function relative_decode_direction(ch, ch2)
 {
+    var vectors, consumed;
+
+    consumed = 1;
     if (ch === "+") { 
         // orthogonally four possible directions
-        return [[[1, 0], [0, 1], [-1, 0], [0, -1]], false];
+        vectors = [[1, 0], [0, 1], [-1, 0], [0, -1]];
     } else if (ch === "=") {
         // orthogonally sideways
-        return [[[1, 0], [-1, 0]], false];
+        vectors = [[1, 0], [-1, 0]];
     } else if (ch === ">") {
         if (ch2 === "=") {
             // >= orthogonally forwards or sideways
-            return [relative_decode_direction(">", undefined)[0].concat(relative_decode_direction("=", undefined)[0]), true];
+            vectors = relative_decode_direction(">", undefined).vectors.concat(relative_decode_direction("=", undefined).vectors);
+            consumed += 1;
         } else if (ch2 === ">") {
             // >> right (Extended Parlett)
-            return [[[1, 0]], true];
+            vectors = [[1, 0]];
+            consumed += 1;
         } else {
             // = orthogonally forward
-            return [[[0, 1]], false];
+            vectors = [[0, 1]];
         }
     } else if (ch === "<") {
         if (ch2 === ">") {
             // <> orthogonally forwards and backwards
-            return [[[0, 1], [0, -1]], true];
+            vectors = [[0, 1], [0, -1]];
+            consumed += 1;
         } else if (ch2 === "=") {
             // <= orthogonally backwards or sideways
-            return [relative_decode_direction("<", undefined)[0].concat(relative_decode_direction("=", undefined)[0]), true];
+            vectors = relative_decode_direction("<", undefined).vectors.concat(relative_decode_direction("=", undefined).vectors);
+            consumed += 1;
         } else if (ch2 === "<") {
             // << left (Extended Parlett)
-            return [[[-1, 0]], true];
+            vectors = [[-1, 0]];
+            consumed += 1;
         } else {
             // < orthogonally backwards
-            return [[[0, -1]], false];
+            vectors = [[0, -1]];
         }
     } else if (ch === "X") { 
         if (ch2 === ">") {
             // X> diagonally forwards
-            return [[[1, 1], [-1, 1]], true];
+            vectors = [[1, 1], [-1, 1]];
+            consumed += 1;
         } else if (ch2 === "<") {
             // X< diagonally backwards
-            return [[[1, -1], [-1, -1]], true];
+            vectors = [[1, -1], [-1, -1]];
+            consumed += 1;
         } else {
             // X diagonally four possible directions
-            return [[[1, 1], [1, -1], [-1, 1], [-1, -1]], false];
+            vectors = [[1, 1], [1, -1], [-1, 1], [-1, -1]];
         }
 
     // Unicode arrows - see http://www.alanwood.net/unicode/arrows.html for a
     // good list - since we were running out of ASCII..
     } else if (ch === "↖") {
         // ↖ diagonally left up (Extended Parlett)
-        return [[[-1, 1]], false];
+        vectors = [[-1, 1]];
     } else if (ch === "↗") {
         // ↗ diagonally right up (Extended Parlett)
-        return [[[1, 1]], false];
+        vectors = [[1, 1]];
     } else if (ch === "↘") {
         // ↘ diagonally right down (Extended Parlett)
-        return [[[1, -1]], false];
+        vectors = [[1, -1]];
     } else if (ch === "↙") {
         // ↙ diagonally left down (Extended Parlett)
-        return [[[-1, -1]], false];
+        vectors = [[-1, -1]];
 
     } else if (ch === "*") {    
         // orthogonally or diagonally (eight possible directions)
-        return [relative_decode_direction("+", undefined)[0].concat(relative_decode_direction("X", undefined)[0]), false];
+        vectors = relative_decode_direction("+", undefined).vectors.concat(relative_decode_direction("X", undefined).vectors);
     } else {
         assert(false, "relative_decode_direction('" + ch + "', '" + ch2 + "'): invalid direction");
     }
+
+    return {vectors:vectors, consumed:consumed};
 }
 
 function parseInt10(x) 
@@ -3390,9 +3402,9 @@ function decode_one_parlett(parlett)
             var maybe_directions = relative_decode_direction(ch, parlett.substr(i + 1, 1));
 
             if (maybe_directions) {
-                directions = maybe_directions[0];
-                if (maybe_directions[1]) {
-                    i += 1; // two-character direction
+                directions = maybe_directions.vectors;
+                if (maybe_directions.consumed > 1) {
+                    i += maybe_directions.consumed - 1; // two-character (or more) direction
                 }
             } else {
                 assert(false, "relative_parlett(" + parlett + "): unsupported: '" + ch + "'");
