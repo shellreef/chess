@@ -529,6 +529,7 @@ var PIECE_TYPES = {
     fourfer: {parlett: "#r4, 1X", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/fr4.html"},
     narrowknight: {parlett: "[1,2], [1,-2], [-1,2], [-1,-2]"},
     wideknight: {parlett: "[2,1], [2,-1], [-2,1], [-2,-1]"},
+    shah: {parlett: "1*", royal: true, url:"http://en.wikipedia.org/wiki/Shatranj#Rules"},  // like a king, but no castling
 
     r4ferz: {parlett: "#r4, #ferz"},
     n2r4: {parlett: "#r4, 2(~1/2)"},
@@ -594,6 +595,7 @@ var PIECE_TYPES = {
     elephantknightwazir: {parlett: "#elephant, #knight, #wazir"},
     elephantwizard: {parlett: "#elephant, #wizard", image:"elephantzzmoon"},
     //fibnifrook: {parlett: "#fibnif, #rook"}, // TODO: image
+    genscher: {parlett: "#panda, #knight"},
     giraffeferz: {parlett: "#giraffe, #ferz"},
     giraffewazir: {parlett: "#giraffe, #wazir"},
     knightcamelzebra: {parlett: "#knight, #camel, #zebra"},
@@ -640,7 +642,7 @@ var PIECE_TYPES = {
     champion: {parlett: "#wazir, #alfil, #warmachine", url:"pc:champion"},
     //crownedrook: {parlett: "#rook, #ferz"},       // TODO: image
     crownedcamel: {parlett: "#camel, #ferz"},
-    camelking: {parlett: "#camel, #king", image:["simplecamelking", "cbjcamelking"]},
+    camelking: {parlett: "#camel, #king", image:["simplecamelking", "cbjcamelking", "tinyscamelking"]},
     general: {parlett: "#wazir", royal: true, url:"pc:general", image:["general2", "general"]}, 
     kangaroo: {parlett: "#knight, #alfil", url:"pc:cangaroo"},  // Newton kangaroo, different than pc:kangaroo
     // http://www.mayhematics.com/v/v_gm.htm has a different definition of wizard
