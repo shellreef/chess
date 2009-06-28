@@ -19,6 +19,7 @@ actualizedpotentialpawn
 actualizedpotentialqueen
 actualizedpotentialrook
 actualizedpotentialwazir
+advancedsoldier
 alfilbishop
 alfildabbabarifle
 alfilhexagon
