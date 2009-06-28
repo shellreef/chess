@@ -403,6 +403,7 @@ var PIECE_TYPES = {
     },
 
     weakpawn: {parlett: "o1>, c1X>"},   // No double move, no promotion
+    shatranjpawn: {parlett: "#weakpawn", promote:["ferz"], url:"http://en.wikipedia.org/wiki/Shatranj#Rules"},
     superpawn: {parlett: "on>, cnX>", letter: "XP", image:"quickpawn"},
     berolinapawn: {parlett: "o1X>, c1>, io2X>", letter: "XB", image:"berolinapawn", resets_50move: true, url:"pc:berolina"},
     // TODO: http://www.chessvariants.org/piececlopedia.dir/berolina-plus.html
@@ -789,7 +790,7 @@ var SAVED_BOARDS = {
     "Recognized": {
 "FIDE Chess": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -",
 
-"Berolina Chess": "rnbqkbnr/xbxbxbxbxbxbxbxb/8/8/8/8/XBXBXBXBXBXBXBXB/RNBQKBNR w KQkq -"
+"Berolina Chess": "rnbqkbnr/xbxbxbxbxbxbxbxb/8/8/8/8/XBXBXBXBXBXBXBXB/RNBQKBNR w KQkq -",
 // TODO: chess960, historical "variants"
 // Korean Chess (Changgi)
 // Chaturanga
@@ -803,12 +804,10 @@ var SAVED_BOARDS = {
 //
 
 // Shatranj, except the following rules are NOT implemented:
-// 1. Pawns can't make double moves
-// 2. Pawn only promotes to ferz
 // 3. Stalemating your opponent wins
 // 4. Taking the last piece of your opponent wins, unless your opponent
 //    can take your last non-king piece too, in which case the game is drawn
-//"Shatranj (Not Quite)":     "rnykxfynr/pppppppp/8/8/8/8/PPPPPPPP/RNYKXFYNR w - -"
+"Shatranj (Almost)":     "rnykxfynr/x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)/8/8/8/8/X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)/RNYKXFYNR w - -"
 
     },
 
