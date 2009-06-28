@@ -415,6 +415,7 @@ lizard
 lobster
 longleaper
 mage
+makrukpawn
 man
 mann2
 marshal2

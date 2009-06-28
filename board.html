@@ -410,6 +410,7 @@ var PIECE_TYPES = {
 
     weakpawn: {parlett: "o1>, c1X>"},   // No double move, no promotion
     shatranjpawn: {parlett: "#weakpawn", promote:["ferz"], url:"http://en.wikipedia.org/wiki/Shatranj#Rules"},
+    makrukpawn: {parlett: "#weakpawn", promote:["ferz"], promotion_rank:6, url:"http://en.wikipedia.org/wiki/Makruk#Pieces"},
     superpawn: {parlett: "on>, cnX>", letter: "XP", image:"quickpawn"},
     berolinapawn: {parlett: "o1X>, c1>, io2X>", letter: "XB", image:"berolinapawn", resets_50move: true, url:"pc:berolina"},
     // TODO: http://www.chessvariants.org/piececlopedia.dir/berolina-plus.html
@@ -794,29 +795,34 @@ var DEFAULT_BOARD_NAME = "FIDE Chess";
 
 // Saved board setups in FEN
 var SAVED_BOARDS = {
+    // Recognized chesses, ordered roughly chronologically and/or increasing complexity
     // http://chessvariants.org/index/mainquery.php?type=Any&orderby=LinkText&displayauthor=1&displayinventor=1&showimages=1&showtextnotes=1&listrecognizedonly=1&primarylinksonly=1&usethisheading=Recognized+Chess+Variants
     "Recognized": {
-"FIDE Chess": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -",
-
-"Berolina Chess": "rnbqkbnr/xbxbxbxbxbxbxbxb/8/8/8/8/XBXBXBXBXBXBXBXB/RNBQKBNR w KQkq -",
-// TODO: chess960, historical "variants"
-// Indian Chess (Chaturanga)
-// Korean Chess (Changgi)
-// Los Alamos Chess (6x6 board)
-// Minishogi
-// Omega Chess
-// Japanese Chess (Shogi)
-// Tamerlane Chess
-// Ultima
-// Chinese Chess (Xiangqi)
-//
-
+// TODO: Indian Chess (Chaturanga)
 // Shatranj (2nd known variant), except that this rule is not implemented:
 // - Taking the last piece of your opponent wins, unless your opponent
 //    can take your last non-king piece too, in which case the game is drawn
 // Note that K v. K will result in a "draw by insufficient material" anyway, and
 // bareing the king will often result in a win eventually.
-"Arabic Chess (Shatranj)":     "rnyx(shah)xfynr/x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)/8/8/8/8/X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)/RNYX(shah)XFYNR w - - uncheckered stalemate=win"
+"Arabic Chess (Shatranj)":     "rnyx(shah)xfynr/x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)/8/8/8/8/X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)/RNYX(shah)XFYNR w - - uncheckered stalemate=win",
+
+// TODO: Korean Chess (Changgi)
+// Omega Chess
+// Japanese Chess (Shogi)
+// Minishogi
+// Tamerlane Chess
+// Chinese Chess (Xiangqi)
+
+// King is khun, not actually shah, but it behaves the same (no castling)
+// Counting rules on http://en.wikipedia.org/wiki/Makruk are not implemented
+"Thai Chess (Makruk)": "rnx(silvergeneral)x(ferz)x(shah)x(silvergeneral)nr/8/x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)/8/8/X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)/8/RNX(silvergeneral)X(shah)X(ferz)X(silvergeneral)NR w - -",
+"FIDE Chess": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -",
+"Berolina Chess": "rnbqkbnr/xbxbxbxbxbxbxbxb/8/8/8/8/XBXBXBXBXBXBXBXB/RNBQKBNR w KQkq -"
+// TODO: Modern variants
+// Los Alamos Chess (6x6 board)
+// Ultima
+// Chess960
+
     },
 
     "New Pieces": {
@@ -934,7 +940,7 @@ var SAVED_BOARDS = {
 "Test Stalemate (half-win)":     "k7/2Q5/8/8/p7/1P6/8/8 w KQkq - fmvn=5 stalemate=halfwin",
 "Test Stalemate (loss)":     "k7/2Q5/8/8/p7/1P6/8/8 w KQkq - fmvn=5 stalemate=loss",
 "Test Remove Check by Capture":     "4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5",
-"Test Promotion":     "K/PX(fiveriderpawn)1X(ccpawn)X(rrpawn)X(nnpawn)X(pkpawn)/8/8/8/8/pppppppp/7k w - -",
+"Test Promotion":     "K/1X(fiveriderpawn)1X(ccpawn)X(rrpawn)X(nnpawn)X(pkpawn)/8/PX(makrukpawn)/8/8/pppppppp/7k w - -",
 "Test Promotion to Rook": "8/k1P5/p7/P3K3/8/8/8/8 w - - 0 53", // from http://chessteacher.110mb.com/2008/10/22/minor-promotion/
 "Test Promotion to Bishop": "8/5P1k/5K1p/7P/8/8/8/8 w - - 0 51",
 "Test En Passant (alone)":     "8/8/8/3pP3/8/8/8/8 w - d6",
@@ -1737,23 +1743,21 @@ function find_legal_move(text)
 // Return whether a piece should be promoted
 function should_promote(piece)
 {
-    var square;
+    var square, relative_rank, promotion_rank;
 
-    // Does it promote?
     if (!PIECE_TYPES[piece.type].promote) {
         return false;
     }
 
     square = piece.square;
 
-    // Is it on the last rank?
-    if (GAME_STATE.active_color === "white") {
-        return square.y === 8;    // 8th rank
-    } else if (GAME_STATE.active_color === "black") {
-        return square.y === 1;    // 1st rank
-    } else {
-        assert(false, "should_promote(" + piece + "): unknown active color");
-    }
+    // Get rank from player's perspective (as in descriptive notation, not algebraic)
+    relative_rank = GAME_STATE.active_color === "white" ? square.y : 9 - square.y;
+
+    // Default to 8th rank
+    promotion_rank = PIECE_TYPES[piece.type].promotion_rank || 8;
+
+    return relative_rank === promotion_rank;
 }
 
 // Return whether the move would cause the piece to promote
