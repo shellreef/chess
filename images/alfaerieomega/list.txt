@@ -463,6 +463,7 @@ oliphant
 onediamondbishop
 onediamondqueen
 onediamondrook
+optingpawn
 orangeknight
 orangepawn
 orphan
