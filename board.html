@@ -89,7 +89,7 @@ table.board
  user-select: none;
 }
 
-td.square
+td.square   /* RULE #16 */
 {
  border-style: none;
  /* border: 1px solid black; */
@@ -104,13 +104,6 @@ td.square
  text-align: left;
 }
 
-td.label { text-align: center; }
-td.file { border-bottom: 2px solid black; }
-td.rank { border-right: 2px solid black; padding-right: 5px; }
-td.right-edge { border-right: 2px solid black; }
-td.bottom-edge { border-bottom: 2px solid black; }
-
-
 /* Colors based on http://en.wikipedia.org/wiki/Chessboard
  * Useful site: http://www.cssdrive.com/imagepalette/index.php
  * Colors palette generator, get colors of an arbitrary image.
@@ -120,8 +113,16 @@ td.bottom-edge { border-bottom: 2px solid black; }
  * But I like these, gives it a nice wooden feel. Could also
  * use green for a tournament-style board.
  */
-td.white { background-color: #ffce9e; }
-td.black { background-color: #d18b47; }
+td.black { background-color: #d18b47; } /* RULE #17 */
+td.white { background-color: #ffce9e; } /* RULE #18 */
+
+
+td.label { text-align: center; }
+td.file { border-bottom: 2px solid black; }
+td.rank { border-right: 2px solid black; padding-right: 5px; }
+td.right-edge { border-right: 2px solid black; }
+td.bottom-edge { border-bottom: 2px solid black; }
+
 
 /* Highlights */
 
@@ -809,7 +810,7 @@ var SAVED_BOARDS = {
 // 3. Stalemating your opponent wins
 // 4. Taking the last piece of your opponent wins, unless your opponent
 //    can take your last non-king piece too, in which case the game is drawn
-"Shatranj (Almost)":     "rnyx(shah)xfynr/x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)/8/8/8/8/X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)/RNYX(shah)XFYNR w - -"
+"Shatranj (Almost)":     "rnyx(shah)xfynr/x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)/8/8/8/8/X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)/RNYX(shah)XFYNR w - - uncheckered"
 
     },
 
@@ -4938,6 +4939,13 @@ function load_fen(fen, replay)
         dojo.query(".dropped-square").removeClass("dropped-square");
 
         update_captured_piece_images();
+
+        if (GAME_STATE.uncheckered) {
+            change_css(16, "border", "1px solid black");    // td.square
+            change_css(17, "background-color", change_css(18, "background-color")); // match td.black to td.white
+        } else {
+            // TODO: Revert to original
+        }
     }
    
     // Now that everything is loaded, set the turn.
@@ -6195,6 +6203,19 @@ function init_dnd()
 }
 
 //// LOW-LEVEL FUNCTIONS
+
+// Modify the existing stylesheet, returning the value. If value is
+// undefined, get the old value instead of changing it.
+function change_css(ordinal, property, value)
+{
+    var rules = document.styleSheets[0].cssRules || document.styleSheets[0].rules;
+
+    if (value === undefined) {
+        return rules[ordinal].style[property];
+    } else {
+        return rules[ordinal].style[property] = value;
+    }
+}
 
 // Toggle display of an element
 function toggle(element)
