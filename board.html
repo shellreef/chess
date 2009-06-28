@@ -815,7 +815,7 @@ var SAVED_BOARDS = {
 // 3. Stalemating your opponent wins
 // 4. Taking the last piece of your opponent wins, unless your opponent
 //    can take your last non-king piece too, in which case the game is drawn
-"Shatranj (Almost)":     "rnyx(shah)xfynr/x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)/8/8/8/8/X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)/RNYX(shah)XFYNR w - - uncheckered"
+"Shatranj (Almost)":     "rnyx(shah)xfynr/x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)/8/8/8/8/X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)/RNYX(shah)XFYNR w - - ruled uncheckered"
 
     },
 
@@ -4948,22 +4948,26 @@ function load_fen(fen, replay)
 
         update_captured_piece_images();
 
-        if (GAME_STATE.uncheckered) {
+        if (GAME_STATE.ruled) {
             change_css(16, "border", "1px solid black");    // td.square
             var size = (parseInt(PREFS.square_size, 10) - 1) + "px";
             change_css(16, "width", size);
             change_css(16, "min-width", size);
             change_css(16, "height", size);
             change_css(16, "min-height", size);
-            change_css(17, "background-color", PREFS.white); // match td.black to td.white
         } else {
             change_css(16, "border", "none");
-            change_css(17, "background-color", PREFS.black);
             var size = PREFS.square_size;
             change_css(16, "width", size);
             change_css(16, "min-width", size);
             change_css(16, "height", size);
             change_css(16, "min-height", size);
+        }
+
+        if (GAME_STATE.uncheckered) {
+            change_css(17, "background-color", PREFS.white); // match td.black to td.white
+        } else {
+            change_css(17, "background-color", PREFS.black);
         }
     }
    
