@@ -130,6 +130,7 @@ cbknight
 cbpawn
 cbqueen
 cbrook
+ccpawn
 chameleon
 champion
 chancellor
@@ -250,6 +251,7 @@ ferzx4ne
 ferzx4nw
 ferzx4se
 ferzx4sw
+fiveriderpawn
 fkingbknight
 fknightbbishop
 fknightbking
@@ -267,6 +269,7 @@ forwardrookbackwardsprince
 fourfer
 fourleaper
 fqueenbknight
+freeleaperpawn
 frog
 frookbbishop
 frookbknight
@@ -443,6 +446,7 @@ neswknight
 nightknight
 nightrider
 nightriderq
+nnpawn
 noclafg
 nspearman
 nwall
@@ -483,6 +487,7 @@ pepperoni
 pincerpawn
 pinkknight
 pinkpawn
+pkpawn
 plane
 prince
 princess
@@ -563,6 +568,7 @@ royalknight
 royalpawn
 royalqueen
 royalrook
+rrpawn
 sausage
 scorpion
 scorpionpawn
