@@ -2869,7 +2869,11 @@ function filtered_moves(piece, color, is_hypothetical)
 
             // Can't move to self-occupied square
             if (capture_piece.color === color) {
-                blocked_moves.push(abs_move);    // to indicate we are guarding this piece
+                if (if_unblocked_dy === undefined) {    // skip castling etc.
+                    // to indicate we are guarding this piece
+                    blocked_moves.push(abs_move);
+                }
+
                 continue;
             }
             // Can't move to invincible piece
