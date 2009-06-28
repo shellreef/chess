@@ -573,6 +573,7 @@ var PIECE_TYPES = {
 
     alfilbishop: {parlett: "#alfil, #bishop"},
     bishoppawn: {parlett: "#bishop, #pawn"},
+    crookedbishopwazir: {parlett: "#crookedbishop, #wazir"},
     duchess: {parlett: "#bishop, #warmachinerider", image:["duchess", "bishopwarmachinerider"], url:"http://www.mayhematics.com/v/v_gm.htm"},
     elephantwarmachine: {parlett: "#elephant, #warmachine"},
     elephantwarmachinewazir: {parlett: "#elephant, #warmachine, #wazir"},
@@ -768,8 +769,9 @@ var PIECE_TYPES = {
     slipbishop: {parlett: "[1,-1](~2/2↖&), [-1,-1](~2/2↗&), [-1,1](~2/2↘&), [1,1](~2/2↙&)"},
     slipqueen: {parlett: "#panda, #slipbishop"},
 
-    // TODO
-    //crookedbishop: {parlett: "n\\↖↗\\", url:"pc:crookedbishop"}, // TODO
+    // TODO: fix same problem as griffon, needs to block both rays! (duplicate squares, disambiguated, one removed and blocked)
+    crookedbishop: {parlett: "nX\\90,-90\\, nX\\-90,90\\", url:"pc:crookedbishop", image:["crookedbishop", "eaglescout"]}, 
+    crookedrook: {parlett: "n+\\90,-90, n+\\-90,90\\"},
 
     // Explicit movements
     crab: {parlett: "[1,2], [-1,2], [-2,-1], [2,-1]", image: ["betzancrab", "crab2", "crab"], url:"pc:crab"},
@@ -931,6 +933,8 @@ var SAVED_BOARDS = {
 "Test Leapers": "K/2E1Y1H1/3M/1XT1W1XG1Z/8/3Z1N/4oo/5k w - -", // TODO: antelope, flamingo
 "Test Riders": "B2R4/5X(barcrider)2/4Q3/4XN3/2X(alibabariderferz)3X(stone)1/3X(crabrider)1X(warmachinerider)X(squirrelrider)1/2X(alfilrider)X(camelrider)2X(zebrarider)1/4X(girafferider)3 w - - 0 1",
 "Test Complex Riders": "8/8/1X(dummy)/4X(griffon)/7X(panda)//5X(slipbishop) w - -",
+"Test Complex Riders II": "8/8/8/8/4X(crookedbishop) w - -",
+"Test Complex Riders III": "8/8/8/8/4X(crookedrook) w - -",
 "Test Amphibians": "4k/8/8/slslslsl/8/8/FFFFFFFF/4K w - -",
 "Test Royalty": "x(royalrook)x(royalknight)x(royalbishop)xjkx(royalbishop)x(royalknight)x(royalrook)/pppppppp/8/8/8/8/PPPPPPPP/X(royalrook)X(royalknight)X(royalbishop)XJKX(royalbishop)X(royalknight)X(royalrook) w KQkq -",
 "Test Projectiles": "x(airplane)X(airplane)4x(airplane)/X(allseeingeye)/1x(bird)/2x(bird)x(bird)x(bird)1x(bird)/3x(bird)x(bird)/3X(archerzz3)x(bird)/4X(archerzz2)X(archer)/x(frog)1X(gun)3X(rocket) w - -",
@@ -3106,12 +3110,13 @@ function filtered_moves(piece, color, is_hypothetical)
     return {legal:moves, blocked:blocked_moves};
 }
 
-// Rotate a direction vector by the given number of degrees, clockwise
+// Rotate a direction vector by the given number of degrees, clockwise,
+// rounded to nearest 45 degree multiple.
+//
 // Example:
 //
 //  rotate_direction([0,1], 180) === [0,-1]
 //
-// Rounded to nearest 45 degree multiple.
 function rotate_direction(vector, degrees)
 {
     var rotate45 = {
@@ -3124,6 +3129,13 @@ function rotate_direction(vector, degrees)
         "v-10": [-1,1],
         "v-11": [0,1]
     };
+    // TODO: support non-unit vectors, like [0,2] hippogonal rider moves?
+    // Could get complicated.
+
+    if (degrees < 0) {
+        degrees = 360 - (-degrees);
+    }
+
     var ticks = Math.round(degrees / 45);
 
     for (var i = 0; i < ticks; i += 1) {
@@ -3132,6 +3144,7 @@ function rotate_direction(vector, degrees)
         vector = rotate45[vector_string];
         assert(vector !== undefined, "rotate_direction(" + vector + ", " + degrees + "): failed to rotate " + vector_string);
     }
+
 
     return vector;
 }
@@ -3322,11 +3335,12 @@ function decode_relative_explicit_move(text_move, existing_flags)
 // The moves must be filtered to determine their validity.
 function decode_one_parlett(parlett)
 {
-    var distances, directions, flags, movement, rel_moves, limit, inner_moves;
+    var distances, directions, flags, movement, rel_moves, limit, inner_moves, rotates;
     var hippogonal = false;
 
     flags = {};
     distances = [];
+    rotates = [];
     rel_moves = [];
     movement = "rider";
 
@@ -3432,9 +3446,9 @@ function decode_one_parlett(parlett)
             limit = parseInt(parlett.substr(i + 1, 1), 10);
             i += 1;
 
-        // TODO: alternating rider directions, for crooked bishop and more
+        // Rotating riders
         } else if (ch === "\\") {
-            var inner;
+            var inner, ary;
             
             inner = "";
             while(i < parlett.length)
@@ -3445,11 +3459,12 @@ function decode_one_parlett(parlett)
 
                 inner += cho;
             }
-          
-            console.log("INNER",inner);
-            // TODO: decode directions, make into array
-            // try to unify with directions, array of array
-            // then have expand_directions cycle through
+
+            // List of rotations in degrees, like \\45,-45\\
+            ary = inner.split(",");
+            for (var k = 0; k < ary.length; k += 1) {
+                rotates.push(parseInt(ary[k], 10));
+            }
 
         // Standard Parlett
         } else if (/[0-9]/.test(ch)) {
@@ -3522,7 +3537,7 @@ function decode_one_parlett(parlett)
         }
 
     } else if (directions) {
-        expand_directions(directions, distances, limit, flags, movement, rel_moves);
+        expand_directions(directions, distances, limit, flags, movement, rel_moves, rotates);
     }
 
 
@@ -3537,8 +3552,8 @@ function decode_one_parlett(parlett)
                 distances[0] = 5;
             }
 
-            // Nightrider-like piece
-            expand_directions(inner_moves, [], distances[0], flags, movement, rel_moves);
+            // Nightrider-like piece (hippogonal rider)
+            expand_directions(inner_moves, [], distances[0], flags, movement, rel_moves, rotates);
         }
 
         // Add inner and outer moves, if both were given, for gryphon, slip pieces
@@ -3563,10 +3578,11 @@ function decode_one_parlett(parlett)
 // Expand a piece in the given directions, distances, up to
 // an optional limit, pushing the moves to rel_moves. Used for non-hippogonal
 // pieces, often riders (n*), but leapers (~n*) are also allowed.
-function expand_directions(directions, distances, limit, flags, movement, rel_moves)
+function expand_directions(directions, distances, limit, flags, movement, rel_moves, rotates)
 {
     for (i = 0; i < directions.length; i += 1) {
         var dir = directions[i];
+
         var rel_x, rel_y, prev_rel_x, prev_rel_y, distance;
 
         // Optional explicit distance instead of all in between (n)
@@ -3590,6 +3606,11 @@ function expand_directions(directions, distances, limit, flags, movement, rel_mo
 
         for (var j = 1; j <= max; j += 1) {
             var these_flags = {};
+
+            if (rotates) {
+                dir = rotate_direction(dir, rotates[j % rotates.length]);
+            }
+
 
             // Riders get blocked. Note that you can have a non-hippogonal leaper.
             // ~n* for example, is like a queen, but not blocked by intervening pieces.
