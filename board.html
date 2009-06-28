@@ -4053,6 +4053,8 @@ function init_board()
                 out_piece(GAME_STATE.piece_under, {});
                 GAME_STATE.piece_under = save;
             } else if (GAME_STATE.shift) {
+                // When releasing shift, unhighlight our own blocked moves, only
+                // (leave legal moves highlighted).
                 highlight_moves(GAME_STATE.piece_under, false, true);
             }
 
@@ -5624,7 +5626,7 @@ function highlight_moves(piece, enable, skip_legal)
         }
     }
 
-    if (skip_legal) {
+    if (!skip_legal) {
         dojo.forEach(moves, function(move) {
             var x, y, flags, to_square;
             
