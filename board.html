@@ -394,7 +394,7 @@ var PIECE_TYPES = {
         resets_50move: true,     // a pawn move resets the halfmove counter for the 50-move rule
         url: "pc:pawn"
     },
-    optingpawn: {parlett:    // can make double-move on any rank, TODO: image
+    optingpawn: {parlett:    // can make double-move on any rank
         "o1>, c1X>, " + 
         "o[0,2;if_unblocked=0,1;mark_ep_target=0,1], " +
         "[-1,1;if_ep_target;capture_at=-1,0], [1,1;if_ep_target;capture_at=-1,0]",
@@ -419,12 +419,12 @@ var PIECE_TYPES = {
     steward: {parlett: "o1+, c1X"}, // aka fusilier, quadrapawn, walker o#wazir, c#ferz
     liapawn: {parlett: "o1>, o1=, c1X, io2>"},
 
-    fiveriderpawn: {parlett: "#pawn", promote: ["rook", "bishop", "nightrider", "camelrider", "zebrarider"], url:"akm"}, // TODO: image
-    //freeleaperpawn: {parlett: "#pawn", promote: ["wazir", "knight", "zebra", "giraffe", "antelope"], url:"akm"}, // TODO: image, and requires antelope
-    ccpawn: {parlett: "#pawn", promote: ["archbishop", "bede", "waffle", "fad"]}, // TODO: image
-    rrpawn: {parlett: "#pawn", promote: ["chancellor", "r4", "woodyrook", "halfduck"]}, // TODO: image
-    nnpawn: {parlett: "#pawn", promote: ["colonel", "chargingrook", "fibnif", "chargingknight"]}, // TODO: image
-    pkpawn: {parlett: "#pawn", promote: ["pepperoni", "sausage", "mushroom", "meatball"]}, // TODO: image
+    fiveriderpawn: {parlett: "#pawn", promote: ["rook", "bishop", "nightrider", "camelrider", "zebrarider"], url:"akm"},
+    //freeleaperpawn: {parlett: "#pawn", promote: ["wazir", "knight", "zebra", "giraffe", "antelope"], url:"akm"}, // TODO: requires antelope
+    ccpawn: {parlett: "#pawn", promote: ["archbishop", "bede", "waffle", "fad"]},
+    rrpawn: {parlett: "#pawn", promote: ["chancellor", "r4", "woodyrook", "halfduck"]},
+    nnpawn: {parlett: "#pawn", promote: ["colonel", "chargingrook", "fibnif", "chargingknight"]},
+    pkpawn: {parlett: "#pawn", promote: ["pepperoni", "sausage", "mushroom", "meatball"]},
 
     // Hippogonal leapers
     man: {parlett: "1*", letter: "M", image:["mann2", "man", "guard", "wazirferz"], url:"pc:man"},    // same as king, but not royale (also known as commoner, guard)
