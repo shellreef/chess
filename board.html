@@ -276,12 +276,17 @@ var PREFS = {
     flipped: false,             // True if from black's perspective instead of white
     setup_mode: false,          // Setup pieces, instead of playing game
 
-    saved_games_path: "games/"
+    saved_games_path: "games/",
+
+    black: "#d18b47",           // Black square
+    white: "#ffce9e",           // White square
+    square_size: "55px"
 };
 
 
 // Info about the game
-var GAME_STATE = {
+var GAME_STATE = null;
+var GAME_STATE_DEFAULT = {
     // Whose turn it is
     active_color: '',
     
@@ -4027,6 +4032,8 @@ function label_board(flipped)
 // Only needs to be performed once per page load.
 function init_board()
 {
+    GAME_STATE = dojo.clone(GAME_STATE_DEFAULT);
+
     var board_menu = dojo.byId("saved_board_menu");
 
     // Create saved boards for openings, since they are stored by
@@ -4908,6 +4915,7 @@ function load_fen(fen, replay)
 
     color = {w:"white", b:"black"}[parts[1]];
 
+    GAME_STATE = dojo.clone(GAME_STATE_DEFAULT);
     if (!isNaN(parseInt(parts[4], 10))) {
         // FEN has halfmove clock and fullmove number in 5th and 6th fields
         GAME_STATE.hmvc = parseInt(parts[4], 10);
@@ -4942,9 +4950,20 @@ function load_fen(fen, replay)
 
         if (GAME_STATE.uncheckered) {
             change_css(16, "border", "1px solid black");    // td.square
-            change_css(17, "background-color", change_css(18, "background-color")); // match td.black to td.white
+            var size = (parseInt(PREFS.square_size, 10) - 1) + "px";
+            change_css(16, "width", size);
+            change_css(16, "min-width", size);
+            change_css(16, "height", size);
+            change_css(16, "min-height", size);
+            change_css(17, "background-color", PREFS.white); // match td.black to td.white
         } else {
-            // TODO: Revert to original
+            change_css(16, "border", "none");
+            change_css(17, "background-color", PREFS.black);
+            var size = PREFS.square_size;
+            change_css(16, "width", size);
+            change_css(16, "min-width", size);
+            change_css(16, "height", size);
+            change_css(16, "min-height", size);
         }
     }
    
