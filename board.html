@@ -422,10 +422,10 @@ var PIECE_TYPES = {
     liapawn: {parlett: "o1>, o1=, c1X, io2>"},
 
     fiveriderpawn: {parlett: "#pawn", promote: ["rook", "bishop", "nightrider", "camelrider", "zebrarider"], url:"akm"}, // TODO: image
-    freeleaperpawn: {parlett: "#pawn", promote: ["wazir", "knight", "zebra", "giraffe", "antelope"], url:"akm"}, // TODO: image
+    //freeleaperpawn: {parlett: "#pawn", promote: ["wazir", "knight", "zebra", "giraffe", "antelope"], url:"akm"}, // TODO: image, and requires antelope
     ccpawn: {parlett: "#pawn", promote: ["archbishop", "bede", "waffle", "fad"]}, // TODO: image
     rrpawn: {parlett: "#pawn", promote: ["chancellor", "r4", "woodyrook", "halfduck"]}, // TODO: image
-    nnpawn: {parlett: "#pawn", promote: ["colonel", "chargingrook", "fibnif", "chargningknight"]}, // TODO: image
+    nnpawn: {parlett: "#pawn", promote: ["colonel", "chargingrook", "fibnif", "chargingknight"]}, // TODO: image
     pkpawn: {parlett: "#pawn", promote: ["pepperoni", "sausage", "mushroom", "meatball"]}, // TODO: image
 
     // Hippogonal leapers
@@ -925,7 +925,7 @@ var SAVED_BOARDS = {
 "Test Checkmate": "r1bknbrN/pppppppp/8/8/8/8/PPPPPPPP/nRBNKB1R b - -",
 "Test Stalemate":     "k7/8/8/8/8/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 5",
 "Test Remove Check by Capture":     "4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5",
-"Test Promotion":     "K/PPPPPPPP/8/8/8/8/pppppppp/7k w - -",
+"Test Promotion":     "K/PX(fiveriderpawn)1X(ccpawn)X(rrpawn)X(nnpawn)X(pkpawn)/8/8/8/8/pppppppp/7k w - -",
 "Test Promotion to Rook": "8/k1P5/p7/P3K3/8/8/8/8 w - - 0 53", // from http://chessteacher.110mb.com/2008/10/22/minor-promotion/
 "Test Promotion to Bishop": "8/5P1k/5K1p/7P/8/8/8/8 w - - 0 51",
 "Test En Passant (alone)":     "8/8/8/3pP3/8/8/8/8 w - d6",
@@ -5346,6 +5346,7 @@ function piece_letter2name(letter)
 // Will not return an empty string but may return E-FEN piece codes. 
 function full_piece_prefix(piece)
 {
+    assert(PIECE_TYPES[piece.type], "full_piece_prefix(" + piece + "): no such type " + piece.type);
     var letter = PIECE_TYPES[piece.type].letter;
 
     if (letter !== undefined) {
@@ -6277,7 +6278,7 @@ function assert(expression, message)
 {
     if (!expression) {
         if (GAME_STATE.alert_assert) {
-            alertalert(message);
+            alert(message);
         }
 
         if (window.console && console.trace) {
