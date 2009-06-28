@@ -829,15 +829,15 @@ var SAVED_BOARDS = {
 // Chess with Different Armies http://www.chessvariants.com/unequal.dir/cwda.html
 // TODO: Choose each? Colorbound Clobberers vs. Remarkable Rookies, randomized, etc.
 // TODO: new pawns to promote to pieces on each board
-"Colorbound Clobberers": "x(bede)x(waffle)x(fad)x(archbishop)kx(fad)x(waffle)x(bede)/pppppppp/8/8/8/8/PPPPPPPP/X(bede)X(waffle)X(fad)X(archbishop)KX(fad)X(waffle)X(bede) w KQkq -",
-"Remarkable Rookies": "x(r4)x(woodyrook)x(halfduck)ckx(halfduck)x(woodyrook)x(r4)/pppppppp/8/8/8/8/PPPPPPPP/X(r4)X(woodyrook)X(halfduck)CKX(halfduck)X(woodyrook)X(r4) w KQkq -",
-"Nutty Knights": "x(chargingrook)x(fibnif)x(chargingknight)x(colonel)kx(chargingknight)x(fibnif)x(chargingrook)/pppppppp/8/8/8/8/PPPPPPPP/X(chargingrook)X(fibnif)X(chargingknight)X(colonel)KX(chargingknight)X(fibnif)X(chargingrook) w KQkq -",
+"Colorbound Clobberers": "x(bede)x(waffle)x(fad)x(archbishop)kx(fad)x(waffle)x(bede)/x(ccpawn)x(ccpawn)x(ccpawn)x(ccpawn)x(ccpawn)x(ccpawn)x(ccpawn)x(ccpawn)/8/8/8/8/X(ccpawn)X(ccpawn)X(ccpawn)X(ccpawn)X(ccpawn)X(ccpawn)X(ccpawn)X(ccpawn)/X(bede)X(waffle)X(fad)X(archbishop)KX(fad)X(waffle)X(bede) w KQkq -",
+"Remarkable Rookies": "x(r4)x(woodyrook)x(halfduck)ckx(halfduck)x(woodyrook)x(r4)/x(rrpawn)x(rrpawn)x(rrpawn)x(rrpawn)x(rrpawn)x(rrpawn)x(rrpawn)x(rrpawn)/8/8/8/8/X(rrpawn)X(rrpawn)X(rrpawn)X(rrpawn)X(rrpawn)X(rrpawn)X(rrpawn)X(rrpawn)/X(r4)X(woodyrook)X(halfduck)CKX(halfduck)X(woodyrook)X(r4) w KQkq -",
+"Nutty Knights": "x(chargingrook)x(fibnif)x(chargingknight)x(colonel)kx(chargingknight)x(fibnif)x(chargingrook)/x(nnpawn)x(nnpawn)x(nnpawn)x(nnpawn)x(nnpawn)x(nnpawn)x(nnpawn)x(nnpawn)/8/8/8/8/X(nnpawn)X(nnpawn)X(nnpawn)X(nnpawn)X(nnpawn)X(nnpawn)X(nnpawn)X(nnpawn)/X(chargingrook)X(fibnif)X(chargingknight)X(colonel)KX(chargingknight)X(fibnif)X(chargingrook) w KQkq -",
 
 "Amazon Army": "x(r4)nbxvkbnx(r4)/pppppppp/8/8/8/8/PPPPPPPP/X(r4)NBXVKBNX(r4) w KQkq -",
-// TODO: Cylindrical Cinders, fighting fizzes, etc.
-// http://en.wikipedia.org/wiki/Chess_with_different_armies#cite_note-2
+/// TODO: Cylindrical Cinders, fighting fizzes, etc.
+/// http://en.wikipedia.org/wiki/Chess_with_different_armies#cite_note-2
 // http://www.chessvariants.org/unequal.dir/pizza-kings.html
-"Pizza Kings": "x(sausage)x(mushroom)x(pepperoni)x(meatball)kx(pepperoni)x(mushroom)x(sausage)/pppppppp/8/8/8/8/PPPPPPPP/X(sausage)X(mushroom)X(pepperoni)X(meatball)KX(pepperoni)X(mushroom)X(sausage) w KQkq -"
+"Pizza Kings": "x(sausage)x(mushroom)x(pepperoni)x(meatball)kx(pepperoni)x(mushroom)x(sausage)/x(pkpawn)x(pkpawn)x(pkpawn)x(pkpawn)x(pkpawn)x(pkpawn)x(pkpawn)x(pkpawn)/8/8/8/8/X(sausage)X(mushroom)X(pepperoni)X(meatball)KX(pepperoni)X(mushroom)X(sausage) w KQkq -"
     },
 
     "Orthodox Variants": {
@@ -4446,7 +4446,12 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
         one = choices[promote_to];
     } else {
         // Surrogate move, for location only
-        one = choices.bishop;
+        for (var any in choices) {
+            if (choices.hasOwnProperty(any)) {
+                one = choices[any];
+                break;
+            }
+        }
     }
     move = one.move;
     piece = one.piece;
@@ -6433,7 +6438,8 @@ onclick="edit_pgn()" class="show_White">
 <span id="status"></span> 
 <span id="dash" style="display: none">&mdash;</span>
 <span id="check"></span>
-<br>
+</p>
+<p>
 <span id="promote_container"></span>
 </p>
 
