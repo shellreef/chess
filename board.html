@@ -133,6 +133,9 @@ td.legal-move-black { background-color: #a15b17; }
 td.legal-move-white { background-color: seagreen !important; }
 td.legal-move-black { background-color: green !important; }
 
+td.blocked-move-white { background-color: indianred !important; }
+td.blocked-move-black { background-color: firebrick !important; }
+
 /* Recent move, shown during mouse operation and also once after */
 
 /* Source square */
@@ -4049,6 +4052,8 @@ function init_board()
                 var save = GAME_STATE.piece_under;
                 out_piece(GAME_STATE.piece_under, {});
                 GAME_STATE.piece_under = save;
+            } else if (GAME_STATE.shift) {
+                highlight_moves(GAME_STATE.piece_under, false, true);
             }
 
             GAME_STATE.shift = false;
@@ -5502,8 +5507,6 @@ function over_piece(piece, event)
     event = event || window.event;
     
     var square = highlight_moves(piece, true);
-    // for debugging
-    //piece.setStyle({border: '1px solid black'});
     if (square) {
         dojo.addClass(square, "recent-move-" + square.color);
     }
@@ -5520,7 +5523,6 @@ function out_piece(piece, event)
     event = event || window.event;
 
     var square = highlight_moves(piece, false);
-    //piece.setStyle({border: 'none'});
     if (square) {
         dojo.removeClass(square, "recent-move-" + square.color);
     }
@@ -5586,9 +5588,11 @@ function create_piece(color, type)
 
 // Highlight/unhighlight moves for a given piece, unless dragging.
 // Return the from square, if anything was highlighted.
-function highlight_moves(piece, enable)
+// If skip_legal, skip legal move highlighting, but continue to enable/disable blocked 
+// move highlighting.
+function highlight_moves(piece, enable, skip_legal)
 {
-    var from_square, moves;
+    var from_square, moves, blocked_moves;
 
     // If player is dragging a piece over another piece, don't show
     // legal moves for the piece under it.
@@ -5603,33 +5607,42 @@ function highlight_moves(piece, enable)
         // so no need to concern ourselves with highlighting its moves.
         return null;
     }
-
-    //console.log(from_square.filerank);
    
     if (piece.color === GAME_STATE.active_color) {
         // Active player's pieces
         moves = VALID_MOVES[from_square.filerank];
-        // TODO: Show squares guarding
-        moves = BLOCKED_MOVES[from_square.filerank];//XYZ
+        blocked_moves = BLOCKED_MOVES[from_square.filerank];
     } else {
         // Opponent's pieces -- allow seeing valid moves if it was
         // their turn, if holding down shift.
         if (GAME_STATE.shift) {
             moves = VALID_MOVES_OPP[from_square.filerank];
-            moves = BLOCKED_MOVES_OPP[from_square.filerank];//XYZ
+            blocked_moves = BLOCKED_MOVES_OPP[from_square.filerank];
             GAME_STATE.shift = 1;    // showing other player's moves
         } else {
             return null;
         }
     }
 
+    if (skip_legal) {
+        dojo.forEach(moves, function(move) {
+            var x, y, flags, to_square;
+            
+            x = move.x;
+            y = move.y;
+            flags = move;
+            to_square = SQUARES[x][y];
 
-    //console.log(moves);
-    if (!moves) {
-        return null;    
+            if (enable) {
+                dojo.addClass(to_square, "legal-move-" + to_square.color);
+            } else {
+                dojo.removeClass(to_square, "legal-move-" + to_square.color);
+            }
+        });
     }
 
-    dojo.forEach(moves, function(move) {
+    // If shifted, show blocked moves, too.
+    dojo.forEach(blocked_moves, function(move) {
         var x, y, flags, to_square;
         
         x = move.x;
@@ -5637,15 +5650,10 @@ function highlight_moves(piece, enable)
         flags = move;
         to_square = SQUARES[x][y];
 
-        if (enable) {
-            if (to_square.color === "white") {
-                dojo.addClass(to_square, "legal-move-white");
-            } else {
-                dojo.addClass(to_square, "legal-move-black");
-            }
+        if (enable && GAME_STATE.shift) {
+            dojo.addClass(to_square, "blocked-move-" + to_square.color);
         } else {
-            dojo.removeClass(to_square, "legal-move-white");
-            dojo.removeClass(to_square, "legal-move-black");
+            dojo.removeClass(to_square, "blocked-move-" + to_square.color);
         }
     });
 
@@ -5659,6 +5667,8 @@ function unhighlight_all()
     dojo.query("td.legal-move-white, td.legal-move-black").forEach(function(square) {
         dojo.removeClass(square, "legal-move-white");
         dojo.removeClass(square, "legal-move-black");
+        dojo.removeClass(square, "blocked-move-black");
+        dojo.removeClass(square, "blocked-move-white");
     });
 }
 
