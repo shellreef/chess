@@ -812,10 +812,9 @@ var SAVED_BOARDS = {
 //
 
 // Shatranj, except the following rules are NOT implemented:
-// 3. Stalemating your opponent wins
 // 4. Taking the last piece of your opponent wins, unless your opponent
 //    can take your last non-king piece too, in which case the game is drawn
-"Shatranj (Almost)":     "rnyx(shah)xfynr/x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)/8/8/8/8/X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)/RNYX(shah)XFYNR w - - uncheckered"
+"Shatranj (Almost)":     "rnyx(shah)xfynr/x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)/8/8/8/8/X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)/RNYX(shah)XFYNR w - - uncheckered stalemate=win"
     },
 
     "New Pieces": {
@@ -927,7 +926,10 @@ var SAVED_BOARDS = {
 
     "Test Rules": {
 "Test Checkmate": "r1bknbrN/pppppppp/8/8/8/8/PPPPPPPP/nRBNKB1R b - -",
-"Test Stalemate":     "k7/2Q5/8/8/p7/1P6/8/8 w KQkq - 0 5",
+"Test Stalemate":     "k7/2Q5/8/8/p7/1P6/8/8 w KQkq - fmnv=5",
+"Test Stalemate (win)":     "k7/2Q5/8/8/p7/1P6/8/8 w KQkq - fmvn=5 stalemate=win",
+"Test Stalemate (half-win)":     "k7/2Q5/8/8/p7/1P6/8/8 w KQkq - fmvn=5 stalemate=halfwin",
+"Test Stalemate (loss)":     "k7/2Q5/8/8/p7/1P6/8/8 w KQkq - fmvn=5 stalemate=loss",
 "Test Remove Check by Capture":     "4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5",
 "Test Promotion":     "K/PX(fiveriderpawn)1X(ccpawn)X(rrpawn)X(nnpawn)X(pkpawn)/8/8/8/8/pppppppp/7k w - -",
 "Test Promotion to Rook": "8/k1P5/p7/P3K3/8/8/8/8 w - - 0 53", // from http://chessteacher.110mb.com/2008/10/22/minor-promotion/
@@ -3679,8 +3681,27 @@ function set_turn(color, historical)
         text_move = "+";
         // TODO: detect double-check, allow ++ for descriptive/algebraic descriptive, but not algebraic
     } else if (!checked && no_moves) {
-        set_check_message("Draw (stalemate)");
-        text_end = "&frac12;-&frac12;";
+        if (GAME_STATE.stalemate === undefined) {
+            // Usual rules: stalemate is a draw
+            set_check_message("Draw (stalemate)");
+            text_end = "&frac12;-&frac12;";
+
+        // Other rules for stalemate for variants, see:
+        // http://en.wikipedia.org/wiki/Stalemate#History_of_the_stalemate_rule
+        } else if (GAME_STATE.stalemate === "win") {
+            // Win for player administering the stalemate (Shatranj, medieval Europe)
+            set_check_message(ucfirst(old_color) + " wins (stalemate)");
+            text_end = old_color === "white" ? "1-0" : "0-1";
+        } else if (GAME_STATE.stalemate === "halfwin") {
+            set_check_message(ucfirst(old_color) + " half-wins (stalemate)");
+            text_end = old_color === "white" ? "&frac12;-0" : "0-&frac12;";
+        } else if (GAME_STATE.stalemate === "loss") { 
+            // Win for player being stalemated (9th century India)
+            set_check_message(ucfirst(new_color) + " wins (stalemate)");
+            text_end = new_color === "white" ? "1-0" : "0-1";
+        } else {
+            assert(false, "set_turn: invalid stalemate rule: " + GAME_STATE.stalemate);
+        }
     } else if (checked && no_moves) {
         set_check_message("Checkmate.");
         if (new_color === "white") { 
