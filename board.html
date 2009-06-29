@@ -2404,7 +2404,7 @@ function populate_make_a_move_list()
     count = own_property_count(VALID_MOVE_NOTATIONS[PREFS.input_notation]);
     if (count === 0) {
         // TODO: This fails, _35e. Fix.
-        menu.appendChild(dojo.create("option", {value:""}, "No legal moves"));
+        menu.appendChild(dojo.create("option", {value:"", innerHTML:"No legal moves"}));
         return;
     }
 
