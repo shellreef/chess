@@ -544,7 +544,7 @@ var PIECE_TYPES = {
     // Like knight, but can be blocked on orthogonal. 
     // Can almost do with this with n+.2\\45\\ or 1X(1+), but not quite (extra moves in intervening squares).
     // Would be really nice if could offset moves, blockable, in that way, though.
-    mao: {parlett: "[1,2;if_unblocked=0,1], [-1,2;if_unblocked=0,1], " + 
+    mao: {parlett: "[1,2;if_unblocked=0,1], [-1,2;if_unblocked=0,1], " +
         "[2,1;if_unblocked=1,0], [2,-1;if_unblocked=1,0], " +
         "[1,-2;if_unblocked=0,-1], [-1,-2;if_unblocked=0,-1], " +
         "[-2,1;if_unblocked=-1,0], [-2,-1;if_unblocked=-1,0]",
@@ -2798,12 +2798,16 @@ function movement_diagram(moves)
         if (move[2].initial_only) {
             ch = "i";
         }
-        if (move[2].if_unblocked_dx) {
+        if (move[2].if_unblocked_dx !== undefined) {
             ch = "u";   // unblocked
         }
     
         // Flip directions
         board[-move[1]][move[0]] = ch;
+
+        if (move[2].if_unblocked_dx !== undefined) {
+            board[-move[2].if_unblocked_dy][move[2].if_unblocked_dx] = "|";
+        }
     }
 
     // Origin
