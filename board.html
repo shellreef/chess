@@ -2931,7 +2931,8 @@ function filtered_moves(piece, color, is_hypothetical)
 
             // Can't move to self-occupied square
             if (capture_piece.color === color) {
-                if (if_unblocked_dy === undefined) {    // skip castling etc.
+                // Castling moves can never guard, since the destination must be unoccupied
+                if (!flags.if_can_castle_short && !flags.if_can_castle_long) {
                     // to indicate we are guarding this piece
                     blocked_moves.push(abs_move);
                 }
@@ -3023,61 +3024,6 @@ function filtered_moves(piece, color, is_hypothetical)
             }
 
             abs_move.en_passant_capture = true;
-        }
-
-        // Castling moves
-        if (flags.if_can_castle_short) {
-            // Moved and lost castling privileges
-            if (!GAME_STATE.can_castle[color].cshort) {
-                continue;
-            }
-
-            // Can't castle if in check
-            if (GAME_STATE.active_in_check) {
-                continue;
-            }
-
-            // Can't castle through check. Ugly hardcoded, check if
-            // if a valid regular move (which must have been listed before
-            // the castling move in Parlett).
-            var found = false;
-            for (var j = 0; j < moves.length; j += 1) {
-                if (moves[j].x === 6 && moves[j].y === (color === "white" ? 1 : 8)) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                continue;
-            }
-
-            // TODO: check if unimpeded here? instead of if_unblockedX in Parlett
-
-            abs_move.notation_override = "O-O";
-        }
-
-        if (flags.if_can_castle_long) {
-            if (!GAME_STATE.can_castle[color].clong) {
-                continue;
-            }
-            if (GAME_STATE.active_in_check) {
-                continue;
-            }
-
-            // Another ugly hardcoded "can't castle through check"
-            found = false;
-            for (j = 0; j < moves.length; j += 1) {
-                if (moves[j].x === 4) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                continue;
-            }
-
-
-            abs_move.notation_override = "O-O-O";
         }
 
         // Capture at relative location, instead of at destination square.
