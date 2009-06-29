@@ -419,6 +419,7 @@ mage
 makrukpawn
 man
 mann2
+mao
 marshal2
 mastodon
 meatball
@@ -426,9 +427,11 @@ medusa
 mini_rose
 minister
 minister2
+moa
 mohyo_ferociousleopard
 moko_blindtiger
 monkey
+moo
 moon
 moonrider
 moosepawn

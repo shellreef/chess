@@ -548,12 +548,11 @@ var PIECE_TYPES = {
         "[2,1;if_unblocked=1,0], [2,-1;if_unblocked=1,0], " +
         "[1,-2;if_unblocked=0,-1], [-1,-2;if_unblocked=0,-1], " +
         "[-2,1;if_unblocked=-1,0], [-2,-1;if_unblocked=-1,0]",
-        image:"horse", url:"pc:mao"},
+        image:["mao", "horse"], url:"pc:mao"},
     moa: {parlett: "[1,2;if_unblocked=1,1], [2,1;if_unblocked=1,1], " +
         "[2,-1;if_unblocked=1,-1], [1,-2;if_unblocked=1,-1], " +
         "[-1,-2;if_unblocked=-1,-1], [-2,-1;if_unblocked=-1,-1], " +
         "[-2,1;if_unblocked=-1,1], [-1,2;if_unblocked=-1,1]"
-        // TODO: image
     },
 
     shah: {parlett: "1*", royal: true, url:"http://en.wikipedia.org/wiki/Shatranj#Rules"},  // like a king, but no castling
@@ -634,7 +633,7 @@ var PIECE_TYPES = {
     narrowknightferz: {parlett: "#narrowknight, #ferz"},
     narrowknightwazir: {parlett: "#narrowknight, #wazir"},
     minister: {parlett: "#knight, #warmachine, #wazir", image:"nwd", url:"http://chessvariants.wikidot.com/pcp-am:minister"},
-    //moo: {parlett: "#mao, #moa", url:"http://chessvariants.wikidot.com/pcp-am:moo"}, // TODO: image
+    moo: {parlett: "#mao, #moa", url:"http://chessvariants.wikidot.com/pcp-am:moo"}, 
     //rhinocamel: {parlett: "#rhino, #camel"},
     //rhinocamelrider: {parlett: "#rhino, #camelrider"},
     //rhinozebra: {parlett: "#rhino, #zebra"},
@@ -956,7 +955,7 @@ var SAVED_BOARDS = {
 "Test Complex Riders": "8/8/1X(dummy)/4X(griffon)/7X(panda)//5X(slipbishop) w - -",
 "Test Complex Riders II": "8/8/8/8/4X(crookedbishop) w - -",
 "Test Complex Riders III": "8/8/8/8/4X(crookedrook) w - -",
-"Test Chinese Pieces": "8/8/8/3X(moa)/3x(mao)X(mao)3/8/8/8 w - -",
+"Test Chinese Pieces": "8/8/8/3X(moa)X(moo)/3x(mao)X(mao)3/8/8/8 w - -",
 "Test Amphibians": "4k/8/8/slslslsl/8/8/FFFFFFFF/4K w - -",
 "Test Royalty": "x(royalrook)x(royalknight)x(royalbishop)xjkx(royalbishop)x(royalknight)x(royalrook)/pppppppp/8/8/8/8/PPPPPPPP/X(royalrook)X(royalknight)X(royalbishop)XJKX(royalbishop)X(royalknight)X(royalrook) w KQkq -",
 "Test Projectiles": "x(airplane)X(airplane)4x(airplane)/X(allseeingeye)/1x(bird)/2x(bird)x(bird)x(bird)1x(bird)/3x(bird)x(bird)/3X(archerzz3)x(bird)/4X(archerzz2)X(archer)/x(frog)1X(gun)3X(rocket) w - -",
