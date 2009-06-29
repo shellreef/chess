@@ -486,6 +486,7 @@ var PIECE_TYPES = {
     kingrook: {parlett: "#king, #rook", royal: true},
 
     // Generals from http://www.mayhematics.com/v/v_gm.htm
+    // and some names from http://filer.case.edu/org/cwrums/games/chu-pieces.html#hiroku
     soldier: {parlett: "1>", url:"akm", image:"shogipawn"}, // TODO: shogi pawn promotion, and a non-promoting variant
     chinesepawn: {parlett: "1>", url:"http://en.wikipedia.org/wiki/Xiangqi", promote:["advancedsoldier"], promotion_rank:6}, // TODO
     goose: {parlett: "o1X>", url:"akm", image:"goose"},
@@ -493,10 +494,10 @@ var PIECE_TYPES = {
     drunk: {parlett: "1=", url:"akm", image:["pawn90cw", "pawn90ccw"]},
     sailor: {parlett: "1X<", image:["ship", "ferzb"], url:"akm"}, 
     backslider: {parlett: "1<", url:"akm"}, 
-    coppergeneral: {parlett: "1>, 1X>", url:"akm"},     // aka dou-sho
+    //notcoppergeneral: {parlett: "1>, 1X>", url:"akm"},     // akm says can't move backwards, but shogi disagrees
     advancedsoldier: {parlett: "1>, 1=", url:"akm"},  // for Xiangqi after passing the river, aka drunken soldier TODO: better image, more similar to chinesepawn
     //ferzwazirhunter: {parlett: "1>, 1X<", url:"akm"}, // TODO: image
-    //adjutant: {parlett: "1>, 1<", url:"akm"}, //  aka tsiu-yin TODO: image
+    //adjutant: {parlett: "1>, 1<", url:"akm"}, //  aka tsiu-yin TODO: image, chuunin / go between / double foot soldier
     //sidewinder: {parlett: "1X>, 1=", url:"akm"}, // TODO: image
     ferz: {parlett: "1X", letter: "XF", image:["ferz", "ferz2", "1bishop"], url:"pc:ferz"}, // or ~1/1
     //wazirferzhunter: {parlett: "1X>, 1<", url:"akm"}, // TODO: image
@@ -505,7 +506,7 @@ var PIECE_TYPES = {
     deserter: {parlett: "1<, 1X<", url:"akm", image:"pawninv"}, 
     //pikeman: {parlett: "1>, 1X>, 1=", url:"akm", image:"redpawn"}, // TODO: image
     silvergeneral: {parlett: "1>, 1X", url:"pc:silvergeneral"},   // aka gin-sho - or #ferz, [0,1]
-    //yale: {parlett: "1=, 1X>, 1<", image:"purplepawn"}, // TODO: image
+    coppergeneral: {parlett: "1=, 1X>, 1<", url:"http://filer.case.edu/org/cwrums/games/chu-pieces.html#dou"}, // aka dou-sho
     //drunkenmarine: {parlett: "1>, 1=, 1X<", image:"pinkpawn"}, // TODO: image
     wazir: {parlett: "1+", letter: "I", url:"pc:wazir", image:["wazir", "1rook2"]},    // or ~0/1
     //gorilla: {parlett: "1=, 1X<, 1<", url:"akm"}, // TODO: image
@@ -513,11 +514,11 @@ var PIECE_TYPES = {
     //yen: {parlett: "1X>, 1=, 1<", url:"akm"}, // TODO: image
     //invertedsilver: {parlett: "1X+, 1<", url:"akm"}, // TODO: image
     //drunkendeserter: {parlett: "1=, 1X<, 1<", url:"akm"}, // TODO: image
-    drunkenelephant: {parlett: "1X, 1>, 1=", url:"akm", image:"drunkelephant"},
-    goldgeneral: {parlett: "1+, 1X>, 1=, 1<", url:"pc:goldgeneral"},  // or: #wazir, [1,1], [-1,1]
-    //crane: {parlett: "1+, 1>, 1<", url:"akm"}, // aka horrible panther, mau-hau TODO: image
+    drunkenelephant: {parlett: "1X, 1>, 1=", url:"akm", image:"drunkelephant"}, // aka suizo
+    goldgeneral: {parlett: "1+, 1X>, 1=, 1<", url:"pc:goldgeneral"},  // or: #wazir, [1,1], [-1,1], aka kin-sho, tokin
+    //crane: {parlett: "1+, 1>, 1<", url:"akm"}, // aka horrible panther, mau-hau/mohyou/ferocious leopard TODO: image
     //drunkengorilla: {parlett: "1>, 1X<, 1=, 1<", url:"akm"}, // TODO: image
-    blindtiger: {parlett: "1X, 1=, 1<", url:"akm", image:"moko_blindtiger"}, // aka reverse gold
+    blindtiger: {parlett: "1X, 1=, 1<", url:"akm", image:"moko_blindtiger"}, // aka reverse gold, mouko
 
     // Asymmetric generals
     rightpawn: {parlett: "[1,0]", image:"pawn45cw"},
@@ -697,7 +698,9 @@ var PIECE_TYPES = {
     honorablehorse: {parlett: "[-1,2], [1,2]", image:"shogiknight", url:"pc:shogiknight"},
 
     //chineseknight: {parlett: "1//2"}, // TODO: intervening must be unblocked
-    lance: {parlett: "n+>", url:"pc:lance", image:["lance", "lance1"]},
+    lance: {parlett: "n+>", url:"pc:lance", image:["lance", "lance1"]},     // aka kyosha/yari / fragrant cheriot, TODO: promote to hakku from http://filer.case.edu/org/cwrums/games/chu-pieces.html
+    reversechariot: {parlett: "n+>, n+<", url:"http://filer.case.edu/org/cwrums/games/chu-pieces.html#hansha"}, // TODO: image, aka hansha
+
     //murray_lion: {parlett: "~0/2, ~2/2, c1*", letter: "XM"}, // TODO: image
     lion: {parlett: "~n*", letter: "XL", url:"pc:lion"},
     elephant: {parlett: "2X", letter: "E", image:["elephantmodern", "elephant1"], url:"pc:elephant"},  // Not a leaper, path can be blocked (unlike alfil, ~2X)
@@ -837,12 +840,15 @@ var SAVED_BOARDS = {
 // aka Iranian Chess, http://www.garagegames.com/community/blogs/view/17595
 "Persian Chess (Shatranj)":     "rnyx(shah)xfynr/x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)/8/8/8/8/X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)/RNYX(shah)XFYNR w - - uncheckered stalemate=win",
 
+// TODO: Tamerlane Chess, Timur's game, http://en.wikipedia.org/wiki/Tamerlane_Chess and http://www.pathguy.com/chess/Tamerlan.htm http://filer.case.edu/org/cwrums/games/tamerlane.html
 // TODO: Korean Chess (Changgi)
-// Omega Chess
-// Japanese Chess (Shogi)
-// Minishogi
-// Tamerlane Chess
-// Chinese Chess (Xiangqi)
+// TODO: Omega Chess
+// TODO: Japanese Chess (Shogi), see http://www.crockford.com/chess/shogi.html
+// TODO: Minishogi, 5x5 board, http://en.wikipedia.org/wiki/Minishogi
+
+// Chinese Chess (Xiangqi). Good westernization here: http://www.crockford.com/chess/xiangqi.html
+// TODO: 9x10 board, and restrict king (general?), ferz, and elephant
+//"Chinese Chess (Xiangqi)": "rx(mao)ex(ferz)x(shah)x(ferz)ex(mao)r w - -",
 
 // King is khun, not actually shah, but it behaves the same (no castling)
 // Counting rules on http://en.wikipedia.org/wiki/Makruk are not implemented
