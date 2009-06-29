@@ -541,8 +541,22 @@ var PIECE_TYPES = {
     fourfer: {parlett: "#r4, 1X", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/fr4.html"},
     narrowknight: {parlett: "[1,2], [1,-2], [-1,2], [-1,-2]"},
     wideknight: {parlett: "[2,1], [2,-1], [-2,1], [-2,-1]"},
-    shah: {parlett: "1*", royal: true, url:"http://en.wikipedia.org/wiki/Shatranj#Rules"},  // like a king, but no castling
+    // Like knight, but can be blocked on orthogonal. 
+    // Can almost do with this with n+.2\\45\\ or 1X(1+), but not quite (extra moves in intervening squares).
+    // Would be really nice if could offset moves, blockable, in that way, though.
+    mao: {parlett: "[1,2;if_unblocked=0,1], [-1,2;if_unblocked=0,1], " + 
+        "[2,1;if_unblocked=1,0], [2,-1;if_unblocked=1,0], " +
+        "[1,-2;if_unblocked=0,-1], [-1,-2;if_unblocked=0,-1], " +
+        "[-2,1;if_unblocked=-1,0], [-2,-1;if_unblocked=-1,0]",
+        image:"horse", url:"pc:mao"},
+    moa: {parlett: "[1,2;if_unblocked=1,1], [2,1;if_unblocked=1,1], " +
+        "[2,-1;if_unblocked=1,-1], [1,-2;if_unblocked=1,-1], " +
+        "[-1,-2;if_unblocked=-1,-1], [-2,-1;if_unblocked=-1,-1], " +
+        "[-2,1;if_unblocked=-1,1], [-1,2;if_unblocked=-1,1]"
+        // TODO: image
+    },
 
+    shah: {parlett: "1*", royal: true, url:"http://en.wikipedia.org/wiki/Shatranj#Rules"},  // like a king, but no castling
     r4ferz: {parlett: "#r4, #ferz"},
     n2r4: {parlett: "#r4, 2(~1/2)"},
     alfilr4: {parlett: "#alfil, #r4"},
@@ -551,6 +565,7 @@ var PIECE_TYPES = {
     q4: {parlett: "n*.4", image:["q4", "halfqueen"]},
 
     // Combined pieces (compound pieces)
+    // TODO: aanca http://chessvariants.wikidot.com/pcp-aa:aanca
     // From piececlopedia http://www.chessvariants.org/index/mainquery.php?type=Piececlopedia&orderby=LinkText&displayauthor=1&displayinventor=1&usethisheading=Piececlopedia
     // or http://members.shaw.ca/quadibloc/chess/ch03.htm or 
     // http://www.chessvariants.com/graphics.dir/alfaerie/
@@ -618,6 +633,8 @@ var PIECE_TYPES = {
     rookelephantrider: {parlett: "#rook, #alfilrider"},
     narrowknightferz: {parlett: "#narrowknight, #ferz"},
     narrowknightwazir: {parlett: "#narrowknight, #wazir"},
+    minister: {parlett: "#knight, #warmachine, #wazir", image:"nwd", url:"http://chessvariants.wikidot.com/pcp-am:minister"},
+    //moo: {parlett: "#mao, #moa", url:"http://chessvariants.wikidot.com/pcp-am:moo"}, // TODO: image
     //rhinocamel: {parlett: "#rhino, #camel"},
     //rhinocamelrider: {parlett: "#rhino, #camelrider"},
     //rhinozebra: {parlett: "#rhino, #zebra"},
@@ -625,6 +642,7 @@ var PIECE_TYPES = {
     //scorpion: {parlett: "#man, #grasshopper"}, 
     //scorpionpawn: {parlett: "#scorpion, #pawn"},
     queenalfilwarmachine: {parlett: "#queen, #alfil, #warmachine", image:"queenalfildabbaba3"},
+    // TODO: herowarmachinewazir, lemurianwarmachinewazir, flexibleknight, linearchieftainjumpinggeneral, from http://chessvariants.wikidot.com/joe-s-strange-notation
     wazirwarmachinealfil: {parlett: "#wazir, #warmachine, #alfil", image:"wazirdababaalfil"},
     woodyrook: {parlett: "#warmachine, #wazir", image:"warmachinewazir", url:"http://www.chessvariants.com/d.betza/chessvar/dan/rookies.html"},  // aka WD
     warmachineriderwazir: {parlett: "#warmachinerider, #wazir"},
@@ -676,7 +694,7 @@ var PIECE_TYPES = {
     
     // Despite appearances, this is not ~1/2>, since that would allow also
     // allow the forward moves [2,-1] and [-2,1]. aka kei, keima
-    honorablehorse: {parlett: "[-1,2], [1,2]", image:["shogiknight", "horse"], url:"pc:shogiknight"},
+    honorablehorse: {parlett: "[-1,2], [1,2]", image:"shogiknight", url:"pc:shogiknight"},
 
     //chineseknight: {parlett: "1//2"}, // TODO: intervening must be unblocked
     lance: {parlett: "n+>", url:"pc:lance", image:["lance", "lance1"]},
@@ -772,6 +790,8 @@ var PIECE_TYPES = {
     // TODO: fix same problem as griffon, needs to block both rays! (duplicate squares, disambiguated, one removed and blocked)
     crookedbishop: {parlett: "nX\\90,-90\\, nX\\-90,90\\", url:"pc:crookedbishop", image:["crookedbishop", "eaglescout"]}, 
     crookedrook: {parlett: "n+\\90,-90, n+\\-90,90\\"},
+
+    galaxy: {parlett: "n+\\45\\", image:"horsezzstar"},
 
     // Explicit movements
     crab: {parlett: "[1,2], [-1,2], [-2,-1], [2,-1]", image: ["betzancrab", "crab2", "crab"], url:"pc:crab"},
@@ -935,6 +955,7 @@ var SAVED_BOARDS = {
 "Test Complex Riders": "8/8/1X(dummy)/4X(griffon)/7X(panda)//5X(slipbishop) w - -",
 "Test Complex Riders II": "8/8/8/8/4X(crookedbishop) w - -",
 "Test Complex Riders III": "8/8/8/8/4X(crookedrook) w - -",
+"Test Chinese Pieces": "8/8/8/3X(moa)/3x(mao)X(mao)3/8/8/8 w - -",
 "Test Amphibians": "4k/8/8/slslslsl/8/8/FFFFFFFF/4K w - -",
 "Test Royalty": "x(royalrook)x(royalknight)x(royalbishop)xjkx(royalbishop)x(royalknight)x(royalrook)/pppppppp/8/8/8/8/PPPPPPPP/X(royalrook)X(royalknight)X(royalbishop)XJKX(royalbishop)X(royalknight)X(royalrook) w KQkq -",
 "Test Projectiles": "x(airplane)X(airplane)4x(airplane)/X(allseeingeye)/1x(bird)/2x(bird)x(bird)x(bird)1x(bird)/3x(bird)x(bird)/3X(archerzz3)x(bird)/4X(archerzz2)X(archer)/x(frog)1X(gun)3X(rocket) w - -",
@@ -2373,6 +2394,7 @@ function populate_make_a_move_list()
 
     count = own_property_count(VALID_MOVE_NOTATIONS[PREFS.input_notation]);
     if (count === 0) {
+        // TODO: This fails, _35e. Fix.
         menu.appendChild(dojo.create("option", {value:""}, "No legal moves"));
         return;
     }
@@ -3333,6 +3355,7 @@ function decode_relative_explicit_move(text_move, existing_flags)
 // under what conditions the move can be made. + is forward, - is backwards,
 // from the perspective of the active color. Has no knowledge of board state.
 // The moves must be filtered to determine their validity.
+// TODO: Other notations?
 function decode_one_parlett(parlett)
 {
     var distances, directions, flags, movement, rel_moves, limit, inner_moves, rotates;
