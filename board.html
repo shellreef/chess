@@ -1174,7 +1174,7 @@ function email_board(get_text)
     dots = ply_info.color ? (ply_info.color === "black" ? "... " : " ") : "";
 
     link = dojo.byId("copyable_link").href;
-    link_text = GAME_STATE.made_moves[ply] ? GAME_STATE.made_moves[ply].notations[form_value("output_notation")] : "move";
+    link_text = GAME_STATE.made_moves[ply] ? GAME_STATE.made_moves[ply].notations[form_value("output_notation")] : "*";
     // Note: IE ActiveXObject for Outlook: http://www.webdeveloper.com/forum/showthread.php?t=176548
     // Got an automation error when I tried it, but it could supposedly allow HTML bodies on Windows
     //body = ply_info.fmvn + ". " + dots + '<a href="' + link + '">' + link_text + '</a>';
