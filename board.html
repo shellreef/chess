@@ -156,21 +156,14 @@ td.penultimate-move-black { background-color: yellow; }*/
 td.dropping-square { background-color: blue !important; }   /* in progress (overrides legal) */  
 td.dropped-square { background-color: blue; }               /* finished (does not) */
 
-/* TODO: if destination square is a capture, make it red, even
- * when hovering. This gives more information on the move but also
- * provides better feedback when dragging to capture your opponent's
- * piece that just moved, because it'll already be colored with
- * dropping-square, giving no visual feedback - but it would if this
- * class was used in that scenario. */
 td.dropping-square-capture { background-color: red !important; }
 td.dropping-square-capture2 { background-color: red !important; }
 
 
-/* TODO:
- * yellow - piece to promote
- * green - move just made
+/* TODO: yellow - piece to promote
+ * green - legal moves
+ * red - blocked moves (when shift-hover), guarded squares
  * blue - move opponent just made
- * red - destination square if capture move
  */
 
 
@@ -413,15 +406,15 @@ var PIECE_TYPES = {
     makrukpawn: {parlett: "#weakpawn", promote:["ferz"], promotion_rank:6, url:"http://en.wikipedia.org/wiki/Makruk#Pieces"},
     superpawn: {parlett: "on>, cnX>", letter: "XP", image:"quickpawn"},
     berolinapawn: {parlett: "o1X>, c1>, io2X>", letter: "XB", image:"berolinapawn", resets_50move: true, url:"pc:berolina"},
-    // TODO: http://www.chessvariants.org/piececlopedia.dir/berolina-plus.html
+    berolinapluspawn: {parlett: "#berolinapawn, c1=", url:"pc:berolina-plus"}, // TODO: image
     
-    // alt image: dragon, but less descriptive. There is also pawnknight!
     dragon: {parlett: "#pawn, #knight", image: ["dragon", "dragon2", "knightpawn", "pawnknight"], url:"pc:dragon"},   
-    // TODO: other dragon, http://www.chessvariants.org/piececlopedia.dir/dragonchess_dragon.html , and rename above pawnknight
+
     // David's pawn
-    pawnattackrook: {parlett: "#pawn, c#rook", image:["pawn135cw", "pawn135ccw"], promote: ["dragon", "rookpawn"]},
-    // TODO: chinesepawn from Xianqui, http://www.chessvariants.org/piececlopedia.dir/pawn-xiangqi.html
-    // 1>, but when crosses "river", can move 1=
+    pawnattackrook: {parlett: "#pawn, c#rook", image:"pawn135cw", promote: ["dragon", "rookpawn"]},
+
+    breakthru: {parlett: "o1>, 1X>", promote:["universal_leaper"], image:"pawn135ccw", url:"http://en.wikipedia.org/wiki/Breakthrough_(board_game)"},
+    
     sergeant: {parlett: "#berolinapawn, #pawn", promote:["queen", "knight", "rook", "bishop"], resets_50move:true, url:"pc:sergeant"},  // aka graz pawn
 
     steward: {parlett: "o1+, c1X"}, // aka fusilier, quadrapawn, walker o#wazir, c#ferz
@@ -488,14 +481,16 @@ var PIECE_TYPES = {
     // Generals from http://www.mayhematics.com/v/v_gm.htm
     // and some names from http://filer.case.edu/org/cwrums/games/chu-pieces.html#hiroku
     soldier: {parlett: "1>", url:"akm", image:"shogipawn"}, // TODO: shogi pawn promotion, and a non-promoting variant
-    chinesepawn: {parlett: "1>", url:"http://en.wikipedia.org/wiki/Xiangqi", promote:["advancedsoldier"], promotion_rank:6}, // TODO
+
+    // 1>, but when crosses "river", promotes and can move 1=
+    chinesepawn: {parlett: "1>", url:"pc:pawn-xiangqi", promote:["advancedsoldier"], promotion_rank:6}, // TODO
     goose: {parlett: "o1X>", url:"akm", image:"goose"},
     swan: {parlett: "1X>", image:"ferzf"},
     drunk: {parlett: "1=", url:"akm", image:["pawn90cw", "pawn90ccw"]},
     sailor: {parlett: "1X<", image:["ship", "ferzb"], url:"akm"}, 
     backslider: {parlett: "1<", url:"akm"}, 
     //notcoppergeneral: {parlett: "1>, 1X>", url:"akm"},     // akm says can't move backwards, but shogi disagrees
-    advancedsoldier: {parlett: "1>, 1=", url:"akm"},  // for Xiangqi after passing the river, aka drunken soldier TODO: better image, more similar to chinesepawn
+    advancedsoldier: {parlett: "1>, 1=", url:"akm"},  // for Xiangqi after passing the river, aka drunken soldier
     //ferzwazirhunter: {parlett: "1>, 1X<", url:"akm"}, // TODO: image
     //adjutant: {parlett: "1>, 1<", url:"akm"}, //  aka tsiu-yin TODO: image, chuunin / go between / double foot soldier
     //sidewinder: {parlett: "1X>, 1=", url:"akm"}, // TODO: image
@@ -706,13 +701,10 @@ var PIECE_TYPES = {
     elephant: {parlett: "2X", letter: "E", image:["elephantmodern", "elephant1"], url:"pc:elephant"},  // Not a leaper, path can be blocked (unlike alfil, ~2X)
     //khohn: {parlett: "1X, 1>", letter: "XK"}, // TODO: image
 
-    // TODO: mushroom, try out Extended Parlett's [], explicitly giving relative moves. See:
-    // http://www.chessvariants.org/graphics.dir/alfaeriemisc/spratt/ - would need to add (and all others)
-    // http://www.chessvariants.org/piececlopedia.dir/mushroom.html
     // TODO: support ~0/0 for "null move" (---), but don't let drop to null, instead show a button
     //kraken: {parlett: "~n/m ~0/0"},     // any square, not realistic since always checkmates! TODO: image
     //octopus: {parlett: "o~n/m ~0/0", letter: "XD"}, // any square (8x8, octo, get it?) but can't capture, much less powerful TODO: image
-    //universal_leaper: {parlett: "~n/m"},// like kraken, but can't go to square it is on (like a zero) TODO: image
+    universal_leaper: {parlett: "~n/m", image:"ubiubi"},// like kraken, but can't go to square it is on (like a zero) TODO: image
     allseeingeye: {parlett: "o~n/m", image:"allseeingeye2"},       // anywhere
 
     // Riders
@@ -868,6 +860,9 @@ var SAVED_BOARDS = {
 
     "New Pieces": {
 "Amazon Chess":         "rnbxvkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBXVKBNR w KQkq -",
+// http://en.wikipedia.org/wiki/Breakthrough_(board_game)
+// TODO: Win if promote.. have a universal leaper, but there is nothing to checkmate.
+"Breakthrough": "x(breakthru)x(breakthru)x(breakthru)x(breakthru)x(breakthru)x(breakthru)x(breakthru)x(breakthru)/x(breakthru)x(breakthru)x(breakthru)x(breakthru)x(breakthru)x(breakthru)x(breakthru)x(breakthru)/8/8/8/8/X(breakthru)X(breakthru)X(breakthru)X(breakthru)X(breakthru)X(breakthru)X(breakthru)X(breakthru)/X(breakthru)X(breakthru)X(breakthru)X(breakthru)X(breakthru)X(breakthru)X(breakthru)X(breakthru) w - - uncheckered",
 "Commoner Chess":     "rnbqmbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQMBNR w KQkq -",
 "Knightmate Chess":    "rmbqxrbmr/pppppppp/8/8/8/8/PPPPPPPP/RMBQXRBMR w KQkq -",
 // TODO: No black pawn promotion
@@ -902,9 +897,6 @@ var SAVED_BOARDS = {
 // http://www.chessclub.com/helpcenter/tips/wild.html
 "Advance Chess":        "rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq -",
 "Atheist Chess": "rn1qk1nr/pppppppp/8/8/8/8/PPPPPPPP/RN1QK1NR w KQkq -",
-// TODO: win if promote (kraken?), allow diagonal even if not capture
-// http://en.wikipedia.org/wiki/Breakthrough_(board_game)
-//"Breakthrough": "pppppppp/pppppppp/8/8/8/8/PPPPPPPP/PPPPPPPP w - -",
 // TODO: Support Chaturanga pawns. No double move/en passant, and promotes to where started, but only if piece was captured.
 // Stalemate / bare king = win for stalemating player,
 //"Indian Chess (Chaturanga)": "rnekxfenr/pppppppp/8/8/8/8/PPPPPPPP/RNEKXFENR w -",
