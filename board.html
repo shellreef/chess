@@ -1832,7 +1832,7 @@ function promote(piece, square, type, notation, is_immediate)
     piece.src = image_path_for(type, piece.color);
     piece.type = type;
 
-    dojo.byId("promote_container").hide();
+    dojo.byId("promote_container").style.display = "none";
 
     // TODO: call with a correct tieback. Re-find it?
     var tieback = get_notations(piece, square, type);
@@ -1870,7 +1870,7 @@ function ask_to_promote(piece, tieback, is_immediate)
         }
     }
 
-    container.show();
+    container.style.display = "";
 
 }
 
@@ -2457,9 +2457,9 @@ function computer_move_if_applicable(clicked)
     if (clicked) {
         if (form_value("black_computer") || form_value("white_computer")) {
             dojo.byId("skill_level").value = PREFS.skill;
-            $("show_skill").show();
+            dojo.byId("show_skill").style.display = "";
         } else {
-            $("show_skill").hide();
+            dojo.byId("show_skill").style.display = "none";
         }
     }
 
