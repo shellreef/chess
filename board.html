@@ -5359,7 +5359,8 @@ function show_piece_inspector(piece)
     misc = [];
     if (type_info.promote) {
         // TODO: links to view other pieces?
-        misc.push("Promotes to " + type_info.promote.join(", ") + "<br>");
+        misc.push("Promotes to " + type_info.promote.join(", ") + 
+                " on rank #" + (type_info.promotion_rank || 8) + "<br>");
     }
     if (type_info.royal) {
         misc.push("Royal (can be checked/checkmated)<br>");
