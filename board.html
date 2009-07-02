@@ -3843,6 +3843,7 @@ function set_turn(color, historical)
     }
 
     set_copyable_link();
+
     return {text_move: text_move, text_end: text_end, repeats: repeats};
 }
 
@@ -3902,6 +3903,7 @@ function set_copyable_link(this_position)
     } else {
         CLIPBOARD.setText(email_board(true));
     }
+
 }
 
 // Make a URL that can be clicked to go to this board state
