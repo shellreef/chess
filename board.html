@@ -5414,13 +5414,13 @@ function show_piece_inspector(piece)
     dojo.byId("inspector-type").innerHTML = piece.type;
 
     // Show all the images, in order of preference.
-    image_html = "";
+    image_htmls = [];
     paths = image_path_for(piece.type, piece.color, true);
     for (var i = 0; i < paths.length; i += 1) {
-        image_html += "<img src=\"" + paths[i] + "\"> ";
+        image_htmls.push("<img src=\"" + paths[i] + "\">");
     }
 
-    dojo.byId("inspector-image").innerHTML = image_html;
+    dojo.byId("inspector-image").innerHTML = image_htmls.join(" ");
     // TODO: proper escaping
     dojo.byId("inspector-movement").innerHTML = type_info.parlett.replace(/&/g, "&amp;").replace(/</g, "&lt;");
 
