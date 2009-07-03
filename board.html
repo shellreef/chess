@@ -2086,7 +2086,12 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
 
             if (capture_or_dash === "-") { 
                 // non-capturing move
-                ps.descr.push([piece, square, [
+                ps.descr.push([piece, square, 
+                    // Must uniq() the array, since some of the notations actually appear twice
+                    // in the list above, and disambiguate_moves() will delete both since it'll think they
+                    // are ambiguous. This would have occurred when piece_name === short_piece_name, that is,
+                    // for KP, QP, K, and Q. 
+                    uniq([
                     piece_letter + capture_or_dash + short_descriptive_dest + promote_paren,        // P-B4
                     piece_name + capture_or_dash + short_descriptive_dest + promote_paren,          // QBP-B4
                     short_piece_name + capture_or_dash + short_descriptive_dest + promote_paren,    // BP-B4
@@ -2097,21 +2102,16 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
                     piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + descriptive_dest + promote_paren,      // P(K2)-K4
                     piece_letter + "(" + descriptive_origin_rank + ")" + capture_or_dash + descriptive_dest + promote_paren, // P(2)-K4
                     piece_letter + "(" + descriptive_origin_file + ")" + capture_or_dash + descriptive_dest + promote_paren  // P(K)-K4
-
-                // Must uniq() the array, since some of the notations actually appear twice
-                // in the list above, and disambiguate_moves() will delete both since it'll think they
-                // are ambiguous. This would have occurred when piece_name === short_piece_name, that is,
-                // for KP, QP, K, and Q. 
-                ].uniq(), move]);
+                ]), move]);
 
 
-                ps.adesc.push([piece, square, [
+                ps.adesc.push([piece, square, uniq([
                     piece_letter + capture_or_dash + adescriptive_dest + promote_paren,             // P-c4
                     piece_aname + capture_or_dash + adescriptive_dest + promote_paren,              // cP-c4
                     piece_letter + "(" + adescriptive_origin + ")" + capture_or_dash + adescriptive_dest + promote_paren,       // P(c2)-c4
                     piece_letter + "(" + adescriptive_origin_rank + ")" + capture_or_dash + adescriptive_dest + promote_paren,  // P(2)-c4
                     piece_letter + "(" + adescriptive_origin_file + ")" + capture_or_dash + adescriptive_dest + promote_paren   // P(c)-c4
-                ].uniq(), move]);
+                ]), move]);
             } else if (capture_or_dash === "x") {
                 var captured_name = captured_piece.descriptive_name;
                 var short_captured_name = short_descriptive(captured_name);
@@ -2119,7 +2119,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
                 var captured_aname = captured_piece.adescriptive_name;
 
                 // capture
-                ps.descr.push([piece, square, [
+                ps.descr.push([piece, square, uniq([
                     // Note: a permutation function would be handy here
                     piece_letter + capture_or_dash + captured_letter + promote_paren,           // PxP
                     piece_letter + capture_or_dash + short_captured_name + promote_paren,       // PxBP
@@ -2135,9 +2135,9 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
                     piece_letter + "(" + descriptive_origin + ")" + capture_or_dash + captured_letter + promote_paren,  // P(K4)xP
                     piece_letter + capture_or_dash + captured_letter + "(" + descriptive_dest + ")" + promote_paren,    // PxP(Q4)
                     piece_name + capture_or_dash + captured_letter + "(" + descriptive_dest + ")" + promote_paren       // KPxP(Q4)
-                ].uniq(), move]);
+                ]), move]);
 
-                ps.adesc.push([piece, square, [
+                ps.adesc.push([piece, square, uniq([
                     piece_letter + capture_or_dash + captured_letter + promote_paren,           // PxP
                     piece_letter + capture_or_dash + captured_aname + promote_paren,            // PxcP
                     piece_aname + capture_or_dash + captured_letter + promote_paren,            // bPxP
@@ -2147,7 +2147,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
                     piece_letter + "(" + adescriptive_origin + ")" + capture_or_dash + captured_letter + promote_paren, // P(b4)xP
                     piece_letter + capture_or_dash + captured_letter + "(" + adescriptive_dest + ")" + promote_paren,   // PxP(c5)
                     piece_aname + capture_or_dash + captured_letter + "(" + adescriptive_dest + ")" + promote_paren     // bPxP(c5)
-                ].uniq(), move]);
+                ]), move]);
             } else {
                 assert(false, "calculate_notations: " + capture_or_dash + " is not - or x");
             }
@@ -6460,6 +6460,21 @@ function init_dnd()
 }
 
 //// LOW-LEVEL FUNCTIONS
+
+// Unique an array. Based on http://blog.archive.jpsykes.com/212/unique-array-filter-in-dojo/index.html
+function uniq(arr)
+{
+    var test = {};
+    var result = [];
+
+    for (var i = 0, len = arr.length; i < len; i += 1) {
+        if (!test[arr[i]]) {
+            test[arr[i]] = true;
+            result.push(arr[i]);
+        }
+    }
+    return result;
+}
 
 // Modify the existing stylesheet, returning the value. If value is
 // undefined, get the old value instead of changing it.
