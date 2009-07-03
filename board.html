@@ -116,6 +116,10 @@ td.square   /* RULE #16 */
 td.black { background-color: #d18b47; } /* RULE #17 */
 td.white { background-color: #ffce9e; } /* RULE #18 */
 
+/* For boundaries. TODO: unify black/white classes. img, td, div */
+.black-color { background-color: #d18b47; } 
+.white-color { background-color: #ffce9e; } 
+
 
 td.label { text-align: center; }
 td.file { border-bottom: 2px solid black; }
@@ -850,7 +854,7 @@ var SAVED_BOARDS = {
 
 // Chinese Chess (Xiangqi). Good westernization here: http://www.crockford.com/chess/xiangqi.html
 // TODO: 9x10 board, and bounds king (general?), ferz, and elephant
-"Chinese Chess (Xiangqi)": "rx(mao)ex(ferz)x(shah)x(ferz)ex(mao)///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)//X(chinesepawn)1X(chinesepawn) w - - bounds1=palace,4,1,6,3,shah,ferz bounds2=river,1,1,10,5,elephant ruled transparent",
+"Chinese Chess (Xiangqi)": "rx(mao)ex(ferz)x(shah)x(ferz)ex(mao)///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)//X(chinesepawn)1X(chinesepawn) w - - bounds1=river,1,1,10,5,elephant bounds2=palace,4,1,6,3,shah,ferz ruled transparent",
 
 // King is khun, not actually shah, but it behaves the same (no castling)
 // Counting rules on http://en.wikipedia.org/wiki/Makruk are not implemented
@@ -5169,18 +5173,18 @@ function set_board_appearance()
     GAME_STATE.boundaries = {};
 
     if (GAME_STATE.bounds1) {
-       set_board_boundary(GAME_STATE.bounds1, "opposite");
+        set_board_boundary(GAME_STATE.bounds1, "same");
     }
 
     if (GAME_STATE.bounds2) {
-        set_board_boundary(GAME_STATE.bounds2, "same");
+        set_board_boundary(GAME_STATE.bounds2, "opposite");
     }
 
 
 }
 
 // Create a palace or river feature
-function set_board_boundary(str, color)
+function set_board_boundary(str, color_kind)
 {
     var ary = str.split(",");
     var bounds_name = ary.shift();
@@ -5196,17 +5200,46 @@ function set_board_boundary(str, color)
     if (x2 > FILE_MAX) { x2 = FILE_MAX; }
     if (y2 > RANK_MAX) { y2 = RANK_MAX; }
 
-    for (var i = 0; i < ary.length; i += 1) {
-        var type = bounds_types[i];
-        var white_area = [x1, y1, x2, y2];
-        var black_area = [x1, (RANK_MAX + 1) - y2, x2, (RANK_MAX + 1) - y1];
+    var white_area = [x1, y1, x2, y2];
+    var black_area = [x1, (RANK_MAX + 1) - y2, x2, (RANK_MAX + 1) - y1];
 
+    // Set boundaries for each piece type given, for quick lookup
+    for (var i = 0; i < bounds_types.length; i += 1) {
+        var type = bounds_types[i];
         // Note: ranks are from each player's perspective
         GAME_STATE.boundaries[type] = {name: bounds_name, 
             white:white_area, 
             black:black_area, 
             types:bounds_types};
     }
+
+    dojo.forEach([white_area, black_area], function(area) {
+            var x1 = area[0], y1 = area[1], x2 = area[2], y2 = area[3];
+            var bottomleft = SQUARES[x1][y1];
+            var topright = SQUARES[x2][y2];
+            var top, left, right, bottom, size;
+
+            size = 55; // TODO: do not hardcode
+            left = dojo._abs(bottomleft).x;
+            bottom = dojo._abs(bottomleft).y + size;
+
+            right = dojo._abs(topright).x + size;
+            top = dojo._abs(topright).y;
+
+            var color = area === white_area ? "white" : "black";
+            if (color_kind === "opposite") {
+                color = opposite_color(color);
+            }
+
+            dojo.create("div", {"class":color + "-color", style:"; position: absolute; " + 
+                "top: " + top + "px; " +
+                "left: " + left + "px; " + 
+                "width: " + (right - left) + "px; " +
+                "height: " + (bottom - top) + "px;" +
+                "z-index: -10"},
+                dojo.body());
+        });
+
     // TODO: change board colors, based on color, to match player's side or opposite
 }
 
