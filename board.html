@@ -4956,7 +4956,7 @@ function active_fen(strip_moves)
 // this if it already been calculated.
 function save_fen()
 {
-    var fen = "", castles;
+    var fens = [], castles;
 
     // Board position
     for (var y = RANK_MAX; y > 0; y -= 1) {
@@ -4967,7 +4967,7 @@ function save_fen()
 
             if (piece) {
                 if (blanks) {
-                    fen += blanks.toString();
+                    fens.push(blanks.toString());
                     blanks = 0;
                 }
                 letter = full_piece_prefix(piece);
@@ -4977,53 +4977,53 @@ function save_fen()
                     letter = letter.toLowerCase();
                 }
 
-                fen += letter;
+                fens.push(letter);
             } else {
                 blanks += 1;
             }
         }
         if (blanks) {
-            fen += blanks.toString();
+            fens.push(blanks.toString());
         }
         if (y !== 1) {
-            fen += "/";
+            fens.push("/");
         }
     }
 
     // Active color
-    fen += " ";
+    fens.push(" ");
     if (GAME_STATE.active_color === "white") {
-        fen += "w";
+        fens.push("w");
     } else {
-        fen += "b";
+        fens.push("b");
     }
 
     // Castling availability
-    fen += " ";
+    fens.push(" ");
     castles = false;
-    if (GAME_STATE.can_castle.white.cshort) { fen += "K"; castles = true; }
-    if (GAME_STATE.can_castle.white.clong)  { fen += "Q"; castles = true; }
-    if (GAME_STATE.can_castle.black.cshort) { fen += "k"; castles = true; }
-    if (GAME_STATE.can_castle.black.clong)  { fen += "q"; castles = true; }
-    if (!castles) { fen += "-"; }
+    if (GAME_STATE.can_castle.white.cshort) { fens.push("K"); castles = true; }
+    if (GAME_STATE.can_castle.white.clong)  { fens.push("Q"); castles = true; }
+    if (GAME_STATE.can_castle.black.cshort) { fens.push("k"); castles = true; }
+    if (GAME_STATE.can_castle.black.clong)  { fens.push("q"); castles = true; }
+    if (!castles) { fens.push("-"); }
 
     // En passant target square
-    fen += " ";
+    fens.push(" ");
     if (GAME_STATE.ep_target) {
-        fen += xy2filerank(GAME_STATE.ep_target);
+        fens.push(xy2filerank(GAME_STATE.ep_target));
     } else {
-        fen += "-";
+        fens.push("-");
     }
 
     // TODO: EPD tags
     /*for (var i = 0; i < GAME_STATE.tags.length; i += 1) {
         var tag = GAME_STATE.tags[i];
-        fen += " " + tag;
+        fens.push(" " + tag);
         if (tag */
-    fen += " " + GAME_STATE.hmvc;
-    fen += " " + GAME_STATE.fmvn;
+    fens.push(" " + GAME_STATE.hmvc);
+    fens.push(" " + GAME_STATE.fmvn);
 
-    return fen;
+    return fens.join("");
 }
 
 // Fields to be parsed as integers instead of strings
