@@ -2035,8 +2035,8 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
             algebraic_prefix = algebraic_piece_prefix(piece);      // blank, N, etc.
             figurine_prefix = figurine_piece_prefix(color, piece); // ♟, ♞, ♙, ♘, etc.
 
-            ps.SAN.push([piece, square, algs.map(function(a) { return algebraic_prefix + a + promote_or_blank; }), move]);  // N??
-            ps.FAN.push([piece, square, algs.map(function(a) { return figurine_prefix + a + promote_figurine; }), move]);   // ♘??
+            ps.SAN.push([piece, square, dojo.map(algs, function(a) { return algebraic_prefix + a + promote_or_blank; }), move]);  // N??
+            ps.FAN.push([piece, square, dojo.map(algs, function(a) { return figurine_prefix + a + promote_figurine; }), move]);   // ♘??
 
             // Minimal notation, supposedly used in Informant
             minimal_algs = [
@@ -3340,7 +3340,7 @@ function parse_flags(text, flags)
             var ary = flag_text.split("=");
             var left = ary[0], right = ary[1];
             value = right.split(",");
-            value = value.map(parseInt10);
+            value = dojo.map(value, parseInt10);
             if (value.length === 1) {
                 flags[left] = value[0];
             } else if (value.length === 2) {
