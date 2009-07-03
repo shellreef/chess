@@ -5408,8 +5408,10 @@ function toggle_piece_library()
     r1.appendChild(c1);
     var c2 = dojo.create("th", {innerHTML:"Black"});
     r1.appendChild(c2);
-    var c3 = dojo.create("th", {style:"text-align: left", innerHTML:"Name"});
+    var c3 = dojo.create("th", {style:"text-align: left", innerHTML:"Letter"});
     r1.appendChild(c3);
+    var c4 = dojo.create("th", {style:"text-align: left", innerHTML:"Name"});
+    r1.appendChild(c4);
 
     i = 0;
     for (var type in PIECE_TYPES) {
@@ -5430,10 +5432,14 @@ function toggle_piece_library()
             var black_cell = dojo.create("td", {"class": "square"}, row);
             black_cell.appendChild(bp);
 
+            dojo.create("td", {innerHTML:PIECE_TYPES[type].letter || ""}, row);
+
             if (type === "custom") {
-                type = "custom: <input id='custom-movement' onfocus='GAME_STATE.update_custom = true;' onblur='GAME_STATE.update_custom = false'> <a href='newchess.html#ep' target='_new'>help</a>";
+                dojo.create("td", {innerHTML:"custom: <input id='custom-movement' onfocus='GAME_STATE.update_custom = true;' onblur='GAME_STATE.update_custom = false'> <a href='newchess.html#ep' target='_new'>help</a>"});
+            } else {
+                dojo.create("td", {innerHTML:type}, row);
             }
-            dojo.create("td", {innerHTML:type}, row);
+
     
             tbody.appendChild(row);
             i += 1;
