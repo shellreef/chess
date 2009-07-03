@@ -5427,7 +5427,7 @@ function toggle_piece_library()
             dojo.create("td", {innerHTML:PIECE_TYPES[type].letter || ""}, row);
 
             if (type === "custom") {
-                dojo.create("td", {innerHTML:"custom: <input id='custom-movement' onfocus='GAME_STATE.update_custom = true;' onblur='GAME_STATE.update_custom = false'> <a href='newchess.html#ep' target='_new'>help</a>"});
+                dojo.create("td", {innerHTML:"custom: <input id='custom-movement' onfocus='GAME_STATE.update_custom = true;' onblur='GAME_STATE.update_custom = false'> <a href='newchess.html#ep' target='_new'>help</a>"}, row);
             } else {
                 dojo.create("td", {innerHTML:type}, row);
             }
