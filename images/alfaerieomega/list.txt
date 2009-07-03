@@ -167,6 +167,7 @@ crookedknightrider
 crookedknightriderlong
 crookedknightriderlongshort
 crookedknightridershort
+crookedqueen
 crookedrook
 crownedcamel
 crusader
