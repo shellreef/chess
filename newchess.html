@@ -1,6 +1,7 @@
 <html>
 <head>
 <title>E-FEN, Extended Parlett, and Algebraic Descriptive Notation </title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
 <h1>New Chess Variant Standards</h1>
@@ -347,7 +348,7 @@ perhaps loaded from a file or other user data.
 <p>The most verbose, but flexible notation is to enclose a |-separated key/value pair (denoted by =) of
 the piece attributes in square brackets: X[image=king.gif|parlett=1*|royal=true]. This is to be used sparingly.
 
-<h1>Extended Parlett</h1>
+<a name="ep"><h1>Extended Parlett</h1></a>
 <p>Based on <a href="http://en.wikipedia.org/wiki/Fairy_chess_piece#Parlett.27s_movement_notation">Parlett movement notation</a>, with extensions
 described on that page. Additionally:
 
@@ -375,7 +376,28 @@ as values: [0,2;initial_only;if_unblocked=0,1].
 
 <p>Braces add flags to arbitrary Parlett moves. Example: {oi2>;mark_ep_target}.
 
-<p>Parlett only supports = for sideways moves. Extended Parlett adds &gt;&gt; for right, and &lt;&lt; for left.
+<p>Parlett only supports = for sideways moves. Extended Parlett adds &gt;&gt; for right, and &lt;&lt; for left, as well as diagonal directions:
+
+<p><table border="1">
+<tr><th>Symbol</th><th>Description</th></tr>
+<tr><td>+</td><td>Orthogonal in four directions (up, down, left, right)</td></tr>
+<tr><td>=</td><td>Sideways (left, right)</td></tr>
+<tr><td>&gt;=</td><td>Orthogonally forwards or sideways</td></tr>
+<tr><td>&gt;&gt;</td><td>Right</td></tr>
+<tr><td>&gt;</td><td>Orthogonally forwards</td></tr>
+<tr><td>&lt;&gt;</td><td>Orthogonally forwards and backwards</td></tr>
+<tr><td>&lt;=</td><td>Orthogonally backwards or sideways</td></tr>
+<tr><td>&lt;&lt;</td><td>Left</td></tr>
+<tr><td>&lt;</td><td>Orthogonally backwards</td></tr>
+<tr><td>X&gt;</td><td>Diagonally forwards</td></tr>
+<tr><td>X&lt;</td><td>Diagonally backwards</td></tr>
+<tr><td>X</td><td>Diagonally in four directions</td></tr>
+<tr><td>↖</td><td>Diagonally left-up</td></tr>
+<tr><td>↗</td><td>Diagonally right-up</td></tr>
+<tr><td>↘</td><td>Diagonally right-down</td></tr>
+<tr><td>↙</td><td>Diagonally left-down</td></tr>
+<tr><td>*</td><td>Orthogonally or diagonally in eight directions</td></tr>
+</table>
 
 <h1>Algebraic Descriptive Notation</h1>
 <p><em>English descriptive notation</em> has several advantages over algebraic notation. Unfortunately, it labels pieces and squares based on chess1 pieces.
