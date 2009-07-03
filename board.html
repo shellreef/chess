@@ -296,7 +296,7 @@ var GAME_STATE_DEFAULT = {
     made_moves: [],             // Piece, square and each move notation for past moves
     ended: false,               // Game is done (drawn, won)
     captured: {white:[], black:[]}, // Captured pieces
-    restrictions: {},           // Board features that restrict piece movement
+    boundings: {},           // Board features that bounds piece movement
 
     // Not game state, but other globals
     dragging: false,
@@ -849,8 +849,8 @@ var SAVED_BOARDS = {
 // TODO: Minishogi, 5x5 board, http://en.wikipedia.org/wiki/Minishogi
 
 // Chinese Chess (Xiangqi). Good westernization here: http://www.crockford.com/chess/xiangqi.html
-// TODO: 9x10 board, and restrict king (general?), ferz, and elephant
-"Chinese Chess (Xiangqi)": "rx(mao)ex(ferz)x(shah)x(ferz)ex(mao) w - - restrict1=palace,4,1,6,3,shah,ferz restrict2=river,1,1,10,5,elephant ruled",
+// TODO: 9x10 board, and bounds king (general?), ferz, and elephant
+"Chinese Chess (Xiangqi)": "rx(mao)ex(ferz)x(shah)x(ferz)ex(mao) w - - bounds1=palace,4,1,6,3,shah,ferz bounds2=river,1,1,10,5,elephant ruled",
 
 // King is khun, not actually shah, but it behaves the same (no castling)
 // Counting rules on http://en.wikipedia.org/wiki/Makruk are not implemented
@@ -3573,7 +3573,7 @@ function decode_one_parlett(parlett)
             }
         }
 
-        // Hippogonal can be optionally restricted by direction
+        // Hippogonal can be optionally bounds by direction
         if (directions) {
             var keep_relmoves = [];
 
@@ -5144,40 +5144,40 @@ function set_board_appearance()
         change_css(16, "min-height", size);
     }
 
-    GAME_STATE.restrictions = {};
+    GAME_STATE.boundings = {};
 
-    if (GAME_STATE.restrict1) {
-        set_board_restriction(GAME_STATE.restrict1, "opposite");
+    if (GAME_STATE.bounds1) {
+        set_board_boundsion(GAME_STATE.bounds1, "opposite");
     }
 
-    if (GAME_STATE.restrict2) {
-        set_board_restriction(GAME_STATE.restrict2, "same");
+    if (GAME_STATE.bounds2) {
+        set_board_boundsion(GAME_STATE.bounds2, "same");
     }
 
 
 }
 
 // Create a palace or river feature
-function set_board_restriction(str, color)
+function set_board_boundsion(str, color)
 {
     var ary = str.split(",");
-    var restrict_name = ary.shift();
+    var bounds_name = ary.shift();
     var x1 = parseInt(ary.shift(), 10);
     var y1 = parseInt(ary.shift(), 10);
     var x2 = parseInt(ary.shift(), 10);
     var y2 = parseInt(ary.shift(), 10);
-    var restricted_types = ary;
+    var bounds_types = ary;
 
     for (var i = 0; i < ary.length; i += 1) {
-        var type = restricted_types[i];
+        var type = bounds_types[i];
         var white_area = [x1, y1, x2, y2];
         var black_area = [x1, (RANK_MAX + 1) - y1, x2, (RANK_MAX + 1) - y2];
 
         // Note: ranks are from each player's perspective
-        GAME_STATE.restrictions[type] = {name: restrict_name, 
+        GAME_STATE.boundings[type] = {name: bounds_name, 
             white_area:white_area, 
             black_area:black_area, 
-            types:restricted_types};
+            types:bounds_types};
     }
     // TODO: change board colors, based on color, to match player's side or opposite
 }
