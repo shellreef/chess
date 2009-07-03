@@ -411,7 +411,7 @@ var PIECE_TYPES = {
     makrukpawn: {parlett: "#weakpawn", promote:["ferz"], promotion_rank:6, url:"http://en.wikipedia.org/wiki/Makruk#Pieces"},
     superpawn: {parlett: "on>, cnX>", letter: "XP", image:"quickpawn"},
     berolinapawn: {parlett: "o1X>, c1>, io2X>", letter: "XB", image:"berolinapawn", resets_50move: true, url:"pc:berolina"},
-    berolinapluspawn: {parlett: "#berolinapawn, c1=", url:"pc:berolina-plus"}, // TODO: image
+    //berolinapluspawn: {parlett: "#berolinapawn, c1=", url:"pc:berolina-plus"}, // TODO: image
     
     dragon: {parlett: "#pawn, #knight", image: ["dragon", "dragon2", "knightpawn", "pawnknight"], url:"pc:dragon"},   
 
@@ -555,6 +555,7 @@ var PIECE_TYPES = {
         "[-1,-2;if_unblocked=-1,-1], [-2,-1;if_unblocked=-1,-1], " +
         "[-2,1;if_unblocked=-1,1], [-1,2;if_unblocked=-1,1]"
     },
+    moo: {parlett: "#mao, #moa", url:"http://chessvariants.wikidot.com/pcp-am:moo"}, 
 
     shah: {parlett: "1*", royal: true, url:"http://en.wikipedia.org/wiki/Shatranj#Rules"},  // like a king, but no castling // TODO: rename "lord", to be less ethnocentric
     r4ferz: {parlett: "#r4, #ferz"},
@@ -634,7 +635,6 @@ var PIECE_TYPES = {
     narrowknightferz: {parlett: "#narrowknight, #ferz"},
     narrowknightwazir: {parlett: "#narrowknight, #wazir"},
     minister: {parlett: "#knight, #warmachine, #wazir", image:"nwd", url:"http://chessvariants.wikidot.com/pcp-am:minister"},
-    moo: {parlett: "#mao, #moa", url:"http://chessvariants.wikidot.com/pcp-am:moo"}, 
     //rhinocamel: {parlett: "#rhino, #camel"},
     //rhinocamelrider: {parlett: "#rhino, #camelrider"},
     //rhinozebra: {parlett: "#rhino, #zebra"},
@@ -5402,16 +5402,6 @@ function toggle_piece_library()
     table = dojo.create("table", {id:"piece-library-table"});
     tbody = dojo.create("tbody");
     table.appendChild(tbody);
-    var r1 = dojo.create("tr");
-    tbody.appendChild(r1);
-    var c1 = dojo.create("th", {innerHTML:"White"});
-    r1.appendChild(c1);
-    var c2 = dojo.create("th", {innerHTML:"Black"});
-    r1.appendChild(c2);
-    var c3 = dojo.create("th", {style:"text-align: left", innerHTML:"Letter"});
-    r1.appendChild(c3);
-    var c4 = dojo.create("th", {style:"text-align: left", innerHTML:"Name"});
-    r1.appendChild(c4);
 
     i = 0;
     for (var type in PIECE_TYPES) {
