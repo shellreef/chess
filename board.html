@@ -2924,6 +2924,7 @@ function filtered_moves(piece, color, is_hypothetical)
 
         if (x < 1 || y < 1 || x > FILE_MAX || y > RANK_MAX) {
             // Out of bounds
+            blocked[rel_x + "," + rel_y] = true;
             continue;
         }
 
@@ -5002,6 +5003,11 @@ function save_fen()
         fen += "-";
     }
 
+    // TODO: EPD tags
+    /*for (var i = 0; i < GAME_STATE.tags.length; i += 1) {
+        var tag = GAME_STATE.tags[i];
+        fen += " " + tag;
+        if (tag */
     fen += " " + GAME_STATE.hmvc;
     fen += " " + GAME_STATE.fmvn;
 
