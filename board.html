@@ -296,7 +296,7 @@ var GAME_STATE_DEFAULT = {
     made_moves: [],             // Piece, square and each move notation for past moves
     ended: false,               // Game is done (drawn, won)
     captured: {white:[], black:[]}, // Captured pieces
-    boundings: {},           // Board features that bounds piece movement
+    boundaries: {},           // Board features that bounds piece movement
 
     // Not game state, but other globals
     dragging: false,
@@ -552,7 +552,7 @@ var PIECE_TYPES = {
         "[-2,1;if_unblocked=-1,1], [-1,2;if_unblocked=-1,1]"
     },
 
-    shah: {parlett: "1*", royal: true, url:"http://en.wikipedia.org/wiki/Shatranj#Rules"},  // like a king, but no castling
+    shah: {parlett: "1*", royal: true, url:"http://en.wikipedia.org/wiki/Shatranj#Rules"},  // like a king, but no castling // TODO: rename "lord", to be less ethnocentric
     r4ferz: {parlett: "#r4, #ferz"},
     n2r4: {parlett: "#r4, 2(~1/2)"},
     alfilr4: {parlett: "#alfil, #r4"},
@@ -2922,6 +2922,10 @@ function filtered_moves(piece, color, is_hypothetical)
 
         abs_move = {x: x, y: y};
 
+        if (GAME_STATE.boundaries[piece.type]) {
+            console.log(GAME_STATE.boundaries[piece.type]);
+        }
+
         if (x < 1 || y < 1 || x > FILE_MAX || y > RANK_MAX) {
             // Out of bounds
             blocked[rel_x + "," + rel_y] = true;
@@ -5144,7 +5148,7 @@ function set_board_appearance()
         change_css(16, "min-height", size);
     }
 
-    GAME_STATE.boundings = {};
+    GAME_STATE.boundaries = {};
 
     if (GAME_STATE.bounds1) {
         set_board_boundsion(GAME_STATE.bounds1, "opposite");
@@ -5174,7 +5178,7 @@ function set_board_boundsion(str, color)
         var black_area = [x1, (RANK_MAX + 1) - y1, x2, (RANK_MAX + 1) - y2];
 
         // Note: ranks are from each player's perspective
-        GAME_STATE.boundings[type] = {name: bounds_name, 
+        GAME_STATE.boundaries[type] = {name: bounds_name, 
             white_area:white_area, 
             black_area:black_area, 
             types:bounds_types};
