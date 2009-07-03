@@ -850,7 +850,7 @@ var SAVED_BOARDS = {
 
 // Chinese Chess (Xiangqi). Good westernization here: http://www.crockford.com/chess/xiangqi.html
 // TODO: 9x10 board, and bounds king (general?), ferz, and elephant
-"Chinese Chess (Xiangqi)": "rx(mao)ex(ferz)x(shah)x(ferz)ex(mao) w - - bounds1=palace,4,1,6,3,shah,ferz bounds2=river,1,1,10,5,elephant ruled",
+"Chinese Chess (Xiangqi)": "rx(mao)ex(ferz)x(shah)x(ferz)ex(mao)///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)//X(chinesepawn)1X(chinesepawn) w - - bounds1=palace,4,1,6,3,shah,ferz bounds2=river,1,1,10,5,elephant ruled",
 
 // King is khun, not actually shah, but it behaves the same (no castling)
 // Counting rules on http://en.wikipedia.org/wiki/Makruk are not implemented
@@ -2922,11 +2922,19 @@ function filtered_moves(piece, color, is_hypothetical)
 
         abs_move = {x: x, y: y};
 
+        // Default to limiting movement based on board dimensions, but
+        // allow boards to also limit based on a river or palace
+        var x1 = 1, y1 = 1, x2 = FILE_MAX, y2 = RANK_MAX;
         if (GAME_STATE.boundaries[piece.type]) {
-            console.log(GAME_STATE.boundaries[piece.type]);
+            var boundary = GAME_STATE.boundaries[piece.type][color];
+
+            x1 = boundary[0];
+            y1 = boundary[1];
+            x2 = boundary[2];
+            y2 = boundary[3];
         }
 
-        if (x < 1 || y < 1 || x > FILE_MAX || y > RANK_MAX) {
+        if (x < x1 || y < y1 || x > x2 || y > y2) {
             // Out of bounds
             blocked[rel_x + "," + rel_y] = true;
             continue;
@@ -5151,18 +5159,18 @@ function set_board_appearance()
     GAME_STATE.boundaries = {};
 
     if (GAME_STATE.bounds1) {
-        set_board_boundsion(GAME_STATE.bounds1, "opposite");
+        set_board_boundary(GAME_STATE.bounds1, "opposite");
     }
 
     if (GAME_STATE.bounds2) {
-        set_board_boundsion(GAME_STATE.bounds2, "same");
+        set_board_boundary(GAME_STATE.bounds2, "same");
     }
 
 
 }
 
 // Create a palace or river feature
-function set_board_boundsion(str, color)
+function set_board_boundary(str, color)
 {
     var ary = str.split(",");
     var bounds_name = ary.shift();
@@ -5172,15 +5180,21 @@ function set_board_boundsion(str, color)
     var y2 = parseInt(ary.shift(), 10);
     var bounds_types = ary;
 
+    // TODO: Replace with assertions, instead of clamping
+    if (x1 < 1) { x1 = 1; }
+    if (y1 < 1) { y1 = 1; }
+    if (x2 > FILE_MAX) { x2 = FILE_MAX; }
+    if (y2 > RANK_MAX) { y2 = RANK_MAX; }
+
     for (var i = 0; i < ary.length; i += 1) {
         var type = bounds_types[i];
         var white_area = [x1, y1, x2, y2];
-        var black_area = [x1, (RANK_MAX + 1) - y1, x2, (RANK_MAX + 1) - y2];
+        var black_area = [x1, (RANK_MAX + 1) - y2, x2, (RANK_MAX + 1) - y1];
 
         // Note: ranks are from each player's perspective
         GAME_STATE.boundaries[type] = {name: bounds_name, 
-            white_area:white_area, 
-            black_area:black_area, 
+            white:white_area, 
+            black:black_area, 
             types:bounds_types};
     }
     // TODO: change board colors, based on color, to match player's side or opposite
