@@ -215,7 +215,7 @@ if (!window.google) {
 /* TODO: why aren't these miniifed? http://code.google.com/apis/ajaxlibs/documentation/index.html#prototype has
  * direct paths but neither prototype nor scriptaculous are minified.. others are though. Maybe just use raw JS. */
 /* TODO: http://compressorrater.thruhere.net/ */
-google.load("prototype", "1.6.0.3");
+//google.load("prototype", "1.6.0.3");
 
 // Chess movement notations, in descending precedence. 
 // For more info see http://en.wikipedia.org/wiki/Chess_notation
@@ -2244,7 +2244,7 @@ function disambiguate_notations(notations)
         var shortest, synonyms;
 
         // Remove undefined elements
-        same_moves = same_moves.compact();
+        same_moves = dojo.filter(same_moves, function(x) { return x !== undefined; });
        
         // Choose shortest (now unambiguous) notation
         // Could also do: min_length = same_moves.pluck("length").min();, then partition
