@@ -850,7 +850,7 @@ var SAVED_BOARDS = {
 
 // Chinese Chess (Xiangqi). Good westernization here: http://www.crockford.com/chess/xiangqi.html
 // TODO: 9x10 board, and bounds king (general?), ferz, and elephant
-"Chinese Chess (Xiangqi)": "rx(mao)ex(ferz)x(shah)x(ferz)ex(mao)///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)//X(chinesepawn)1X(chinesepawn) w - - bounds1=palace,4,1,6,3,shah,ferz bounds2=river,1,1,10,5,elephant ruled",
+"Chinese Chess (Xiangqi)": "rx(mao)ex(ferz)x(shah)x(ferz)ex(mao)///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)//X(chinesepawn)1X(chinesepawn) w - - bounds1=palace,4,1,6,3,shah,ferz bounds2=river,1,1,10,5,elephant ruled transparent",
 
 // King is khun, not actually shah, but it behaves the same (no castling)
 // Counting rules on http://en.wikipedia.org/wiki/Makruk are not implemented
@@ -5141,9 +5141,15 @@ function set_board_appearance()
         change_css(17, "background-color", PREFS.white); // match td.black to td.white
         GAME_STATE.ruled = true;    // uncheckered implies ruled
     } else {
-        change_css(17, "background-color", PREFS.black);
+        change_css(17, "background-color", PREFS.black); // black is black
     }
 
+    if (GAME_STATE.transparent) {
+        change_css(17, "background-color", "transparent"); // td.black
+        change_css(18, "background-color", "transparent"); // td.white
+    }
+
+ 
     if (GAME_STATE.ruled) {
         change_css(16, "border", "1px solid black");    // td.square
         var size = (parseInt(PREFS.square_size, 10) - 1) + "px";
@@ -5163,7 +5169,7 @@ function set_board_appearance()
     GAME_STATE.boundaries = {};
 
     if (GAME_STATE.bounds1) {
-        set_board_boundary(GAME_STATE.bounds1, "opposite");
+       set_board_boundary(GAME_STATE.bounds1, "opposite");
     }
 
     if (GAME_STATE.bounds2) {
