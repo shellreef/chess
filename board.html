@@ -5395,6 +5395,8 @@ function toggle_piece_library()
         return;
     }
 
+    enable_document_selection(false, lib);
+
     // TODO: sortable columns, searchable table, so can list by symbol, alphabetically,
     // royal pieces first, pieces that promote, and find what you want.
     // IE7 chokes due to the fix for http://dev.rubyonrails.org/ticket/2707
@@ -6619,13 +6621,15 @@ function assert(expression, message)
 
 // Based on http://tech.hickorywind.org/articles/2008/10/24/turning-off-text-selection-in-javascript
 var ORIGINAL_ONSELECTSTART;
-function enable_document_selection(enable) 
+function enable_document_selection(enable, element) 
 {
-    if(enable) {
-        document.onselectstart = ORIGINAL_ONSELECTSTART;
+    var element = element || document;
+
+    if (enable) {
+        element.onselectstart = ORIGINAL_ONSELECTSTART;
     } else {
-        ORIGINAL_ONSELECTSTART = document.onselectstart;
-        document.onselectstart = function() { return false; };
+        ORIGINAL_ONSELECTSTART = element.onselectstart;
+        element.onselectstart = function() { return false; };
     }
 }
 
