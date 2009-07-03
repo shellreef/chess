@@ -6427,7 +6427,7 @@ function drop_or_revert()
                 // Remove node, so leftover torn-off pieces from library
                 // that were not dragged anywhere do not accumulate.
                 if (piece.parentNode) {
-                    piece.remove();
+                    piece.parentNode.removeChild(piece);
                 }
                
             });
