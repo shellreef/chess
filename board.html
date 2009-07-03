@@ -780,7 +780,6 @@ var PIECE_TYPES = {
    
     // Complex riders
     
-    // TODO: diagonal squares occupied need to block both rays
     griffon: {parlett: "[1,0](n+>), [1,0](n+<), [0,1](n+>>), [0,1](n+<<), [-1,0](n+<), [-1,0](n+>), [0,-1](n+<<), [0,-1](n+>>)", 
         image:"gryphon", url:"pc:griffon"}, 
 
@@ -789,7 +788,6 @@ var PIECE_TYPES = {
     slipbishop: {parlett: "[1,-1](~2/2↖&), [-1,-1](~2/2↗&), [-1,1](~2/2↘&), [1,1](~2/2↙&)"},
     slipqueen: {parlett: "#panda, #slipbishop"},
 
-    // TODO: fix same problem as griffon, needs to block both rays! (duplicate squares, disambiguated, one removed and blocked)
     crookedbishop: {parlett: "nX\\90,-90\\, nX\\-90,90\\", url:"pc:crookedbishop", image:["crookedbishop", "eaglescout"]}, 
     crookedrook: {parlett: "n+\\90,-90, n+\\-90,90\\"},
     crookedqueen: {parlett: "#crookedbishop, #rook", url:"pc:crooked-queen"},
@@ -963,9 +961,8 @@ var SAVED_BOARDS = {
 "Test Pawns": "8/x(rookpawn)x(dragon)x(bishoppawn)x(superpawn)x(weakpawn)x(berolinapawn)x(pawnattackrook)//2x(steward)4X(optingpawn)/4X(sergeant)1X(liapawn)/8/X(rookpawn)X(dragon)X(bishoppawn)X(superpawn)X(weakpawn)X(berolinapawn)X(pawnattackrook)P w - -",
 "Test Leapers": "K/2E1Y1H1/3M/1XT1W1XG1Z/8/3Z1N/4oo/5k w - -", // TODO: antelope, flamingo
 "Test Riders": "B2R4/5X(barcrider)2/4Q3/4XN3/2X(alibabariderferz)3X(stone)1/3X(crabrider)1X(warmachinerider)X(squirrelrider)1/2X(alfilrider)X(camelrider)2X(zebrarider)1/4X(girafferider)3 w - - 0 1",
-"Test Complex Riders": "8/8/1X(dummy)/4X(griffon)/7X(panda)//5X(slipbishop) w - -",
-"Test Complex Riders II": "8/8/8/8/4X(crookedbishop) w - -",
-"Test Complex Riders III": "8/8/8/8/4X(crookedrook) w - -",
+"Test Complex Riders": "1X(crookedbishop)/8/3X(dummy)/4X(griffon)/7X(panda)//5X(slipbishop) w - -",
+"Test Complex Riders I": "8/8/8/8/4X(crookedrook) w - -",
 "Test Chinese Pieces": "8/8/8/3X(moa)X(moo)/3x(mao)X(mao)3/8/8/8 w - -",
 "Test Amphibians": "4k/8/8/slslslsl/8/8/FFFFFFFF/4K w - -",
 "Test Royalty": "x(royalrook)x(royalknight)x(royalbishop)xjkx(royalbishop)x(royalknight)x(royalrook)/pppppppp/8/8/8/8/PPPPPPPP/X(royalrook)X(royalknight)X(royalbishop)XJKX(royalbishop)X(royalknight)X(royalrook) w KQkq -",
@@ -2864,7 +2861,7 @@ function unfiltered_moves(parlett)
         // (Would be nice if JavaScript arrays had a Python-like .extend)
         rel_moves.push.apply(rel_moves, decode_one_parlett(choice_groups[i]));
     }   
-    rel_moves = without_dupes(rel_moves);
+    //rel_moves = without_dupes(rel_moves);
 
     PARLETT_CACHE[parlett] = rel_moves;
     //PARLETT_CACHE[parlett] = dojo.toJson(rel_moves);
@@ -3146,7 +3143,26 @@ function filtered_moves(piece, color, is_hypothetical)
         }
     }
 
-    return {legal:moves, blocked:blocked_moves};
+    var unique = [];
+    var unique_xy = {};
+
+    // Remove/merge duplicate absolute moves. They must be removed after
+    // making absolute, not when they are relative, since riders may have
+    // multiple rays that need to be blocked (such as the griffon).
+    for (var i = 0; i < moves.length; i += 1) {
+        var move = moves[i];
+        var key = move.x + "," + move.y;
+
+        if (!unique_xy[key]) {
+            unique.push(move);
+            unique_xy[key] = unique.slice(-1);
+        } else {
+            // Merge flags
+            dojo.mixin(unique_xy[key], move);
+        }
+    }
+
+    return {legal:unique, blocked:blocked_moves};
 }
 
 // Rotate a direction vector by the given number of degrees, clockwise,
@@ -3709,9 +3725,6 @@ function expand_directions(directions, distances, limit, flags, movement, rel_mo
 // modified to use Prototype's Hash, won't do because the keys will be 
 // converted to strings. But at least the ugliness is confined to this function.
 // Note: flags also differentiate a move.
-//
-// TODO: Find out the griffon - each pair of rays overlap, but only one 
-// rider ray gets blocked, since they are from the same square.
 function without_dupes(a)
 {
     var hash = {};
@@ -4595,6 +4608,9 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
             }
         }
     }
+
+    assert(one, "execute_move(" + promote_to + ", " + choices + "): move not found!");
+
     move = one.move;
     piece = one.piece;
     square = one.square;
