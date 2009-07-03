@@ -1439,8 +1439,9 @@ function load_pgn(pgn)
 // Parse PGN into an array of dictionaries, one dictionary per game.
 function parse_pgn(pgn)
 {
-    var dict = {move_text: ""};
+    var dict = {};
     var dicts = [dict];
+    var move_texts = [];
 
     // Parse headers into dictionaries
     for (var i = 0; i < pgn.length; i += 1) {
@@ -1476,17 +1477,20 @@ function parse_pgn(pgn)
 
             if (dict[key]) {
                 // Duplicate key means this is a new game
-                dict = {move_text: ""};
+                dict.move_text = move_texts.join("");
+                dict = {};
+                move_texts = [];
                 dicts.push(dict);
             }
             dict[key] = value;
 
         } else if (ch === "\n") {
-            dict.move_text += " ";
+            move_texts.push(" ");
         } else {
-            dict.move_text += ch;
+            move_texts.push(ch);
         }
     }
+    dict.move_text = move_texts.join("");
 
     // Process each game, parsing move text
     for (var k = 0; k < dicts.length; k += 1) {
