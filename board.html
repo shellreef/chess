@@ -4659,7 +4659,8 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
         dojo.query(".recent-move-white").removeClass("recent-move-white");
         dojo.addClass(real_from_square, " recent-move-" + real_from_square.color);
 
-        // Re-highlight to-square
+        // Re-highlight to-square. The "dropped-square" class lacks !important so it
+        // will be overridden by legal move highlighting, while "dropping-square" won't.
         dojo.query(".dropping-square").removeClass("dropping-square");
         dojo.query(".dropped-square").removeClass("dropped-square");
         dojo.addClass(real_square, " dropped-square");
@@ -4899,9 +4900,13 @@ function move_dropped_piece(piece, square, event)
         unhighlight_all();
         dojo.query(".recent-move-black").removeClass("recent-move-black");
         dojo.query(".recent-move-white").removeClass("recent-move-white");
+        dojo.query(".dropping-square").removeClass("dropping-square");
         dojo.query(".dropped-square").removeClass("dropped-square");
         if (from_square) { 
             dojo.addClass(from_square, "dropped-square");
+        }
+        if (square) {
+            dojo.addClass(square, "dropped-square");
         }
 
         realize_vboard();
