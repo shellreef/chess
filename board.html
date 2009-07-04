@@ -485,7 +485,7 @@ var PIECE_TYPES = {
 
     // Generals from http://www.mayhematics.com/v/v_gm.htm
     // and some names from http://filer.case.edu/org/cwrums/games/chu-pieces.html#hiroku
-    soldier: {parlett: "1>", url:"akm", image:"shogipawn"}, // TODO: shogi pawn promotion, and a non-promoting variant
+    shogipawn: {parlett: "1>", url:"http://en.wikipedia.org/wiki/Shogi", /*promotion_rank:9*/}, // aka soldier TODO: optional promotion
 
     // 1>, but when crosses "river", promotes and can move 1=
     chinesepawn: {parlett: "1>", url:"pc:pawn-xiangqi", promote:["advancedsoldier"], promotion_rank:6}, // TODO
@@ -1209,7 +1209,7 @@ function edit_pgn()
 
     ORIGINAL_UI_HTML = game_ui.innerHTML;
 
-    game_ui.innerHTML = "<textarea id='edited_pgn' name='edited_pgn' cols='80' rows='35'>" + save_pgn().escapeHTML() + 
+    game_ui.innerHTML = "<textarea id='edited_pgn' name='edited_pgn' cols='80' rows='35'>" + escape_html(save_pgn()) + 
         "<\/textarea>" + 
         "<button type='button' name='ok' accesskey='o' " + 
         "onclick='reload_pgn()'>OK<\/button>" +
@@ -1270,7 +1270,7 @@ function save_pgn()
         var tag = tags[i];
         var elt = dojo.byId("PGN_" + tag);
 
-        if (elt.visible()) {
+        if (elt.style.display !== "none") {
             dict[tag] = elt.innerHTML;
         }
     }
@@ -5462,8 +5462,7 @@ function show_piece_inspector(piece)
     }
 
     dojo.byId("inspector-image").innerHTML = image_htmls.join(" ");
-    // TODO: proper escaping
-    dojo.byId("inspector-movement").innerHTML = type_info.parlett.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+    dojo.byId("inspector-movement").innerHTML = escape_html(type_info.parlett);
 
     dojo.byId("inspector-diagram").innerHTML = movement_diagram(unfiltered_moves(type_info.parlett));
 
@@ -6498,6 +6497,12 @@ function init_dnd()
 
 //// LOW-LEVEL FUNCTIONS
 
+// Escape a plaintext string for displaying in HTML
+function escape_html(s)
+{
+    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 // Unique an array. Based on http://blog.archive.jpsykes.com/212/unique-array-filter-in-dojo/index.html
 function uniq(arr)
 {
@@ -6791,7 +6796,7 @@ onclick="edit_pgn()" class="show_White">
 
 <!-- TODO: disclosure triangles -->
 <p><a href="#" onclick="var _c=dojo.byId('controls');_c.style.display=_c.style.display==='none'?'':'none'">controls</a> | 
-<a href="#" onclick="toggle_piece_library();">pieces</a>
+<a href="#" onclick="toggle_piece_library();">setup</a>
 
 <div id="controls" style="display: none; border-left: 2px solid blue">
 <div>
