@@ -780,7 +780,7 @@ var PIECE_TYPES = {
     //checker: {parlett: "cn(^2X)>, o1X>", url:"http://en.wikipedia.org/wiki/Fairy_chess_piece#Notations"}, // TODO: movement
     
     //cannon: {parlett: "on+, cn+^^"}, // TODO: movement
-    //grasshopper: {parlett: "n*^^", url:"http://en.wikipedia.org/wiki/Grasshopper_(chess)"}, // TODO: movement
+    //grasshopper: {parlett: "n*^", url:"http://en.wikipedia.org/wiki/Grasshopper_(chess)"}, // TODO: movement
    
     // Complex riders
     
@@ -967,6 +967,7 @@ var SAVED_BOARDS = {
 "Test Riders": "B2R4/5X(barcrider)2/4Q3/4XN3/2X(alibabariderferz)3X(stone)1/3X(crabrider)1X(warmachinerider)X(squirrelrider)1/2X(alfilrider)X(camelrider)2X(zebrarider)1/4X(girafferider)3 w - - 0 1",
 "Test Complex Riders": "1X(crookedbishop)/8/3X(dummy)/4X(griffon)/7X(panda)//5X(slipbishop) w - -",
 "Test Complex Riders I": "8/8/8/8/4X(crookedrook) w - -",
+//"Test Hoppers": "///4X(grasshopper)//4X(dummy) w - -",
 "Test Chinese Pieces": "8/8/8/3X(moa)X(moo)/3x(mao)X(mao)3/8/8/8 w - -",
 "Test Amphibians": "4k/8/8/slslslsl/8/8/FFFFFFFF/4K w - -",
 "Test Royalty": "x(royalrook)x(royalknight)x(royalbishop)xjkx(royalbishop)x(royalknight)x(royalrook)/pppppppp/8/8/8/8/PPPPPPPP/X(royalrook)X(royalknight)X(royalbishop)XJKX(royalbishop)X(royalknight)X(royalrook) w KQkq -",
@@ -2818,7 +2819,7 @@ function movement_diagram(moves)
         if (move[2].if_unblocked_dx !== undefined) {
             ch = "u";   // unblocked
         }
-    
+
         // Flip directions
         board[-move[1]][move[0]] = ch;
 
@@ -3413,7 +3414,7 @@ function decode_relative_explicit_move(text_move, existing_flags)
 function decode_one_parlett(parlett)
 {
     var distances, directions, flags, movement, rel_moves, limit, inner_moves, rotates;
-    var hippogonal = false;
+    var hippogonal = false, hopper = false;
 
     flags = {};
     distances = [];
@@ -3450,6 +3451,10 @@ function decode_one_parlett(parlett)
             // can move to enemy square in order to capture it
             // (pawn's forward move)
             flags.no_capture = true;
+        
+        // Hopping rider
+        } else if (ch === "^") {
+            hopper = true;
 
         // Grouping
         } else if (ch === "(") {
@@ -3551,7 +3556,7 @@ function decode_one_parlett(parlett)
         } else if (ch === "/") {
             hippogonal = true;
         } else if (ch === " ") {
-            assert(false, "relative_parlett(" + parlett + "): whitespace encountered, did you forget a comma?");
+            assert(false, "decode_one_parlett(" + parlett + "): whitespace encountered, did you forget a comma?");
         } else {
             var maybe_directions = relative_decode_direction(ch, parlett.substr(i + 1, 1));
 
@@ -3561,13 +3566,14 @@ function decode_one_parlett(parlett)
                     i += maybe_directions.consumed - 1; // two-character (or more) direction
                 }
             } else {
-                assert(false, "relative_parlett(" + parlett + "): unsupported: '" + ch + "'");
+                assert(false, "decode_one_parlett(" + parlett + "): unsupported: '" + ch + "'");
             }
         }
     }
 
     if (hippogonal) {
-        assert(distances.length === 2, "relative_parlett(" + parlett + "): for hippogonal, expected exactly two distances");
+        assert(!hopper, "decode_one_parlett(" + parlett + "): sorry, hippogonal hoppers are not supported");
+        assert(distances.length === 2, "decode_one_parlett(" + parlett + "): for hippogonal, expected exactly two distances");
         var a = distances[0], b = distances[1];
 
         if (a !== Infinity && b !== Infinity) {
@@ -3614,7 +3620,7 @@ function decode_one_parlett(parlett)
         }
 
     } else if (directions) {
-        expand_directions(directions, distances, limit, flags, movement, rel_moves, rotates);
+        expand_directions(directions, distances, limit, flags, movement, rel_moves, rotates, hopper);
     }
 
 
@@ -3630,7 +3636,7 @@ function decode_one_parlett(parlett)
             }
 
             // Nightrider-like piece (hippogonal rider)
-            expand_directions(inner_moves, [], distances[0], flags, movement, rel_moves, rotates);
+            expand_directions(inner_moves, [], distances[0], flags, movement, rel_moves, rotates, hopper);
         }
 
         // Add inner and outer moves, if both were given, for gryphon, slip pieces
@@ -3653,9 +3659,15 @@ function decode_one_parlett(parlett)
 }
 
 // Expand a piece in the given directions, distances, up to
-// an optional limit, pushing the moves to rel_moves. Used for non-hippogonal
-// pieces, often riders (n*), but leapers (~n*) are also allowed.
-function expand_directions(directions, distances, limit, flags, movement, rel_moves, rotates)
+// an optional limit, pushing the moves to rel_moves.
+// directions: array of direction vectors
+// distances: length from origin in direction, often an Infinity
+// limit: maximum distance to go in direction, or Infinity
+// flags: move flags to add
+// movement: "rider" or "leaper"
+// rotates: array of degrees to rotate moves after each step
+// TODO: hopper: whether a intervening piece (hurdle) is required in the direction to be able to move
+function expand_directions(directions, distances, limit, flags, movement, rel_moves, rotates, hopper)
 {
     for (i = 0; i < directions.length; i += 1) {
         var dir = directions[i];
