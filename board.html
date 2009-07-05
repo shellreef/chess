@@ -780,7 +780,7 @@ var PIECE_TYPES = {
     //checker: {parlett: "cn(^2X)>, o1X>", url:"http://en.wikipedia.org/wiki/Fairy_chess_piece#Notations"}, // TODO: movement
     
     //cannon: {parlett: "on+, cn+^^"}, // TODO: movement
-    //grasshopper: {parlett: "n*^", url:"http://en.wikipedia.org/wiki/Grasshopper_(chess)"}, // TODO: movement
+    grasshopper: {parlett: "n*^", url:"http://en.wikipedia.org/wiki/Grasshopper_(chess)"}, // TODO: movement
    
     // Complex riders
     
@@ -967,7 +967,7 @@ var SAVED_BOARDS = {
 "Test Riders": "B2R4/5X(barcrider)2/4Q3/4XN3/2X(alibabariderferz)3X(stone)1/3X(crabrider)1X(warmachinerider)X(squirrelrider)1/2X(alfilrider)X(camelrider)2X(zebrarider)1/4X(girafferider)3 w - - 0 1",
 "Test Complex Riders": "1X(crookedbishop)/8/3X(dummy)/4X(griffon)/7X(panda)//5X(slipbishop) w - -",
 "Test Complex Riders I": "8/8/8/8/4X(crookedrook) w - -",
-//"Test Hoppers": "///4X(grasshopper)//4X(dummy) w - -",
+"Test Hoppers": "///4X(grasshopper)kx(dummy)//4X(dummy) w - -",
 "Test Chinese Pieces": "8/8/8/3X(moa)X(moo)/3x(mao)X(mao)3/8/8/8 w - -",
 "Test Amphibians": "4k/8/8/slslslsl/8/8/FFFFFFFF/4K w - -",
 "Test Royalty": "x(royalrook)x(royalknight)x(royalbishop)xjkx(royalbishop)x(royalknight)x(royalrook)/pppppppp/8/8/8/8/PPPPPPPP/X(royalrook)X(royalknight)X(royalbishop)XJKX(royalbishop)X(royalknight)X(royalrook) w KQkq -",
@@ -2819,6 +2819,9 @@ function movement_diagram(moves)
         if (move[2].if_unblocked_dx !== undefined) {
             ch = "u";   // unblocked
         }
+        if (move[2].if_blocked_dx !== undefined) {
+            ch = "^";   // probably a hopper
+        }
 
         // Flip directions
         board[-move[1]][move[0]] = ch;
@@ -2910,6 +2913,7 @@ function filtered_moves(piece, color, is_hypothetical)
 
         // Local copies of relative coords, so don't modify original.
         var if_unblocked_dx = flags.if_unblocked_dx, if_unblocked_dy = flags.if_unblocked_dy;
+        var if_blocked_dx = flags.if_blocked_dx, if_blocked_dy = flags.if_blocked_dy;
         var if_unblocked2_dx = flags.if_unblocked2_dx, if_unblocked2_dy = flags.if_unblocked2_dy;
         var if_unblocked3_dx = flags.if_unblocked3_dx, if_unblocked3_dy = flags.if_unblocked3_dy;
         //var capture_at_dx = flags.capture_at_dx, capture_at_dy = flags.capture_at_dy;
@@ -2920,6 +2924,7 @@ function filtered_moves(piece, color, is_hypothetical)
             rel_y = -rel_y;
             // Reverse any embedded relative coordinates.
             if (if_unblocked_dy) { if_unblocked_dy = -if_unblocked_dy; }
+            if (if_blocked_dy) { if_blocked_dy = -if_blocked_dy; }
             if (if_unblocked2_dy) { if_unblocked2_dy = -if_unblocked2_dy; }
             if (if_unblocked3_dy) { if_unblocked3_dy = -if_unblocked3_dy; }
             //if (capture_at_dy) { capture_at_dy = -capture_at_dy; }
@@ -3009,6 +3014,15 @@ function filtered_moves(piece, color, is_hypothetical)
                 continue;
             }
         }
+
+        // Only if *is* blocked
+        if (if_blocked_dy !== undefined) {
+            key = if_blocked_dx + "," + if_blocked_dy;
+            if (!blocked[key] && !pc_or_offboard(if_blocked_dx + start_x, if_blocked_dy + start_y, true)) {
+                continue;
+            }
+        }
+
         if (if_unblocked2_dy !== undefined) {
             key = if_unblocked2_dx + "," + if_unblocked2_dy;
             if (blocked[key] || pc_or_offboard(if_unblocked2_dx + start_x, if_unblocked2_dy + start_y, true)) {
@@ -3700,7 +3714,6 @@ function expand_directions(directions, distances, limit, flags, movement, rel_mo
                 dir = rotate_direction(dir, rotates[j % rotates.length]);
             }
 
-
             // Riders get blocked. Note that you can have a non-hippogonal leaper.
             // ~n* for example, is like a queen, but not blocked by intervening pieces.
 
@@ -3717,17 +3730,38 @@ function expand_directions(directions, distances, limit, flags, movement, rel_mo
                 these_flags.if_unblocked_dx = prev_rel_x;
                 these_flags.if_unblocked_dy = prev_rel_y;
 
-            } 
+            }
 
-            // Directions - these were either specified by direction vector code
+ 
+           // Directions - these were either specified by direction vector code
             // as in n* or hippogonally using ~1/2& (both these expand to >1 direction)
             rel_x += dir[0];
             rel_y += dir[1];
 
+            if (hopper) {
+                // Hoppers require a blocking piece (hurdle)
+                if (prev_rel_x !== null) {
+                    these_flags.if_blocked_dx = prev_rel_x;
+                    these_flags.if_blocked_dy = prev_rel_y;
+
+                    // TODO: only allow hopping over one piece (not an overhopper)
+                    //these_flags.if_blocked_skip = max - count - 1;
+                }  else {
+                    // This is one square away from the moving piece.
+                    // Skip this move, since no hurdle can fit within in here.
+                    // But, set previous x and y since they won't be set at the end
+                    // of the loop since we're continue'ing out of it.
+                    prev_rel_x = rel_x;
+                    prev_rel_y = rel_y;
+                    continue;
+                }
+            }
+
+
             dojo.mixin(these_flags, flags);
 
             // Blocked by a square which you CAN move to - riders w/ no limits except board dimensions
-            if (distance === Infinity && movement === "rider") {
+            if (distance === Infinity && movement === "rider" && !hopper) {
                 these_flags.if_blocked_skip = max - count - 1;
             }
 
