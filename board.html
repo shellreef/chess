@@ -5493,12 +5493,30 @@ function toggle_piece_library()
 // Show information on a piece
 function show_piece_inspector(piece)
 {
-    var symbols, type_info, misc, images, paths, diagram;
+    var symbols, type_info, misc, images, paths, diagram, alt_names, alt_names_string;
     var inspector = dojo.byId("piece-inspector");
 
     type_info = PIECE_TYPES[piece.type];
 
-    dojo.byId("inspector-type").innerHTML = piece.type;
+    // Also known as...
+    alt_names = [];
+    if (dojo.isArray(type_info.image)) {
+        alt_names = dojo.clone(type_info.image);
+    } 
+    if (type_info.aka) {
+        alt_names = alt_names.concat(type_info.aka);
+    }
+    // Remove dupes and canonical name
+    alt_names = uniq(alt_names);
+    alt_names = dojo.filter(alt_names, function(x) { return x !== piece.type; });
+
+    if (alt_names.length) {
+        alt_names_string = " (" + alt_names.join(", ") + ")";
+    } else {
+        alt_names_string = "";
+    }
+
+    dojo.byId("inspector-type").innerHTML = piece.type + alt_names_string;
 
     // Show all the images, in order of preference.
     image_htmls = [];
