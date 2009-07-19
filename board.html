@@ -379,7 +379,7 @@ var PIECE_TYPES = {
           royal: true, letter: "K", figurines: ["\u2654", "\u265a"],
           castles_with: "rook", url:"pc:king"},
     queen: {parlett: "n*", letter: "Q", figurines: ["\u2655", "\u265b"], iccf_number: 1, url:"pc:queen"},
-    rook: {parlett: "n+", letter: "R", castle: true, figurines: ["\u2656", "\u265c"], iccf_number: 2, url:"pc:rook"},
+    rook: {parlett: "n+", letter: "R", castle: true, figurines: ["\u2656", "\u265c"], iccf_number: 2, url:"pc:rook", aka:["chariot", "car"]},
     bishop: {parlett: "nX", letter: "B", figurines: ["\u2657", "\u265d"], iccf_number: 3, url:"pc:bishop"},
     knight: {parlett: "~1/2", letter: "N", figurines: ["\u2658", "\u265e"], iccf_number: 4, url:"pc:knight"},
 
@@ -703,7 +703,7 @@ var PIECE_TYPES = {
 
     //murray_lion: {parlett: "~0/2, ~2/2, c1*", letter: "XM"}, // TODO: image
     lion: {parlett: "~n*", letter: "XL", url:"pc:lion"},
-    elephant: {parlett: "2X", letter: "E", image:["elephantmodern", "elephant1"], url:"pc:elephant"},  // Not a leaper, path can be blocked (unlike alfil, ~2X)
+    elephant: {parlett: "2X", letter: "E", image:["elephantmodern", "elephant1"], url:"pc:elephant", aka:["minister"]},  // Not a leaper, path can be blocked (unlike alfil, ~2X)
     //khohn: {parlett: "1X, 1>", letter: "XK"}, // TODO: image
 
     // TODO: support ~0/0 for "null move" (---), but don't let drop to null, instead show a button
