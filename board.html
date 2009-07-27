@@ -4107,10 +4107,24 @@ function game_file_list()
     dojo.xhrGet({url: PREFS.saved_games_path + "index",
         load:function(text) {
             var array = text.split("\n");
-            var browser = dojo.byId("game-browser");
 
-            browser.style.display = "";
-            browser.innerHTML = array.join("<br>");
+            for (var i = 0; i < array.length; i += 1) {
+                var filename = array[i];
+
+                dojo.xhrGet({url: PREFS.saved_games_path + filename,
+                    load:function(pgn_text) {
+                        var games;
+                       
+                        // Large files take too long to parse. TODO: web worker?
+                        //if (pgn_text.length === 317651) 
+                        //    games = parse_pgn(pgn_text);
+
+                        var browser = dojo.byId("game-browser");
+
+                        browser.style.display = "";
+                        browser.innerHTML += pgn_text.length + "<br>";
+                }});
+            }
         }});
 }
 
@@ -6860,7 +6874,8 @@ onclick="edit_pgn()" class="show_White">
 
 <!-- TODO: disclosure triangles -->
 <p><a href="#" onclick="var _c=dojo.byId('controls');_c.style.display=_c.style.display==='none'?'':'none'">controls</a> | 
-<a href="#" onclick="toggle_piece_library();">setup</a>
+<a href="#" onclick="toggle_piece_library();">setup</a> |
+<a href="#" onclick="game_file_list()">saved</a>
 
 <div id="controls" style="display: none; border-left: 2px solid blue">
 <div>
