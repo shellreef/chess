@@ -3187,7 +3187,7 @@ function filtered_moves(piece, color, is_hypothetical)
     // multiple rays that need to be blocked (such as the griffon).
     for (var i = 0; i < moves.length; i += 1) {
         var move = moves[i];
-        var key = move.x + "," + move.y;
+        var key = move.x + "," + move.y + "," + move.promote_to;
 
         if (!unique_xy[key]) {
             unique.push(move);
@@ -4557,7 +4557,7 @@ function get_notations(piece, square, promote_to)
                                 piece: this_piece,
                                 notations: {}};
                         }
-                        
+
                         finds[key].notations[notation] = text;
                     }
                 }
