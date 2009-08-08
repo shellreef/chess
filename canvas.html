@@ -3,6 +3,16 @@
 <title>Canvas Chessboard</title>
 </head>
 <script>
+var DIM = {
+    board_top:10,
+    board_left:10,
+    board_width:400,
+    board_height:400,
+
+    square_width:50,
+    square_height:50
+};
+
 function draw_board()
 {
     var canvas, ctx;
@@ -17,7 +27,15 @@ function draw_board()
     ctx = canvas.getContext("2d");
     ctx.strokeStyle = "#000";
     ctx.lineWidth = 2;
-    ctx.strokeRect(10, 10, 100, 100);
+    ctx.strokeRect(DIM.board_top, DIM.board_left, DIM.board_width + 2, DIM.board_height);
+
+    for (var x = 0; x < 8; x += 1) {
+        ctx.fillStyle = "#" + (9 - x) + x + x; //x % 2 ? "#000" : "#fff";
+        ctx.fillRect(DIM.board_top + 1 + x * DIM.square_width, 
+                DIM.board_left + 1, 
+                DIM.square_width,
+                DIM.square_height);
+    }
 }
 </script>
 <body onload="draw_board()">
