@@ -1,0 +1,26 @@
+<html>
+<head>
+<title>Canvas Chessboard</title>
+</head>
+<script>
+function draw_board()
+{
+    var canvas, ctx;
+    
+    canvas = document.getElementById("canvas-board");
+
+    if (!canvas.getContext) {
+        alert("Sorry, your browser does not support the HTML5 canvas element.");
+        return;
+    }
+
+    ctx = canvas.getContext("2d");
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(10, 10, 100, 100);
+}
+</script>
+<body onload="draw_board()">
+<canvas id="canvas-board" width="500" height="500"></canvas>
+</body>
+</html>
