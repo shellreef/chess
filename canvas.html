@@ -3,14 +3,19 @@
 <title>Canvas Chessboard</title>
 </head>
 <script>
-var DIM = {
+var DISPLAY = {
     board_top:10,
     board_left:10,
     board_width:400,
     board_height:400,
 
+    ranks:8,
+    files:8,
+
     square_width:50,
-    square_height:50
+    square_height:50,
+    black:"#000",
+    white:"#fff"
 };
 
 function draw_board()
@@ -27,14 +32,16 @@ function draw_board()
     ctx = canvas.getContext("2d");
     ctx.strokeStyle = "#000";
     ctx.lineWidth = 2;
-    ctx.strokeRect(DIM.board_top, DIM.board_left, DIM.board_width + 2, DIM.board_height);
+    ctx.strokeRect(DISPLAY.board_top, DISPLAY.board_left, DISPLAY.board_width + 2, DISPLAY.board_height);
 
-    for (var x = 0; x < 8; x += 1) {
-        ctx.fillStyle = "#" + (9 - x) + x + x; //x % 2 ? "#000" : "#fff";
-        ctx.fillRect(DIM.board_top + 1 + x * DIM.square_width, 
-                DIM.board_left + 1, 
-                DIM.square_width,
-                DIM.square_height);
+    for (var x = 0; x < DISPLAY.ranks; x += 1) {
+        for (var y = 0; y < DISPLAY.files; y += 1) {
+            ctx.fillStyle = (x + y % 2) % 2 ? DISPLAY.black : DISPLAY.white;
+            ctx.fillRect(DISPLAY.board_top + 1 + x * DISPLAY.square_width, 
+                    DISPLAY.board_left + 1 + y * DISPLAY.square_height, 
+                    DISPLAY.square_width,
+                    DISPLAY.square_height);
+        }
     }
 }
 </script>
