@@ -16,21 +16,34 @@ var DISPLAY = {
     rank_labels_top:4,
     board_border:2,
 
-    ranks:20,
-    files:20,
+    files:8,
+    ranks:8,
 
+    //files:9,
+    //ranks:10,
+    //files:36,
+    //ranks:36,
+
+    // TODO: support smaller squares for larger boards like taikyoku shogi (3x36)? Since:
+    // <rdar://problem/7128886> Cmd+ doesn't zoom canvas elements
     square_width:55,
     square_height:55,
     black:"#d18b47",
     white:"#ffce9e",
-    text_color:"black"
+    text_color:"black",
+
+    canvas:null,        // The HTML canvas element
+    context:null,       // 2D drawing context
+    clean_board:null    // Image data of a clean, unmarked board
 };
 
+// Initially draw a board, saving the image data so it can be quickly redrawn 
 function draw_board()
 {
     var canvas, ctx, board_width, board_height;
     
     canvas = document.getElementById("canvas-board");
+    DISPLAY.canvas = canvas;
 
     if (!canvas.getContext) {
         alert("Sorry, your browser does not support the HTML5 canvas element.");
@@ -38,6 +51,7 @@ function draw_board()
     }
 
     ctx = canvas.getContext("2d");
+    DISPLAY.context = ctx;
 
     canvas.width = DISPLAY.files * DISPLAY.square_width + DISPLAY.board_left + DISPLAY.board_border*2;
     canvas.height= DISPLAY.ranks * DISPLAY.square_height + DISPLAY.board_top + DISPLAY.board_border*2;
@@ -81,7 +95,16 @@ function draw_board()
         ctx.fillText(rank, DISPLAY.rank_labels_left, 
                 DISPLAY.rank_labels_top + DISPLAY.square_height * (y + 1), DISPLAY.board_left);
     }
+
+    DISPLAY.clean_board = ctx.getImageData(0, 0, canvas.width, canvas.height);
 }
+
+// Restore the board to the clean state
+function redraw_board()
+{
+    DISPLAY.context.putImageData(DISPLAY.clean_board, 0, 0);
+}
+
 </script>
 </head>
 <body onload="draw_board()">
