@@ -38,7 +38,7 @@ var DISPLAY = {
 };
 
 // Initially draw a board, saving the image data so it can be quickly redrawn 
-function draw_board()
+function create_board()
 {
     var canvas, ctx, board_width, board_height;
     
@@ -105,9 +105,22 @@ function redraw_board()
     DISPLAY.context.putImageData(DISPLAY.clean_board, 0, 0);
 }
 
+// Highlight a square with a given color
+function highlight_square(file, rank, color)
+{
+    var x, y, ctx;
+
+    ctx = DISPLAY.context;
+    x = DISPLAY.board_left + DISPLAY.board_border/2 + (file - 1) * DISPLAY.square_width;
+    y = DISPLAY.board_top + DISPLAY.board_border/2 + (rank - 1) * DISPLAY.square_height;
+
+    ctx.fillStyle = color;
+    ctx.fillRect(x, y, DISPLAY.square_width, DISPLAY.square_height);
+}
+
 </script>
 </head>
-<body onload="draw_board()">
+<body onload="create_board()">
 <canvas id="canvas-board"></canvas>
 </body>
 </html>
