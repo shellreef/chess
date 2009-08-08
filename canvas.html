@@ -8,6 +8,7 @@ var DISPLAY = {
     board_left:10,
     board_width:400,
     board_height:400,
+    board_border:2,
 
     ranks:8,
     files:8,
@@ -31,14 +32,17 @@ function draw_board()
 
     ctx = canvas.getContext("2d");
     ctx.strokeStyle = "#000";
-    ctx.lineWidth = 2;
-    ctx.strokeRect(DISPLAY.board_top, DISPLAY.board_left, DISPLAY.board_width + 2, DISPLAY.board_height);
+    ctx.lineWidth = DISPLAY.board_border;
+    ctx.strokeRect(DISPLAY.board_top, 
+            DISPLAY.board_left, 
+            DISPLAY.board_width + DISPLAY.board_border, 
+            DISPLAY.board_height + DISPLAY.board_border);
 
     for (var x = 0; x < DISPLAY.ranks; x += 1) {
         for (var y = 0; y < DISPLAY.files; y += 1) {
             ctx.fillStyle = (x + y % 2) % 2 ? DISPLAY.black : DISPLAY.white;
-            ctx.fillRect(DISPLAY.board_top + 1 + x * DISPLAY.square_width, 
-                    DISPLAY.board_left + 1 + y * DISPLAY.square_height, 
+            ctx.fillRect(DISPLAY.board_top + DISPLAY.board_border/2 + x * DISPLAY.square_width, 
+                    DISPLAY.board_left + DISPLAY.board_border/2 + y * DISPLAY.square_height, 
                     DISPLAY.square_width,
                     DISPLAY.square_height);
         }
