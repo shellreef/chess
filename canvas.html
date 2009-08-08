@@ -11,13 +11,13 @@ var DISPLAY = {
     file_labels_top:19,
     file_labels_left:25,
     label_font:"12pt Gill Sans",
-    board_left:18,
-    rank_labels_left:4,
+    board_left:20,
+    rank_labels_left:10,
     rank_labels_top:4,
     board_border:2,
 
-    ranks:8,
-    files:8,
+    ranks:20,
+    files:20,
 
     square_width:55,
     square_height:55,
@@ -38,6 +38,9 @@ function draw_board()
     }
 
     ctx = canvas.getContext("2d");
+
+    canvas.width = DISPLAY.files * DISPLAY.square_width + DISPLAY.board_left + DISPLAY.board_border*2;
+    canvas.height= DISPLAY.ranks * DISPLAY.square_height + DISPLAY.board_top + DISPLAY.board_border*2;
 
     // Border
     ctx.strokeStyle = "#000";
@@ -71,16 +74,17 @@ function draw_board()
 
     // Rank labels
     ctx.fillStyle = DISPLAY.text_color;
+    ctx.textAlign = "center";
     for (var y = 0; y < DISPLAY.ranks; y += 1) {
         var rank = DISPLAY.ranks - y;
 
         ctx.fillText(rank, DISPLAY.rank_labels_left, 
-                DISPLAY.rank_labels_top + DISPLAY.square_height * (y + 1));
+                DISPLAY.rank_labels_top + DISPLAY.square_height * (y + 1), DISPLAY.board_left);
     }
 }
 </script>
 </head>
 <body onload="draw_board()">
-<canvas id="canvas-board" width="500" height="500"></canvas>
+<canvas id="canvas-board"></canvas>
 </body>
 </html>
