@@ -6,22 +6,20 @@
 var DISPLAY = {
     board_top:10,
     board_left:10,
-    board_width:400,
-    board_height:400,
     board_border:2,
 
     ranks:8,
     files:8,
 
-    square_width:50,
-    square_height:50,
+    square_width:55,
+    square_height:55,
     black:"#d18b47",
     white:"#ffce9e"
 };
 
 function draw_board()
 {
-    var canvas, ctx;
+    var canvas, ctx, board_width, board_height;
     
     canvas = document.getElementById("canvas-board");
 
@@ -33,10 +31,12 @@ function draw_board()
     ctx = canvas.getContext("2d");
     ctx.strokeStyle = "#000";
     ctx.lineWidth = DISPLAY.board_border;
+    board_width = DISPLAY.files * DISPLAY.square_width;
+    board_height = DISPLAY.ranks * DISPLAY.square_height;
     ctx.strokeRect(DISPLAY.board_top, 
             DISPLAY.board_left, 
-            DISPLAY.board_width + DISPLAY.board_border, 
-            DISPLAY.board_height + DISPLAY.board_border);
+            board_width + DISPLAY.board_border, 
+            board_height + DISPLAY.board_border);
 
     for (var x = 0; x < DISPLAY.ranks; x += 1) {
         for (var y = 0; y < DISPLAY.files; y += 1) {
