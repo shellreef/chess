@@ -8,11 +8,12 @@ body { margin: 0; padding: 0; border: 0; }
 <script>
 var DISPLAY = {
     board_top:26,
-    labels_top:17,
-    labels_left:0,
+    file_labels_top:19,
+    file_labels_left:-3,
     label_font:"12pt Gill Sans",
     board_left:18,
-    labels_left:6,
+    rank_labels_left:4,
+    rank_labels_top:4,
     board_border:2,
 
     ranks:8,
@@ -55,8 +56,9 @@ function draw_board()
         var file = String.fromCharCode("a".charCodeAt(0) + x);
         ctx.fillStyle = DISPLAY.text_color;
         ctx.fillText(file, 
-                DISPLAY.board_left + x * DISPLAY.square_width + DISPLAY.square_width / 2, 
-                DISPLAY.labels_top);
+                DISPLAY.board_left + DISPLAY.file_labels_left + 
+                    x * DISPLAY.square_width + DISPLAY.square_width / 2, 
+                DISPLAY.file_labels_top);
 
         // Squares
         for (var y = 0; y < DISPLAY.ranks; y += 1) {
@@ -73,7 +75,8 @@ function draw_board()
     for (var y = 0; y < DISPLAY.ranks; y += 1) {
         var rank = DISPLAY.ranks - y;
 
-        ctx.fillText(rank, DISPLAY.labels_left, DISPLAY.square_height * (y + 1));
+        ctx.fillText(rank, DISPLAY.rank_labels_left, 
+                DISPLAY.rank_labels_top + DISPLAY.square_height * (y + 1));
     }
 }
 </script>
