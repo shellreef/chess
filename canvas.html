@@ -1,12 +1,18 @@
 <html>
 <head>
 <title>Canvas Chessboard</title>
+<style>
+body { margin: 0; padding: 0; border: 0; }
+</style>
+
 <script>
 var DISPLAY = {
-    board_top:18,
-    labels_top:11,
+    board_top:25,
+    labels_top:17,
+    labels_left:0,
     label_font:"12pt Gill Sans",
-    board_left:10,
+    board_left:20,
+    labels_left:7,
     board_border:2,
 
     ranks:8,
@@ -60,6 +66,14 @@ function draw_board()
                     DISPLAY.square_width,
                     DISPLAY.square_height);
         }
+    }
+
+    // Rank labels
+    ctx.fillStyle = DISPLAY.text_color;
+    for (var y = 0; y < DISPLAY.ranks; y += 1) {
+        var rank = DISPLAY.ranks - y;
+
+        ctx.fillText(rank, DISPLAY.labels_left, DISPLAY.square_height * (y + 1));
     }
 }
 </script>
