@@ -9,7 +9,7 @@ body { margin: 0; padding: 0; border: 0; }
 var DISPLAY = {
     board_top:26,
     file_labels_top:19,
-    file_labels_left:-3,
+    file_labels_left:25,
     label_font:"12pt Gill Sans",
     board_left:18,
     rank_labels_left:4,
@@ -56,8 +56,7 @@ function draw_board()
         var file = String.fromCharCode("a".charCodeAt(0) + x);
         ctx.fillStyle = DISPLAY.text_color;
         ctx.fillText(file, 
-                DISPLAY.board_left + DISPLAY.file_labels_left + 
-                    x * DISPLAY.square_width + DISPLAY.square_width / 2, 
+                DISPLAY.board_left + DISPLAY.file_labels_left + x * DISPLAY.square_width,
                 DISPLAY.file_labels_top);
 
         // Squares
