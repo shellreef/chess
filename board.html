@@ -317,6 +317,7 @@ var DISPLAY = {
     recent_move_white: "blue",
     recent_move_black: "blue",
 
+    highlights: {},    // Color of legal move highlighted squares, for restoring color on drop over
 
     text_color:"black",
     feature_border_width:3,
@@ -4969,7 +4970,8 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
 
         highlight_square(from_square, DISPLAY["recent_move_" + from_square.color]);
         highlight_square(square, DISPLAY["recent_move_" + square.color]);
-
+        // Restore highlight of dropped square
+        DISPLAY.highlights[xy2filerank(square.x, square.y)] = DISPLAY["recent_move_" + square.color];
 
         // TODO: remove for canvas
         var real_square = SQUARES[square.x][square.y];
@@ -5220,6 +5222,8 @@ function move_dropped_piece(piece, square, event)
 
         do_virtual_move(piece, {x:square.x, y:square.y});
         unhighlight_all();
+
+        // TODO: remove for canvas
         dojo.query(".recent-move-black").removeClass("recent-move-black");
         dojo.query(".recent-move-white").removeClass("recent-move-white");
         dojo.query(".dropping-square").removeClass("dropping-square");
@@ -5230,6 +5234,8 @@ function move_dropped_piece(piece, square, event)
         if (square) {
             dojo.addClass(square, "dropped-square");
         }
+
+
 
         realize_vboard();
         set_copyable_link(true);    // this board state
@@ -6302,6 +6308,8 @@ function highlight_moves(piece, enable, skip_legal)
 
             to_square = VBOARD[x][y];
             highlight_square(to_square, enable ? DISPLAY["legal_move_" + to_square.color] : false);
+            // Save so drop square highlighting can recover
+            DISPLAY.highlights[xy2filerank(to_square.x, to_square.y)] = enable ? DISPLAY["legal_move_" + to_square.color] : false;
 
             // TODO: remove for canvas
             to_square = SQUARES[x][y];
@@ -6660,11 +6668,19 @@ function dragging_over(element, left, top)
         //var square  = dojo.query('#board-body')[0].childNodes[9 - cell_y].childNodes[cell_x];
         
         if (DROP.square) {
+            // Recover legal move highlighting, if any. 
+            highlight_square(DROP.square, DISPLAY.highlights[xy2filerank(DROP.square.x, DROP.square.y)]);
+
+            // TODO: remove for canvas
             dojo.removeClass(DROP.square, "dropping-square");
         }
 
         if (accepts(element, square)) {
             DROP.square = square;
+
+            highlight_square(square, DISPLAY["recent_move_" + square.color]);
+
+            // TODO: remove for canvas
             dojo.addClass(square, "dropping-square");
         } else {
             DROP.square = null;
