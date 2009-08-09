@@ -5333,7 +5333,7 @@ function load_starting_position(fen, replay)
             var piece = decode_piece_letter(letter);
             piece.virtual = true;
             piece.square = VBOARD[x][y];
-            piece.unique_id = letter + "," + x + "," + y;   // TODO: from name_pieces instead?
+            //piece.unique_id = letter + "," + x + "," + y;   // TODO: from name_pieces instead?
 
             VBOARD[x][y].piece = piece;
 
@@ -5630,19 +5630,19 @@ function name_pieces()
         var file = xy2descriptive("white", file_number);
 
         // White's pieces and pawns
-        piece = pc(file_number, 1, false); if (piece) { piece.descriptive_name = file; }
-        piece = pc(file_number, 2, false); if (piece) { descriptive_name = file + "P"; }
+        piece = pc(file_number, 1, true); if (piece) { piece.descriptive_name = file; }
+        piece = pc(file_number, 2, true); if (piece) { descriptive_name = file + "P"; }
 
         // Black's pieces and pawns
-        piece = pc(file_number, 8, false); if (piece) { descriptive_name = file; }
-        piece = pc(file_number, 7, false); if (piece) { descriptive_name = file + "P"; }
+        piece = pc(file_number, 8, true); if (piece) { descriptive_name = file; }
+        piece = pc(file_number, 7, true); if (piece) { descriptive_name = file + "P"; }
 
 
         // Algebraic descriptive notation
         var afile = xy2filerank(file_number, "");
         for (var white_rank = 1; white_rank <= RANK_MAX; white_rank += 1) {
             var black_rank = 9 - white_rank;
-            piece = pc(file_number, white_rank, false);
+            piece = pc(file_number, white_rank, true);
             var rank, piece_letter;
 
             if (!piece) {
