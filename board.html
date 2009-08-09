@@ -4142,17 +4142,16 @@ function game_file_list()
 // Load the virtual board into the displayed board. Any number of operations
 // can be conducted on the virtual in-memory board, then when it is finished,
 // only then does the board need to be rendered in HTML. 
-var CREATED_PIECE_IMAGES = [];
 function realize_vboard()
 {
     var time_started = new Date().getTime();
 
-    // Delete all prior pieces
-    var piece_container = dojo.byId("onboard-pieces");
-    while (piece_container.firstChild) {
-        piece_container.removeChild(piece_container.firstChild);
-    }
-
+    // Delete all prior onboard pieces
+    dojo.query(".piece").forEach(function(piece) {
+            if (!dojo.hasClass(piece, "tear-off")) {
+                piece.parentNode.removeChild(piece);
+            }
+    });
 
     for (var x = 1; x <= FILE_MAX; x += 1) {
         for (var y = 1; y <= RANK_MAX; y += 1) {
@@ -4160,23 +4159,17 @@ function realize_vboard()
             var square = SQUARES[x][y];
             var piece;
 
-            while (square.firstChild) {
-                square.removeChild(square.firstChild);
-            }
-
             if (v.piece) {
                 piece = create_piece(v.piece.color, v.piece.type);
                 piece.square = SQUARES[x][y];
-                // TODO: what about descriptive_name, adescriptive_name?? Its important.
+                // TODO: what about descriptive_name, adescriptive_name?? It is important.
                 piece.unique_id = v.piece.unique_id;
 
-                square.appendChild(piece);
-
                 piece.style.position = "absolute";
+                // TODO: get_square_x/get_square_y
                 piece.style.left = 55 * (x - 1) + 20 + "px";
                 piece.style.top = 55 * (RANK_MAX - y) + 30 + "px";
-                CREATED_PIECE_IMAGES.push(piece);
-                piece_container.appendChild(piece);
+                dojo.body().appendChild(piece);
             }
         }
     }
@@ -6830,9 +6823,6 @@ function enable_document_selection(enable, element)
 ></tr
 ></tbody
 ></table>
-
-<!-- Pieces are added to this element -->
-<div id="onboard-pieces"></div>
 
 </td><td style="vertical-align: top">
 <noscript><p>JavaScript is disabled, nothing will work!</p></noscript>
