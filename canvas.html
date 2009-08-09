@@ -32,6 +32,9 @@ var DISPLAY = {
     white:"#ffce9e",
     text_color:"black",
 
+    checkered:true,     // Squares alternating colors, otherwise all white
+    borders:false,      // Squares have borders (useful for non-checkered boards)
+
     canvas:null,        // The HTML canvas element
     context:null,       // 2D drawing context
     clean_board:null    // Image data of a clean, unmarked board
@@ -77,12 +80,24 @@ function create_board()
                 DISPLAY.file_labels_top);
 
         // Squares
+        ctx.fillStyle = DISPLAY.white;
         for (var y = 0; y < DISPLAY.ranks; y += 1) {
-            ctx.fillStyle = (x + y % 2) % 2 ? DISPLAY.black : DISPLAY.white;
-            ctx.fillRect(DISPLAY.board_left + DISPLAY.board_border/2 + x * DISPLAY.square_width, 
-                    DISPLAY.board_top + DISPLAY.board_border/2 + y * DISPLAY.square_height, 
-                    DISPLAY.square_width,
-                    DISPLAY.square_height);
+            var rx, ry, rw, rh;
+
+            if (DISPLAY.checkered) {
+                ctx.fillStyle = (x + y % 2) % 2 ? DISPLAY.black : DISPLAY.white;
+            }
+
+            rx = DISPLAY.board_left + DISPLAY.board_border/2 + x * DISPLAY.square_width;
+            ry = DISPLAY.board_top + DISPLAY.board_border/2 + y * DISPLAY.square_height;
+            rw = DISPLAY.square_width;
+            rh = DISPLAY.square_height;
+
+            ctx.fillRect(rx, ry, rw, rh);
+
+            if (DISPLAY.borders) {
+                ctx.strokeRect(rx, ry, rw, rh);
+            }
         }
     }
 
