@@ -4400,12 +4400,11 @@ function realize_vboard()
     for (var x = 1; x <= FILE_MAX; x += 1) {
         for (var y = 1; y <= RANK_MAX; y += 1) {
             var v = VBOARD[x][y];
-            var square = SQUARES[x][y];
             var piece;
 
             if (v.piece) {
                 piece = create_piece(v.piece.color, v.piece.type);
-                piece.square = SQUARES[x][y];
+                piece.square = VBOARD[x][y];
                 // TODO: what about descriptive_name, adescriptive_name?? It is important.
                 piece.unique_id = v.piece.unique_id;
 
@@ -5206,6 +5205,7 @@ function move_dropped_piece(piece, square, event)
         // Consider animating opacity or width+height (with dojo.anim or CSS transitions)
     //}
 
+    /*
     // Visually rehome piece. This is a UI speed hack: after move_piece_to_square() is
     // called, realize_vboard() will finalize the board position, moving any other
     // pieces (castling, en passant, snapback, etc.) -- but it feels faster to have
@@ -5216,6 +5216,7 @@ function move_dropped_piece(piece, square, event)
     piece.style.position = "relative";
     piece.style.top = piece.style.left = 0;
     square.appendChild(piece);
+*/
 
     if (PREFS.setup_mode) {
         var from_square = piece.square;
@@ -6659,13 +6660,11 @@ function dragging_over(element, left, top)
 
         // Highlight droppable square
         var flipped = PREFS.flipped;
-        if (!SQUARES[flipped ? 9 - cell_x : cell_x]) {
+        if (!VBOARD[flipped ? 9 - cell_x : cell_x]) {
             DROP.square = null;
             return;
         }
-        var square = SQUARES[flipped ? 9 - cell_x : cell_x][flipped ? 9 - cell_y : cell_y];
-        // Slow, so use cached node above
-        //var square  = dojo.query('#board-body')[0].childNodes[9 - cell_y].childNodes[cell_x];
+        var square = VBOARD[flipped ? 9 - cell_x : cell_x][flipped ? 9 - cell_y : cell_y];
         
         if (DROP.square) {
             // Recover legal move highlighting, if any. 
@@ -6840,6 +6839,14 @@ function init_dnd()
         });
     document.ontouchend = touchend;
 
+    DROP.area.left = DISPLAY.board_left;
+    DROP.area.top = DISPLAY.board_top;
+    DROP.area.cell_width = DISPLAY.square_width;
+    DROP.area.width = DISPLAY.files * DISPLAY.square_width;
+    DROP.area.height = DISPLAY.ranks * DISPLAY.square_height;
+
+    // TODO: remove for canvas
+    /*
     // Get dimensions of droppable area
     var top_left_square = dojo.query("#top-left-square")[0];
     var bottom_right_square = dojo.query("#bottom-right-square")[0];
@@ -6854,6 +6861,7 @@ function init_dnd()
 
     // for testing
     //dojo._setBox(foo, DROP.area.left, DROP.area.top, DROP.area.width, DROP.area.height, "px");
+    */
 
     DROP.area.right = DROP.area.left + DROP.area.width;
     DROP.area.bottom = DROP.area.top + DROP.area.height;
