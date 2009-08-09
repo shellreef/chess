@@ -144,9 +144,6 @@ td.blocked-move-black { background-color: firebrick !important; }
 /* Recent move, shown during mouse operation and also once after */
 
 /* Source square */
-/*td.recent-move-white { background-color: #0066ff; }
-td.recent-move-black { background-color: #0099ff; }*/
-
 td.recent-move-white { background-color: blue; }
 td.recent-move-black { background-color: blue; }
 
@@ -157,7 +154,7 @@ td.penultimate-move-black { background-color: yellow; }*/
 
 
 /* Destination square */
-td.dropping-square { background-color: blue !important; }   /* in progress (overrides legal) */  
+td.dropping-square { background-color:green !important; }   /* in progress (overrides legal) */  
 td.dropped-square { background-color: blue; }               /* finished (does not) */
 
 /* TODO: yellow - piece to promote
@@ -300,12 +297,23 @@ var DISPLAY = {
     square_width:55,
     square_height:55,
 
+    // Colors
+    
+    // Squares
     black:"#d18b47",
     white:"#ffce9e",
+
+    // Highlighting of legal moves on mouseover
     legal_move_white: "seagreen",
     legal_move_black: "green",
+
+    // Highlighting blocked moves on shift-mouseover
     blocked_move_white: "indianred",
     blocked_move_black: "firebrick",
+
+    // Source move, when already moved a piece from this square, and mousing over when about to
+    recent_move_white: "blue",
+    recent_move_black: "blue",
 
 
     text_color:"black",
@@ -6155,6 +6163,9 @@ function over_piece(piece, event)
     
     var square = highlight_moves(piece, true);
     if (square) {
+        highlight_square(square, DISPLAY["recent_move_" + square.color]);
+
+        // TODO: remove for canvas
         dojo.addClass(square, "recent-move-" + square.color);
     }
  
@@ -6171,6 +6182,9 @@ function out_piece(piece, event)
 
     var square = highlight_moves(piece, false);
     if (square) {
+        highlight_square(square, false);
+
+        // TODO: remove for canvas
         dojo.removeClass(square, "recent-move-" + square.color);
     }
    
