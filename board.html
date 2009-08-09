@@ -160,10 +160,6 @@ td.penultimate-move-black { background-color: yellow; }*/
 td.dropping-square { background-color: blue !important; }   /* in progress (overrides legal) */  
 td.dropped-square { background-color: blue; }               /* finished (does not) */
 
-td.dropping-square-capture { background-color: red !important; }
-td.dropping-square-capture2 { background-color: red !important; }
-
-
 /* TODO: yellow - piece to promote
  * green - legal moves
  * red - blocked moves (when shift-hover), guarded squares
@@ -6325,7 +6321,7 @@ function unhighlight_all()
 {
     redraw_board();
 
-    // TODO: remove
+    // TODO: remove for canvas
     dojo.query("td.legal-move-white, td.legal-move-black").forEach(function(square) {
         dojo.removeClass(square, "legal-move-white");
         dojo.removeClass(square, "legal-move-black");
