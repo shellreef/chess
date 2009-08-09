@@ -33,13 +33,20 @@ var DISPLAY = {
     text_color:"black",
     feature_border_width:3,
 
-    checkered:true,     // Squares alternating colors, otherwise all white
-    bordered:false,     // Squares have borders (useful for non-checkered boards)
+    colored:false,     // Squares are filled in or empty
+    checkered:false,   // Squares alternating colors, otherwise all white
+    bordered:true,     // Squares have borders (useful for non-checkered boards)
     
-    // http://www.chessvariants.com/xiangqi.dir/xiangqiwest.html
     features:[
-        {color:"yellow", file:4, rank:3, width:3, height:3},    // palace
-        {color:"blue", file:1, rank:5, width:9, height:0},      // river
+        // Xiangqi Westernization using lines and outlines to indicate features on a checkered board
+        // http://www.chessvariants.com/xiangqi.dir/xiangqiwest.html
+        //{color:"yellow", file:4, rank:3, width:3, height:3},    // palace
+        //{color:"blue", file:1, rank:5, width:9, height:0},      // river
+
+        // Xiangqi Westernization using square color to indicate features on an uncheckered board
+        // http://www.crockford.com/chess/xiangqi.html
+        {fill:true, color:"same", file:1, rank:5, width:9, height:5},        // sides of river
+        {fill:true, color:"opposite", file:4, rank:3, width:3, height:3},    // palace
     ],
 
     canvas:null,        // The HTML canvas element
@@ -78,6 +85,11 @@ function create_board()
 
     ctx.font = DISPLAY.label_font;
 
+    draw_features();
+
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = DISPLAY.board_border;
+
     for (var x = 0; x < DISPLAY.files; x += 1) {
         // File labels
         var file = String.fromCharCode("a".charCodeAt(0) + x);
@@ -94,14 +106,14 @@ function create_board()
             if (DISPLAY.checkered) {
                 ctx.fillStyle = (x + y % 2) % 2 ? DISPLAY.white : DISPLAY.black;
             }
-            // TODO: palace and river colors, http://www.crockford.com/chess/xiangqi.html
-
             rx = get_square_x(x + 1);
             ry = get_square_y(y + 1);
             rw = DISPLAY.square_width;
             rh = DISPLAY.square_height;
 
-            ctx.fillRect(rx, ry, rw, rh);
+            if (DISPLAY.colored) {
+                ctx.fillRect(rx, ry, rw, rh);
+            }
 
             if (DISPLAY.bordered) {
                 ctx.strokeRect(rx, ry, rw, rh);
@@ -121,24 +133,59 @@ function create_board()
 
     ctx.lineWidth = DISPLAY.feature_border_width;
 
-    // Board "features": cosmetic embellishments that indicate something
+    DISPLAY.clean_board = ctx.getImageData(0, 0, canvas.width, canvas.height);
+}
+
+// Board "features": cosmetic embellishments that indicate something
+function draw_features()
+{
+    var ctx = DISPLAY.context;
+
     for (var i = 0; i < DISPLAY.features.length; i += 1) {
         var feature = DISPLAY.features[i];
+        var rx, ry, rw, rh, color;
 
-        ctx.strokeStyle = feature.color;
-        ctx.strokeRect(get_square_x(feature.file), 
-                get_square_y(feature.rank), 
-                feature.width * DISPLAY.square_width, 
-                feature.height * DISPLAY.square_height);
+        // White's side first
+        if (feature.color === "same") {
+            color = DISPLAY.white;
+        } else if (feature.color === "opposite") { 
+            color = DISPLAY.black;
+        } else {
+            color = feature.color;
+        }
 
-        // Mirror to other side of board
-        ctx.strokeRect(get_square_x(feature.file), 
-                get_square_y(feature.rank + (DISPLAY.ranks - feature.height)),
-                feature.width * DISPLAY.square_width, 
-                feature.height * DISPLAY.square_height);
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+
+        rx = get_square_x(feature.file), 
+        ry = get_square_y(feature.rank), 
+        rw = feature.width * DISPLAY.square_width, 
+        rh = feature.height * DISPLAY.square_height;
+
+        if (feature.fill) {
+            ctx.fillRect(rx, ry, rw, rh);
+        } else {
+            ctx.strokeRect(rx, ry, rw, rh);
+        }
+
+        // Mirror to black's side of board
+        if (feature.color === "same") {
+            color = DISPLAY.black;
+        } else if (feature.color === "opposite") { 
+            color = DISPLAY.white;
+        } else {
+            color = feature.color;
+        }
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+
+        ry = get_square_y(feature.rank + (DISPLAY.ranks - feature.height));
+        if (feature.fill) {
+            ctx.fillRect(rx, ry, rw, rh);
+        } else {
+            ctx.strokeRect(rx, ry, rw, rh);
+        }
     }
-
-    DISPLAY.clean_board = ctx.getImageData(0, 0, canvas.width, canvas.height);
 }
 
 // Restore the board to the clean state
