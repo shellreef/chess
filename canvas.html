@@ -16,11 +16,11 @@ var DISPLAY = {
     rank_labels_top:4,
     board_border:2,
 
-    files:8,
-    ranks:8,
+    //files:8,
+    //ranks:8,
 
-    //files:9,
-    //ranks:10,
+    files:9,
+    ranks:10,
     //files:36,
     //ranks:36,
 
@@ -31,9 +31,16 @@ var DISPLAY = {
     black:"#d18b47",
     white:"#ffce9e",
     text_color:"black",
+    feature_border_width:3,
 
     checkered:true,     // Squares alternating colors, otherwise all white
-    borders:false,      // Squares have borders (useful for non-checkered boards)
+    bordered:false,     // Squares have borders (useful for non-checkered boards)
+    
+    // http://www.chessvariants.com/xiangqi.dir/xiangqiwest.html
+    features:[
+        {color:"yellow", file:4, rank:3, width:3, height:3},    // palace
+        {color:"blue", file:1, rank:5, width:9, height:0},      // river
+    ],
 
     canvas:null,        // The HTML canvas element
     context:null,       // 2D drawing context
@@ -85,17 +92,18 @@ function create_board()
             var rx, ry, rw, rh;
 
             if (DISPLAY.checkered) {
-                ctx.fillStyle = (x + y % 2) % 2 ? DISPLAY.black : DISPLAY.white;
+                ctx.fillStyle = (x + y % 2) % 2 ? DISPLAY.white : DISPLAY.black;
             }
+            // TODO: palace and river colors, http://www.crockford.com/chess/xiangqi.html
 
-            rx = DISPLAY.board_left + DISPLAY.board_border/2 + x * DISPLAY.square_width;
-            ry = DISPLAY.board_top + DISPLAY.board_border/2 + y * DISPLAY.square_height;
+            rx = get_square_x(x + 1);
+            ry = get_square_y(y + 1);
             rw = DISPLAY.square_width;
             rh = DISPLAY.square_height;
 
             ctx.fillRect(rx, ry, rw, rh);
 
-            if (DISPLAY.borders) {
+            if (DISPLAY.bordered) {
                 ctx.strokeRect(rx, ry, rw, rh);
             }
         }
@@ -111,6 +119,25 @@ function create_board()
                 DISPLAY.rank_labels_top + DISPLAY.square_height * (y + 1), DISPLAY.board_left);
     }
 
+    ctx.lineWidth = DISPLAY.feature_border_width;
+
+    // Board "features": cosmetic embellishments that indicate something
+    for (var i = 0; i < DISPLAY.features.length; i += 1) {
+        var feature = DISPLAY.features[i];
+
+        ctx.strokeStyle = feature.color;
+        ctx.strokeRect(get_square_x(feature.file), 
+                get_square_y(feature.rank), 
+                feature.width * DISPLAY.square_width, 
+                feature.height * DISPLAY.square_height);
+
+        // Mirror to other side of board
+        ctx.strokeRect(get_square_x(feature.file), 
+                get_square_y(feature.rank + (DISPLAY.ranks - feature.height)),
+                feature.width * DISPLAY.square_width, 
+                feature.height * DISPLAY.square_height);
+    }
+
     DISPLAY.clean_board = ctx.getImageData(0, 0, canvas.width, canvas.height);
 }
 
@@ -120,17 +147,27 @@ function redraw_board()
     DISPLAY.context.putImageData(DISPLAY.clean_board, 0, 0);
 }
 
+// Get the upper-left x coordinate of a square given file
+function get_square_x(file)
+{
+    return DISPLAY.board_left + DISPLAY.board_border/2 + (file - 1) * DISPLAY.square_width;
+}
+
+// Get the upper-left y coordinate of a square given rank
+function get_square_y(rank)
+{
+    return DISPLAY.board_top + DISPLAY.board_border/2 + (DISPLAY.ranks - rank) * DISPLAY.square_height;
+}
+
 // Highlight a square with a given color
 function highlight_square(file, rank, color)
 {
     var x, y, ctx;
 
     ctx = DISPLAY.context;
-    x = DISPLAY.board_left + DISPLAY.board_border/2 + (file - 1) * DISPLAY.square_width;
-    y = DISPLAY.board_top + DISPLAY.board_border/2 + (rank - 1) * DISPLAY.square_height;
 
     ctx.fillStyle = color;
-    ctx.fillRect(x, y, DISPLAY.square_width, DISPLAY.square_height);
+    ctx.fillRect(get_square_x(file), get_square_y(rank), DISPLAY.square_width, DISPLAY.square_height);
 }
 
 </script>
