@@ -4139,27 +4139,26 @@ function game_file_list()
 
 //// BOARD FUNCTIONS
 
-// TODO: a "board lab", where can drag pieces onto board in arbitrary
-// positions, or drag off (with an Effect.Puff), to load arbitrary fen.
-// Have a different mode where pieces can be dragged anywhere, including
-// to offboard, and from a piece library.
-
 // Load the virtual board into the displayed board. Any number of operations
 // can be conducted on the virtual in-memory board, then when it is finished,
 // only then does the board need to be rendered in HTML. 
+var CREATED_PIECE_IMAGES = [];
 function realize_vboard()
 {
     var time_started = new Date().getTime();
+
+    // Delete all prior pieces
+    var piece_container = dojo.byId("onboard-pieces");
+    while (piece_container.firstChild) {
+        piece_container.removeChild(piece_container.firstChild);
+    }
+
+
     for (var x = 1; x <= FILE_MAX; x += 1) {
         for (var y = 1; y <= RANK_MAX; y += 1) {
             var v = VBOARD[x][y];
             var square = SQUARES[x][y];
             var piece;
-
-            while (square.firstChild) {
-                // 14% of realize_vboard() is spent here. TODO: Avoid removing if no change??
-                square.removeChild(square.firstChild);
-            }
 
             if (v.piece) {
                 piece = create_piece(v.piece.color, v.piece.type);
@@ -4168,6 +4167,12 @@ function realize_vboard()
                 piece.unique_id = v.piece.unique_id;
 
                 square.appendChild(piece);
+
+                piece.style.position = "absolute";
+                piece.style.left = 55 * (x - 1) + 20 + "px";
+                piece.style.top = 55 * (RANK_MAX - y) + 30 + "px";
+                CREATED_PIECE_IMAGES.push(piece);
+                piece_container.appendChild(piece);
             }
         }
     }
@@ -6821,6 +6826,9 @@ function enable_document_selection(enable, element)
 ></tr
 ></tbody
 ></table>
+
+<!-- Pieces are added to this element -->
+<div id="onboard-pieces"></div>
 
 </td><td style="vertical-align: top">
 <noscript><p>JavaScript is disabled, nothing will work!</p></noscript>
