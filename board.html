@@ -1086,7 +1086,7 @@ var OPENINGS = {
 
 /* Global functions for jslint to recognize. TODO: move to objects? */
 
-/*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved unfiltered_moves filtered_moves relative_decode_direction parse_flags nested_flags decode_relative_explicit_move decode_one_parlett without_dupes opposite_color set_turn set_check_message check_repetition load_notations capture_piece notation_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position init_board label_board name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc image_path_for create_piece create_piece_by_letter highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection make_move_by_menu populate_make_a_move_list make_vboard realize_vboard*/
+/*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved unfiltered_moves filtered_moves relative_decode_direction parse_flags nested_flags decode_relative_explicit_move decode_one_parlett without_dupes opposite_color set_turn set_check_message check_repetition load_notations capture_piece notation_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position init_board label_board name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc image_path_for create_piece create_piece_by_letter highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection make_move_by_menu populate_make_a_move_list realize_vboard*/
  
 google.setOnLoadCallback(function() {
 // http://o.aolcdn.com/dojo/1.0.0/dojo/cookie.xd.js
@@ -2289,7 +2289,7 @@ function disambiguate_notations(notations)
 // If is_hypothetical, do not update globals, and allow "moves" that put in
 // check (useful for attacks, see is_hypothetical elsewhere).
 //
-// This operates on VBOARD only, for speed. Use make_vboard() before if needed.
+// This operates on VBOARD only.
 function calculate_moves(color, is_hypothetical)
 {
     var valid_moves = {}, is_valid_move = {}, blocked_moves = {};
@@ -4180,24 +4180,6 @@ function realize_vboard()
     //alert("realize_vboard took " + time_took + " ms");
 }
 
-// Save the current displayed board state to VBOARD.
-function make_vboard()
-{
-    for (var x = 1; x <= FILE_MAX; x += 1) {
-        for (var y = 1; y <= RANK_MAX; y += 1) {
-            var square = SQUARES[x][y];
-            var piece = square.firstChild;
-
-            if (piece) {
-                // TODO: Store arbitrary parameters?
-                VBOARD[x][y].piece = {virtual:true, color:piece.color, type:piece.type, square:VBOARD[x][y], unique_id:piece.unique_id};
-            } else {
-                VBOARD[x][y].piece = null;
-            }
-        }
-    }
-}
-
 // Toggle perspective of board
 function flip()
 {
@@ -5206,7 +5188,6 @@ function load_fen(fen, replay)
     }
    
     // Now that everything is loaded, set the turn.
-    make_vboard();
     set_turn(color, replay);
     populate_make_a_move_list();
 }
@@ -5355,7 +5336,12 @@ function load_starting_position(fen, replay)
             var letter = fen.substr(i, length);
             i += length - 1;
 
-            VBOARD[x][y].piece = decode_piece_letter(letter);
+            var piece = decode_piece_letter(letter);
+            piece.virtual = true;
+            piece.square = VBOARD[x][y];
+            piece.unique_id = letter + "," + x + "," + y;   // TODO: from name_pieces instead?
+
+            VBOARD[x][y].piece = piece;
 
             x += 1;
         } else if (code === "/") {
