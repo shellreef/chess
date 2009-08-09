@@ -4747,10 +4747,10 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
             if (square.x === 7) {
                 // TODO: actually calculate square moved over, then move rook there
                 // (instead of hardcoding). Short.
-                move_piece_to_square(pc(8, first_rank, true), VBOARD[6][first_rank], true, true);
+                move_piece_to_square(pc(8, first_rank), VBOARD[6][first_rank], true, true);
             } else if (square.x === 3) {
                 // Castle long.
-                move_piece_to_square(pc(1, first_rank, true), VBOARD[4][first_rank], true, true);
+                move_piece_to_square(pc(1, first_rank), VBOARD[4][first_rank], true, true);
             }
         }
     }
@@ -5630,19 +5630,19 @@ function name_pieces()
         var file = xy2descriptive("white", file_number);
 
         // White's pieces and pawns
-        piece = pc(file_number, 1, true); if (piece) { piece.descriptive_name = file; }
-        piece = pc(file_number, 2, true); if (piece) { descriptive_name = file + "P"; }
+        piece = pc(file_number, 1); if (piece) { piece.descriptive_name = file; }
+        piece = pc(file_number, 2); if (piece) { descriptive_name = file + "P"; }
 
         // Black's pieces and pawns
-        piece = pc(file_number, 8, true); if (piece) { descriptive_name = file; }
-        piece = pc(file_number, 7, true); if (piece) { descriptive_name = file + "P"; }
+        piece = pc(file_number, 8); if (piece) { descriptive_name = file; }
+        piece = pc(file_number, 7); if (piece) { descriptive_name = file + "P"; }
 
 
         // Algebraic descriptive notation
         var afile = xy2filerank(file_number, "");
         for (var white_rank = 1; white_rank <= RANK_MAX; white_rank += 1) {
             var black_rank = 9 - white_rank;
-            piece = pc(file_number, white_rank, true);
+            piece = pc(file_number, white_rank);
             var rank, piece_letter;
 
             if (!piece) {
@@ -5776,10 +5776,10 @@ function pc_or_offboard(x, y)
     }
 
     // Virtual board only
-    return pc(x, y, true);
+    return pc(x, y);
 }
 
-// Return an existing piece somewhere (or a false value), given:
+// Return an existing piece on the virtual board, or a false, given:
 // - (x,y) coordinates, like (8,1)
 // - location in filerank notation, like "a8"
 // To get piece from a square, use .piece if virtual, or .firstChild if not
@@ -5794,7 +5794,7 @@ function pc(x, y, virtual)
     //assert(x >= 1 && x <= FILE_MAX, "pc(" + x + ", " + y + "): bad x: " + x);
     //assert(y >= 1 && y <= RANK_MAX, "pc(" + x + ", " + y + "): bad y: " + y);
 
-    return virtual ? VBOARD[x][y].piece : SQUARES[x][y].firstChild;
+    return VBOARD[x][y].piece;
 }
 
 // Return the path to an image for the piece of that color.
