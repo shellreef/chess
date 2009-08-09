@@ -4160,6 +4160,10 @@ function realize_vboard()
             var square = SQUARES[x][y];
             var piece;
 
+            while (square.firstChild) {
+                square.removeChild(square.firstChild);
+            }
+
             if (v.piece) {
                 piece = create_piece(v.piece.color, v.piece.type);
                 piece.square = SQUARES[x][y];
