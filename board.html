@@ -6303,6 +6303,8 @@ function highlight_moves(piece, enable, skip_legal)
         flags = move;
         to_square = SQUARES[x][y];
 
+        highlight_square(to_square, enable ? DISPLAY["blocked_move_" + to_square.color] : false);
+
         if (enable && GAME_STATE.shift) {
             dojo.addClass(to_square, "blocked-move-" + to_square.color);
         } else {
