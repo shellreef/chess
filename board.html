@@ -6191,7 +6191,7 @@ function short_descriptive(descriptive_file)
 // - filerank notation (example: "a8", one argument), or
 // - x,y coordinates, (equivalent example: 1,8)
 // To get the square of a piece, use .square
-// Note: code should use SQUARES[x][y] or .square. This is 
+// Note: code should use VBOARD[x][y] or .square. This is 
 // only for user convenience (console) and debugging.
 function sq(code, extra)
 {
@@ -6218,7 +6218,7 @@ function sq(code, extra)
     /*assert(x >= 1 && x <= FILE_MAX && y >= 1 && y <= RANK_MAX, "sq(" + code + ", " + extra + 
         "): out of range (" + x + ", " + y + ")");*/
 
-    return SQUARES[x][y];
+    return VBOARD[x][y];
 }
 
 //// DRAG-AND-DROP FUNCTIONS
