@@ -6282,10 +6282,12 @@ function highlight_moves(piece, enable, skip_legal)
             x = move.x;
             y = move.y;
             flags = move;
-            to_square = SQUARES[x][y];
 
+            to_square = VBOARD[x][y];
             highlight_square(to_square, enable ? DISPLAY["legal_move_" + to_square.color] : false);
 
+            // TODO: remove for canvas
+            to_square = SQUARES[x][y];
             if (enable) {
                 dojo.addClass(to_square, "legal-move-" + to_square.color);
             } else {
@@ -6301,10 +6303,12 @@ function highlight_moves(piece, enable, skip_legal)
         x = move.x;
         y = move.y;
         flags = move;
+
+        to_square = VBOARD[x][y];
+        highlight_square(to_square, enable && GAME_STATE.shift ? DISPLAY["blocked_move_" + to_square.color] : false);
+
+        // TODO: remove for canvas
         to_square = SQUARES[x][y];
-
-        highlight_square(to_square, enable ? DISPLAY["blocked_move_" + to_square.color] : false);
-
         if (enable && GAME_STATE.shift) {
             dojo.addClass(to_square, "blocked-move-" + to_square.color);
         } else {
@@ -6319,6 +6323,9 @@ function highlight_moves(piece, enable, skip_legal)
 // some reason, highlight_moves(piece, false) does not unhighlight, maybe the piece changed..
 function unhighlight_all()
 {
+    redraw_board();
+
+    // TODO: remove
     dojo.query("td.legal-move-white, td.legal-move-black").forEach(function(square) {
         dojo.removeClass(square, "legal-move-white");
         dojo.removeClass(square, "legal-move-black");
