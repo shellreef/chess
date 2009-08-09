@@ -4756,10 +4756,10 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
             if (square.x === 7) {
                 // TODO: actually calculate square moved over, then move rook there
                 // (instead of hardcoding). Short.
-                move_piece_to_square(pc(8, first_rank, piece.virtual), VBOARD[6][first_rank], true, true);
+                move_piece_to_square(pc(8, first_rank, true), VBOARD[6][first_rank], true, true);
             } else if (square.x === 3) {
                 // Castle long.
-                move_piece_to_square(pc(1, first_rank, piece.virtual), VBOARD[4][first_rank], true, true);
+                move_piece_to_square(pc(1, first_rank, true), VBOARD[4][first_rank], true, true);
             }
         }
     }
@@ -5634,19 +5634,19 @@ function name_pieces()
         var file = xy2descriptive("white", file_number);
 
         // White's pieces and pawns
-        piece = pc(file_number, 1); if (piece) { piece.descriptive_name = file; }
-        piece = pc(file_number, 2); if (piece) { descriptive_name = file + "P"; }
+        piece = pc(file_number, 1, false); if (piece) { piece.descriptive_name = file; }
+        piece = pc(file_number, 2, false); if (piece) { descriptive_name = file + "P"; }
 
         // Black's pieces and pawns
-        piece = pc(file_number, 8); if (piece) { descriptive_name = file; }
-        piece = pc(file_number, 7); if (piece) { descriptive_name = file + "P"; }
+        piece = pc(file_number, 8, false); if (piece) { descriptive_name = file; }
+        piece = pc(file_number, 7, false); if (piece) { descriptive_name = file + "P"; }
 
 
         // Algebraic descriptive notation
         var afile = xy2filerank(file_number, "");
         for (var white_rank = 1; white_rank <= RANK_MAX; white_rank += 1) {
             var black_rank = 9 - white_rank;
-            piece = pc(file_number, white_rank);
+            piece = pc(file_number, white_rank, false);
             var rank, piece_letter;
 
             if (!piece) {
