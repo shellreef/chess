@@ -130,6 +130,8 @@ td.bottom-edge { border-bottom: 2px solid black; }
 
 /* Highlights */
 
+/* TODO: remove for canvas */
+
 /* Legal squares to move to on mouseover */
 /* different shades of tan
 td.legal-move-white { background-color: #cf9e6e; }
@@ -154,7 +156,7 @@ td.penultimate-move-black { background-color: yellow; }*/
 
 
 /* Destination square */
-td.dropping-square { background-color:green !important; }   /* in progress (overrides legal) */  
+td.dropping-square { background-color:blue !important; }   /* in progress (overrides legal) */  
 td.dropped-square { background-color: blue; }               /* finished (does not) */
 
 /* TODO: yellow - piece to promote
@@ -4965,6 +4967,11 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
             GAME_STATE.hmvc += 1;
         }
 
+        highlight_square(from_square, DISPLAY["recent_move_" + from_square.color]);
+        highlight_square(square, DISPLAY["recent_move_" + square.color]);
+
+
+        // TODO: remove for canvas
         var real_square = SQUARES[square.x][square.y];
         var real_from_square = SQUARES[from_square.x][from_square.y];
 
