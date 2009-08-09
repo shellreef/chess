@@ -303,8 +303,15 @@ var DISPLAY = {
     // <rdar://problem/7128886> Cmd+ doesn't zoom canvas elements
     square_width:55,
     square_height:55,
+
     black:"#d18b47",
     white:"#ffce9e",
+    legal_move_white: "seagreen",
+    legal_move_black: "green",
+    blocked_move_white: "indianred",
+    blocked_move_black: "firebrick",
+
+
     text_color:"black",
     feature_border_width:3,
 
@@ -6277,8 +6284,9 @@ function highlight_moves(piece, enable, skip_legal)
             flags = move;
             to_square = SQUARES[x][y];
 
+            highlight_square(to_square, enable ? DISPLAY["legal_move_" + to_square.color] : false);
+
             if (enable) {
-                //highlight_square(to_square.x, to_square.y, "blue");
                 dojo.addClass(to_square, "legal-move-" + to_square.color);
             } else {
                 dojo.removeClass(to_square, "legal-move-" + to_square.color);
