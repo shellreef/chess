@@ -280,6 +280,16 @@ var PREFS = {
     square_size: "55px"
 };
 
+// Predefined game rules for rs EPD opcode, makes it more compact to store non-FIDE games
+var RULE_SETS = {
+    shatranj: { uncheckered: true, stalemate: "win" },
+    xiangqi: {
+        bounds1:"river,1,1,10,5,elephant", 
+        bounds2:"palace,4,1,6,3,shah,ferz",
+        ruled:true,
+        transparent:true
+    }
+};
 
 // Info about the game
 var GAME_STATE = null;
@@ -844,7 +854,7 @@ var SAVED_BOARDS = {
 // Note that K v. K will result in a "draw by insufficient material" anyway, and
 // bareing the king will often result in a win eventually.
 // aka Iranian Chess, http://www.garagegames.com/community/blogs/view/17595
-"Iranian Chess (Shatranj)":     "rnyx(shah)xfynr/x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)/8/8/8/8/X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)/RNYX(shah)XFYNR w - - uncheckered stalemate=win",
+"Iranian Chess (Shatranj)":     "rnyx(shah)xfynr/x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)/8/8/8/8/X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)/RNYX(shah)XFYNR w - - rs=shatranj",
 
 // TODO: Tamerlane Chess, Timur's game, http://en.wikipedia.org/wiki/Tamerlane_Chess and http://www.pathguy.com/chess/Tamerlan.htm http://filer.case.edu/org/cwrums/games/tamerlane.html
 // TODO: Korean Chess (Changgi)
@@ -854,7 +864,7 @@ var SAVED_BOARDS = {
 
 // Chinese Chess (Xiangqi). Good westernization here: http://www.crockford.com/chess/xiangqi.html
 // TODO: 9x10 board, and bounds king (general?), ferz, and elephant
-"Chinese Chess (Xiangqi)": "rx(mao)ex(ferz)x(shah)x(ferz)ex(mao)///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)//X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1/RX(mao)EX(ferz)X(shah)X(ferz)EX(mao) w - - bounds1=river,1,1,10,5,elephant bounds2=palace,4,1,6,3,shah,ferz ruled transparent",
+"Chinese Chess (Xiangqi)": "rx(mao)ex(ferz)x(shah)x(ferz)ex(mao)///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)//X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1/RX(mao)EX(ferz)X(shah)X(ferz)EX(mao) w - - rs=xiangqi",
 
 // King is khun, not actually shah, but it behaves the same (no castling)
 // Counting rules on http://en.wikipedia.org/wiki/Makruk are not implemented
@@ -5168,6 +5178,11 @@ function load_fen(fen, replay)
         GAME_STATE.fmvn = 1;
 
         dojo.mixin(GAME_STATE, parse_epd_opcodes(parts));
+    }
+
+    if (GAME_STATE.rs) {
+        // Game "rule set"
+        dojo.mixin(GAME_STATE, RULE_SETS[GAME_STATE.rs]);
     }
 
     if (!replay) { 
