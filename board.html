@@ -4410,8 +4410,16 @@ function realize_vboard()
 
                 piece.style.position = "absolute";
                 // TODO: get_square_x/get_square_y
-                piece.style.left = 55 * (x - 1) + 20 + "px";
-                piece.style.top = 55 * (RANK_MAX - y) + 30 + "px";
+                //piece.style.left = 55 * (x - 1) + 20 + "px";
+                //piece.style.top = 55 * (RANK_MAX - y) + 30 + "px";
+
+                piece.style.left = DISPLAY.square_width * (x - 1) + 25 + "px";
+                piece.style.top = DISPLAY.square_height * (RANK_MAX - y) + 30 + "px";
+
+
+                // TODO: find out why this is off
+                //piece.style.left = get_square_x(x) + "px";
+                //piece.style.top = get_square_y(y) + "px";
                 dojo.body().appendChild(piece);
             }
         }
@@ -4971,6 +4979,7 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
         highlight_square(square, DISPLAY["recent_move_" + square.color]);
         // Restore highlight of dropped square
         DISPLAY.highlights[xy2filerank(square.x, square.y)] = DISPLAY["recent_move_" + square.color];
+        // TODO: 1. f4 e5, mouse over BP, fix how it unhighlights the recent move
 
         // TODO: remove for canvas
         var real_square = SQUARES[square.x][square.y];
