@@ -280,6 +280,56 @@ var PREFS = {
     square_size: "55px"
 };
 
+// Board display and drawing settings
+var DISPLAY = {
+    board_top:26,
+    file_labels_top:19,
+    file_labels_left:25,
+    label_font:"12pt Gill Sans",
+    board_left:20,
+    rank_labels_left:10,
+    rank_labels_top:4,
+    board_border:2,
+
+    //files:8,
+    //ranks:8,
+
+    files:9,
+    ranks:10,
+    //files:36,
+    //ranks:36,
+
+    // TODO: support smaller squares for larger boards like taikyoku shogi (3x36)? Since:
+    // <rdar://problem/7128886> Cmd+ doesn't zoom canvas elements
+    square_width:55,
+    square_height:55,
+    black:"#d18b47",
+    white:"#ffce9e",
+    text_color:"black",
+    feature_border_width:3,
+
+    colored:false,     // Squares are filled in or empty
+    checkered:false,   // Squares alternating colors, otherwise all white
+    bordered:true,     // Squares have borders (useful for non-checkered boards)
+    
+    features:[
+        // Karakus' Xiangqi westernization using lines and outlines to indicate features on a checkered board
+        // http://www.chessvariants.com/xiangqi.dir/xiangqiwest.html
+        {color:"yellow", file:4, rank:3, width:3, height:3},    // palace
+        {color:"blue", file:1, rank:5, width:9, height:5},      // river
+
+        // Crockford's Xiangqi westernization using square color to indicate features on an uncheckered board
+        // http://www.crockford.com/chess/xiangqi.html
+        {fill:true, color:"same", file:1, rank:5, width:9, height:5},        // sides of river
+        {fill:true, color:"opposite", file:4, rank:3, width:3, height:3},    // palace
+    ],
+
+    canvas:null,        // The HTML canvas element
+    context:null,       // 2D drawing context
+    clean_board:null    // Image data of a clean, unmarked board
+};
+
+
 // Predefined game rules for rs EPD opcode, makes it more compact to store non-FIDE games
 var RULE_SETS = {
     shatranj: { uncheckered: true, stalemate: "win" },
@@ -4137,6 +4187,186 @@ function game_file_list()
         }});
 }
 
+//// DISPLAY FUNCTIONS
+
+// Initially draw a board, saving the image data so it can be quickly redrawn 
+function create_board()
+{
+    var canvas, ctx, board_width, board_height;
+    
+    canvas = document.getElementById("canvas-board");
+    DISPLAY.canvas = canvas;
+
+    if (!canvas.getContext) {
+        alert("Sorry, your browser does not support the HTML5 canvas element.");
+        return;
+    }
+
+    ctx = canvas.getContext("2d");
+    DISPLAY.context = ctx;
+
+    canvas.width = DISPLAY.files * DISPLAY.square_width + DISPLAY.board_left + DISPLAY.board_border*2;
+    canvas.height= DISPLAY.ranks * DISPLAY.square_height + DISPLAY.board_top + DISPLAY.board_border*2;
+
+    // Border
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = DISPLAY.board_border;
+    board_width = DISPLAY.files * DISPLAY.square_width;
+    board_height = DISPLAY.ranks * DISPLAY.square_height;
+    ctx.strokeRect(DISPLAY.board_left, 
+            DISPLAY.board_top, 
+            board_width + DISPLAY.board_border, 
+            board_height + DISPLAY.board_border);
+
+    ctx.font = DISPLAY.label_font;
+
+    draw_features(false);
+
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = DISPLAY.board_border;
+
+    for (var x = 0; x < DISPLAY.files; x += 1) {
+        // File labels
+        var file = String.fromCharCode("a".charCodeAt(0) + x);
+        ctx.fillStyle = DISPLAY.text_color;
+        ctx.fillText(file, 
+                DISPLAY.board_left + DISPLAY.file_labels_left + x * DISPLAY.square_width,
+                DISPLAY.file_labels_top);
+
+        // Squares
+        ctx.fillStyle = DISPLAY.white;
+        for (var y = 0; y < DISPLAY.ranks; y += 1) {
+            var rx, ry, rw, rh;
+
+            if (DISPLAY.checkered) {
+                ctx.fillStyle = (x + y % 2) % 2 ? DISPLAY.white : DISPLAY.black;
+            }
+            rx = get_square_x(x + 1);
+            ry = get_square_y(y + 1);
+            rw = DISPLAY.square_width;
+            rh = DISPLAY.square_height;
+
+            if (DISPLAY.colored) {
+                ctx.fillRect(rx, ry, rw, rh);
+            }
+
+            if (DISPLAY.bordered) {
+                ctx.strokeRect(rx, ry, rw, rh);
+            }
+        }
+    }
+
+    // Rank labels
+    ctx.fillStyle = DISPLAY.text_color;
+    ctx.textAlign = "center";
+    for (var y = 0; y < DISPLAY.ranks; y += 1) {
+        var rank = DISPLAY.ranks - y;
+
+        ctx.fillText(rank, DISPLAY.rank_labels_left, 
+                DISPLAY.rank_labels_top + DISPLAY.square_height * (y + 1), DISPLAY.board_left);
+    }
+
+    ctx.lineWidth = DISPLAY.feature_border_width;
+
+    // Draw outlined features only
+    draw_features(true);
+
+    DISPLAY.clean_board = ctx.getImageData(0, 0, canvas.width, canvas.height);
+}
+
+// Board "features": cosmetic embellishments that indicate something
+// draw_outlines determines whether to draw solid features or outlined features only
+function draw_features(draw_outlines)
+{
+    var ctx = DISPLAY.context;
+
+    for (var i = 0; i < DISPLAY.features.length; i += 1) {
+        var feature = DISPLAY.features[i];
+        var rx, ry, rw, rh, color;
+
+        if (feature.fill === draw_outlines) {
+            continue;
+        }
+
+        // White's side first
+        if (feature.color === "same") {
+            color = DISPLAY.white;
+        } else if (feature.color === "opposite") { 
+            color = DISPLAY.black;
+        } else {
+            color = feature.color;
+        }
+
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+
+        rx = get_square_x(feature.file), 
+        ry = get_square_y(feature.rank), 
+        rw = feature.width * DISPLAY.square_width, 
+        rh = feature.height * DISPLAY.square_height;
+
+        if (feature.fill) {
+            ctx.fillRect(rx, ry, rw, rh);
+        } else {
+            ctx.strokeRect(rx, ry, rw, rh);
+        }
+
+        // Mirror to black's side of board
+        if (feature.color === "same") {
+            color = DISPLAY.black;
+        } else if (feature.color === "opposite") { 
+            color = DISPLAY.white;
+        } else {
+            color = feature.color;
+        }
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+
+        ry = get_square_y(feature.rank + (DISPLAY.ranks - feature.height));
+        if (feature.fill) {
+            ctx.fillRect(rx, ry, rw, rh);
+        } else {
+            ctx.strokeRect(rx, ry, rw, rh);
+        }
+    }
+}
+
+// Restore the board to the clean state
+function redraw_board()
+{
+    DISPLAY.context.putImageData(DISPLAY.clean_board, 0, 0);
+}
+
+// Get the upper-left x coordinate of a square given file
+function get_square_x(file)
+{
+    return DISPLAY.board_left + DISPLAY.board_border/2 + (file - 1) * DISPLAY.square_width;
+}
+
+// Get the upper-left y coordinate of a square given rank
+function get_square_y(rank)
+{
+    return DISPLAY.board_top + DISPLAY.board_border/2 + (DISPLAY.ranks - rank) * DISPLAY.square_height;
+}
+
+// Highlight a square with a given color, or unhighlight it if color is false
+function highlight_square(square, color)
+{
+    var ctx;
+
+    file = square.x;
+    rank = square.y;
+
+    ctx = DISPLAY.context;
+
+    if (!color) {
+        color = DISPLAY[square.color];
+    }
+
+    ctx.fillStyle = color;
+    ctx.fillRect(get_square_x(file), get_square_y(rank), DISPLAY.square_width, DISPLAY.square_height);
+}
+
 //// BOARD FUNCTIONS
 
 // Load the virtual board into the displayed board. Any number of operations
@@ -5186,6 +5416,14 @@ function load_fen(fen, replay)
 
         update_captured_piece_images();
 
+        DISPLAY.ranks = GAME_STATE.ranks || 8;
+        DISPLAY.files = GAME_STATE.files || 8;
+        DISPLAY.checkered = DISPLAY.colored = true;
+        DISPLAY.bordered = false;
+        DISPLAY.features = [];
+        // TODO: read features, uncheckered, other settings from EPD
+        create_board();
+
         set_board_appearance();
     }
    
@@ -6040,6 +6278,7 @@ function highlight_moves(piece, enable, skip_legal)
             to_square = SQUARES[x][y];
 
             if (enable) {
+                //highlight_square(to_square.x, to_square.y, "blue");
                 dojo.addClass(to_square, "legal-move-" + to_square.color);
             } else {
                 dojo.removeClass(to_square, "legal-move-" + to_square.color);
@@ -6719,6 +6958,7 @@ function enable_document_selection(enable, element)
 <table id="outer">
 <tr>
 <td style="vertical-align: top">
+
 <!-- TODO: dynamically generate, so can have arbitrary sizes -->
 <table class="board" id="board">
 <tbody id="board-body"
@@ -6823,6 +7063,8 @@ function enable_document_selection(enable, element)
 ></tr
 ></tbody
 ></table>
+
+<canvas id="canvas-board"></canvas>
 
 </td><td style="vertical-align: top">
 <noscript><p>JavaScript is disabled, nothing will work!</p></noscript>
