@@ -5298,17 +5298,11 @@ function set_board_boundary(str, color_kind)
     // TODO: change board colors, based on color, to match player's side or opposite
 }
 
-// Remove all pieces from the board.
+// Remove all pieces from the virtual board.
 function clear_board()
 {
-    for (var x = 1; x <= RANK_MAX; x += 1) {
-        for (var y = 1; y <= FILE_MAX; y += 1) {
-            var square = SQUARES[x][y];
-            while(square.firstChild) {
-                square.removeChild(square.firstChild);
-            }
-        }
-    }
+    // Initializes VBOARD
+    label_board(GAME_STATE.flipped);
 }
 
 
