@@ -1441,7 +1441,6 @@ function load_pgn(pgn)
         set_turn(last_ply.color);
     }
 
-    realize_vboard();
     populate_make_a_move_list();
     show_move_history();
 
@@ -5356,8 +5355,8 @@ function load_starting_position(fen, replay)
             var letter = fen.substr(i, length);
             i += length - 1;
 
-            SQUARES[x][y].appendChild(create_piece_by_letter(letter));
-            SQUARES[x][y].firstChild.square = SQUARES[x][y];
+            VBOARD[x][y].piece = decode_piece_letter(letter);
+
             x += 1;
         } else if (code === "/") {
             x = 1;
@@ -5373,6 +5372,8 @@ function load_starting_position(fen, replay)
             assert(false, "load_starting_position(" + fen + "): unknown code: " + code);
         }
     }
+
+    realize_vboard();
 
     if (!replay) {
         name_pieces();
