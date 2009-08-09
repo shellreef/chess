@@ -7009,7 +7009,9 @@ function enable_document_selection(enable, element)
 <tr>
 <td style="vertical-align: top">
 
-<!-- TODO: dynamically generate, so can have arbitrary sizes -->
+<canvas id="canvas-board"></canvas>
+
+<!-- TODO: remove for canvas -->
 <table class="board" id="board">
 <tbody id="board-body"
 ><tr
@@ -7113,8 +7115,6 @@ function enable_document_selection(enable, element)
 ></tr
 ></tbody
 ></table>
-
-<canvas id="canvas-board"></canvas>
 
 </td><td style="vertical-align: top">
 <noscript><p>JavaScript is disabled, nothing will work!</p></noscript>
