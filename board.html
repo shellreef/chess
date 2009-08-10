@@ -904,6 +904,7 @@ var SAVED_BOARDS = {
 "Thai Chess (Makruk)": "rnx(silvergeneral)x(ferz)x(shah)x(silvergeneral)nr/8/x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)/8/8/X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)/8/RNX(silvergeneral)X(shah)X(ferz)X(silvergeneral)NR w - -",
 //"Taikyoku Shogi": "/ w - - ranks=36 files=36",
 "FIDE Chess": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -",
+"Capablanca Chess (w/o castling)": "rnabqkbcnr/pppppppppp/8/8/8/8/PPPPPPPPPP/RNABQKBCNR w - - files=10",
 "Berolina Chess": "rnbqkbnr/xbxbxbxbxbxbxbxb/8/8/8/8/XBXBXBXBXBXBXBXB/RNBQKBNR w KQkq -"
 // TODO: Modern variants
 // Los Alamos Chess (6x6 board)
@@ -2002,10 +2003,14 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
         var adescriptive_origin = xy2adescriptive(color, filerank2xy(starting_filerank));           // e2
         var descriptive_dest = xy2descriptive(color, move);                                         // K4
         var adescriptive_dest = xy2adescriptive(color, move);                                       // e4
-        var descriptive_dest_file = descriptive_dest.substr(0, descriptive_dest.length - 1);        // K
-        var descriptive_dest_rank = descriptive_dest.substr(descriptive_dest.length - 1);           //  4
-        var descriptive_origin_file = descriptive_origin.substr(0, descriptive_origin.length - 1);  // K
-        var descriptive_origin_rank = descriptive_dest.substr(descriptive_dest.length - 1);         //  4
+        var descriptive_dest_file = descriptive_dest &&
+            descriptive_dest.substr(0, descriptive_dest.length - 1);                                // K
+        var descriptive_dest_rank = descriptive_dest &&
+            descriptive_dest.substr(descriptive_dest.length - 1);                                   //  4
+        var descriptive_origin_file = descriptive_origin &&
+            descriptive_origin.substr(0, descriptive_origin.length - 1);                            // K
+        var descriptive_origin_rank = descriptive_dest && 
+            descriptive_dest.substr(descriptive_dest.length - 1);                                   //  4
         //var adescriptive_dest_file = adescriptive_dest.substr(0, 1);                              // e
         //var adescriptive_dest_rank = adescriptive_dest.substr(1, 1);                              //  4
         var adescriptive_origin_file = adescriptive_origin.substr(0, 1);                            // e
@@ -4075,6 +4080,7 @@ function check_insufficient_material()
         for (var y = 1; y <= GAME_STATE.files; y += 1) {
             var square = VBOARD[x][y];
 
+            console.log(x,y,square);
             if (square.piece) {
                 // Count all pieces
                 if (counts[square.piece.type] === undefined) {
@@ -5361,7 +5367,6 @@ function load_fen(fen, replay)
     var parts, castling, color;
 
     parts = fen.split(" ");
-    load_starting_position(parts[0], replay);
 
     assert(/^[wb]$/.test(parts[1]), "load_fen(" + fen + "): bad active color: " + parts[1]);
 
@@ -5398,6 +5403,8 @@ function load_fen(fen, replay)
         // Game "rule set"
         dojo.mixin(GAME_STATE, RULE_SETS[GAME_STATE.rs]);
     }
+    
+    load_starting_position(parts[0], replay);
 
     if (!replay) { 
         GAME_STATE.position_moves = {}; 
@@ -5488,7 +5495,7 @@ function load_starting_position(fen, replay)
     // Note that ranks and files internally are represented here by
     // x,y coordinates, so a8 = 1,8. That is where FEN starts.
     x = 1;
-    y = 8;
+    y = GAME_STATE.ranks;
     for (i = 0; i < fen.length; i += 1) {
         code = fen.charAt(i);
 
@@ -5731,7 +5738,7 @@ function show_piece_inspector(piece)
     if (type_info.promote) {
         // TODO: links to view other pieces?
         misc.push("Promotes to " + type_info.promote.join(", ") + 
-                " on rank #" + (type_info.promotion_rank || 8) + "<br>");
+                " on rank #" + (type_info.promotion_rank || GAME_STATE.ranks) + "<br>");
     }
     if (type_info.royal) {
         misc.push("Royal (can be checked/checkmated)<br>");
