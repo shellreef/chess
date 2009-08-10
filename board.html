@@ -317,6 +317,8 @@ var DISPLAY = {
 var RULE_SETS = {
     shatranj: { uncheckered: true, stalemate: "win" },
     xiangqi: {
+        ranks:10, 
+        files:9,
         bounds1:"river,1,1,10,5,elephant", 
         bounds2:"palace,4,1,6,3,shah,ferz",
         ruled:true,
@@ -5412,15 +5414,8 @@ function load_fen(fen, replay)
 
         update_captured_piece_images();
 
-        DISPLAY.ranks = GAME_STATE.ranks || 8;
-        DISPLAY.files = GAME_STATE.files || 8;
-        DISPLAY.checkered = DISPLAY.colored = true;
-        DISPLAY.bordered = false;
-        DISPLAY.features = [];
-        // TODO: read features, uncheckered, other settings from EPD
-        create_board();
-
         set_board_appearance();
+        create_board();
     }
    
     // Now that everything is loaded, set the turn.
@@ -5431,38 +5426,27 @@ function load_fen(fen, replay)
 // Set the appearance parameters of the chessboard from EPD
 function set_board_appearance()
 {
+    DISPLAY.ranks = GAME_STATE.ranks || 8;
+    DISPLAY.files = GAME_STATE.files || 8;
+
+    // TODO: cleaner 1:1 correspondence
+    
     // Style
     if (GAME_STATE.uncheckered) {
-        change_css(17, "background-color", PREFS.white); // match td.black to td.white
-        GAME_STATE.ruled = true;    // uncheckered implies ruled
+        DISPLAY.checkered = false;
+        DISPLAY.bordered = true;    // uncheckered implies ruled
     } else {
-        change_css(17, "background-color", PREFS.black); // black is black
+        DISPLAY.checkered = true;
+        DISPLAY.bordered = false;
     }
 
-    if (GAME_STATE.transparent) {
-        change_css(17, "background-color", "transparent"); // td.black
-        change_css(18, "background-color", "transparent"); // td.white
-    }
+    DISPLAY.colored = !GAME_STATE.transparent;
 
- 
-    if (GAME_STATE.ruled) {
-        change_css(16, "border", "1px solid black");    // td.square
-        var size = (parseInt(PREFS.square_size, 10) - 1) + "px";
-        change_css(16, "width", size);
-        change_css(16, "min-width", size);
-        change_css(16, "height", size);
-        change_css(16, "min-height", size);
-    } else {
-        change_css(16, "border", "none");
-        var size = PREFS.square_size;
-        change_css(16, "width", size);
-        change_css(16, "min-width", size);
-        change_css(16, "height", size);
-        change_css(16, "min-height", size);
-    }
-
+    // TODO: read DISPLAY.features from EPD
+    DISPLAY.features = [];
+   
+    /*
     GAME_STATE.boundaries = {};
-
     if (GAME_STATE.bounds1) {
         set_board_boundary(GAME_STATE.bounds1, "same");
     }
@@ -5470,11 +5454,12 @@ function set_board_appearance()
     if (GAME_STATE.bounds2) {
         set_board_boundary(GAME_STATE.bounds2, "opposite");
     }
-
+    */
 
 }
 
 // Create a palace or river feature
+// TODO: update for canvas
 function set_board_boundary(str, color_kind)
 {
     var ary = str.split(",");
