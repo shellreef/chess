@@ -4318,6 +4318,7 @@ function draw_features(draw_outlines)
 // Restore the board to the clean state, unhighlighting all highlighted black/white squares.
 function unhighlight_all()
 {
+    DISPLAY.highlights = {};
     DISPLAY.context.putImageData(DISPLAY.clean_board, 0, 0);
 }
 
