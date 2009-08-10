@@ -128,44 +128,6 @@ td.right-edge { border-right: 2px solid black; }
 td.bottom-edge { border-bottom: 2px solid black; }
 
 
-/* Highlights */
-
-/* TODO: remove for canvas */
-
-/* Legal squares to move to on mouseover */
-/* different shades of tan
-td.legal-move-white { background-color: #cf9e6e; }
-td.legal-move-black { background-color: #a15b17; }
-*/
-td.legal-move-white { background-color: seagreen !important; }
-td.legal-move-black { background-color: green !important; }
-
-td.blocked-move-white { background-color: indianred !important; }
-td.blocked-move-black { background-color: firebrick !important; }
-
-/* Recent move, shown during mouse operation and also once after */
-
-/* Source square */
-td.recent-move-white { background-color: blue; }
-td.recent-move-black { background-color: blue; }
-
-/* Next to last move */
-/* TODO
-td.penultimate-move-white { background-color: yellow; }
-td.penultimate-move-black { background-color: yellow; }*/
-
-
-/* Destination square */
-td.dropping-square { background-color:blue !important; }   /* in progress (overrides legal) */  
-td.dropped-square { background-color: blue; }               /* finished (does not) */
-
-/* TODO: yellow - piece to promote
- * green - legal moves
- * red - blocked moves (when shift-hover), guarded squares
- * blue - move opponent just made
- */
-
-
 #piece-inspector {
     position: absolute; 
     border: 1px solid black; 
@@ -300,7 +262,14 @@ var DISPLAY = {
     square_height:55,
 
     // Colors
-    
+ /* TODO: yellow - piece to promote
+ * green - legal moves
+ * red - blocked moves (when shift-hover), guarded squares
+ * blue - move opponent just made
+ */
+
+
+   
     // Squares
     black:"#d18b47",
     white:"#ffce9e",
@@ -4253,6 +4222,7 @@ function create_board()
             var rx, ry, rw, rh;
 
             if (DISPLAY.checkered) {
+                // TODO: look at VBOARD[x][y].color
                 ctx.fillStyle = (x + y % 2) % 2 ? DISPLAY.white : DISPLAY.black;
             }
             rx = get_square_x(x + 1);
@@ -4345,8 +4315,8 @@ function draw_features(draw_outlines)
     }
 }
 
-// Restore the board to the clean state
-function redraw_board()
+// Restore the board to the clean state, unhighlighting all highlighted black/white squares.
+function unhighlight_all()
 {
     DISPLAY.context.putImageData(DISPLAY.clean_board, 0, 0);
 }
@@ -4454,32 +4424,19 @@ function label_board(flipped)
         SQUARES[x] = [];
         VBOARD[x] = [];
         for (var y = 1; y <= RANK_MAX; y += 1) {
-            // Lookup the table cell from the DOM. This is extraordinarly expensive,
-            // so it is only done once here then stored in a global, SQUARES.
-            var square  = dojo.byId("board-body").childNodes[flipped ? y : 9 - y].childNodes[flipped ? 9 - x : x];
+            VBOARD[x][y] = {virtual:true};
+            var square = VBOARD[x][y];
 
             square.x = x;
             square.y = y;
             square.filerank = xy2filerank(x, y);
             // Store the square color here once, so can always lookup .color, 
             // never have to check the white/black class name again.
-            square.color = dojo.hasClass(square, "white") ? "white" : "black";
+            square.color = (x + y % 2) % 2 ? "white" : "black";
 
             square.descriptive = {};
             square.descriptive.white = xy2descriptive("white", [x, y]);
             square.descriptive.black = xy2descriptive("black", [x, y]);
-
-            SQUARES[x][y] = square;
-
-            // Virtual, in-memory board
-            VBOARD[x][y] = {
-                virtual: true,
-                x: x, 
-                y: y, 
-                filerank: square.filerank, 
-                color: square.color,
-                descriptive: {white: square.descriptive.white, black: square.descriptive.black}
-            };
         }
     }
 
@@ -4980,22 +4937,6 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
         // Restore highlight of dropped square
         DISPLAY.highlights[xy2filerank(square.x, square.y)] = DISPLAY["recent_move_" + square.color];
         // TODO: 1. f4 e5, mouse over BP, fix how it unhighlights the recent move
-
-        // TODO: remove for canvas
-        var real_square = SQUARES[square.x][square.y];
-        var real_from_square = SQUARES[from_square.x][from_square.y];
-
-        // Remove old from square highlighting, and re-add new. This makes it
-        // persist after the move has been made, to show what happened.
-        dojo.query(".recent-move-black").removeClass("recent-move-black");
-        dojo.query(".recent-move-white").removeClass("recent-move-white");
-        dojo.addClass(real_from_square, " recent-move-" + real_from_square.color);
-
-        // Re-highlight to-square. The "dropped-square" class lacks !important so it
-        // will be overridden by legal move highlighting, while "dropping-square" won't.
-        dojo.query(".dropping-square").removeClass("dropping-square");
-        dojo.query(".dropped-square").removeClass("dropped-square");
-        dojo.addClass(real_square, " dropped-square");
     }
 
     // If castling, move the rook in place. Ugly hardcoded.
@@ -5232,20 +5173,6 @@ function move_dropped_piece(piece, square, event)
 
         do_virtual_move(piece, {x:square.x, y:square.y});
         unhighlight_all();
-
-        // TODO: remove for canvas
-        dojo.query(".recent-move-black").removeClass("recent-move-black");
-        dojo.query(".recent-move-white").removeClass("recent-move-white");
-        dojo.query(".dropping-square").removeClass("dropping-square");
-        dojo.query(".dropped-square").removeClass("dropped-square");
-        if (from_square) { 
-            dojo.addClass(from_square, "dropped-square");
-        }
-        if (square) {
-            dojo.addClass(square, "dropped-square");
-        }
-
-
 
         realize_vboard();
         set_copyable_link(true);    // this board state
@@ -6187,9 +6114,6 @@ function over_piece(piece, event)
     var square = highlight_moves(piece, true);
     if (square) {
         highlight_square(square, DISPLAY["recent_move_" + square.color]);
-
-        // TODO: remove for canvas
-        dojo.addClass(square, "recent-move-" + square.color);
     }
  
     if (event.shiftKey) {
@@ -6206,9 +6130,6 @@ function out_piece(piece, event)
     var square = highlight_moves(piece, false);
     if (square) {
         highlight_square(square, false);
-
-        // TODO: remove for canvas
-        dojo.removeClass(square, "recent-move-" + square.color);
     }
    
     if (!event.shiftKey) {
@@ -6320,14 +6241,6 @@ function highlight_moves(piece, enable, skip_legal)
             highlight_square(to_square, enable ? DISPLAY["legal_move_" + to_square.color] : false);
             // Save so drop square highlighting can recover
             DISPLAY.highlights[xy2filerank(to_square.x, to_square.y)] = enable ? DISPLAY["legal_move_" + to_square.color] : false;
-
-            // TODO: remove for canvas
-            to_square = SQUARES[x][y];
-            if (enable) {
-                dojo.addClass(to_square, "legal-move-" + to_square.color);
-            } else {
-                dojo.removeClass(to_square, "legal-move-" + to_square.color);
-            }
         });
     }
 
@@ -6341,32 +6254,9 @@ function highlight_moves(piece, enable, skip_legal)
 
         to_square = VBOARD[x][y];
         highlight_square(to_square, enable && GAME_STATE.shift ? DISPLAY["blocked_move_" + to_square.color] : false);
-
-        // TODO: remove for canvas
-        to_square = SQUARES[x][y];
-        if (enable && GAME_STATE.shift) {
-            dojo.addClass(to_square, "blocked-move-" + to_square.color);
-        } else {
-            dojo.removeClass(to_square, "blocked-move-" + to_square.color);
-        }
     });
 
     return from_square;
-}
-
-// Unhighlight all highlighted black/white squares. Used in onEnd draggable, for
-// some reason, highlight_moves(piece, false) does not unhighlight, maybe the piece changed..
-function unhighlight_all()
-{
-    redraw_board();
-
-    // TODO: remove for canvas
-    dojo.query("td.legal-move-white, td.legal-move-black").forEach(function(square) {
-        dojo.removeClass(square, "legal-move-white");
-        dojo.removeClass(square, "legal-move-black");
-        dojo.removeClass(square, "blocked-move-black");
-        dojo.removeClass(square, "blocked-move-white");
-    });
 }
 
 //// SQUARE FUNCTIONS / FILE-RANK NOTATION
@@ -6678,9 +6568,6 @@ function dragging_over(element, left, top)
         if (DROP.square) {
             // Recover legal move highlighting, if any. 
             highlight_square(DROP.square, DISPLAY.highlights[xy2filerank(DROP.square.x, DROP.square.y)]);
-
-            // TODO: remove for canvas
-            dojo.removeClass(DROP.square, "dropping-square");
         }
 
         if (accepts(element, square)) {
@@ -6688,8 +6575,6 @@ function dragging_over(element, left, top)
 
             highlight_square(square, DISPLAY["recent_move_" + square.color]);
 
-            // TODO: remove for canvas
-            dojo.addClass(square, "dropping-square");
         } else {
             DROP.square = null;
         }
@@ -6854,23 +6739,6 @@ function init_dnd()
     DROP.area.width = DISPLAY.files * DISPLAY.square_width;
     DROP.area.height = DISPLAY.ranks * DISPLAY.square_height;
 
-    // TODO: remove for canvas
-    /*
-    // Get dimensions of droppable area
-    var top_left_square = dojo.query("#top-left-square")[0];
-    var bottom_right_square = dojo.query("#bottom-right-square")[0];
-    var top_left = dojo._abs(top_left_square, true);
-    DROP.area.left = top_left.x;
-    DROP.area.top = top_left.y;
-
-    var bottom_right_top_left = dojo._abs(bottom_right_square, true);
-    DROP.area.cell_width = dojo.style(bottom_right_square, "width");
-    DROP.area.width = bottom_right_top_left.x - DROP.area.left + DROP.area.cell_width;
-    DROP.area.height  = bottom_right_top_left.y - DROP.area.top + DROP.area.cell_width; // square
-
-    // for testing
-    //dojo._setBox(foo, DROP.area.left, DROP.area.top, DROP.area.width, DROP.area.height, "px");
-    */
 
     DROP.area.right = DROP.area.left + DROP.area.width;
     DROP.area.bottom = DROP.area.top + DROP.area.height;
@@ -7027,111 +6895,6 @@ function enable_document_selection(enable, element)
 <td style="vertical-align: top">
 
 <canvas id="canvas-board"></canvas>
-
-<!-- TODO: remove for canvas -->
-<table class="board" id="board">
-<tbody id="board-body"
-><tr
-><td></td
-><td class="file label">a</td
-><td class="file label">b</td
-><td class="file label">c</td
-><td class="file label">d</td
-><td class="file label">e</td
-><td class="file label">f</td
-><td class="file label">g</td
-><td class="file label">h</td
-></tr
-><tr
-><td class="rank label">8</td
-><td class="white square" id="top-left-square"></td
-><td class="black square"></td
-><td class="white square"></td
-><td class="black square"></td
-><td class="white square"></td
-><td class="black square"></td
-><td class="white square"></td
-><td class="black square right-edge"></td
-></tr
-><tr
-><td class="rank label">7</td
-><td class="black square"></td
-><td class="white square"></td
-><td class="black square"></td
-><td class="white square"></td
-><td class="black square"></td
-><td class="white square"></td
-><td class="black square"></td
-><td class="white square right-edge"></td
-></tr
-><tr
-><td class="rank label">6</td
-><td class="white square"></td
-><td class="black square"></td
-><td class="white square"></td
-><td class="black square"></td
-><td class="white square"></td
-><td class="black square"></td
-><td class="white square"></td
-><td class="black square right-edge"></td
-></tr
-><tr
-><td class="rank label">5</td
-><td class="black square"></td
-><td class="white square"></td
-><td class="black square"></td
-><td class="white square"></td
-><td class="black square"></td
-><td class="white square"></td
-><td class="black square"></td
-><td class="white square right-edge"></td
-></tr
-><tr
-><td class="rank label">4</td
-><td class="white square"></td
-><td class="black square"></td
-><td class="white square"></td
-><td class="black square"></td
-><td class="white square"></td
-><td class="black square"></td
-><td class="white square"></td
-><td class="black square right-edge"></td
-></tr
-><tr
-><td class="rank label">3</td
-><td class="black square"></td
-><td class="white square"></td
-><td class="black square"></td
-><td class="white square"></td
-><td class="black square"></td
-><td class="white square"></td
-><td class="black square"></td
-><td class="white square right-edge"></td
-></tr
-><tr
-><td class="rank label">2</td
-><td class="white square"></td
-><td class="black square"></td
-><td class="white square"></td
-><td class="black square"></td
-><td class="white square"></td
-><td class="black square"></td
-><td class="white square"></td
-><td class="black square right-edge"></td
-></tr
-><tr
-><td class="rank label">1</td
-><td class="black square bottom-edge"></td
-><td class="white square bottom-edge"></td
-><td class="black square bottom-edge" id="f1"></td
-><td class="white square bottom-edge" id="f2"></td
-><td class="black square bottom-edge"></td
-><td class="white square bottom-edge"></td
-><td class="black square bottom-edge"></td
-><td class="white square bottom-edge right-edge" id="bottom-right-square"></td
-></tr
-></tbody
-></table>
 
 </td><td style="vertical-align: top">
 <noscript><p>JavaScript is disabled, nothing will work!</p></noscript>
