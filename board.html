@@ -4704,14 +4704,14 @@ function piece_was_captured(piece, square)
     if (piece.type === "rook") {
         // Note that this is the first rank of the *other* player
         var opponent = opposite_color(GAME_STATE.active_color);
-        var first_rank = opponent === "white" ? 1 : 8;
+        var first_rank = opponent === "white" ? 1 : GAME_STATE.ranks;
         
         // TODO: really would like to not have to hardcode this
         if (square.y === first_rank) {
             if (square.x === 1) {
                 GAME_STATE.can_castle[opponent].clong = false;
                 //console.log("no more long");
-            } else if (square.x === 8) {
+            } else if (square.x === GAME_STATE.ranks) {
                 GAME_STATE.can_castle[opponent].cshort = false;
                 //console.log("no more short");
             }
@@ -4955,7 +4955,7 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
         // If moved either rook, can't castle on that side.
         if (PIECE_TYPES[piece.type].castle) {
             // TODO: More generic, so will work with chess960 or 480
-            if (from_square.x === 8) {
+            if (from_square.x === GAME_STATE.ranks) {
                 GAME_STATE.can_castle[GAME_STATE.active_color].cshort = false;
             } else if (from_square.x === 1) {
                 GAME_STATE.can_castle[GAME_STATE.active_color].clong = false;
@@ -4977,12 +4977,12 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
     // Note: if pass this in abs_move/choices, need to save in raw move notation, too.
     if (piece.type === "king") {
         // TODO: test with chess960 positions
-        var first_rank = (GAME_STATE.active_color === "white" ? 1 : 8);
+        var first_rank = (GAME_STATE.active_color === "white" ? 1 : GAME_STATE.ranks);
         if (from_square.x === 5) {
             if (square.x === 7) {
                 // TODO: actually calculate square moved over, then move rook there
                 // (instead of hardcoding). Short.
-                move_piece_to_square(pc(8, first_rank), VBOARD[6][first_rank], true, true);
+                move_piece_to_square(pc(GAME_STATE.ranks, first_rank), VBOARD[6][first_rank], true, true);
             } else if (square.x === 3) {
                 // Castle long.
                 move_piece_to_square(pc(1, first_rank), VBOARD[4][first_rank], true, true);
@@ -5493,6 +5493,9 @@ function load_starting_position(fen, replay)
         }
     }
 
+    // Re-init drag & drop since board size may have changed
+    init_dnd();
+
     realize_vboard();
 
     if (!replay) {
@@ -5774,8 +5777,8 @@ function name_pieces()
         piece = pc(file_number, 2); if (piece) { descriptive_name = file + "P"; }
 
         // Black's pieces and pawns
-        piece = pc(file_number, 8); if (piece) { descriptive_name = file; }
-        piece = pc(file_number, 7); if (piece) { descriptive_name = file + "P"; }
+        piece = pc(file_number, GAME_STATE.ranks); if (piece) { descriptive_name = file; }
+        piece = pc(file_number, GAME_STATE.ranks - 1); if (piece) { descriptive_name = file + "P"; }
 
 
         // Algebraic descriptive notation
