@@ -294,8 +294,8 @@ var RULE_SETS = {
     shatranj: { uncheckered: true, ruled: true, stalemate: "win" },
     xiangqi: {
         // TODO
-        //ranks:10, 
-        //files:9,
+        ranks:10, 
+        files:9,
       
         // Piece movement restrictions
         bounds1:"river,1,1,10,5,elephant", 
@@ -897,7 +897,7 @@ var SAVED_BOARDS = {
 
 // Chinese Chess (Xiangqi). Good westernization here: http://www.crockford.com/chess/xiangqi.html
 // TODO: 9x10 board, and bounds king (general?), ferz, and elephant
-"Chinese Chess (Xiangqi)": "rx(mao)ex(ferz)x(shah)x(ferz)ex(mao)///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)//X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1/RX(mao)EX(ferz)X(shah)X(ferz)EX(mao) w - - rs=xiangqi",
+"Chinese Chess (Xiangqi)": "rx(mao)ex(ferz)x(shah)x(ferz)ex(mao)r///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)///RX(mao)EX(ferz)X(shah)X(ferz)EX(mao)R w - - rs=xiangqi",
 
 // King is khun, not actually shah, but it behaves the same (no castling)
 // Counting rules on http://en.wikipedia.org/wiki/Makruk are not implemented
