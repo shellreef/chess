@@ -4351,6 +4351,43 @@ function highlight_square(square, color)
     ctx.fillRect(get_square_x(file), get_square_y(rank), DISPLAY.square_width, DISPLAY.square_height);
 }
 
+// Push a layer of a highlight color to a square, coloring the square that color.
+function push_highlight(square, color)
+{
+    if (!DISPLAY.highlights[square.filerank]) {
+        DISPLAY.highlights[square.filerank] = [];
+    }
+
+    DISPLAY.highlights[square.filerank].push(color);
+
+    highlight_square(square, color);
+
+    return DISPLAY.highlights[square.filerank];
+}
+
+// Peel off a highlighted color and reveal the color underneath.
+function pop_highlight(square)
+{
+    var stack, color, old_color;
+
+    stack = DISPLAY.highlights[square.filerank];
+
+    // Remove current color
+    old_color = stack && stack.pop();
+
+    if (!stack || stack.length === 0) {
+        // Native square color
+        color = DISPLAY[square.color];
+    } else {
+        // Color underneath is now top of stack
+        color = stack[stack.length - 1];
+    }
+
+    highlight_square(square, color);
+
+    return color;
+}
+
 //// BOARD FUNCTIONS
 
 // Load the virtual board into the displayed board. Any number of operations
@@ -4934,9 +4971,8 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
 
         highlight_square(from_square, DISPLAY["recent_move_" + from_square.color]);
         highlight_square(square, DISPLAY["recent_move_" + square.color]);
-        // Restore highlight of dropped square
+        // To restore highlight of dropped square
         DISPLAY.highlights[xy2filerank(square.x, square.y)] = DISPLAY["recent_move_" + square.color];
-        // TODO: 1. f4 e5, mouse over BP, fix how it unhighlights the recent move
     }
 
     // If castling, move the rook in place. Ugly hardcoded.
