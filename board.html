@@ -291,10 +291,6 @@ var DISPLAY = {
     text_color:"black",
     feature_border_width:3,
 
-    colored:false,     // Squares are filled in or empty
-    checkered:false,   // Squares alternating colors, otherwise all white
-    bordered:true,     // Squares have borders (useful for non-checkered boards)
-    
     features:[
         // Karakus' Xiangqi westernization using lines and outlines to indicate features on a checkered board
         // http://www.chessvariants.com/xiangqi.dir/xiangqiwest.html
@@ -315,12 +311,27 @@ var DISPLAY = {
 
 // Predefined game rules for rs EPD opcode, makes it more compact to store non-FIDE games
 var RULE_SETS = {
-    shatranj: { uncheckered: true, stalemate: "win" },
+    shatranj: { uncheckered: true, ruled: true, stalemate: "win" },
     xiangqi: {
-        ranks:10, 
-        files:9,
-        bounds1:"river,1,1,10,5,elephant", 
-        bounds2:"palace,4,1,6,3,shah,ferz",
+        // TODO
+        //ranks:10, 
+        //files:9,
+        
+        //bounds1:"river,1,1,10,5,elephant", 
+        //bounds2:"palace,4,1,6,3,shah,ferz",
+        features:[
+            // Karakus' Xiangqi westernization using lines and outlines to indicate features on a checkered board
+            // http://www.chessvariants.com/xiangqi.dir/xiangqiwest.html
+            {color:"yellow", file:4, rank:3, width:3, height:3},    // palace
+            {color:"blue", file:1, rank:5, width:9, height:5},      // river
+
+            // Crockford's Xiangqi westernization using square color to indicate features on an uncheckered board
+            // http://www.crockford.com/chess/xiangqi.html
+            {fill:true, color:"same", file:1, rank:5, width:9, height:5},        // sides of river
+            {fill:true, color:"opposite", file:4, rank:3, width:3, height:3},    // palace
+        ],
+
+
         ruled:true,
         transparent:true
     }
@@ -345,8 +356,14 @@ var GAME_STATE_DEFAULT = {
     made_moves: [],             // Piece, square and each move notation for past moves
     ended: false,               // Game is done (drawn, won)
     captured: {white:[], black:[]}, // Captured pieces
-    boundaries: {},           // Board features that bounds piece movement
 
+    boundaries: {},             // Board features that bound piece movement
+    transparent:false,          // Squares empty, otherwise are filled in
+    uncheckered:false,          // Squares all white, otherwise alternating colors
+    ruled:false,                // Squares have borders (useful for non-checkered boards)
+    ranks:8,                    // Number of ranks
+    files:8,                    // Number of files
+ 
     // Not game state, but other globals
     dragging: false,
     active_in_check: false,
@@ -390,8 +407,6 @@ var ALT_MOVE_NOTATIONS = null;      // Same as above, but non-canonical, longer 
 
 
 // Board 
-var RANK_MAX = 8;
-var FILE_MAX = 8;
 var SQUARES = null;                 // Get table cell square node by rank and file
 var VBOARD = null;                  // Virtual in-memory board
 var CLIPBOARD = null;               // ZeroClipboard instance
@@ -1137,8 +1152,8 @@ dojo.cookie=function(_2,_3,_4){var c=document.cookie;if(arguments.length==1){var
 
     // Let the games begin
     load_notations();
-    label_board();
     init_board();
+    label_board();
     init_dnd();
 
     // test 50 move rule (game from http://www.chessville.com/misc/History/Mad_Aussie_Trivia_Archive_12.htm)
@@ -1849,10 +1864,10 @@ function should_promote(piece)
     square = piece.square;
 
     // Get rank from player's perspective (as in descriptive notation, not algebraic)
-    relative_rank = GAME_STATE.active_color === "white" ? square.y : (RANK_MAX + 1) - square.y;
+    relative_rank = GAME_STATE.active_color === "white" ? square.y : (GAME_STATE.ranks + 1) - square.y;
 
     // Default to last rank
-    promotion_rank = PIECE_TYPES[piece.type].promotion_rank || RANK_MAX;
+    promotion_rank = PIECE_TYPES[piece.type].promotion_rank || GAME_STATE.ranks;
 
     return relative_rank === promotion_rank;
 }
@@ -1868,10 +1883,10 @@ function would_promote(piece, move)
     }
 
      // Get rank from player's perspective (as in descriptive notation, not algebraic)
-    relative_rank = GAME_STATE.active_color === "white" ? move.y : (RANK_MAX + 1) - move.y;
+    relative_rank = GAME_STATE.active_color === "white" ? move.y : (GAME_STATE.ranks + 1) - move.y;
 
     // Default to last rank
-    promotion_rank = PIECE_TYPES[piece.type].promotion_rank || RANK_MAX;
+    promotion_rank = PIECE_TYPES[piece.type].promotion_rank || GAME_STATE.ranks;
 
     return relative_rank === promotion_rank;
 }
@@ -1948,8 +1963,8 @@ function in_check(victim_color, all_moves)
     // Pieces that can't be captured and need to move if attacked
     if (virtual) { 
         royals = [];
-        for (var x = 1; x <= FILE_MAX; x += 1) {
-            for (var y = 1; y <= RANK_MAX; y += 1) {
+        for (var x = 1; x <= GAME_STATE.files; x += 1) {
+            for (var y = 1; y <= GAME_STATE.ranks; y += 1) {
                 var piece;
 
                 piece = VBOARD[x][y].piece;
@@ -2345,8 +2360,8 @@ function calculate_moves(color, is_hypothetical)
     }
 
     // Look at all the active pieces
-    for (var x = 1; x <= FILE_MAX; x += 1) {
-        for (var y = 1; y <= RANK_MAX; y += 1) {
+    for (var x = 1; x <= GAME_STATE.files; x += 1) {
+        for (var y = 1; y <= GAME_STATE.ranks; y += 1) {
             var starting_filerank, square_from, moves, moves_all, piece;
 
             square_from = VBOARD[x][y];
@@ -2825,9 +2840,9 @@ function movement_diagram(moves)
     var board = {}, texts;
 
     // Empty board
-    for (var x = -FILE_MAX; x <= FILE_MAX; x += 1) {
+    for (var x = -GAME_STATE.files; x <= GAME_STATE.files; x += 1) {
         board[x] = {};
-        for (var y = -RANK_MAX; y <= RANK_MAX; y += 1) {
+        for (var y = -GAME_STATE.ranks; y <= GAME_STATE.ranks; y += 1) {
             board[x][y] = " ";
         }
     }
@@ -2880,11 +2895,11 @@ function movement_diagram(moves)
 
     // Stringify
     texts = [];
-    for (var x = -FILE_MAX; x <= FILE_MAX; x += 1) {
-        for (var y = -RANK_MAX; y <= RANK_MAX; y += 1) {
+    for (var x = -GAME_STATE.files; x <= GAME_STATE.files; x += 1) {
+        for (var y = -GAME_STATE.ranks; y <= GAME_STATE.ranks; y += 1) {
             var ch = board[x][y];
-            var top = (x + FILE_MAX) * 10;
-            var left = (y + RANK_MAX) * 10;
+            var top = (x + GAME_STATE.files) * 10;
+            var left = (y + GAME_STATE.ranks) * 10;
             texts.push("<div class='inspector-diagram-cell' style='top:" + top + "px; left: " + left + "px;'>" + ch + "</div>");
         }
     }
@@ -2982,7 +2997,7 @@ function filtered_moves(piece, color, is_hypothetical)
 
         // Default to limiting movement based on board dimensions, but
         // allow boards to also limit based on a river or palace
-        var x1 = 1, y1 = 1, x2 = FILE_MAX, y2 = RANK_MAX;
+        var x1 = 1, y1 = 1, x2 = GAME_STATE.files, y2 = GAME_STATE.ranks;
         if (GAME_STATE.boundaries[piece.type]) {
             var boundary = GAME_STATE.boundaries[piece.type][color];
 
@@ -3176,7 +3191,7 @@ function filtered_moves(piece, color, is_hypothetical)
         if (capture_at_dx !== undefined) {
            var cx = capture_at_dx + start_x, cy = capture_at_dy + start_y;
 
-           if (cx < 1 || cy < 1 || cx > RANK_MAX || cy > FILE_MAX) {
+           if (cx < 1 || cy < 1 || cx > GAME_STATE.ranks || cy > GAME_STATE.files) {
                continue;
            }
 
@@ -3650,8 +3665,8 @@ function decode_one_parlett(parlett)
                 ]));
         } else {
             // ~n/m, any square on board. Remember, these are relative moves.
-            for (var x = -FILE_MAX; x <= +FILE_MAX; x += 1) {
-                for (var y = -RANK_MAX; y <= +RANK_MAX; y += 1) {
+            for (var x = -GAME_STATE.files; x <= +GAME_STATE.files; x += 1) {
+                for (var y = -GAME_STATE.ranks; y <= +GAME_STATE.ranks; y += 1) {
                     rel_moves.push([x, y, flags]);
                 }
             }
@@ -3747,7 +3762,7 @@ function expand_directions(directions, distances, limit, flags, movement, rel_mo
         prev_rel_y = null;
 
         // Iterate to either given limit or maximum
-        var max = limit || Math.max(RANK_MAX, FILE_MAX);
+        var max = limit || Math.max(GAME_STATE.ranks, GAME_STATE.files);
 
         var count = 0;
 
@@ -4072,8 +4087,8 @@ function check_insufficient_material()
    
     // Count how many of each piece type are on the board
     // TODO: piece lists?
-    for (var x = 1; x <= RANK_MAX; x += 1) {
-        for (var y = 1; y <= FILE_MAX; y += 1) {
+    for (var x = 1; x <= GAME_STATE.ranks; x += 1) {
+        for (var y = 1; y <= GAME_STATE.files; y += 1) {
             var square = VBOARD[x][y];
 
             if (square.piece) {
@@ -4223,7 +4238,7 @@ function create_board()
         for (var y = 0; y < DISPLAY.ranks; y += 1) {
             var rx, ry, rw, rh;
 
-            if (DISPLAY.checkered) {
+            if (!GAME_STATE.uncheckered) {
                 // TODO: look at VBOARD[x][y].color
                 ctx.fillStyle = (x + y % 2) % 2 ? DISPLAY.white : DISPLAY.black;
             }
@@ -4232,11 +4247,11 @@ function create_board()
             rw = DISPLAY.square_width;
             rh = DISPLAY.square_height;
 
-            if (DISPLAY.colored) {
+            if (!GAME_STATE.transparent) {
                 ctx.fillRect(rx, ry, rw, rh);
             }
 
-            if (DISPLAY.bordered) {
+            if (GAME_STATE.ruled) {
                 ctx.strokeRect(rx, ry, rw, rh);
             }
         }
@@ -4265,6 +4280,8 @@ function create_board()
 function draw_features(draw_outlines)
 {
     var ctx = DISPLAY.context;
+
+    // TODO: support parsing bounds1, bounds2 strings
 
     for (var i = 0; i < DISPLAY.features.length; i += 1) {
         var feature = DISPLAY.features[i];
@@ -4407,8 +4424,8 @@ function realize_vboard()
             }
     });
 
-    for (var x = 1; x <= FILE_MAX; x += 1) {
-        for (var y = 1; y <= RANK_MAX; y += 1) {
+    for (var x = 1; x <= GAME_STATE.files; x += 1) {
+        for (var y = 1; y <= GAME_STATE.ranks; y += 1) {
             var v = VBOARD[x][y];
             var piece;
 
@@ -4421,10 +4438,10 @@ function realize_vboard()
                 piece.style.position = "absolute";
                 // TODO: get_square_x/get_square_y
                 //piece.style.left = 55 * (x - 1) + 20 + "px";
-                //piece.style.top = 55 * (RANK_MAX - y) + 30 + "px";
+                //piece.style.top = 55 * (GAME_STATE.ranks - y) + 30 + "px";
 
                 piece.style.left = DISPLAY.square_width * (x - 1) + 25 + "px";
-                piece.style.top = DISPLAY.square_height * (RANK_MAX - y) + 30 + "px";
+                piece.style.top = DISPLAY.square_height * (GAME_STATE.ranks - y) + 30 + "px";
 
 
                 // TODO: find out why this is off
@@ -4460,10 +4477,10 @@ function label_board(flipped)
 {
     SQUARES = [];
     VBOARD = [];
-    for (var x = 1; x <= FILE_MAX; x += 1) {
+    for (var x = 1; x <= GAME_STATE.files; x += 1) {
         SQUARES[x] = [];
         VBOARD[x] = [];
-        for (var y = 1; y <= RANK_MAX; y += 1) {
+        for (var y = 1; y <= GAME_STATE.ranks; y += 1) {
             VBOARD[x][y] = {virtual:true};
             var square = VBOARD[x][y];
 
@@ -5248,9 +5265,9 @@ function save_fen()
     var fens = [], castles;
 
     // Board position
-    for (var y = RANK_MAX; y > 0; y -= 1) {
+    for (var y = GAME_STATE.ranks; y > 0; y -= 1) {
         var blanks = 0;
-        for (var x = 1; x <= FILE_MAX; x += 1) {
+        for (var x = 1; x <= GAME_STATE.files; x += 1) {
             var piece = VBOARD[x][y].piece;
             var letter;
 
@@ -5414,48 +5431,12 @@ function load_fen(fen, replay)
 
         update_captured_piece_images();
 
-        set_board_appearance();
         create_board();
     }
    
     // Now that everything is loaded, set the turn.
     set_turn(color, replay);
     populate_make_a_move_list();
-}
-
-// Set the appearance parameters of the chessboard from EPD
-function set_board_appearance()
-{
-    DISPLAY.ranks = GAME_STATE.ranks || 8;
-    DISPLAY.files = GAME_STATE.files || 8;
-
-    // TODO: cleaner 1:1 correspondence
-    
-    // Style
-    if (GAME_STATE.uncheckered) {
-        DISPLAY.checkered = false;
-        DISPLAY.bordered = true;    // uncheckered implies ruled
-    } else {
-        DISPLAY.checkered = true;
-        DISPLAY.bordered = false;
-    }
-
-    DISPLAY.colored = !GAME_STATE.transparent;
-
-    // TODO: read DISPLAY.features from EPD
-    DISPLAY.features = [];
-   
-    /*
-    GAME_STATE.boundaries = {};
-    if (GAME_STATE.bounds1) {
-        set_board_boundary(GAME_STATE.bounds1, "same");
-    }
-
-    if (GAME_STATE.bounds2) {
-        set_board_boundary(GAME_STATE.bounds2, "opposite");
-    }
-    */
-
 }
 
 // Create a palace or river feature
@@ -5473,11 +5454,11 @@ function set_board_boundary(str, color_kind)
     // TODO: Replace with assertions, instead of clamping
     if (x1 < 1) { x1 = 1; }
     if (y1 < 1) { y1 = 1; }
-    if (x2 > FILE_MAX) { x2 = FILE_MAX; }
-    if (y2 > RANK_MAX) { y2 = RANK_MAX; }
+    if (x2 > GAME_STATE.files) { x2 = GAME_STATE.files; }
+    if (y2 > GAME_STATE.ranks) { y2 = GAME_STATE.ranks; }
 
     var white_area = [x1, y1, x2, y2];
-    var black_area = [x1, (RANK_MAX + 1) - y2, x2, (RANK_MAX + 1) - y1];
+    var black_area = [x1, (GAME_STATE.ranks + 1) - y2, x2, (GAME_STATE.ranks + 1) - y1];
 
     // Set boundaries for each piece type given, for quick lookup
     for (var i = 0; i < bounds_types.length; i += 1) {
@@ -5846,7 +5827,7 @@ function name_pieces()
 {
     var piece, descriptive_name;
 
-    for (var file_number = 1; file_number <= FILE_MAX; file_number += 1) {
+    for (var file_number = 1; file_number <= GAME_STATE.files; file_number += 1) {
         // English descriptive notation (only really applicable to chess1)
         var file = xy2descriptive("white", file_number);
 
@@ -5861,7 +5842,7 @@ function name_pieces()
 
         // Algebraic descriptive notation
         var afile = xy2filerank(file_number, "");
-        for (var white_rank = 1; white_rank <= RANK_MAX; white_rank += 1) {
+        for (var white_rank = 1; white_rank <= GAME_STATE.ranks; white_rank += 1) {
             var black_rank = 9 - white_rank;
             piece = pc(file_number, white_rank);
             var rank, piece_letter;
@@ -5992,7 +5973,7 @@ function figurine_piece_prefix(color, piece)
 // Return a piece at (x,y), or "offboard" if the coordinates are out of range.
 function pc_or_offboard(x, y)
 {
-    if (x < 1 || y < 1 || x > FILE_MAX || y > RANK_MAX) {
+    if (x < 1 || y < 1 || x > GAME_STATE.files || y > GAME_STATE.ranks) {
         return "offboard";
     }
 
@@ -6012,8 +5993,8 @@ function pc(x, y, virtual)
         y = xy[1];
     }
 
-    //assert(x >= 1 && x <= FILE_MAX, "pc(" + x + ", " + y + "): bad x: " + x);
-    //assert(y >= 1 && y <= RANK_MAX, "pc(" + x + ", " + y + "): bad y: " + y);
+    //assert(x >= 1 && x <= GAME_STATE.files, "pc(" + x + ", " + y + "): bad x: " + x);
+    //assert(y >= 1 && y <= GAME_STATE.ranks, "pc(" + x + ", " + y + "): bad y: " + y);
 
     return VBOARD[x][y].piece;
 }
@@ -6299,8 +6280,8 @@ function filerank2xy(code)
     var x = code.charCodeAt(0) - "a".charCodeAt(0) + 1; // corresponds to file (horizontal)
     var y = code.charCodeAt(1) - "1".charCodeAt(0) + 1; // corresponds to rank (vertical)
 
-    //assert(x >= 1 && x <= FILE_MAX, "filerank2xy(" + code + "): bad x: " + x);
-    //assert(y >= 1 && y <= RANK_MAX, "filerank2xy(" + code + "): bad y: " + y);
+    //assert(x >= 1 && x <= GAME_STATE.files, "filerank2xy(" + code + "): bad x: " + x);
+    //assert(y >= 1 && y <= GAME_STATE.ranks, "filerank2xy(" + code + "): bad y: " + y);
 
     return [x, y];
 }
@@ -6328,8 +6309,8 @@ function xy2filerank(x, y)
         x = x[0];
     }
 
-    //assert(x >= 1 && x <= FILE_MAX, "xy2filerank(" + x + ", " + y + "): bad x: " + x);
-    //assert(y === "" || (y >= 1 && y <= RANK_MAX), "xy2filerank(" + x + ", " + y + "): bad y: " + y);
+    //assert(x >= 1 && x <= GAME_STATE.files, "xy2filerank(" + x + ", " + y + "): bad x: " + x);
+    //assert(y === "" || (y >= 1 && y <= GAME_STATE.ranks), "xy2filerank(" + x + ", " + y + "): bad y: " + y);
 
     filerank = String.fromCharCode(x + "a".charCodeAt(0) - 1);
     if (y !== "") {
@@ -6357,8 +6338,8 @@ function xy2descriptive(color, xy)
         y = "";
     }
 
-    assert(x >= 1 && x <= FILE_MAX, "xy2descriptive(" + x + ", " + y + "): bad x: " + x);
-    assert(y === "" || (y >= 1 && y <= RANK_MAX), "xy2descriptive(" + x + ", " + y + "): bad y: " + y);
+    assert(x >= 1 && x <= GAME_STATE.files, "xy2descriptive(" + x + ", " + y + "): bad x: " + x);
+    assert(y === "" || (y >= 1 && y <= GAME_STATE.ranks), "xy2descriptive(" + x + ", " + y + "): bad y: " + y);
 
     return [null, "QR", "QN", "QB", "Q", "K", "KB", "KN", "KR"][x] + (color === "white" ? y : 9 - y);
 }
@@ -6380,8 +6361,8 @@ function xy2adescriptive(color, xy)
         y = "";
     }
 
-    assert(x >= 1 && x <= FILE_MAX, "xy2adescriptive(" + x + ", " + y + "): bad x: " + x);
-    assert(y >= 1 && y <= RANK_MAX, "xy2adescriptive(" + x + ", " + y + "): bad y: " + y);
+    assert(x >= 1 && x <= GAME_STATE.files, "xy2adescriptive(" + x + ", " + y + "): bad x: " + x);
+    assert(y >= 1 && y <= GAME_STATE.ranks, "xy2adescriptive(" + x + ", " + y + "): bad y: " + y);
 
     return xy2filerank(x, "") + (color === "white" ? y : 9 - y);
 }
@@ -6424,7 +6405,7 @@ function sq(code, extra)
         assert(false, "sq(" + code + ", " + extra + "): couldn't find out what I was given");
     }
 
-    /*assert(x >= 1 && x <= FILE_MAX && y >= 1 && y <= RANK_MAX, "sq(" + code + ", " + extra + 
+    /*assert(x >= 1 && x <= GAME_STATE.files && y >= 1 && y <= GAME_STATE.ranks, "sq(" + code + ", " + extra + 
         "): out of range (" + x + ", " + y + ")");*/
 
     return VBOARD[x][y];
