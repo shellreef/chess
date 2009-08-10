@@ -6614,7 +6614,6 @@ function dragging_over(element, left, top)
             DROP.square = square;
 
             push_highlight(square, DISPLAY["recent_move_" + square.color]);
-
         } else {
             DROP.square = null;
         }
@@ -6647,6 +6646,7 @@ function mouseup()
     drop_or_revert();
 
     DRAG.element_m = null;
+    DROP.square = null;
 }
 
 
