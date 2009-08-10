@@ -4969,10 +4969,8 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
             GAME_STATE.hmvc += 1;
         }
 
-        highlight_square(from_square, DISPLAY["recent_move_" + from_square.color]);
-        highlight_square(square, DISPLAY["recent_move_" + square.color]);
-        // To restore highlight of dropped square
-        DISPLAY.highlights[xy2filerank(square.x, square.y)] = DISPLAY["recent_move_" + square.color];
+        push_highlight(from_square, DISPLAY["recent_move_" + from_square.color]);
+        push_highlight(square, DISPLAY["recent_move_" + square.color]);
     }
 
     // If castling, move the rook in place. Ugly hardcoded.
@@ -6149,7 +6147,7 @@ function over_piece(piece, event)
     
     var square = highlight_moves(piece, true);
     if (square) {
-        highlight_square(square, DISPLAY["recent_move_" + square.color]);
+        push_highlight(square, DISPLAY["recent_move_" + square.color]);
     }
  
     if (event.shiftKey) {
@@ -6165,7 +6163,7 @@ function out_piece(piece, event)
 
     var square = highlight_moves(piece, false);
     if (square) {
-        highlight_square(square, false);
+        pop_highlight(square, false);
     }
    
     if (!event.shiftKey) {
@@ -6274,9 +6272,11 @@ function highlight_moves(piece, enable, skip_legal)
             flags = move;
 
             to_square = VBOARD[x][y];
-            highlight_square(to_square, enable ? DISPLAY["legal_move_" + to_square.color] : false);
-            // Save so drop square highlighting can recover
-            DISPLAY.highlights[xy2filerank(to_square.x, to_square.y)] = enable ? DISPLAY["legal_move_" + to_square.color] : false;
+            if (enable) {
+                push_highlight(to_square, DISPLAY["legal_move_" + to_square.color]);
+            } else {
+                pop_highlight(to_square);
+            }
         });
     }
 
@@ -6289,7 +6289,11 @@ function highlight_moves(piece, enable, skip_legal)
         flags = move;
 
         to_square = VBOARD[x][y];
-        highlight_square(to_square, enable && GAME_STATE.shift ? DISPLAY["blocked_move_" + to_square.color] : false);
+        if (enable && GAME_STATE.shift) {
+            push_highlight(to_square, DISPLAY["blocked_move_" + to_square.color]);
+        } else {
+            pop_highlight(to_square);
+        }
     });
 
     return from_square;
@@ -6602,14 +6606,13 @@ function dragging_over(element, left, top)
         var square = VBOARD[flipped ? 9 - cell_x : cell_x][flipped ? 9 - cell_y : cell_y];
         
         if (DROP.square) {
-            // Recover legal move highlighting, if any. 
-            highlight_square(DROP.square, DISPLAY.highlights[xy2filerank(DROP.square.x, DROP.square.y)]);
+            pop_highlight(DROP.square);
         }
 
         if (accepts(element, square)) {
             DROP.square = square;
 
-            highlight_square(square, DISPLAY["recent_move_" + square.color]);
+            push_highlight(square, DISPLAY["recent_move_" + square.color]);
 
         } else {
             DROP.square = null;
