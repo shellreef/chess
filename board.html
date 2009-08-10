@@ -1138,7 +1138,6 @@ dojo.cookie=function(_2,_3,_4){var c=document.cookie;if(arguments.length==1){var
     // Let the games begin
     load_notations();
     init_board();
-    label_board();
     init_dnd();
 
     // test 50 move rule (game from http://www.chessville.com/misc/History/Mad_Aussie_Trivia_Archive_12.htm)
@@ -4076,11 +4075,10 @@ function check_insufficient_material()
    
     // Count how many of each piece type are on the board
     // TODO: piece lists?
-    for (var x = 1; x <= GAME_STATE.ranks; x += 1) {
-        for (var y = 1; y <= GAME_STATE.files; y += 1) {
+    for (var x = 1; x <= GAME_STATE.files; x += 1) {
+        for (var y = 1; y <= GAME_STATE.ranks; y += 1) {
             var square = VBOARD[x][y];
 
-            console.log(x,y,square);
             if (square.piece) {
                 // Count all pieces
                 if (counts[square.piece.type] === undefined) {
@@ -4455,6 +4453,7 @@ function realize_vboard()
 // Toggle perspective of board
 function flip()
 {
+    // TODO: actually relabel canvas!!
     label_board(!PREFS.flipped);
     load_fen(save_fen(), true);
     // BUG: if edit board, then flip it, lose changes. TODO: fix
@@ -4487,17 +4486,6 @@ function label_board(flipped)
             square.descriptive.white = xy2descriptive("white", [x, y]);
             square.descriptive.black = xy2descriptive("black", [x, y]);
         }
-    }
-
-    // Label ranks and files
-    var ranks = dojo.query(".rank.label")
-    for (var i = 0; i < ranks.length; i += 1) {
-        ranks[i].innerHTML = flipped ? i + 1 : 8 - i;
-    }
-
-    var files = dojo.query(".file.label");
-    for (i = 0; i < files.length; i += 1) {
-        files[i].innerHTML = String.fromCharCode(flipped ? "h".charCodeAt(0) - i : "a".charCodeAt(0) + i);
     }
 
     PREFS.flipped = flipped;
@@ -5191,29 +5179,6 @@ function mark_repeated_moves(reps)
 // Handle graphically moving of a piece, dropping it to its new location
 function move_dropped_piece(piece, square, event)
 {
-    //console.log(piece);
-    //console.log(square);
- 
-    // TODO: Consider setting piece.style.position to static here, so it is 
-    // static when stationary, and change it to absolute (absolutize) when dragging..
-    // Any way to finish running the code AFTER the effect finishes? New effect?
-    //if (square.firstChild) {
-        // Consider animating opacity or width+height (with dojo.anim or CSS transitions)
-    //}
-
-    /*
-    // Visually rehome piece. This is a UI speed hack: after move_piece_to_square() is
-    // called, realize_vboard() will finalize the board position, moving any other
-    // pieces (castling, en passant, snapback, etc.) -- but it feels faster to have
-    // the piece immediately move to its destination. This is optional.
-    while(square.firstChild) {
-        square.removeChild(square.firstChild);
-    }
-    piece.style.position = "relative";
-    piece.style.top = piece.style.left = 0;
-    square.appendChild(piece);
-*/
-
     if (PREFS.setup_mode) {
         var from_square = piece.square;
 
