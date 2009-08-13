@@ -71,63 +71,6 @@ img.captured
 img.black {}
 img.white {}
 
-/* Would be cool to use CSS3 expressions to make the pattern, but they're not in
- * Firefox 3.0.8, maybe in Firefox 3.1. Safari has them though! 
- * If do this, would need to remember to shift nth-child per ranks. 
- *td:nth-child(2n) { background-color: green } */
-table.board
-{
- /*border: 2px solid black;*/
-
-/* This is like cellspacing=0 cellpadding=0 */
- border-collapse: collapse;
-
-/* Disable text selection when dragging */
-/* http://www.w3.org/TR/1999/WD-css3-userint-19990916#user-select */
- -moz-user-select: none;
- -webkit-user-select: none;
- user-select: none;
-}
-
-td.square   /* RULE #16 */
-{
- border-style: none;
- /* border: 1px solid black; */
- padding: 0em;
- margin: 0em;
- width: 55px; min-width: 55px;
- height: 55px; min-height: 55px;
- text-align: center;
-
- /* So absolutely positioned images in cell are not misaligned */
- vertical-align: top;
- text-align: left;
-}
-
-/* Colors based on http://en.wikipedia.org/wiki/Chessboard
- * Useful site: http://www.cssdrive.com/imagepalette/index.php
- * Colors palette generator, get colors of an arbitrary image.
- *
- * Other colors to consider: http://chessos.com/, higher contrast
- *  http://chessteacher.110mb.com/, much lighter
- * But I like these, gives it a nice wooden feel. Could also
- * use green for a tournament-style board.
- */
-td.black { background-color: #d18b47; } /* RULE #17 */
-td.white { background-color: #ffce9e; } /* RULE #18 */
-
-/* For boundaries. TODO: unify black/white classes. img, td, div */
-.black-color { background-color: #d18b47; } 
-.white-color { background-color: #ffce9e; } 
-
-
-td.label { text-align: center; }
-td.file { border-bottom: 2px solid black; }
-td.rank { border-right: 2px solid black; padding-right: 5px; }
-td.right-edge { border-right: 2px solid black; }
-td.bottom-edge { border-bottom: 2px solid black; }
-
-
 #piece-inspector {
     position: absolute; 
     border: 1px solid black; 
