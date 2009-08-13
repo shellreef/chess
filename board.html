@@ -416,6 +416,7 @@ var PIECE_TYPES = {
     },
 
     weakpawn: {parlett: "o1>, c1X>"},   // No double move, no promotion
+    losalamospawn: {parlett: "o1>, c1X>", promote: ["queen", "rook", "knight"]},
     shatranjpawn: {parlett: "#weakpawn", promote:["ferz"], url:"http://en.wikipedia.org/wiki/Shatranj#Rules"},
     makrukpawn: {parlett: "#weakpawn", promote:["ferz"], promotion_rank:6, url:"http://en.wikipedia.org/wiki/Makruk#Pieces"},
     superpawn: {parlett: "on>, cnX>", letter: "XP", image:"quickpawn"},
@@ -440,6 +441,7 @@ var PIECE_TYPES = {
     rrpawn: {parlett: "#pawn", promote: ["chancellor", "r4", "woodyrook", "halfduck"]},
     nnpawn: {parlett: "#pawn", promote: ["colonel", "chargingrook", "fibnif", "chargingknight"]},
     pkpawn: {parlett: "#pawn", promote: ["pepperoni", "sausage", "mushroom", "meatball"]},
+ 
 
     // Hippogonal leapers
     man: {parlett: "1*", letter: "M", image:["mann2", "man", "guard", "wazirferz"], url:"pc:man"},    // same as king, but not royale (also known as commoner, guard)
@@ -870,7 +872,7 @@ var SAVED_BOARDS = {
 "Thai Chess (Makruk)": "rnx(silvergeneral)x(ferz)x(shah)x(silvergeneral)nr/8/x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)/8/8/X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)/8/RNX(silvergeneral)X(shah)X(ferz)X(silvergeneral)NR w - -",
 "FIDE Chess": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -",
 // TODO: pawns promote to rook,knight,queen, no double-move
-//"Los Alamos Chess": "rnqknr/pppppp/6/6/PPPPPP/RNQKNR w - - ranks=6 files=6",
+"Los Alamos Chess": "rnqknr/x(losalamospawn)x(losalamospawn)x(losalamospawn)x(losalamospawn)x(losalamospawn)x(losalamospawn)/6/6/X(losalamospawn)X(losalamospawn)X(losalamospawn)X(losalamospawn)X(losalamospawn)X(losalamospawn)/RNQKNR w - - ranks=6 files=6",
 "Capablanca Chess (w/o castling)": "rnabqkbcnr/pppppppppp/8/8/8/8/PPPPPPPPPP/RNABQKBCNR w - - files=10",
 "Berolina Chess": "rnbqkbnr/xbxbxbxbxbxbxbxb/8/8/8/8/XBXBXBXBXBXBXBXB/RNBQKBNR w KQkq -"
 //"Taikyoku Shogi": "/ w - - ranks=36 files=36",

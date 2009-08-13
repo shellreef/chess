@@ -416,6 +416,7 @@ lionmod3
 lizard
 lobster
 longleaper
+losalamospawn
 mage
 makrukpawn
 man
