@@ -5138,12 +5138,12 @@ function mark_repeated_moves(reps)
    
     for (var i = 0; i < reps.length; i += 1) {
         var ply = reps[i];
+        var link = dojo.byId("ply_" + ply);
 
-        console.log(ply);
-        dojo.query("a#ply_" + ply).forEach(function(m) {
-                console.log(m);
-                dojo.style(m, "background-color", color);
-            });
+        // TODO: fix
+        assert(link, "mark_repeated_moves(" + reps + "): no such ply " + ply);
+
+        dojo.style(link, "background-color", color);
     }
 }
 
