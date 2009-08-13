@@ -71,6 +71,29 @@ img.captured
 img.black {}
 img.white {}
 
+.canvas-board
+{
+/* Disable text selection when dragging */
+/* http://www.w3.org/TR/1999/WD-css3-userint-19990916#user-select */
+ -moz-user-select: none;
+ -webkit-user-select: none;
+ user-select: none;
+}
+
+td.square
+{
+ border-style: none;
+ padding: 0em;
+ margin: 0em;
+ width: 55px; min-width: 55px;
+ height: 55px; min-height: 55px;
+ text-align: center;
+
+ /* So absolutely positioned images in cell are not misaligned */
+ vertical-align: top;
+ text-align: left;
+}
+
 #piece-inspector {
     position: absolute; 
     border: 1px solid black; 
