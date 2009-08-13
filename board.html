@@ -5136,15 +5136,14 @@ function mark_repeated_moves(reps)
 
     REPEAT_COLOR_COUNT += 1;
    
-    var setcolor = function(m) {
-                //dojo.addClass(m, "repeated_move");
-                m.setStyle({backgroundColor: color});
-            };
-
     for (var i = 0; i < reps.length; i += 1) {
         var ply = reps[i];
 
-        dojo.query("a#ply_" + ply).forEach(setcolor);
+        console.log(ply);
+        dojo.query("a#ply_" + ply).forEach(function(m) {
+                console.log(m);
+                dojo.style(m, "background-color", color);
+            });
     }
 }
 
