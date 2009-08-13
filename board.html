@@ -5056,7 +5056,7 @@ function finish_up_move(tieback, is_immediate, promote_to, is_raw)
 // Fill in move_history with the move history
 function show_move_history()
 {
-    var htmls = [];
+    var htmls = [], repeats = [];
     var first = true;
 
     for (var ply = 1; ply < GAME_STATE.made_moves.length; ply += 1) {
@@ -5099,7 +5099,7 @@ function show_move_history()
         }
 
         if (move_info.repeats) {
-            mark_repeated_moves(move_info.repeats);
+            repeats.push(move_info.repeats);
         }
 
         // End-text, not a move. Terminates the game.
@@ -5113,6 +5113,11 @@ function show_move_history()
     }
 
     dojo.byId("move_history").innerHTML = htmls.join("");
+
+    // Mark repeated moves for threefold repetition, after showing this move.
+    dojo.forEach(repeats, function(peat) {
+            mark_repeated_moves(peat);
+        });
 
     // Last ply
     dojo.query("a.active_move").forEach(function(m) {
