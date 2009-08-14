@@ -5780,7 +5780,7 @@ function name_pieces()
         // Algebraic descriptive notation
         var afile = xy2filerank(file_number, "");
         for (var white_rank = 1; white_rank <= GAME_STATE.ranks; white_rank += 1) {
-            var black_rank = 9 - white_rank;
+            var black_rank = (GAME_STATE.ranks + 1) - white_rank;
             piece = pc(file_number, white_rank);
             var rank, piece_letter;
 
@@ -6278,7 +6278,7 @@ function xy2descriptive(color, xy)
     assert(x >= 1 && x <= GAME_STATE.files, "xy2descriptive(" + x + ", " + y + "): bad x: " + x);
     assert(y === "" || (y >= 1 && y <= GAME_STATE.ranks), "xy2descriptive(" + x + ", " + y + "): bad y: " + y);
 
-    return [null, "QR", "QN", "QB", "Q", "K", "KB", "KN", "KR"][x] + (color === "white" ? y : 9 - y);
+    return [null, "QR", "QN", "QB", "Q", "K", "KB", "KN", "KR"][x] + (color === "white" ? y : (GAME_STATE.ranks + 1) - y);
 }
 
 // Return name of square from color's perspective in "algebraic descriptive notation".
@@ -6301,7 +6301,7 @@ function xy2adescriptive(color, xy)
     assert(x >= 1 && x <= GAME_STATE.files, "xy2adescriptive(" + x + ", " + y + "): bad x: " + x);
     assert(y >= 1 && y <= GAME_STATE.ranks, "xy2adescriptive(" + x + ", " + y + "): bad y: " + y);
 
-    return xy2filerank(x, "") + (color === "white" ? y : 9 - y);
+    return xy2filerank(x, "") + (color === "white" ? y : (GAME_STATE.ranks + 1) - y);
 }
 
 // Shorten a file name, in descriptive notation, to a possibly-ambiguous name.
@@ -6503,11 +6503,11 @@ function dragging_over(element, left, top)
 
         // Highlight droppable square
         var flipped = PREFS.flipped;
-        if (!VBOARD[flipped ? 9 - cell_x : cell_x]) {
+        if (!VBOARD[flipped ? (GAME_STATE.files + 1) - cell_x : cell_x]) {
             DROP.square = null;
             return;
         }
-        var square = VBOARD[flipped ? 9 - cell_x : cell_x][flipped ? 9 - cell_y : cell_y];
+        var square = VBOARD[flipped ? (GAME_STATE.files + 1) - cell_x : cell_x][flipped ? (GAME_STATE.ranks + 1) - cell_y : cell_y];
         
         if (DROP.square) {
             pop_highlight(DROP.square);
