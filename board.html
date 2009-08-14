@@ -6485,8 +6485,8 @@ function touchmove(evt)
 function dragging_over(element, left, top)
 {
     // Position from center
-    var x = left + (DROP.area.cell_width / 2);
-    var y = top + (DROP.area.cell_width / 2);
+    var x = left + (DISPLAY.square_width / 2);
+    var y = top + (DISPLAY.square_height / 2);
 
     // Inside board?
     if (x > DROP.area.left && y > DROP.area.top &&
@@ -6495,8 +6495,8 @@ function dragging_over(element, left, top)
         DROP.offboard = false;
 
         // Find cell mathematically
-        var cell_x = Math.ceil((x - DROP.area.left) / DROP.area.cell_width);
-        var cell_y = Math.ceil((DROP.area.right - y) / DROP.area.cell_width);
+        var cell_x = Math.ceil((x - DROP.area.left) / DISPLAY.square_width);
+        var cell_y = Math.ceil((DROP.area.right - y) / DISPLAY.square_height);
         if (cell_y === 0) {
             cell_y = 1;
         }
@@ -6678,7 +6678,6 @@ function init_dnd()
 
     DROP.area.left = DISPLAY.board_left;
     DROP.area.top = DISPLAY.board_top;
-    DROP.area.cell_width = DISPLAY.square_width;
     DROP.area.width = GAME_STATE.files * DISPLAY.square_width;
     DROP.area.height = GAME_STATE.ranks * DISPLAY.square_height;
 
