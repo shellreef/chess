@@ -245,6 +245,7 @@ var DISPLAY = {
     recent_move_black: "blue",
 
     highlights: {},    // Color of legal move highlighted squares, for restoring color on drop over
+    native_square_images:{}, // Image of square without any highlights (includes color and borders)
 
     text_color:"black",
     feature_border_width:3,
@@ -4336,10 +4337,19 @@ function highlight_square(square, color)
 // Push a layer of a highlight color to a square, coloring the square that color.
 function push_highlight(square, color)
 {
-    if (!DISPLAY.highlights[square.filerank]) {
+    console.log("push_highlight",square.filerank,color);
+    if (!DISPLAY.highlights[square.filerank] || DISPLAY.highlights[square.filerank].length === 0) {
+
+        var sx = get_square_x(square.x);
+        var sy = get_square_y(square.y);
+        var sw = DISPLAY.square_width;
+        var sh = DISPLAY.square_height;
+
         DISPLAY.highlights[square.filerank] = [];
+        DISPLAY.native_square_images[square.filerank] = DISPLAY.context.getImageData(sx, sy, sw, sh);
     }
 
+ 
     DISPLAY.highlights[square.filerank].push(color);
 
     highlight_square(square, color);
@@ -4359,7 +4369,11 @@ function pop_highlight(square)
 
     if (!stack || stack.length === 0) {
         // Native square color
-        color = DISPLAY[square.color];
+        var native_image = DISPLAY.native_square_images[square.filerank];
+
+        assert(native_image, "pop_highlight(" + square.filerank + "): no native image");
+
+        DISPLAY.context.putImageData(native_image, get_square_x(square.x), get_square_y(square.y));
     } else {
         // Color underneath is now top of stack
         color = stack[stack.length - 1];
