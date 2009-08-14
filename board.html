@@ -4337,7 +4337,6 @@ function highlight_square(square, color)
 // Push a layer of a highlight color to a square, coloring the square that color.
 function push_highlight(square, color)
 {
-    console.log("push_highlight",square.filerank,color);
     if (!DISPLAY.highlights[square.filerank] || DISPLAY.highlights[square.filerank].length === 0) {
 
         var sx = get_square_x(square.x);
@@ -4364,8 +4363,13 @@ function pop_highlight(square)
 
     stack = DISPLAY.highlights[square.filerank];
 
+    if (!stack || stack.length === 0) {
+        // Nothing to pop
+        return;
+    }
+
     // Remove current color
-    old_color = stack && stack.pop();
+    old_color = stack.pop();
 
     if (!stack || stack.length === 0) {
         // Native square color
