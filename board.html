@@ -6496,7 +6496,7 @@ function dragging_over(element, left, top)
 
         // Find cell mathematically
         var cell_x = Math.ceil((x - DROP.area.left) / DISPLAY.square_width);
-        var cell_y = Math.ceil((DROP.area.right - y) / DISPLAY.square_height);
+        var cell_y = Math.ceil((DROP.area.bottom - y) / DISPLAY.square_height);
         if (cell_y === 0) {
             cell_y = 1;
         }
