@@ -4378,14 +4378,16 @@ function pop_highlight(square)
         assert(native_image, "pop_highlight(" + square.filerank + "): no native image");
 
         DISPLAY.context.putImageData(native_image, get_square_x(square.x), get_square_y(square.y));
+
+        return native_image;
     } else {
         // Color underneath is now top of stack
         color = stack[stack.length - 1];
+        
+        highlight_square(square, color);
+
+        return color;
     }
-
-    highlight_square(square, color);
-
-    return color;
 }
 
 //// BOARD FUNCTIONS
