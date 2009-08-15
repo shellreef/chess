@@ -1525,7 +1525,7 @@ function parse_pgn(pgn)
         // Parse move text
         var tokens = dict.move_text.split(" ");
         delete dict.move_text;  // not for anyone but this function
-        var fmvn, outcome, moves = [], color = "white";
+        var fmvn = 1, outcome, moves = [], color = "white";
         var in_comment = false;
 
         for (i = 0; i < tokens.length; i += 1) {
@@ -4137,8 +4137,10 @@ function game_file_list()
                         var games;
                        
                         // Large files take too long to parse. TODO: web worker?
-                        //if (pgn_text.length === 317651) 
-                        //    games = parse_pgn(pgn_text);
+                        if (pgn_text.length < 1000)
+                            games = parse_pgn(pgn_text);
+
+                        console.log(games);
 
                         var browser = dojo.byId("game-browser");
 
