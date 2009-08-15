@@ -4539,9 +4539,8 @@ function init_board()
                 out_piece(GAME_STATE.piece_under, {});
                 GAME_STATE.piece_under = save;
             } else if (GAME_STATE.shift) {
-                // When releasing shift, unhighlight our own blocked moves, only
-                // (leave legal moves highlighted).
-                highlight_moves(GAME_STATE.piece_under, false, true);
+                // When releasing shift, unhighlight our own blocked moves.
+                highlight_moves(GAME_STATE.piece_under, false, false);
             }
 
             GAME_STATE.shift = false;
