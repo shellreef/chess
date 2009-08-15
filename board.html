@@ -4538,9 +4538,12 @@ function init_board()
                 var save = GAME_STATE.piece_under;
                 out_piece(GAME_STATE.piece_under, {});
                 GAME_STATE.piece_under = save;
-            } else if (GAME_STATE.shift) {
+            } else if (GAME_STATE.shift && GAME_STATE.piece_under) {
                 // When releasing shift, unhighlight our own blocked moves.
                 highlight_moves(GAME_STATE.piece_under, false, false);
+
+                // TODO: fix highlights when mousing over w/ shift
+                pop_highlight(GAME_STATE.piece_under.square);
             }
 
             GAME_STATE.shift = false;
