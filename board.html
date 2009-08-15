@@ -390,7 +390,7 @@ var PIECE_TYPES = {
           castles_with: "rook", url:"pc:king"},
     queen: {parlett: "n*", letter: "Q", figurines: ["\u2655", "\u265b"], iccf_number: 1, url:"pc:queen"},
     rook: {parlett: "n+", letter: "R", castle: true, figurines: ["\u2656", "\u265c"], iccf_number: 2, url:"pc:rook", aka:["chariot", "car"]},
-    bishop: {parlett: "nX", letter: "B", figurines: ["\u2657", "\u265d"], iccf_number: 3, url:"pc:bishop"},
+    bishop: {parlett: "nX", letter: "B", figurines: ["\u2657", "\u265d"], iccf_number: 3, url:"pc:bishop", aka:["courier"]},
     knight: {parlett: "~1/2", letter: "N", figurines: ["\u2658", "\u265e"], iccf_number: 4, url:"pc:knight"},
 
 
@@ -874,7 +874,8 @@ var SAVED_BOARDS = {
 "FIDE Chess": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -",
 // TODO: pawns promote to rook,knight,queen, no double-move
 "Los Alamos Chess": "rnqknr/x(losalamospawn)x(losalamospawn)x(losalamospawn)x(losalamospawn)x(losalamospawn)x(losalamospawn)/6/6/X(losalamospawn)X(losalamospawn)X(losalamospawn)X(losalamospawn)X(losalamospawn)X(losalamospawn)/RNQKNR w - - ranks=6 files=6",
-"Capablanca Chess (w/o castling)": "rnabqkbcnr/pppppppppp/8/8/8/8/PPPPPPPPPP/RNABQKBCNR w - - files=10",
+"Courier Chess": "rnybmkxfibynr/x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)/////X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)/RNYBMKXFIBYNR w - - files=12 ranks=8",
+"Capablanca Chess (w/o castling)": "rnabqkbcnr/pppppppppp/8/8/8/8/PPPPPPPPPP/RNABQKBCNR w - - files=10 stalemate=win",
 "Berolina Chess": "rnbqkbnr/xbxbxbxbxbxbxbxb/8/8/8/8/XBXBXBXBXBXBXBXB/RNBQKBNR w KQkq -"
 //"Taikyoku Shogi": "/ w - - ranks=36 files=36",
 // TODO: Modern variants
