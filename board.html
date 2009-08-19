@@ -788,10 +788,12 @@ var PIECE_TYPES = {
     //forfnifurlrurking: {parlett: "~1/2>, n=, n>, 1*", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/fhnfrlrk.html"}, // TODO: image
  
     // Hoppers
-    //leo: {parlett: "on*, c^&", url:"http://en.wikipedia.org/wiki/Fairy_chess_piece#Notable_examples"}, // TODO: movement
     //checker: {parlett: "cn(^2X)>, o1X>", url:"http://en.wikipedia.org/wiki/Fairy_chess_piece#Notations"}, // TODO: movement
     
-    //cannon: {parlett: "on+, cn+^^"}, // TODO: movement
+    //cannon: {parlett: "on+, cn+^^", aka:["pao"]}, // TODO: movement. Like rook, but hops.
+    //vao: {parlett: "onX, cnX^^"}, // TODO: movement. Like bishop, but hops.
+    //leo: {letter: "XO", parlett: "on*, c^&", url:"http://en.wikipedia.org/wiki/Fairy_chess_piece#Notable_examples"}, // TODO: locust movement, cn*^&?? cn*^^?. Like queen, but hops
+    
     grasshopper: {parlett: "n*^", url:"http://en.wikipedia.org/wiki/Grasshopper_(chess)"}, // TODO: movement
    
     // Complex riders
@@ -823,9 +825,7 @@ var PIECE_TYPES = {
 
     
     // Pieces that probably won't be supported without significant coding
-    //leo: {parlett: "on*, c^" + AMP, letter:"XO"},        // no locust support
-    // TODO: "darters", blockable 'leapers' - 1//2, elban knight, mao (0,1 then 1,1), moa (1,1 then 0,1)
-    //moo: {parlett: "#mao, #moa"},
+    // TODO: "darters", blockable 'leapers' - 1//2, elban knight, like mao and moa
     //checker: {parlett: "cn(^2X>), o1X>", promote: "checker_kinged", letter:"XY"},  // no grouping
     //checker_kinged: {parlett: "cn(^2X), o1x", letter:"XZ"},
     //spy: {parlett: "2>, 2=, (1/1)>", letter:"XS"}  // no grouping
