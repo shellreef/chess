@@ -275,6 +275,8 @@ var RULE_SETS = {
         features:[
             {fill:true, color:"lightblue", file:1, rank:5, width:9, height:5},      // background
             {over:true, fill: true, color:"lightblue", file:1, rank:6, width:9, height:1, shift_y:true}, // river
+
+            {over:true, color:"yellow", file:4, rank:3, width:2, height:2, shift_y:true, shift_x:true},
         ],
 
         ruled:true,
@@ -4326,11 +4328,7 @@ function draw_features(draw_over)
             ry += DISPLAY.square_height / 2;
         }
 
-        if (feature.fill) {
-            ctx.fillRect(rx, ry, rw, rh);
-        } else {
-            ctx.strokeRect(rx, ry, rw, rh);
-        }
+        draw_feature(ctx, feature, rx, ry, rw, rh);
 
         // Mirror to black's side of board
         if (feature.color === "same") {
@@ -4344,84 +4342,100 @@ function draw_features(draw_over)
         ctx.fillStyle = color;
 
         ry = get_square_y(feature.rank + (GAME_STATE.ranks - feature.height));
-        if (feature.fill) {
-            ctx.fillRect(rx, ry, rw, rh);
-        } else {
-            ctx.strokeRect(rx, ry, rw, rh);
+        if (feature.shift_y) {
+            ry += DISPLAY.square_height / 2;
+            // Ugly hack to get black aligned right.
+            ry += DISPLAY.square_height;
         }
+
+        draw_feature(ctx, feature, rx, ry, rw, rh);
     }
 }
+
+// Draw an individual feature on the board.
+function draw_feature(ctx, feature, rx, ry, rw, rh)
+{
+    if (feature.fill) {
+        ctx.fillRect(rx, ry, rw, rh);
+    } else if (feature.line) {
+        // TODO
+        ctx.strokeRect(rx, ry, rw, rh);
+    } else {
+        ctx.strokeRect(rx, ry, rw, rh);
+    }
+}
+
 
 // Restore the board to the clean state, unhighlighting all highlighted black/white squares.
 function unhighlight_all()
 {
-    DISPLAY.highlights = {};
-    DISPLAY.context.putImageData(DISPLAY.clean_board, 0, 0);
+DISPLAY.highlights = {};
+DISPLAY.context.putImageData(DISPLAY.clean_board, 0, 0);
 }
 
 // Get the upper-left x coordinate of a square given file
 function get_square_x(file)
 {
-    return DISPLAY.board_left + DISPLAY.board_border/2 + (file - 1) * DISPLAY.square_width;
+return DISPLAY.board_left + DISPLAY.board_border/2 + (file - 1) * DISPLAY.square_width;
 }
 
 // Get the upper-left y coordinate of a square given rank
 function get_square_y(rank)
 {
-    return DISPLAY.board_top + DISPLAY.board_border/2 + (GAME_STATE.ranks - rank) * DISPLAY.square_height;
+return DISPLAY.board_top + DISPLAY.board_border/2 + (GAME_STATE.ranks - rank) * DISPLAY.square_height;
 }
 
 // Highlight a square with a given color, or unhighlight it if color is false
 function highlight_square(square, color)
 {
-    var ctx;
+var ctx;
 
-    file = square.x;
-    rank = square.y;
+file = square.x;
+rank = square.y;
 
-    ctx = DISPLAY.context;
+ctx = DISPLAY.context;
 
-    if (!color) {
-        color = DISPLAY[square.color];
-    }
+if (!color) {
+    color = DISPLAY[square.color];
+}
 
-    ctx.fillStyle = color;
-    ctx.fillRect(get_square_x(file), get_square_y(rank), DISPLAY.square_width, DISPLAY.square_height);
+ctx.fillStyle = color;
+ctx.fillRect(get_square_x(file), get_square_y(rank), DISPLAY.square_width, DISPLAY.square_height);
 }
 
 // Push a layer of a highlight color to a square, coloring the square that color.
 function push_highlight(square, color)
 {
-    if (!DISPLAY.highlights[square.filerank] || DISPLAY.highlights[square.filerank].length === 0) {
+if (!DISPLAY.highlights[square.filerank] || DISPLAY.highlights[square.filerank].length === 0) {
 
-        var sx = get_square_x(square.x);
-        var sy = get_square_y(square.y);
-        var sw = DISPLAY.square_width;
-        var sh = DISPLAY.square_height;
+    var sx = get_square_x(square.x);
+    var sy = get_square_y(square.y);
+    var sw = DISPLAY.square_width;
+    var sh = DISPLAY.square_height;
 
-        DISPLAY.highlights[square.filerank] = [];
-        DISPLAY.native_square_images[square.filerank] = DISPLAY.context.getImageData(sx, sy, sw, sh);
-    }
+    DISPLAY.highlights[square.filerank] = [];
+    DISPLAY.native_square_images[square.filerank] = DISPLAY.context.getImageData(sx, sy, sw, sh);
+}
 
- 
-    DISPLAY.highlights[square.filerank].push(color);
 
-    highlight_square(square, color);
+DISPLAY.highlights[square.filerank].push(color);
 
-    return DISPLAY.highlights[square.filerank];
+highlight_square(square, color);
+
+return DISPLAY.highlights[square.filerank];
 }
 
 // Peel off a highlighted color and reveal the color underneath.
 function pop_highlight(square)
 {
-    var stack, color, old_color;
+var stack, color, old_color;
 
-    stack = DISPLAY.highlights[square.filerank];
+stack = DISPLAY.highlights[square.filerank];
 
-    if (!stack || stack.length === 0) {
-        // Nothing to pop
-        return;
-    }
+if (!stack || stack.length === 0) {
+    // Nothing to pop
+    return;
+}
 
     // Remove current color
     old_color = stack.pop();
