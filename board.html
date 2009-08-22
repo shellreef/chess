@@ -476,7 +476,7 @@ var PIECE_TYPES = {
     man: {parlett: "1*", letter: "M", image:["mann2", "man", "guard", "wazirferz"], url:"pc:man"},    // same as king, but not royale (also known as commoner, guard)
     warmachine: {parlett: "~0/2", letter: "D", url:"pc:dabbabah"},  // or ~2+
     alfil: {parlett: "~2/2", letter: "Y", image:["elephant2", "elephantrev2", "elephant"], url:"pc:alfil"},       //  or ~2X
-    threeheadmonster: {parlett: "~3/0", letter: "H", aka:"threeleaper"},
+    threeheadmonster: {parlett: "~3/0", aka:"threeleaper"},
     bird: {parlett: "~3/3", letter: "XT", image:["bird", "bird2"], aka:"tripper"},
     camel: {parlett: "~1/3", letter: "W", image:["camel", "camel2", "camelrev2"], url:"pc:camel"},  // TODO: Timur's game
     zebra: {parlett:"~2/3", letter: "Z", url:"pc:zebra"},
@@ -539,7 +539,7 @@ var PIECE_TYPES = {
     //ferzwazirhunter: {parlett: "1>, 1X<", url:"akm"}, // TODO: image
     //adjutant: {parlett: "1>, 1<", url:"akm", aka:["tsiu-yin", "chuuuin", "gobetween", "doublefootsoldier"]}, 
     //sidewinder: {parlett: "1X>, 1=", url:"akm"}, // TODO: image
-    ferz: {parlett: "1X", letter: "XF", image:["ferz", "ferz2", "1bishop"], url:"pc:ferz"}, // or ~1/1
+    ferz: {parlett: "1X", letter: "XF", image:["ferz", "ferz2", "1bishop"], url:"pc:ferz", aka:["adviser", "firzin"]}, // or ~1/1
     //wazirferzhunter: {parlett: "1X>, 1<", url:"akm"}, // TODO: image
     drunkensailor: {parlett: "1=, 1X<", image:"shipinv", url:"akm"}, 
     //drunkenbackslider: {parlett: "1=, 1<", url:"akm", aka:["reversesoldier"]}, // TODO: image
@@ -589,7 +589,7 @@ var PIECE_TYPES = {
         "[2,1;if_unblocked=1,0], [2,-1;if_unblocked=1,0], " +
         "[1,-2;if_unblocked=0,-1], [-1,-2;if_unblocked=0,-1], " +
         "[-2,1;if_unblocked=-1,0], [-2,-1;if_unblocked=-1,0]",
-        image:["mao", "horse"], url:"pc:mao"},
+        image:["mao", "horse"], url:"pc:mao", letter:"H"},
     moa: {parlett: "[1,2;if_unblocked=1,1], [2,1;if_unblocked=1,1], " +
         "[2,-1;if_unblocked=1,-1], [1,-2;if_unblocked=1,-1], " +
         "[-1,-2;if_unblocked=-1,-1], [-2,-1;if_unblocked=-1,-1], " +
