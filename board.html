@@ -271,12 +271,13 @@ var RULE_SETS = {
         bounds1:"river,1,1,10,5,elephant", 
         bounds2:"palace,4,1,6,3,lord,ferz",
 
-        // TODO: diagonal lines in palace, gap in river
+        // Graphical board features to show piece movement restrictions
         features:[
             {fill:true, color:"lightblue", file:1, rank:5, width:9, height:5},      // background
             {over:true, fill: true, color:"lightblue", file:1, rank:6, width:9, height:1, shift_y:true}, // river
 
-            {over:true, color:"yellow", file:4, rank:3, width:2, height:2, shift_y:true, shift_x:true},
+            // palace
+            {cross:true, over:true, color:"black", file:4, rank:3, width:2, height:2, shift_y:true, shift_x:true},
         ],
 
         ruled:true,
@@ -4357,9 +4358,20 @@ function draw_feature(ctx, feature, rx, ry, rw, rh)
 {
     if (feature.fill) {
         ctx.fillRect(rx, ry, rw, rh);
-    } else if (feature.line) {
-        // TODO
-        ctx.strokeRect(rx, ry, rw, rh);
+    } else if (feature.cross) {
+        // Draw an X cross in this area
+        ctx.beginPath();
+
+        // \
+        ctx.moveTo(rx, ry);
+        ctx.lineTo(rx + rw, ry + rh);
+
+        // /
+        ctx.moveTo(rx, ry + rh);
+        ctx.lineTo(rx + rw, ry);
+
+        ctx.stroke();
+
     } else {
         ctx.strokeRect(rx, ry, rw, rh);
     }
