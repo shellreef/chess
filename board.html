@@ -260,8 +260,29 @@ var DISPLAY = {
 var RULE_SETS = {
     shatranj: { uncheckered: true, ruled: true, stalemate: "win" },
 
-    // "Westernized" Xiangqi, where pieces sit on squares
-    xiangqiw: {
+    // Xiangqi where pieces are on intersections
+    xiangqi: {
+        on_intersections:true,
+
+        ranks:10, 
+        files:9,
+      
+        // piece movement restrictions
+        bounds1:"river,1,1,10,5,elephant", 
+        bounds2:"palace,4,1,6,3,shah,ferz",
+
+        // TODO: diagonal lines in palace, gap in river
+        features:[
+            {fill:true, color:"lightblue", file:1, rank:5, width:9, height:5},      // background
+            {over:true, fill: true, color:"lightblue", file:1, rank:6, width:9, height:1, shift_y:true}, // river
+        ],
+
+        ruled:true,
+        uncheckered:true
+     },
+
+     // "Westernized" Xiangqi, where pieces sit on squares
+     xiangqiw: {
         ranks:10, 
         files:9,
       
@@ -288,25 +309,6 @@ var RULE_SETS = {
         transparent:true
     },
 
-    // Xiangqi where pieces are on intersections
-    xiangqi: {
-        on_intersections:true,
-
-        ranks:10, 
-        files:9,
-      
-        // piece movement restrictions
-        bounds1:"river,1,1,10,5,elephant", 
-        bounds2:"palace,4,1,6,3,shah,ferz",
-
-        // TODO: diagonal lines in palace, gap in river
-        features:[
-            {over:true, fill: true, color:"blue", file:1, rank:6, width:9, height:1},      // river
-        ],
-
-        ruled:true,
-        transparent:true
-     }
 
 };
 
@@ -887,11 +889,10 @@ var SAVED_BOARDS = {
 // TODO: Japanese Chess (Shogi), see http://www.crockford.com/chess/shogi.html
 // TODO: Minishogi, 5x5 board, http://en.wikipedia.org/wiki/Minishogi
 
-// Chinese Chess (Xiangqi). Good westernization here: http://www.crockford.com/chess/xiangqi.html
-// TODO: 9x10 board, and bounds king (general?), ferz, and elephant
-"Chinese Chess (Xiangqi, Westernized) (w/o cannons)": "rx(mao)ex(ferz)x(shah)x(ferz)ex(mao)r///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)///RX(mao)EX(ferz)X(shah)X(ferz)EX(mao)R w - - rs=xiangqiw",
-
+// Chinese Chess (Xiangqi),
 "Chinese Chess (Xiangqi, grid) (w/o cannons)": "rx(mao)ex(ferz)x(shah)x(ferz)ex(mao)r///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)///RX(mao)EX(ferz)X(shah)X(ferz)EX(mao)R w - - rs=xiangqi",
+
+"Chinese Chess (Xiangqi, Westernized) (w/o cannons)": "rx(mao)ex(ferz)x(shah)x(ferz)ex(mao)r///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)///RX(mao)EX(ferz)X(shah)X(ferz)EX(mao)R w - - rs=xiangqiw",
 
 // King is khun, not actually shah, but it behaves the same (no castling)
 // Counting rules on http://en.wikipedia.org/wiki/Makruk are not implemented
@@ -4317,9 +4318,12 @@ function draw_features(draw_over)
         rw = feature.width * DISPLAY.square_width, 
         rh = feature.height * DISPLAY.square_height;
 
-        if (GAME_STATE.on_intersections) {
-            // XYZ
+        // Shift by half of square, for drawing in between squares.
+        // Most useful with on_intersections.
+        if (feature.shift_x) {
             rx += DISPLAY.square_width / 2;
+        }
+        if (feature.shift_y) {
             ry += DISPLAY.square_height / 2;
         }
 
