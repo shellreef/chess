@@ -273,8 +273,9 @@ var RULE_SETS = {
         features:[
             // Karakus' Xiangqi westernization using lines and outlines to indicate features on a checkered board
             // http://www.chessvariants.com/xiangqi.dir/xiangqiwest.html
-            {color:"yellow", file:4, rank:3, width:3, height:3},    // palace
-            {color:"blue", file:1, rank:5, width:9, height:5},      // river
+            // Draw these _after_ drawing the board, so they are on top of the original lines
+            {after:true, color:"yellow", file:4, rank:3, width:3, height:3},    // palace
+            {after:true, color:"blue", file:1, rank:5, width:9, height:5},      // river
 
             // Crockford's Xiangqi westernization using square color to indicate features on an uncheckered board
             // http://www.crockford.com/chess/xiangqi.html
@@ -299,9 +300,12 @@ var RULE_SETS = {
         bounds2:"palace,4,1,6,3,shah,ferz",
 
         // TODO: diagonal lines in palace, gap in river
+        features:[
+            {fill: true, color:"blue", file:1, rank:6, width:9, height:1},      // river
+        ],
 
-        ruled:true
-        //transparent:true
+        ruled:true,
+        transparent:true
      }
 
 };
@@ -4205,6 +4209,7 @@ function create_board()
 
     ctx.font = DISPLAY.label_font;
 
+    // Draw features below
     draw_features(false);
 
     ctx.strokeStyle = "#000";
@@ -4271,15 +4276,15 @@ function create_board()
 
     ctx.lineWidth = DISPLAY.feature_border_width;
 
-    // Draw outlined features only
+    // Draw features on top
     draw_features(true);
 
     DISPLAY.clean_board = ctx.getImageData(0, 0, canvas.width, canvas.height);
 }
 
 // Board "features": cosmetic embellishments that indicate something
-// draw_outlines determines whether to draw solid features or outlined features only
-function draw_features(draw_outlines)
+// draw_after determines whether to draw features to be drawn after the board, or before
+function draw_features(draw_after)
 {
     var ctx = DISPLAY.context;
 
@@ -4291,7 +4296,7 @@ function draw_features(draw_outlines)
         var feature = GAME_STATE.features[i];
         var rx, ry, rw, rh, color;
 
-        if (feature.fill === draw_outlines) {
+        if (!!feature.after !== !!draw_after) {
             continue;
         }
 
@@ -4311,6 +4316,12 @@ function draw_features(draw_outlines)
         ry = get_square_y(feature.rank), 
         rw = feature.width * DISPLAY.square_width, 
         rh = feature.height * DISPLAY.square_height;
+
+        if (GAME_STATE.on_intersections) {
+            // XYZ
+            rx += DISPLAY.square_width / 2;
+            ry += DISPLAY.square_height / 2;
+        }
 
         if (feature.fill) {
             ctx.fillRect(rx, ry, rw, rh);
