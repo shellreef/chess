@@ -259,12 +259,13 @@ var DISPLAY = {
 // Predefined game rules for rs EPD opcode, makes it more compact to store non-FIDE games
 var RULE_SETS = {
     shatranj: { uncheckered: true, ruled: true, stalemate: "win" },
-    xiangqi: {
-        // TODO
+
+    // "Westernized" Xiangqi, where pieces sit on squares
+    xiangqiw: {
         ranks:10, 
         files:9,
       
-        // Piece movement restrictions
+        // piece movement restrictions
         bounds1:"river,1,1,10,5,elephant", 
         bounds2:"palace,4,1,6,3,shah,ferz",
 
@@ -284,7 +285,25 @@ var RULE_SETS = {
 
         ruled:true,
         transparent:true
-    }
+    },
+
+    // Xiangqi where pieces are on intersections
+    xiangqi: {
+        on_intersections:true,
+
+        ranks:10, 
+        files:9,
+      
+        // piece movement restrictions
+        bounds1:"river,1,1,10,5,elephant", 
+        bounds2:"palace,4,1,6,3,shah,ferz",
+
+        // TODO: diagonal lines in palace, gap in river
+
+        ruled:true
+        //transparent:true
+     }
+
 };
 
 // Info about the game
@@ -866,7 +885,9 @@ var SAVED_BOARDS = {
 
 // Chinese Chess (Xiangqi). Good westernization here: http://www.crockford.com/chess/xiangqi.html
 // TODO: 9x10 board, and bounds king (general?), ferz, and elephant
-"Chinese Chess (Xiangqi)": "rx(mao)ex(ferz)x(shah)x(ferz)ex(mao)r///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)///RX(mao)EX(ferz)X(shah)X(ferz)EX(mao)R w - - rs=xiangqi",
+"Chinese Chess (Xiangqi, Westernized) (w/o cannons)": "rx(mao)ex(ferz)x(shah)x(ferz)ex(mao)r///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)///RX(mao)EX(ferz)X(shah)X(ferz)EX(mao)R w - - rs=xiangqiw",
+
+"Chinese Chess (Xiangqi, grid) (w/o cannons)": "rx(mao)ex(ferz)x(shah)x(ferz)ex(mao)r///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)///RX(mao)EX(ferz)X(shah)X(ferz)EX(mao)R w - - rs=xiangqi",
 
 // King is khun, not actually shah, but it behaves the same (no castling)
 // Counting rules on http://en.wikipedia.org/wiki/Makruk are not implemented
@@ -4156,7 +4177,7 @@ function game_file_list()
 // Initially draw a board, saving the image data so it can be quickly redrawn 
 function create_board()
 {
-    var canvas, ctx, board_width, board_height;
+    var canvas, ctx, board_width, board_height, start_x, start_y, max_x, max_y;
     
     canvas = document.getElementById("canvas-board");
     DISPLAY.canvas = canvas;
@@ -4189,7 +4210,18 @@ function create_board()
     ctx.strokeStyle = "#000";
     ctx.lineWidth = DISPLAY.board_border;
 
-    for (var x = 0; x < GAME_STATE.files; x += 1) {
+    start_x = 0;
+    start_y = 0;
+    max_x = GAME_STATE.files;
+    max_y = GAME_STATE.ranks;
+
+    if (GAME_STATE.on_intersections) {
+        // Fewer lines are needed if the pieces are placed on the line intersections.
+        start_y = 1;
+        max_x -= 1;
+    }
+
+    for (var x = start_x; x < max_x; x += 1) {
         // File labels
         var file = String.fromCharCode("a".charCodeAt(0) + x);
         ctx.fillStyle = DISPLAY.text_color;
@@ -4199,7 +4231,7 @@ function create_board()
 
         // Squares
         ctx.fillStyle = DISPLAY.white;
-        for (var y = 0; y < GAME_STATE.ranks; y += 1) {
+        for (var y = start_y; y < max_y; y += 1) {
             var rx, ry, rw, rh;
 
             if (!GAME_STATE.uncheckered) {
@@ -4210,6 +4242,12 @@ function create_board()
             ry = get_square_y(y + 1);
             rw = DISPLAY.square_width;
             rh = DISPLAY.square_height;
+
+            if (GAME_STATE.on_intersections) {
+                // Pieces on intersections of lines, instead of squares formed by those lines.
+                rx += DISPLAY.square_width / 2;
+                ry += DISPLAY.square_height / 2;
+            }
 
             if (!GAME_STATE.transparent) {
                 ctx.fillRect(rx, ry, rw, rh);
