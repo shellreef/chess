@@ -6705,8 +6705,10 @@ function drop_or_revert()
 
     // Dragging offboard: delete in setup mode
     if (DROP.offboard && PREFS.setup_mode) {
+        var new_top = dojo.style(piece, "top") + dojo.style(piece, "height") / 2;
+        var new_left = dojo.style(piece, "left") + dojo.style(piece, "width") / 2;
         // Shrink off into the distance
-        dojo.anim(piece, {width:0, height:0}, PREFS.revert_time, undefined, function() {
+        dojo.anim(piece, {width:0, height:0, top:new_top, left:new_left}, PREFS.revert_time, undefined, function() {
                 // It was on board, move piece over itself to kill it
                 if (piece.square) {
                     do_virtual_move(piece, {x:piece.square.x, y:piece.square.y});
