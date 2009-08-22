@@ -269,7 +269,7 @@ var RULE_SETS = {
       
         // piece movement restrictions
         bounds1:"river,1,1,10,5,elephant", 
-        bounds2:"palace,4,1,6,3,shah,ferz",
+        bounds2:"palace,4,1,6,3,lord,ferz",
 
         // TODO: diagonal lines in palace, gap in river
         features:[
@@ -288,7 +288,7 @@ var RULE_SETS = {
       
         // piece movement restrictions
         bounds1:"river,1,1,10,5,elephant", 
-        bounds2:"palace,4,1,6,3,shah,ferz",
+        bounds2:"palace,4,1,6,3,lord,ferz",
 
         // Graphical board features to show piece movement restrictions
         features:[
@@ -594,7 +594,7 @@ var PIECE_TYPES = {
     },
     moo: {parlett: "#mao, #moa", url:"http://chessvariants.wikidot.com/pcp-am:moo"}, 
 
-    shah: {parlett: "1*", royal: true, url:"http://en.wikipedia.org/wiki/Shatranj#Rules"},  // like a king, but no castling // TODO: rename "lord", to be less ethnocentric
+    lord: {parlett: "1*", royal: true, url:"http://en.wikipedia.org/wiki/Shatranj#Rules", aka:["shah", "khun"]},  // like a king, but no castling 
     r4ferz: {parlett: "#r4, #ferz"},
     n2r4: {parlett: "#r4, 2(~1/2)"},
     alfilr4: {parlett: "#alfil, #r4"},
@@ -881,7 +881,7 @@ var SAVED_BOARDS = {
 // Note that K v. K will result in a "draw by insufficient material" anyway, and
 // bareing the king will often result in a win eventually.
 // aka Iranian Chess, http://www.garagegames.com/community/blogs/view/17595
-"Iranian Chess (Shatranj)":     "rnyx(shah)xfynr/x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)/8/8/8/8/X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)/RNYX(shah)XFYNR w - - rs=shatranj",
+"Iranian Chess (Shatranj)":     "rnyx(lord)xfynr/x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)/8/8/8/8/X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)/RNYX(lord)XFYNR w - - rs=shatranj",
 
 // TODO: Tamerlane Chess, Timur's game, http://en.wikipedia.org/wiki/Tamerlane_Chess and http://www.pathguy.com/chess/Tamerlan.htm http://filer.case.edu/org/cwrums/games/tamerlane.html
 // TODO: Korean Chess (Changgi)
@@ -890,13 +890,12 @@ var SAVED_BOARDS = {
 // TODO: Minishogi, 5x5 board, http://en.wikipedia.org/wiki/Minishogi
 
 // Chinese Chess (Xiangqi),
-"Chinese Chess (Xiangqi, grid) (w/o cannons)": "rx(mao)ex(ferz)x(shah)x(ferz)ex(mao)r///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)///RX(mao)EX(ferz)X(shah)X(ferz)EX(mao)R w - - rs=xiangqi",
+"Chinese Chess (Xiangqi, grid) (w/o cannons)": "rx(mao)ex(ferz)x(lord)x(ferz)ex(mao)r///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)///RX(mao)EX(ferz)X(lord)X(ferz)EX(mao)R w - - rs=xiangqi",
 
-"Chinese Chess (Xiangqi, Westernized) (w/o cannons)": "rx(mao)ex(ferz)x(shah)x(ferz)ex(mao)r///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)///RX(mao)EX(ferz)X(shah)X(ferz)EX(mao)R w - - rs=xiangqiw",
+"Chinese Chess (Xiangqi, Westernized) (w/o cannons)": "rx(mao)ex(ferz)x(lord)x(ferz)ex(mao)r///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)///RX(mao)EX(ferz)X(lord)X(ferz)EX(mao)R w - - rs=xiangqiw",
 
-// King is khun, not actually shah, but it behaves the same (no castling)
 // Counting rules on http://en.wikipedia.org/wiki/Makruk are not implemented
-"Thai Chess (Makruk)": "rnx(silvergeneral)x(ferz)x(shah)x(silvergeneral)nr/8/x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)/8/8/X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)/8/RNX(silvergeneral)X(shah)X(ferz)X(silvergeneral)NR w - -",
+"Thai Chess (Makruk)": "rnx(silvergeneral)x(ferz)x(lord)x(silvergeneral)nr/8/x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)/8/8/X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)/8/RNX(silvergeneral)X(lord)X(ferz)X(silvergeneral)NR w - -",
 "FIDE Chess": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -",
 // TODO: pawns promote to rook,knight,queen, no double-move
 "Los Alamos Chess": "rnqknr/x(losalamospawn)x(losalamospawn)x(losalamospawn)x(losalamospawn)x(losalamospawn)x(losalamospawn)/6/6/X(losalamospawn)X(losalamospawn)X(losalamospawn)X(losalamospawn)X(losalamospawn)X(losalamospawn)/RNQKNR w - - ranks=6 files=6",

@@ -416,6 +416,7 @@ lionmod3
 lizard
 lobster
 longleaper
+lord
 losalamospawn
 mage
 makrukpawn
@@ -585,7 +586,6 @@ scout
 seepingunicorn
 sergeant
 sespearman
-shah
 shamanelephantferz
 shatranjpawn
 ship
