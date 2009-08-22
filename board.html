@@ -273,9 +273,9 @@ var RULE_SETS = {
         features:[
             // Karakus' Xiangqi westernization using lines and outlines to indicate features on a checkered board
             // http://www.chessvariants.com/xiangqi.dir/xiangqiwest.html
-            // Draw these _after_ drawing the board, so they are on top of the original lines
-            {after:true, color:"yellow", file:4, rank:3, width:3, height:3},    // palace
-            {after:true, color:"blue", file:1, rank:5, width:9, height:5},      // river
+            // Draw these over the board (after the original lines are drawn)
+            {over:true, color:"yellow", file:4, rank:3, width:3, height:3},    // palace
+            {over:true, color:"blue", file:1, rank:5, width:9, height:5},      // river
 
             // Crockford's Xiangqi westernization using square color to indicate features on an uncheckered board
             // http://www.crockford.com/chess/xiangqi.html
@@ -301,7 +301,7 @@ var RULE_SETS = {
 
         // TODO: diagonal lines in palace, gap in river
         features:[
-            {fill: true, color:"blue", file:1, rank:6, width:9, height:1},      // river
+            {over:true, fill: true, color:"blue", file:1, rank:6, width:9, height:1},      // river
         ],
 
         ruled:true,
@@ -4283,8 +4283,8 @@ function create_board()
 }
 
 // Board "features": cosmetic embellishments that indicate something
-// draw_after determines whether to draw features to be drawn after the board, or before
-function draw_features(draw_after)
+// draw_over determines whether to draw features to be drawn after the board, or before
+function draw_features(draw_over)
 {
     var ctx = DISPLAY.context;
 
@@ -4296,7 +4296,7 @@ function draw_features(draw_after)
         var feature = GAME_STATE.features[i];
         var rx, ry, rw, rh, color;
 
-        if (!!feature.after !== !!draw_after) {
+        if (!!feature.over !== !!draw_over) {
             continue;
         }
 
