@@ -717,7 +717,7 @@ var PIECE_TYPES = {
     //crownedrook: {parlett: "#rook, #ferz"},       // TODO: image
     crownedcamel: {parlett: "#camel, #ferz"},
     camelking: {parlett: "#camel, #king", image:["simplecamelking", "cbjcamelking", "tinyscamelking"]},
-    general: {parlett: "#wazir", royal: true, url:"pc:general", image:["general2", "general"]}, 
+    general: {parlett: "#wazir", royal: true, url:"pc:general", image:["general2", "general"], aka:["chineseking"]}, 
     kangaroo: {parlett: "#knight, #alfil", url:"pc:cangaroo"},  // Newton kangaroo, different than pc:kangaroo
     // http://www.mayhematics.com/v/v_gm.htm has a different definition of wizard
     wizard: {parlett: "#camel, #ferz", image:"moon",  url:"pc:wizard"},
@@ -893,9 +893,9 @@ var SAVED_BOARDS = {
 // TODO: Minishogi, 5x5 board, http://en.wikipedia.org/wiki/Minishogi
 
 // Chinese Chess (Xiangqi),
-"Chinese Chess (Xiangqi) (w/o cannons)": "rx(mao)ex(ferz)x(lord)x(ferz)ex(mao)r///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)///RX(mao)EX(ferz)X(lord)X(ferz)EX(mao)R w - - rs=xiangqi",
+"Chinese Chess (Xiangqi) (w/o cannons)": "rx(mao)ex(ferz)x(general)x(ferz)ex(mao)r///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)///RX(mao)EX(ferz)X(general)X(ferz)EX(mao)R w - - rs=xiangqi",
 
-"Chinese Chess (Xiangqi, Westernized) (w/o cannons)": "rx(mao)ex(ferz)x(lord)x(ferz)ex(mao)r///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)///RX(mao)EX(ferz)X(lord)X(ferz)EX(mao)R w - - rs=xiangqiw",
+"Chinese Chess (Xiangqi, Westernized) (w/o cannons)": "rx(mao)ex(ferz)x(general)x(ferz)ex(mao)r///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)///RX(mao)EX(ferz)X(general)X(ferz)EX(mao)R w - - rs=xiangqiw",
 
 // Counting rules on http://en.wikipedia.org/wiki/Makruk are not implemented
 "Thai Chess (Makruk)": "rnx(silvergeneral)x(ferz)x(lord)x(silvergeneral)nr/8/x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)/8/8/X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)/8/RNX(silvergeneral)X(lord)X(ferz)X(silvergeneral)NR w - -",
