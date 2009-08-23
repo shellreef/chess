@@ -6509,6 +6509,51 @@ function decode_chess960_s(number)
     return array.join("");
 }
 
+// Encode a Chess960 opening setup to an S# code.
+function encode_chess960_s(string)
+{
+    var bishop, light_bishop, dark_bishop, queen, krn_code, i, number;
+
+    string = string.replace("-", "");
+
+    // Find light and dark bishops first
+    bishop = string.indexOf("B");
+    string = string.replace("B", "x");  // to avoid finding again, but not change offset
+    if (bishop % 2) {
+        light_bishop = (bishop - 1) / 2;
+        dark_bishop = string.indexOf("B") / 2;
+    } else {
+        dark_bishop = bishop / 2;
+        light_bishop = (string.indexOf("B") - 1) / 2;
+    }
+
+    // Queen is encoded as Nth available space, so exclude the two bishops before finding it
+    string = string.replace("x", "");
+    string = string.replace("B", "");
+    queen = string.indexOf("Q");
+
+    // Reverse lookup KNR code
+    string = string.replace("Q", "");
+    knr_code = {
+        "NNRKR":0,    // S#000-095
+        "NRNKR":1,    // S#096-191
+        "NRKNR":2,    // S#192-287
+
+        "NRKRN":3,    // S#288-383
+        "RNNKR":4,    // S#384-479
+        "RNKNR":5,    // S#480-575
+        "RNKRN":6,    // S#576-671
+        
+        "RKNNR":7,    // S#672-767
+        "RKNRN":8,    // S#768-863
+        "RKRNN":9     // S#864-959
+            }[string];
+
+    number = light_bishop + 4 * dark_bishop + 16 * queen + 96 * knr_code;
+
+    return number;
+}
+
 //// DRAG-AND-DROP FUNCTIONS
 
 // Initiate drag-and-drop on mouse down, if over a draggable element
