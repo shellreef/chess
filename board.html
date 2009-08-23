@@ -322,7 +322,7 @@ var GAME_STATE_DEFAULT = {
     active_color: '',
     
     // Castling privileges
-    can_castle: {white: {h: true, a: true}, black: {h: true, a: true}},
+    can_castle: {white: {}, black: {}},
 
     ep_target: null,
 
@@ -5427,11 +5427,7 @@ function load_fen(fen, replay)
 
     assert(/^[wb]$/.test(parts[1]), "load_fen(" + fen + "): bad active color: " + parts[1]);
 
-    castling = parts[2];
-    GAME_STATE.can_castle.white.h = /K/.test(castling);
-    GAME_STATE.can_castle.white.a  = /Q/.test(castling);
-    GAME_STATE.can_castle.black.h = /k/.test(castling);
-    GAME_STATE.can_castle.black.a  = /q/.test(castling);
+    castling = parts[2]; // parsed below, after know dimensions
 
     if (parts[3] === "-") {
         GAME_STATE.ep_target = null;
@@ -5460,7 +5456,35 @@ function load_fen(fen, replay)
         // Game "rule set"
         dojo.mixin(GAME_STATE, RULE_SETS[GAME_STATE.rs]);
     }
-    
+
+    // Now that know rank & file count, parse castling eligibilities
+    for (var i = 0; i < castling.length; i += 1) {
+        var ch = castling.charAt(i);
+        var castle_color, file;
+
+        if (ch === "-") { 
+            continue;
+        } else if (/[A-Z]/.test(ch)) {
+            castle_color = "white";
+        } else if (/[a-z]/.test(ch)) {
+            castle_color = "black";
+        } else {
+            assert(false, "load_fen(" + fen + "): invalid castling code: " + castling);
+        }
+        file = ch.toLowerCase();
+
+        // X-FEN / FEN compatibility, KQkq for corner rooks
+        if (file === "k") {
+            // "kingside" (a-side)
+            file = "a";
+        } else if (file === "q") {
+            // "queenside", furthest file from a-side (h-side on orthodox board)
+            file = String.fromCharCode("a".charCodeAt(0) - 1 + GAME_STATE.files);
+        }
+
+        GAME_STATE.can_castle[castle_color][file] = true;
+    }
+   
     load_starting_position(parts[0], replay);
 
     if (!replay) { 
