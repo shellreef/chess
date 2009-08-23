@@ -6434,6 +6434,78 @@ function sq(code, extra)
     return VBOARD[x][y];
 }
 
+//// CHESS960/FRC FUNCTIONS
+
+
+// Decode the Chess960 S# (Scharnagl) code to a piece array
+// Algorithm from _Play Stronger Chess by Examining Chess960_ by Gene Milener, pg. 82
+function decode_chess960_s(number)
+{
+    var array = new Array(8);
+    var light_bishop, dark_bishop, queen, krn_code, krn_array, available, i, j;
+
+    assert(number >= 0 && number <= 959, "decode_chess960_s(" + number + "): out of range 0-959");
+
+    // Bishops are placed on light and dark squares directly
+    
+    light_bishop = number % 4;
+    array[light_bishop * 2]  = "B";
+    // To do integer divison, reduce by remainder before dividing
+    number -= light_bishop;
+    number /= 4;
+
+    dark_bishop = number % 4;
+    array[dark_bishop * 2 + 1] = "B"; 
+    number -= dark_bishop;
+    number /= 4;
+
+    // Queen is placed on Nth available square
+    queen = number % 6;
+    available = 0;
+    for (i = 0; i < array.length; i += 1) {
+        if (array[i]) {
+            continue;
+        }
+
+        available += 1;
+        if (available === queen) {
+            array[available] = "Q";
+            break;
+        }
+    }
+    number -= queen;
+    number /= 6;
+
+    // Encodes king, knight, and rook
+    knr_code = number;
+    knr_array = [
+        "NNRKR",
+        "NRNKR",
+        "NRKNR",
+        "NRKRN",
+        "RNNKR",
+        "RNKNR",
+        "RNKRN",
+        "RKNNR",
+        "RKNRN",
+        "RKRNN"][knr_code];
+
+    j = 0;
+    for (i = 0; i < array.length; i += 1) {
+        if (array[i]) {
+            continue;
+        }
+
+        array[i] = knr_array.charAt(j);
+        j += 1;
+    }
+
+    // Divide into two groups for readability
+    array.splice(4, 0, "-");
+
+    return array.join("");
+}
+
 //// DRAG-AND-DROP FUNCTIONS
 
 // Initiate drag-and-drop on mouse down, if over a draggable element
