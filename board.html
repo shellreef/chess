@@ -6449,13 +6449,13 @@ function decode_chess960_s(number)
     // Bishops are placed on light and dark squares directly
     
     light_bishop = number % 4;
-    array[light_bishop * 2]  = "B";
+    array[light_bishop * 2 + 1]  = "B";
     // To do integer divison, reduce by remainder before dividing
     number -= light_bishop;
     number /= 4;
 
     dark_bishop = number % 4;
-    array[dark_bishop * 2 + 1] = "B"; 
+    array[dark_bishop * 2] = "B"; 
     number -= dark_bishop;
     number /= 4;
 
@@ -6467,11 +6467,11 @@ function decode_chess960_s(number)
             continue;
         }
 
-        available += 1;
         if (available === queen) {
-            array[available] = "Q";
+            array[i] = "Q";
             break;
         }
+        available += 1;
     }
     number -= queen;
     number /= 6;
@@ -6479,16 +6479,19 @@ function decode_chess960_s(number)
     // Encodes king, knight, and rook
     knr_code = number;
     knr_array = [
-        "NNRKR",
-        "NRNKR",
-        "NRKNR",
-        "NRKRN",
-        "RNNKR",
-        "RNKNR",
-        "RNKRN",
-        "RKNNR",
-        "RKNRN",
-        "RKRNN"][knr_code];
+        "NNRKR",    // S#000-095
+        "NRNKR",    // S#096-191
+        "NRKNR",    // S#192-287
+
+        "NRKRN",    // S#288-383
+        "RNNKR",    // S#384-479
+        "RNKNR",    // S#480-575
+        "RNKRN",    // S#576-671
+        
+        "RKNNR",    // S#672-767
+        "RKNRN",    // S#768-863
+        "RKRNN"     // S#864-959
+            ][knr_code];
 
     j = 0;
     for (i = 0; i < array.length; i += 1) {
