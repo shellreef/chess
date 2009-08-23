@@ -322,7 +322,7 @@ var GAME_STATE_DEFAULT = {
     active_color: '',
     
     // Castling privileges
-    can_castle: {white: {cshort: true, clong: true}, black: {cshort: true, clong: true}},
+    can_castle: {white: {h: true, a: true}, black: {h: true, a: true}},
 
     ep_target: null,
 
@@ -3125,7 +3125,7 @@ function filtered_moves(piece, color, is_hypothetical)
         // Castling moves
         if (flags.if_can_castle_short) {
             // Moved and lost castling privileges
-            if (!GAME_STATE.can_castle[color].cshort) {
+            if (!GAME_STATE.can_castle[color].h) {
                 continue;
             }
 
@@ -3154,7 +3154,7 @@ function filtered_moves(piece, color, is_hypothetical)
         }
 
         if (flags.if_can_castle_long) {
-            if (!GAME_STATE.can_castle[color].clong) {
+            if (!GAME_STATE.can_castle[color].a) {
                 continue;
             }
             if (GAME_STATE.active_in_check) {
@@ -4792,10 +4792,10 @@ function piece_was_captured(piece, square)
         // TODO: really would like to not have to hardcode this
         if (square.y === first_rank) {
             if (square.x === 1) {
-                GAME_STATE.can_castle[opponent].clong = false;
+                GAME_STATE.can_castle[opponent].a = false;
                 //console.log("no more long");
             } else if (square.x === GAME_STATE.ranks) {
-                GAME_STATE.can_castle[opponent].cshort = false;
+                GAME_STATE.can_castle[opponent].h = false;
                 //console.log("no more short");
             }
         }
@@ -5028,20 +5028,20 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
 
         // Moving king makes it ineligible for castling
         if (move.clear_castle_short) {
-            GAME_STATE.can_castle[GAME_STATE.active_color].cshort = false;
+            GAME_STATE.can_castle[GAME_STATE.active_color].h = false;
         }
 
         if (move.clear_castle_long) {
-            GAME_STATE.can_castle[GAME_STATE.active_color].clong = false;
+            GAME_STATE.can_castle[GAME_STATE.active_color].a = false;
         }
 
         // If moved either rook, can't castle on that side.
         if (PIECE_TYPES[piece.type].castle) {
             // TODO: More generic, so will work with chess960 or 480
             if (from_square.x === GAME_STATE.ranks) {
-                GAME_STATE.can_castle[GAME_STATE.active_color].cshort = false;
+                GAME_STATE.can_castle[GAME_STATE.active_color].h = false;
             } else if (from_square.x === 1) {
-                GAME_STATE.can_castle[GAME_STATE.active_color].clong = false;
+                GAME_STATE.can_castle[GAME_STATE.active_color].a = false;
             }
         }
 
@@ -5351,10 +5351,10 @@ function save_fen()
     // Castling availability
     fens.push(" ");
     castles = false;
-    if (GAME_STATE.can_castle.white.cshort) { fens.push("K"); castles = true; }
-    if (GAME_STATE.can_castle.white.clong)  { fens.push("Q"); castles = true; }
-    if (GAME_STATE.can_castle.black.cshort) { fens.push("k"); castles = true; }
-    if (GAME_STATE.can_castle.black.clong)  { fens.push("q"); castles = true; }
+    if (GAME_STATE.can_castle.white.h) { fens.push("K"); castles = true; }
+    if (GAME_STATE.can_castle.white.a)  { fens.push("Q"); castles = true; }
+    if (GAME_STATE.can_castle.black.h) { fens.push("k"); castles = true; }
+    if (GAME_STATE.can_castle.black.a)  { fens.push("q"); castles = true; }
     if (!castles) { fens.push("-"); }
 
     // En passant target square
@@ -5428,10 +5428,10 @@ function load_fen(fen, replay)
     assert(/^[wb]$/.test(parts[1]), "load_fen(" + fen + "): bad active color: " + parts[1]);
 
     castling = parts[2];
-    GAME_STATE.can_castle.white.cshort = /K/.test(castling);
-    GAME_STATE.can_castle.white.clong  = /Q/.test(castling);
-    GAME_STATE.can_castle.black.cshort = /k/.test(castling);
-    GAME_STATE.can_castle.black.clong  = /q/.test(castling);
+    GAME_STATE.can_castle.white.h = /K/.test(castling);
+    GAME_STATE.can_castle.white.a  = /Q/.test(castling);
+    GAME_STATE.can_castle.black.h = /k/.test(castling);
+    GAME_STATE.can_castle.black.a  = /q/.test(castling);
 
     if (parts[3] === "-") {
         GAME_STATE.ep_target = null;
