@@ -901,6 +901,7 @@ var SAVED_BOARDS = {
 // Counting rules on http://en.wikipedia.org/wiki/Makruk are not implemented
 "Thai Chess (Makruk)": "rnx(silvergeneral)x(ferz)x(lord)x(silvergeneral)nr/8/x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)/8/8/X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)/8/RNX(silvergeneral)X(lord)X(ferz)X(silvergeneral)NR w - -",
 "FIDE Chess": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -",
+"Chess960 (w/o castling)": setup_chess960,
 // TODO: pawns promote to rook,knight,queen, no double-move
 "Los Alamos Chess": "rnqknr/x(losalamospawn)x(losalamospawn)x(losalamospawn)x(losalamospawn)x(losalamospawn)x(losalamospawn)/6/6/X(losalamospawn)X(losalamospawn)X(losalamospawn)X(losalamospawn)X(losalamospawn)X(losalamospawn)/RNQKNR w - - ranks=6 files=6",
 "Capablanca Chess (w/o castling)": "rnabqkbcnr/pppppppppp/8/8/8/8/PPPPPPPPPP/RNABQKBCNR w - - files=10 stalemate=win",
@@ -4761,6 +4762,8 @@ function load_from_query_string()
 // Load a board from the drop down menu of SAVED_BOARDS.
 function change_loaded_board(menu)
 {
+    var fen;
+
     if (!menu.value) {
         return;
     }
@@ -4771,7 +4774,9 @@ function change_loaded_board(menu)
     dojo.cookie("board_group", group);
     dojo.cookie("board_name", name);
 
-    load_fen(menu.value);
+    fen = SAVED_BOARDS[group][name];
+
+    load_fen(fen);
 }
 
 // Acknowledge that a piece was captured. Called by move_piece_to_square(), which
@@ -5405,6 +5410,7 @@ function parse_epd_opcodes(parts)
 
 
 // Load board state in Forsyth-Edwards Notation (FEN) or Extended Position Description (EPD).
+// The fen can either be a string of EPD/FEN, or a function that returns the string.
 // If replay is true, this is reloading an existing position, not loading a new game.
 // TODO: support any base 10 number (10 for skip ten spaces), and asterisks for filling remainder of rank with empty
 // spaces, and {} for labels, see http://play.chessvariants.org/pbm/devguide.html
@@ -5412,6 +5418,10 @@ function parse_epd_opcodes(parts)
 function load_fen(fen, replay)
 {
     var parts, castling, color;
+
+    if (dojo.isFunction(fen)) {
+        fen = fen();
+    }
 
     parts = fen.split(" ");
 
@@ -6504,7 +6514,8 @@ function decode_chess960_s(number)
     }
 
     // Divide into two groups for readability
-    array.splice(4, 0, "-");
+    // Removed, since this is more annoying when manipulating. Should use it for display, though.
+    //array.splice(4, 0, "-");
 
     return array.join("");
 }
@@ -6552,6 +6563,24 @@ function encode_chess960_s(string)
     number = light_bishop + 4 * dark_bishop + 16 * queen + 96 * knr_code;
 
     return number;
+}
+
+// TODO: Add F# (Fritz9) and R# (Milener's reciprocal) Chess960 starting position codes, enc/dec
+
+// Return the FEN for a Chess960 game, either of the given S# code, or random if undefined
+function setup_chess960(code)
+{
+    var setup_string, fen;
+
+    if (code === undefined) {
+        code = Math.floor(Math.random() * 960);
+    }
+
+    setup_string = decode_chess960_s(code);
+
+    fen = setup_string.toLowerCase() + "/pppppppp/8/8/8/8/PPPPPPPP/" + setup_string + " w KQkq -";
+
+    return fen;
 }
 
 //// DRAG-AND-DROP FUNCTIONS
@@ -7121,7 +7150,7 @@ not to implement chess AI. But having automatic moves is useful for testing. -->
  <label for="enable_setup_mode"><input accesskey="e" name="enable_setup_mode" id="enable_setup_mode" type="checkbox" onclick="set_setup_mode(this.checked)">Setup</label>
 
  <p><select id="saved_board_menu" onchange="change_loaded_board(this)"></select>
-     <button onclick="load_fen(dojo.byId('saved_board_menu').value)" accesskey="n">New Game</button>
+     <button onclick="change_loaded_board(dojo.byId('saved_board_menu'))" accesskey="n">New Game</button>
  
  </div>
  </div>
