@@ -6591,21 +6591,42 @@ function encode_chess960_s(string)
 
 // TODO: Add F# (Fritz9) and R# (Milener's reciprocal) Chess960 starting position codes, enc/dec
 
+// Generate the castling string in Shredder-FEN, from a Chess960 setup 
+function generate_castling_eligibility(setup_string)
+{
+    var rook1, rook2, file1, file2, castling;
+
+    rook1 = setup_string.indexOf("R");
+    setup_string = setup_string.replace("R", "-");
+    rook2 = setup_string.indexOf("R");
+
+    file1 = String.fromCharCode("a".charCodeAt(0) + rook1);
+    file2 = String.fromCharCode("a".charCodeAt(0) + rook2);
+
+    // AHha, for example
+    castling = file1 + file2;
+    castling = castling.toUpperCase() + castling;
+
+    return castling;
+}
+
 // Return the FEN for a Chess960 game, either of the given S# code, or random if undefined
 function setup_chess960(code)
 {
-    var setup_string, fen;
+    var setup_string, fen, castling;
 
     if (code === undefined) {
         code = Math.floor(Math.random() * 960);
     }
 
     setup_string = decode_chess960_s(code);
+    castling = generate_castling_eligibility(setup_string);
 
-    fen = setup_string.toLowerCase() + "/pppppppp/8/8/8/8/PPPPPPPP/" + setup_string + " w KQkq -";
+    fen = setup_string.toLowerCase() + "/pppppppp/8/8/8/8/PPPPPPPP/" + setup_string + " w " + castling + " -";
 
     return fen;
 }
+
 
 //// DRAG-AND-DROP FUNCTIONS
 
