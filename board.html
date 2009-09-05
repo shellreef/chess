@@ -1431,10 +1431,14 @@ function load_pgn(pgn)
 
             node.innerHTML = value;
 
-            $$(".show_" + tag).invoke("show");
+            dojo.query(".show_" + tag).forEach(function(node) {
+                    node.style.display = "";
+                });
         } else {
             node.style.display = "none";
-            $$(".show_" + tag).invoke("hide");
+            dojo.query(".show_" + tag).forEach(function(node) {
+                    node.style.display = "none";
+                });
         }
     }
 
@@ -1670,7 +1674,6 @@ function load_ply(ply)
     // Make "1." be ply 1, and "1..." or "1. ..." be ply 2.
     // Maybe make it a user function, go()
     
-    //$$("a.active_move").invoke("removeClassName", "active_move");
     dojo.query("a.active_move").removeClass("active_move");
 
     load_fen(GAME_STATE.position_after[ply], true);
@@ -1958,24 +1961,19 @@ function in_check(victim_color, all_moves)
 {
     var royals;
     var attacked = false;
-    var virtual = true;
 
     // Pieces that can't be captured and need to move if attacked
-    if (virtual) { 
-        royals = [];
-        for (var x = 1; x <= GAME_STATE.files; x += 1) {
-            for (var y = 1; y <= GAME_STATE.ranks; y += 1) {
-                var piece;
+    royals = [];
+    for (var x = 1; x <= GAME_STATE.files; x += 1) {
+        for (var y = 1; y <= GAME_STATE.ranks; y += 1) {
+            var piece;
 
-                piece = VBOARD[x][y].piece;
+            piece = VBOARD[x][y].piece;
 
-                if (piece && PIECE_TYPES[piece.type].royal) {
-                    royals.push(piece);
-                }
+            if (piece && PIECE_TYPES[piece.type].royal) {
+                royals.push(piece);
             }
         }
-    } else {
-        royals = $$("img.royal." + victim_color);
     }
 
     // Attack the royal pieces?
@@ -6224,7 +6222,7 @@ function create_piece(color, type)
 
     filename = image_path_for(type, color);
 
-    // CSS classes, can use with $$ and also shown in toString (useful 
+    // CSS classes, can use with dojo.query and also shown in toString (useful 
     // for debugging), however, note that code should not use this, because
     // all the classes are in a space-separated string, .className, according to
     // the DOM, and Prototype's hasClassName uses a slow RegExp to parse it,
