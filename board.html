@@ -5037,6 +5037,21 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
     square = one.square;
     from_square = piece.square;
 
+    // If castling, move the rook in place. Ugly hardcoded.
+    // Note: if pass this in abs_move/choices, need to save in raw move notation, too.
+    if (PIECE_TYPES[piece.type].castles_with) {
+        // TODO: test with chess960 positions
+        var first_rank = (GAME_STATE.active_color === "white" ? 1 : GAME_STATE.ranks);
+
+        // We rely on can_castle to indicate whether the king/rook have moved.
+        if (GAME_STATE.can_castle[GAME_STATE.active_color].h && square.x === GAME_STATE.castle_moves.short.king_to) {
+            move_piece_to_square(pc(GAME_STATE.ranks, first_rank), VBOARD[GAME_STATE.castle_moves.short.castle_to][first_rank], true, true);
+        } else if (GAME_STATE.can_castle[GAME_STATE.active_color].a && square.x === GAME_STATE.castle_moves.long.king_to) {
+            move_piece_to_square(pc(1, first_rank), VBOARD[GAME_STATE.castle_moves.long.castle_to][first_rank], true, true);
+        }
+    }
+
+
     if (!is_hypothetical) {
         // Pieces captured /before/ this move
         GAME_STATE.last_captured = export_captured();
@@ -5073,20 +5088,6 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
 
         push_highlight(from_square, DISPLAY["recent_move_" + from_square.color]);
         push_highlight(square, DISPLAY["recent_move_" + square.color]);
-    }
-
-    // If castling, move the rook in place. Ugly hardcoded.
-    // Note: if pass this in abs_move/choices, need to save in raw move notation, too.
-    if (PIECE_TYPES[piece.type].castles_with) {
-        // TODO: test with chess960 positions
-        var first_rank = (GAME_STATE.active_color === "white" ? 1 : GAME_STATE.ranks);
-        if (from_square.x === 5) {   // original king square (TODO: chess960)
-            if (square.x === GAME_STATE.castle_moves.short.king_to) {
-                move_piece_to_square(pc(GAME_STATE.ranks, first_rank), VBOARD[GAME_STATE.castle_moves.short.castle_to][first_rank], true, true);
-            } else if (square.x === GAME_STATE.castle_moves.long.king_to) {
-                move_piece_to_square(pc(1, first_rank), VBOARD[GAME_STATE.castle_moves.long.castle_to][first_rank], true, true);
-            }
-        }
     }
 
     did = do_virtual_move(piece, move);
