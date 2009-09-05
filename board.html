@@ -420,8 +420,8 @@ var PIECE_TYPES = {
     //king: {parlett: "1*", /*[@3,0;move_a_castle_to=@4,0], [@7,0;move_h_castle_to=@6,0]",*/
     // TODO: actually pay attention to move_{a,h}_castle_to commands, instead of having the logic in piece moved,
     king: {parlett: "1*, " +     // or ~0/1, ~1/1
-             "[-2,0;if_can_castle_long;if_unblocked=-1,0;if_unblocked2=-2,0;if_unblocked3=-3,0;move_a_castle_to=3,0], " +
-             "[2,0;if_can_castle_short;if_unblocked=1,0;if_unblocked2=2,0;move_h_castle_to=-2,0]",
+             "[-2,0;if_can_castle=a;if_unblocked=-1,0;if_unblocked2=-2,0;if_unblocked3=-3,0;move_a_castle_to=3,0], " +
+             "[2,0;if_can_castle=h;if_unblocked=1,0;if_unblocked2=2,0;move_h_castle_to=-2,0]",
           royal: true, letter: "K", figurines: ["\u2654", "\u265a"],
           castles_with: "rook", url:"pc:king"},
     queen: {parlett: "n*", letter: "Q", figurines: ["\u2655", "\u265b"], iccf_number: 1, url:"pc:queen"},
@@ -3033,7 +3033,7 @@ function filtered_moves(piece, color, is_hypothetical)
             // Can't move to self-occupied square
             if (capture_piece.color === color) {
                 // Castling moves can never guard, since the destination must be unoccupied
-                if (!flags.if_can_castle_short && !flags.if_can_castle_long) {
+                if (!flags.if_can_castle) {
                     // to indicate we are guarding this piece
                     blocked_moves.push(abs_move);
                 }
@@ -3137,9 +3137,9 @@ function filtered_moves(piece, color, is_hypothetical)
         }
 
         // Castling moves
-        if (flags.if_can_castle_short) {
+        if (flags.if_can_castle) {
             // Moved and lost castling privileges
-            if (!GAME_STATE.can_castle[color].h) {
+            if (!GAME_STATE.can_castle[color][flags.if_can_castle]) {
                 continue;
             }
 
@@ -3148,47 +3148,37 @@ function filtered_moves(piece, color, is_hypothetical)
                 continue;
             }
 
-            // Can't castle through check. Ugly hardcoded, check if
-            // if a valid regular move (which must have been listed before
-            // the castling move in Parlett).
             var found = false;
-            for (var j = 0; j < moves.length; j += 1) {
-                if (moves[j].x === 6 && moves[j].y === (color === "white" ? 1 : 8)) {
-                    found = true;
-                    break;
+            if (flags.if_can_castle === "h") {
+                abs_move.notation_override = "O-O";
+
+                // Can't castle through check. Ugly hardcoded, check if
+                // if a valid regular move (which must have been listed before
+                // the castling move in Parlett).
+                for (var j = 0; j < moves.length; j += 1) {
+                    if (moves[j].x === 6 && moves[j].y === (color === "white" ? 1 : 8)) {
+                        found = true;
+                        break;
+                    }
                 }
+            } else if (flags.if_can_castle === "a") {
+                abs_move.notation_override = "O-O-O";
+
+                for (j = 0; j < moves.length; j += 1) {
+                    if (moves[j].x === 4) {
+                        found = true;
+                        break;
+                    }
+                }
+            } else {
+                assert(false, "TODO: support non-a/h castling");
             }
+ 
             if (!found) {
                 continue;
             }
 
             // TODO: check if unimpeded here? instead of if_unblockedX in Parlett
-
-            abs_move.notation_override = "O-O";
-        }
-
-        if (flags.if_can_castle_long) {
-            if (!GAME_STATE.can_castle[color].a) {
-                continue;
-            }
-            if (GAME_STATE.active_in_check) {
-                continue;
-            }
-
-            // Another ugly hardcoded "can't castle through check"
-            found = false;
-            for (j = 0; j < moves.length; j += 1) {
-                if (moves[j].x === 4) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                continue;
-            }
-
-
-            abs_move.notation_override = "O-O-O";
         }
 
         // Capture at relative location, instead of at destination square.
@@ -3387,9 +3377,12 @@ function relative_decode_direction(ch, ch2)
     return {vectors:vectors, consumed:consumed};
 }
 
+// Attempt to parse an integer in base 10, but if it fails, return the input.
 function parseInt10(x) 
 { 
-    return parseInt(x, 10); 
+    var number = parseInt(x, 10); 
+
+    return isNaN(number) ? x : number;
 }
 
 // Parse semicolon separated flags, possibly key/value pairs
