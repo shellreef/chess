@@ -3275,11 +3275,12 @@ function filtered_moves(piece, color, is_hypothetical)
     }
 
     if (PIECE_TYPES[piece.type].castles_with) {
-        // TODO: "King captures rook" to castle
+        // "King captures rook" to castle
         var come_from = castles_come_from();
 
-        unique.push({x:come_from.short_x, y:piece.square.y, is_castle_move:true});
-        //unique.push({x:come_from.long_y, y:piece.square.y, is_castle_move:true});
+        // TODO: XYZ: only push if eligible!!
+        unique.push({x:come_from.short_x, y:piece.square.y, is_castle_move:true, notation_override:"O-O(exp)"});
+        unique.push({x:come_from.long_x, y:piece.square.y, is_castle_move:true, notation_override:"O-O-O(exp)"});
     }
 
     return {legal:unique, blocked:blocked_moves};
@@ -5087,10 +5088,26 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
         var come_from = castles_come_from();
 
         // We rely on can_castle to indicate whether the king/rook have moved.
-        if (GAME_STATE.can_castle[GAME_STATE.active_color][come_from.short_file] && square.x === GAME_STATE.castle_moves.cshort.king_to) {
+        if (GAME_STATE.can_castle[GAME_STATE.active_color][come_from.short_file] && 
+                    (square.x === GAME_STATE.castle_moves.cshort.king_to    // king moves two spaces (Chess1)
+                     || square.x === come_from.short_x)                     // king captures rook (Chess960)
+                    ) {
+
+            // Move rook
             move_piece_to_square(pc(come_from.short_x, square.y), VBOARD[GAME_STATE.castle_moves.cshort.castle_to][square.y], true, true);
-        } else if (GAME_STATE.can_castle[GAME_STATE.active_color][come_from.long_file] && square.x === GAME_STATE.castle_moves.clong.king_to) {
+
+            // TODO: Move king
+            //move_piece_to_square(piece, VBOARD[GAME_STATE.castle_moves.cshort.king_to][square.y], true, true);
+        } else if (GAME_STATE.can_castle[GAME_STATE.active_color][come_from.long_file] && 
+                    (square.x === GAME_STATE.castle_moves.clong.king_to
+                     || square.x === come_from.long_x) 
+                    ) {
+
+            // Move rook
             move_piece_to_square(pc(come_from.long_x, square.y), VBOARD[GAME_STATE.castle_moves.clong.castle_to][square.y], true, true);
+
+            // TODO: Move king
+            //move_piece_to_square(piece, VBOARD[GAME_STATE.castle_moves.clong.king_to][square.y], true, true);
         }
 
         // TODO: allow moving king onto castle
