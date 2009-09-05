@@ -3138,8 +3138,12 @@ function filtered_moves(piece, color, is_hypothetical)
 
         // Castling moves
         if (flags.if_can_castle) {
+            // Where the "castle" (such as a rook, NOT the king) comes from
+            var castle_from_file = flags.if_can_castle;
+            var castle_from_x = castle_from_file.charCodeAt(0) - "a".charCodeAt(0) + 1;
+
             // Moved and lost castling privileges
-            if (!GAME_STATE.can_castle[color][flags.if_can_castle]) {
+            if (!GAME_STATE.can_castle[color][castle_from_file]) {
                 continue;
             }
 
@@ -3149,31 +3153,30 @@ function filtered_moves(piece, color, is_hypothetical)
             }
 
             var found = false;
-            if (flags.if_can_castle === "h") {
-                abs_move.notation_override = "O-O";
+            var kings_leap;
 
-                // Can't castle through check. Ugly hardcoded, check if
-                // if a valid regular move (which must have been listed before
-                // the castling move in Parlett).
-                for (var j = 0; j < moves.length; j += 1) {
-                    if (moves[j].x === 6 && moves[j].y === (color === "white" ? 1 : 8)) {
-                        found = true;
-                        break;
-                    }
-                }
-            } else if (flags.if_can_castle === "a") {
+            if (castle_from_x < start.x) {
+                // a-side castling
                 abs_move.notation_override = "O-O-O";
-
-                for (j = 0; j < moves.length; j += 1) {
-                    if (moves[j].x === 4 && moves[j].y === (color === "white" ? 1 : 8)) {
-                        found = true;
-                        break;
-                    }
-                }
+                kings_leap = start.x - 1;
+            } else if (castle_from_x > start.x) {
+                // h-side castling
+                abs_move.notation_override = "O-O";
+                kings_leap = start.x + 1;
             } else {
-                assert(false, "TODO: support non-a/h castling");
+                assert(false, "castling: castle_from_x === start.x (" + castle_from_x + " === " + start.x + ")");
             }
- 
+
+            // Cannot castle through check. Check if the square that the king
+            // moves through is a valid regular move (which must have been listed
+            // before the castling move in Parlett). TODO: Rethink this for Chess960 castling, since the kings_leap square won't be a valid move.
+            for (j = 0; j < moves.length; j += 1) {
+                if (moves[j].x === kings_leap && moves[j].y === start.y) {
+                    found = true;
+                    break;
+                }
+            }
+
             if (!found) {
                 continue;
             }
