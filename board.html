@@ -426,8 +426,10 @@ var PIECE_TYPES = {
     // Chess960 orthodox castling when rooks &amp; kings are not at known positions.
     //king: {parlett: "1*", /*[@3,0;move_a_castle_to=@4,0], [@7,0;move_h_castle_to=@6,0]",*/
     king: {parlett: "1*, " +     // or ~0/1, ~1/1
-             "[-2,0;if_can_castle=a;if_unblocked=-1,0;if_unblocked2=-2,0;if_unblocked3=-3,0], " +
-             "[2,0;if_can_castle=h;if_unblocked=1,0;if_unblocked2=2,0]",
+             //"[-2,0;if_can_castle=a;if_unblocked=-1,0;if_unblocked2=-2,0;if_unblocked3=-3,0], " +
+             //"[2,0;if_can_castle=h;if_unblocked=1,0;if_unblocked2=2,0]",
+             "[3,0;absolute_x;if_can_castle=a;if_unblocked=-1,0;if_unblocked2=-2,0;if_unblocked3=-3,0], " +
+             "[7,0;absolute_x;if_can_castle=h;if_unblocked=1,0;if_unblocked2=2,0]",
           royal: true, letter: "K", figurines: ["\u2654", "\u265a"],
           castles_with: "rook", url:"pc:king"},
     queen: {parlett: "n*", letter: "Q", figurines: ["\u2655", "\u265b"], iccf_number: 1, url:"pc:queen"},
@@ -3002,8 +3004,8 @@ function filtered_moves(piece, color, is_hypothetical)
             if (mark_ep_target_dy) { mark_ep_target_dy = -mark_ep_target_dy; }
         }
 
-        x = rel_x + start_x;
-        y = rel_y + start_y;
+        x = rel_x + (flags.absolute_x ? 0 : start_x);
+        y = rel_y + (flags.absolute_y ? 0 : start_y);
 
         abs_move = {x: x, y: y};
 
