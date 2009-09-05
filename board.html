@@ -329,8 +329,15 @@ var GAME_STATE_DEFAULT = {
     // Whose turn it is
     active_color: '',
     
-    // Castling privileges
+    // Castling privileges, keyed by file of castle (a or h for chess1)
     can_castle: {white: {}, black: {}},
+
+    // Where the kings and castles are moved to when castling. 
+    // Here, long means a-side (O-O-O) and short h-side (O-O).
+    castle_moves: {
+        long: {castle_to: 4, king_to: 3},
+        short: {castle_to: 6, king_to: 7}
+    },
 
     ep_target: null,
 
@@ -343,7 +350,7 @@ var GAME_STATE_DEFAULT = {
     ended: false,               // Game is done (drawn, won)
     captured: {white:[], black:[]}, // Captured pieces
 
-    boundaries: {},             // Board features that bound piece movement
+    boundaries: {},             // Board restrictions that bound piece movement
     transparent:false,          // Squares empty, otherwise are filled in
     uncheckered:false,          // Squares all white, otherwise alternating colors
     ruled:false,                // Squares have borders (useful for non-checkered boards)
@@ -5070,17 +5077,14 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
 
     // If castling, move the rook in place. Ugly hardcoded.
     // Note: if pass this in abs_move/choices, need to save in raw move notation, too.
-    if (piece.type === "king") {
+    if (PIECE_TYPES[piece.type].castles_with) {
         // TODO: test with chess960 positions
         var first_rank = (GAME_STATE.active_color === "white" ? 1 : GAME_STATE.ranks);
-        if (from_square.x === 5) {
-            if (square.x === 7) {
-                // TODO: actually calculate square moved over, then move rook there
-                // (instead of hardcoding). Short.
-                move_piece_to_square(pc(GAME_STATE.ranks, first_rank), VBOARD[6][first_rank], true, true);
-            } else if (square.x === 3) {
-                // Castle long.
-                move_piece_to_square(pc(1, first_rank), VBOARD[4][first_rank], true, true);
+        if (from_square.x === 5) {   // original king square (TODO: chess960)
+            if (square.x === GAME_STATE.castle_moves.short.king_to) {
+                move_piece_to_square(pc(GAME_STATE.ranks, first_rank), VBOARD[GAME_STATE.castle_moves.short.castle_to][first_rank], true, true);
+            } else if (square.x === GAME_STATE.castle_moves.long.king_to) {
+                move_piece_to_square(pc(1, first_rank), VBOARD[GAME_STATE.castle_moves.long.castle_to][first_rank], true, true);
             }
         }
     }
