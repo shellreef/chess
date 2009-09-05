@@ -428,8 +428,12 @@ var PIECE_TYPES = {
     king: {parlett: "1*, " +     // or ~0/1, ~1/1
              //"[-2,0;if_can_castle=a;if_unblocked=-1,0;if_unblocked2=-2,0;if_unblocked3=-3,0], " +
              //"[2,0;if_can_castle=h;if_unblocked=1,0;if_unblocked2=2,0]",
+            
              "[3,0;absolute_x;if_can_castle=a;if_unblocked=-1,0;if_unblocked2=-2,0;if_unblocked3=-3,0], " +
              "[7,0;absolute_x;if_can_castle=h;if_unblocked=1,0;if_unblocked2=2,0]",
+             
+             //"[3,0;absolute_x;if_can_castle=a], " +
+             //"[7,0;absolute_x;if_can_castle=h]",
           royal: true, letter: "K", figurines: ["\u2654", "\u265a"],
           castles_with: "rook", url:"pc:king"},
     queen: {parlett: "n*", letter: "Q", figurines: ["\u2655", "\u265b"], iccf_number: 1, url:"pc:queen"},
@@ -1073,9 +1077,15 @@ var SAVED_BOARDS = {
 "Test KB + KB same colors":     "k7/8/K7/8/8/8/3b/B b - - 0 30",
 "Test KBB + KBB same colors":     "k7/8/K7/8/8/8/3b1b/B3B b - - 0 30",
 "Test KBB + KBB opposite colors":     "k7/8/K7/8/8/8/3b1b/B2B b - - 0 30",
-"Test Castling out of Check":     "4r3/8/8/8/8/8/8/R3K2R w KQkq -",
-"Test Castling through Check":     "1k3r2/8/8/8/8/7Q/8/R3K2R w KQkq -",
+"Test Castling K/Q": "1k/8/8/8/8/8/8/R3K2R w KQ -",
+"Test Castling Unable": "1k/8/8/8/8/8/8/R3K2R w - -",
+"Test Castling through Check":     "1k3r2/8/8/8/8/7Q/8/R3K2R w KQ -",
 "Test Castling through Check (pawn)": "rnbqkbnr/pppp2pp/8/6N1/4p3/3B4/PPPP2pP/RNBQK2R w KQkq - 0 7",
+"Test Castling out of Check":     "4r3/8/8/8/8/8/8/R3K2R w KQ -",
+"Test Castling A/H king E": "1k/8/8/8/8/8/8/R3K2R w AH -",
+"Test Castling A/H king D": "1k/8/8/8/8/8/8/R2K3R w AH -",
+"Test Castling D/F king E": "1k/8/8/8/8/8/8/3RKR w DF -",
+"Test Castling B/D king C": "7k/8/8/8/8/8/8/1RKR w BD -",
 "Test Castling w/ Intervening Pieces":     "1k/8/8/8/8/8/8/R3KQ1R w KQ -",
 "Test Only Move ":     "rnbqkbnr/ppp2ppp/8/8/8/8/PPP2PPP/RNBQKBNR w KQkq -",
 "Test Disambiguation by File":     "k7/8/8/8/8/8/3N4/6N1 w - -",
@@ -2924,7 +2934,7 @@ function movement_diagram(moves)
 
 
 // Get the unfiltered, relative moves for a Parlett string.
-// Warning: do not modify the moves! Otherwise other moves will get confused.
+// Warning: do not modify the moves returned! Otherwise other moves will get confused.
 var PARLETT_CACHE = {};
 function unfiltered_moves(parlett)
 {
@@ -3262,6 +3272,14 @@ function filtered_moves(piece, color, is_hypothetical)
             // Merge flags
             dojo.mixin(unique_xy[key], move);
         }
+    }
+
+    if (PIECE_TYPES[piece.type].castles_with) {
+        // TODO: "King captures rook" to castle
+        var come_from = castles_come_from();
+
+        unique.push({x:come_from.short_x, y:piece.square.y, is_castle_move:true});
+        //unique.push({x:come_from.long_y, y:piece.square.y, is_castle_move:true});
     }
 
     return {legal:unique, blocked:blocked_moves};
@@ -4403,73 +4421,73 @@ function draw_feature(ctx, feature, rx, ry, rw, rh)
 // Restore the board to the clean state, unhighlighting all highlighted black/white squares.
 function unhighlight_all()
 {
-DISPLAY.highlights = {};
-DISPLAY.context.putImageData(DISPLAY.clean_board, 0, 0);
+    DISPLAY.highlights = {};
+    DISPLAY.context.putImageData(DISPLAY.clean_board, 0, 0);
 }
 
 // Get the upper-left x coordinate of a square given file
 function get_square_x(file)
 {
-return DISPLAY.board_left + DISPLAY.board_border/2 + (file - 1) * DISPLAY.square_width;
+    return DISPLAY.board_left + DISPLAY.board_border/2 + (file - 1) * DISPLAY.square_width;
 }
 
 // Get the upper-left y coordinate of a square given rank
 function get_square_y(rank)
 {
-return DISPLAY.board_top + DISPLAY.board_border/2 + (GAME_STATE.ranks - rank) * DISPLAY.square_height;
+    return DISPLAY.board_top + DISPLAY.board_border/2 + (GAME_STATE.ranks - rank) * DISPLAY.square_height;
 }
 
 // Highlight a square with a given color, or unhighlight it if color is false
 function highlight_square(square, color)
 {
-var ctx;
+    var ctx;
 
-file = square.x;
-rank = square.y;
+    file = square.x;
+    rank = square.y;
 
-ctx = DISPLAY.context;
+    ctx = DISPLAY.context;
 
-if (!color) {
-    color = DISPLAY[square.color];
-}
+    if (!color) {
+        color = DISPLAY[square.color];
+    }
 
-ctx.fillStyle = color;
-ctx.fillRect(get_square_x(file), get_square_y(rank), DISPLAY.square_width, DISPLAY.square_height);
+    ctx.fillStyle = color;
+    ctx.fillRect(get_square_x(file), get_square_y(rank), DISPLAY.square_width, DISPLAY.square_height);
 }
 
 // Push a layer of a highlight color to a square, coloring the square that color.
 function push_highlight(square, color)
 {
-if (!DISPLAY.highlights[square.filerank] || DISPLAY.highlights[square.filerank].length === 0) {
+    if (!DISPLAY.highlights[square.filerank] || DISPLAY.highlights[square.filerank].length === 0) {
 
-    var sx = get_square_x(square.x);
-    var sy = get_square_y(square.y);
-    var sw = DISPLAY.square_width;
-    var sh = DISPLAY.square_height;
+        var sx = get_square_x(square.x);
+        var sy = get_square_y(square.y);
+        var sw = DISPLAY.square_width;
+        var sh = DISPLAY.square_height;
 
-    DISPLAY.highlights[square.filerank] = [];
-    DISPLAY.native_square_images[square.filerank] = DISPLAY.context.getImageData(sx, sy, sw, sh);
-}
+        DISPLAY.highlights[square.filerank] = [];
+        DISPLAY.native_square_images[square.filerank] = DISPLAY.context.getImageData(sx, sy, sw, sh);
+    }
 
 
-DISPLAY.highlights[square.filerank].push(color);
+    DISPLAY.highlights[square.filerank].push(color);
 
-highlight_square(square, color);
+    highlight_square(square, color);
 
-return DISPLAY.highlights[square.filerank];
+    return DISPLAY.highlights[square.filerank];
 }
 
 // Peel off a highlighted color and reveal the color underneath.
 function pop_highlight(square)
 {
-var stack, color, old_color;
+    var stack, color, old_color;
 
-stack = DISPLAY.highlights[square.filerank];
+    stack = DISPLAY.highlights[square.filerank];
 
-if (!stack || stack.length === 0) {
-    // Nothing to pop
-    return;
-}
+    if (!stack || stack.length === 0) {
+        // Nothing to pop
+        return;
+    }
 
     // Remove current color
     old_color = stack.pop();
@@ -4993,7 +5011,7 @@ function forwards_vector(color)
 
 
 
-// Make a move or half-move on the virtual board given piece + square.
+// Make a ply or half-ply move (promotion) on the virtual board given piece + square.
 // If is_hypothetical is true, this is an internal move part of another move
 // (castling) so it shouldn't be logged.
 // If is_immediate, then finish_up_move() will realize the virtual board.
@@ -6334,7 +6352,7 @@ function highlight_moves(piece, enable, skip_legal)
     if (!skip_legal) {
         dojo.forEach(moves, function(move) {
             var x, y, flags, to_square;
-            
+
             x = move.x;
             y = move.y;
             flags = move;
