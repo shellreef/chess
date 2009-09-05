@@ -6375,10 +6375,12 @@ function highlight_moves(piece, enable, skip_legal)
         flags = move;
 
         to_square = VBOARD[x][y];
-        if (enable && GAME_STATE.shift) {
-            push_highlight(to_square, DISPLAY["blocked_move_" + to_square.color]);
-        } else {
-            pop_highlight(to_square);
+        if (GAME_STATE.shift) {
+            if (enable) {
+                push_highlight(to_square, DISPLAY["blocked_move_" + to_square.color]);
+            } else {
+                pop_highlight(to_square);
+            }
         }
     });
 
