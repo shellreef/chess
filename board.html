@@ -910,6 +910,7 @@ var SAVED_BOARDS = {
 "Thai Chess (Makruk)": "rnx(silvergeneral)x(ferz)x(lord)x(silvergeneral)nr/8/x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)/8/8/X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)/8/RNX(silvergeneral)X(lord)X(ferz)X(silvergeneral)NR w - -",
 "FIDE Chess": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -",
 "Chess960 (w/o castling)": setup_chess960,
+"Chess256": setup_chess256,
 // TODO: pawns promote to rook,knight,queen, no double-move
 "Los Alamos Chess": "rnqknr/x(losalamospawn)x(losalamospawn)x(losalamospawn)x(losalamospawn)x(losalamospawn)x(losalamospawn)/6/6/X(losalamospawn)X(losalamospawn)X(losalamospawn)X(losalamospawn)X(losalamospawn)X(losalamospawn)/RNQKNR w - - ranks=6 files=6",
 "Capablanca Chess (w/o castling)": "rnabqkbcnr/pppppppppp/8/8/8/8/PPPPPPPPPP/RNABQKBCNR w - - files=10 stalemate=win",
@@ -6623,7 +6624,7 @@ function generate_castling_eligibility(setup_string)
     return castling;
 }
 
-// Return the FEN for a Chess960 game, either of the given S# code, or random if undefined
+// Return the FEN for a Chess960/Fischerrandom game, either of the given S# code, or random if undefined
 function setup_chess960(code)
 {
     var setup_string, fen, castling;
@@ -6640,6 +6641,44 @@ function setup_chess960(code)
     return fen;
 }
 
+// Return the FEN for a Chess256/Randompawns game, http://hem.passagen.se/melki9/randompawn.htm
+function setup_chess256(code)
+{
+    var fen, i, bit, rank2, rank3;
+
+    if (code === undefined) {
+        code = Math.floor(Math.random() * 255);
+    }
+
+    assert(code >= 0 && code <= 255, "setup_chess256(" + code + "): out of range 0-255, inclusive");
+
+    // Code is an 8-bit binary number, where 1=pawn on 3rd rank, 2=on 2nd rank
+    // reading left-to-right, from white's perspective
+    
+    rank2 = [".", ".", ".", ".", ".", ".", ".", "."];
+    rank3 = [".", ".", ".", ".", ".", ".", ".", "."];
+
+    for (var i = 7; i != -1; i -= 1) {
+        bit = code % 2;
+
+        if (bit) {
+            rank3[i] = "p";
+        } else {
+            rank2[i] = "p";
+        }
+
+        code /= 2;
+        code = Math.floor(code);
+    }
+
+    rank2 = rank2.join("");
+    rank3 = rank3.join("");
+
+    fen = "rnbqkbnr/" + rank2 + "/" + rank3 + "/8/8/" + 
+        rank3.toUpperCase() + "/" + rank2.toUpperCase() + "/RNBQKBNR w KQkq -",
+
+    return fen;
+}
 
 //// DRAG-AND-DROP FUNCTIONS
 
