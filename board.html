@@ -3165,7 +3165,7 @@ function filtered_moves(piece, color, is_hypothetical)
                 abs_move.notation_override = "O-O-O";
 
                 for (j = 0; j < moves.length; j += 1) {
-                    if (moves[j].x === 4) {
+                    if (moves[j].x === 4 && moves[j].y === (color === "white" ? 1 : 8)) {
                         found = true;
                         break;
                     }
