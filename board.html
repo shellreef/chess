@@ -4047,7 +4047,7 @@ function set_copyable_link(this_position)
     url = make_copyable_link(fen) + captured + last_move + perspective;
     dojo.byId("copyable_link").href = url;
 
-    if (document.URL.indexOf("file:") === 0) {
+    if (document.URL.indexOf("file:") === 0 || !CLIPBOARD) {
         dojo.byId("copy_link").onclick = function() {
             prompt("Manually copy this:", email_board(true));
         };
@@ -4677,8 +4677,10 @@ function init_board()
         // For some reason, copying with ZeroClipboard doesn't work with local files
         ;
     } else {
-        CLIPBOARD = new ZeroClipboard.Client();
-        CLIPBOARD.glue(dojo.byId("copy_link"));
+        if (window.ZeroClipboard) {
+            CLIPBOARD = new ZeroClipboard.Client();
+            CLIPBOARD.glue(dojo.byId("copy_link"));
+        }
     }
 
     // Get board name in cookie, if any. This lets the user select
