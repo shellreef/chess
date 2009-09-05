@@ -5014,10 +5014,10 @@ function move_piece_to_square(piece, square, is_hypothetical, is_immediate)
 
 // Get the file numbers of where the castles are originally, or where they were.
 // For chess1, this is {clong:1,cshort:8}, but in Chess960 it can be different.
-function castles_originally_at()
+function castles_come_from()
 {
     var cs = GAME_STATE.can_castle.white;  // same existance for black and white
-    var files = [];
+    var files = [], ret = {};
 
     for (var i = 0; i < GAME_STATE.files; i += 1) {
         var file = String.fromCharCode("a".charCodeAt(0) + i);
@@ -5028,7 +5028,13 @@ function castles_originally_at()
         }
     }
 
-    return {clong:files[0], cshort:files[1]};
+    ret.long_x = files[0];
+    ret.short_x = files[1];
+
+    ret.long_file = String.fromCharCode("a".charCodeAt(0) + files[0] - 1);
+    ret.short_file = String.fromCharCode("a".charCodeAt(0) + files[1] - 1);
+
+    return ret;
 }
 
 // Make a move, or half-move, given choices.
@@ -5056,16 +5062,16 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
     square = one.square;
     from_square = piece.square;
 
-    // If castling, move the rook in place. Ugly hardcoded.
+    // If castling, move the rook in place. 
     // Note: if pass this in abs_move/choices, need to save in raw move notation, too.
     if (PIECE_TYPES[piece.type].castles_with) {
-        // TODO: remove hardcoding h/a as short/long
+        var come_from = castles_come_from();
 
         // We rely on can_castle to indicate whether the king/rook have moved.
-        if (GAME_STATE.can_castle[GAME_STATE.active_color].h && square.x === GAME_STATE.castle_moves.cshort.king_to) {
-            move_piece_to_square(pc(castles_originally_at().cshort, square.y), VBOARD[GAME_STATE.castle_moves.cshort.castle_to][square.y], true, true);
-        } else if (GAME_STATE.can_castle[GAME_STATE.active_color].a && square.x === GAME_STATE.castle_moves.clong.king_to) {
-            move_piece_to_square(pc(castles_originally_at().clong, square.y), VBOARD[GAME_STATE.castle_moves.clong.castle_to][square.y], true, true);
+        if (GAME_STATE.can_castle[GAME_STATE.active_color][come_from.short_file] && square.x === GAME_STATE.castle_moves.cshort.king_to) {
+            move_piece_to_square(pc(come_from.short_x, square.y), VBOARD[GAME_STATE.castle_moves.cshort.castle_to][square.y], true, true);
+        } else if (GAME_STATE.can_castle[GAME_STATE.active_color][come_from.long_file] && square.x === GAME_STATE.castle_moves.clong.king_to) {
+            move_piece_to_square(pc(come_from.long_x, square.y), VBOARD[GAME_STATE.castle_moves.clong.castle_to][square.y], true, true);
         }
 
         // TODO: allow moving king onto castle
