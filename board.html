@@ -127,17 +127,25 @@ div.inspector-diagram-cell {
 
 </style>
 <!--<script type='text/javascript' src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'></script>-->
-<script src="http://o.aolcdn.com/dojo/1.3.1/dojo/dojo.xd.js"></script>
 <!--<script src="http://o.aolcdn.com/dojo/1.3.1/dojo/dojo.xd.js.uncompressed.js"></script>-->
+
+<script src="dojo.xd.js"></script>
+
+<!--
+<script src="http://o.aolcdn.com/dojo/1.3.1/dojo/dojo.xd.js"></script>
 <script src="ZeroClipboard.js"></script>
 <script src="http://www.google.com/jsapi"></script>
+-->
 <script type="text/javascript">
 /*jslint bitwise: true, browser: true, eqeqeq: true, immed: true, newcap: true, nomen: true, plusplus: true, regexp: true, undef: true*/
 /*global window google form_value Hash $break Event*/
 
+/*
 if (!window.google) {
     alert("Google was not found. Nothing will work.");
 }
+
+google.setOnLoadCallback(main);*/
 
 /* TODO: why aren't these miniifed? http://code.google.com/apis/ajaxlibs/documentation/index.html#prototype has
  * direct paths but neither prototype nor scriptaculous are minified.. others are though. Maybe just use raw JS. */
@@ -1128,7 +1136,7 @@ var OPENINGS = {
 
 /*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved unfiltered_moves filtered_moves relative_decode_direction parse_flags nested_flags decode_relative_explicit_move decode_one_parlett without_dupes opposite_color set_turn set_check_message check_repetition load_notations capture_piece notation_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position init_board label_board name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc image_path_for create_piece create_piece_by_letter highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection make_move_by_menu populate_make_a_move_list realize_vboard*/
  
-google.setOnLoadCallback(function() {
+function main() {
 // http://o.aolcdn.com/dojo/1.0.0/dojo/cookie.xd.js
 // This file is small enough to just include here (without the module provisions)
 dojo.cookie=function(_2,_3,_4){var c=document.cookie;if(arguments.length==1){var _6=c.lastIndexOf(_2+"=");if(_6==-1){return null;}var _7=_6+_2.length+1;var _8=c.indexOf(";",_6+_2.length+1);if(_8==-1){_8=c.length;}return decodeURIComponent(c.substring(_7,_8));}else{_4=_4||{};_3=encodeURIComponent(_3);if(typeof (_4.expires)=="number"){var d=new Date();d.setTime(d.getTime()+(_4.expires*24*60*60*1000));_4.expires=d;}document.cookie=_2+"="+_3+(_4.expires?"; expires="+_4.expires.toUTCString():"")+(_4.path?"; path="+_4.path:"")+(_4.domain?"; domain="+_4.domain:"")+(_4.secure?"; secure":"");return null;}}
@@ -1200,7 +1208,7 @@ pgn = load_pgn(
 "59.Qe7+ Kb8 60.c6 1-0");*/
 
 
-});
+}
 
 // PGN (PORTABLE GAME NOTATION) FUNCTIONS
 
@@ -7116,7 +7124,7 @@ function enable_document_selection(enable, element)
 
 </script>
 </head>
-<body>
+<body onload="main()">
 <table id="outer">
 <tr>
 <td style="vertical-align: top">
