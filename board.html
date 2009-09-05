@@ -5063,9 +5063,9 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
 
         // We rely on can_castle to indicate whether the king/rook have moved.
         if (GAME_STATE.can_castle[GAME_STATE.active_color].h && square.x === GAME_STATE.castle_moves.cshort.king_to) {
-            move_piece_to_square(pc(GAME_STATE.files, square.y), VBOARD[GAME_STATE.castle_moves.cshort.castle_to][square.y], true, true);
+            move_piece_to_square(pc(castles_originally_at().cshort, square.y), VBOARD[GAME_STATE.castle_moves.cshort.castle_to][square.y], true, true);
         } else if (GAME_STATE.can_castle[GAME_STATE.active_color].a && square.x === GAME_STATE.castle_moves.clong.king_to) {
-            move_piece_to_square(pc(1, square.y), VBOARD[GAME_STATE.castle_moves.clong.castle_to][square.y], true, true);
+            move_piece_to_square(pc(castles_originally_at().clong, square.y), VBOARD[GAME_STATE.castle_moves.clong.castle_to][square.y], true, true);
         }
 
         // TODO: allow moving king onto castle
