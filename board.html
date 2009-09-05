@@ -3173,6 +3173,9 @@ function filtered_moves(piece, color, is_hypothetical)
             var found = false;
             var kings_leap;
 
+            // King captures rook
+            abs_move.x = castle_from_x;
+
             if (castle_from_x < start.x) {
                 // a-side castling
                 abs_move.notation_override = "O-O-O";
@@ -3188,6 +3191,7 @@ function filtered_moves(piece, color, is_hypothetical)
             // Cannot castle through check. Check if the square that the king
             // moves through is a valid regular move (which must have been listed
             // before the castling move in Parlett). TODO: Rethink this for Chess960 castling, since the kings_leap square won't be a valid move.
+            // TODO: Need to get the *path* from the source to destination squares.
             for (j = 0; j < moves.length; j += 1) {
                 if (moves[j].x === kings_leap && moves[j].y === start.y) {
                     found = true;
@@ -3272,15 +3276,6 @@ function filtered_moves(piece, color, is_hypothetical)
             // Merge flags
             dojo.mixin(unique_xy[key], move);
         }
-    }
-
-    if (PIECE_TYPES[piece.type].castles_with) {
-        // "King captures rook" to castle
-        var come_from = castles_come_from();
-
-        // TODO: XYZ: only push if eligible!!
-        unique.push({x:come_from.short_x, y:piece.square.y, is_castle_move:true, notation_override:"O-O(exp)"});
-        unique.push({x:come_from.long_x, y:piece.square.y, is_castle_move:true, notation_override:"O-O-O(exp)"});
     }
 
     return {legal:unique, blocked:blocked_moves};
