@@ -1143,7 +1143,7 @@ var OPENINGS = {
 
 /* Global functions for jslint to recognize. TODO: move to objects? */
 
-/*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved unfiltered_moves filtered_moves relative_decode_direction parse_flags nested_flags decode_explicit_move decode_one_parlett without_dupes opposite_color set_turn set_check_message check_repetition load_notations capture_piece notation_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position init_board label_board name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc image_path_for create_piece create_piece_by_letter highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection make_move_by_menu populate_make_a_move_list realize_vboard*/
+/*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved unfiltered_moves filtered_moves relative_decode_direction parse_move_flags nested_flags decode_explicit_move decode_one_parlett without_dupes opposite_color set_turn set_check_message check_repetition load_notations capture_piece notation_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position init_board label_board name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc image_path_for create_piece create_piece_by_letter highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection make_move_by_menu populate_make_a_move_list realize_vboard*/
  
 function main() {
 // http://o.aolcdn.com/dojo/1.0.0/dojo/cookie.xd.js
@@ -2692,7 +2692,7 @@ function decode_raw_move(s)
     square = VBOARD[move.x][move.y];
 
     // Populate move with flags
-    dojo.mixin(move, parse_flags(flags));
+    dojo.mixin(move, parse_move_flags(flags));
 
     return {piece:piece, square:square, move:move};
     //do_virtual_move(piece, move);
@@ -3397,7 +3397,7 @@ function parseInt10(x)
 // Parse semicolon separated flags, possibly key/value pairs
 // foo;bar sets foo:true and bar:true, can also set relative coordinates:
 // if_unblocked=1,2.
-function parse_flags(text, flags)
+function parse_move_flags(text, flags)
 {
     var flags_text;
 
@@ -3429,7 +3429,7 @@ function parse_flags(text, flags)
                 flags[left + "_dx"] = value[0];
                 flags[left + "_dy"] = value[1];
             } else {
-                assert(false, "parse_flags(" + text + ", " + flags + "): not 1 or 2 elements: " + value);
+                assert(false, "parse_move_flags(" + text + ", " + flags + "): not 1 or 2 elements: " + value);
             }
         } else {
             flags[flag_text] = true;
@@ -3449,7 +3449,7 @@ function nested_flags(parlett)
     // Do not cache, since can be modified
     rel_moves = dojo.clone(unfiltered_moves(flags_text.shift()));
 
-    flags = parse_flags(flags_text);
+    flags = parse_move_flags(flags_text);
 
     for (var flag in flags) {
         if (flags.hasOwnProperty(flag)) {
@@ -3481,7 +3481,7 @@ function decode_explicit_move(text_move, existing_flags)
         assert(false, "decode_explicit_move(" + text_move + ", " + existing_flags + "): not [x,y;flags], missing comma");
     }
 
-    flags = parse_flags(xy_text_flags, existing_flags);
+    flags = parse_move_flags(xy_text_flags, existing_flags);
 
     return [x, y, flags];
 }
