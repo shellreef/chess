@@ -7231,25 +7231,28 @@ function init_dnd()
 
 //// LOW-LEVEL FUNCTIONS
 
-function nth_index_of(array, needle, n)
+// Get the index of the nth needle in the array. Like Array.indexOf(),
+// but nth can not only be 1st, but also 2nd, 3rd, etc. to ignore the
+// first or second occurrence.
+function nth_index_of(array, needle, nth)
 {
-    var found;
+    var hits = 0;
 
-    do
-    {
-        found = array.indexOf(needle);
-        if (found === -1) {
-            break;
+    if (!nth) {
+        nth = 1;
+    }
+
+    for (var i = 0; i < array.length; i += 1) {
+        if (array[i] === needle) {
+            hits += 1;
+
+            if (hits === nth) {
+                return i;
+            }
         }
+    }
 
-        array.splice(0, found);
-
-        console.log(array);
-
-        n -= 1;
-    } while(n && found);
-
-    return found;
+    return -1;
 }
 
 // Return an array including integers between a and b, inclusive.
