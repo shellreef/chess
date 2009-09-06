@@ -207,6 +207,7 @@ var PREFS = {
     saved_games_path: "games/",
 
     show_castling_impediments:false,    // Highlight squares preventing castling
+    variant_generator:null,             // Setup function for randomized games
 
     black: "#d18b47",           // Black square
     white: "#ffce9e",           // White square
@@ -4887,8 +4888,6 @@ function change_loaded_board(menu)
     dojo.cookie("board_group", group);
     dojo.cookie("board_name", name);
 
-    dojo.byId("game_name").innerHTML = escape_html(name);
-
     fen = SAVED_BOARDS[group][name];
 
     load_fen(fen);
@@ -6633,6 +6632,36 @@ function sq(code, extra)
 
 //// CHESS960(FRC)/256/RANDOMIZED CHESS SETUP FUNCTIONS
 
+// Set the variant and variant generator, updating the code in the process.
+function set_variant_code(code, generator)
+{
+    var vc = dojo.byId("variant_code");
+    
+    vc.value = code;
+    vc.style.display = code === null ? "none" : "";
+
+    assert(generator, "set_variant_code(" + code + ", " + generator + "): requires generator");
+
+    PREFS.variant_generator = generator;
+}
+
+// Load a new game when a new variant code is entered.
+function update_variant_code(code) 
+{
+    assert(PREFS.variant_generator, "update_variant_code(" + code + "): called before set_variant_code, missing variant_generator");
+
+    if (code.indexOf && code.indexOf("0x") === 0) {
+        code = parseInt(code, 16);
+    } else {
+        code = parseInt(code, 10);
+    }
+
+    if (isNaN(code)) {
+        code = undefined;
+    }
+
+    load_fen(PREFS.variant_generator(code));
+}
 
 // Decode the Chess960 S# (Scharnagl) code to a piece array
 // Algorithm from _Play Stronger Chess by Examining Chess960_ by Gene Milener, pg. 82
@@ -6785,6 +6814,8 @@ function setup_chess960(code)
     setup_string = decode_chess960_s(code);
     castling = generate_castling_eligibility(setup_string);
 
+    console.log(code);
+    set_variant_code(code, setup_chess960);
     return setup_string.toLowerCase() + "/pppppppp/8/8/8/8/PPPPPPPP/" + setup_string + " w " + castling + " -";
 }
 
@@ -6828,6 +6859,8 @@ function setup_chess256(code)
     var fen, setup;
 
     setup = decode_chess256(code);
+
+    set_variant_code(code, setup_chess256);
 
     return "rnbqkbnr/" + setup.rank2 + "/" + setup.rank3 + "/8/8/" + 
         setup.rank3.toUpperCase() + "/" + setup.rank2.toUpperCase() + "/RNBQKBNR w KQkq -";
@@ -6905,6 +6938,8 @@ function setup_dchess(code)
     var setup, fen;
 
     setup = decode_dchess(code);
+
+    set_variant_code(code, setup_dchess);
 
     fen = setup.black + "/pppppppp/8/8/8/8/PPPPPPPP/" + setup.white + " ? - -";
 
@@ -7474,11 +7509,6 @@ onclick="edit_pgn()" class="show_White">
 <span id="status"></span> 
 <span id="dash" style="display: none">&mdash;</span>
 <span id="check"></span>
-<br>
-<small>
-<span id="game_name"></span>
-<span id="game_variant"></span>
-</small>
 </p>
 
 <p>
@@ -7527,6 +7557,7 @@ not to implement chess AI. But having automatic moves is useful for testing. -->
 
  <p><select id="saved_board_menu" onchange="change_loaded_board(this)"></select>
      <button onclick="change_loaded_board(dojo.byId('saved_board_menu'))" accesskey="n">New Game</button>
+ <p><input name="variant_code" id="variant_code" size="10" style="display: none" onchange="update_variant_code(this.value)">
  
  </div>
  </div>
