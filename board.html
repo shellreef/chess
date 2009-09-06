@@ -984,6 +984,7 @@ var SAVED_BOARDS = {
 "Corner Chess":         "4rbqk/4rb1q/4r1bb/5rrr/RRR5/BB1R4/Q1BR4/KQBR4 w - -",
 "Corner Chess II":      "kbp2pbq/nrp2prn/pp4pp/8/8/PP4PP/NRP2PRN/QBP2PBK w - -",
 "Corridor Chess":       "1nrqkrn1/2b2b2/1pppppp1/8/8/1PPPPPP1/2B2B2/1NRQKRN1 w - -",
+"Black Begins": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR ? KQkq -",
 "Desegregated Chess": "RNbqKBnr/ppPpPPPp/8/8/8/8/PPpppPpP/rnBQkBnr w KQkq -",
 "Dunsany's Chess": "rnbqkbnr/pppppppp/8/8/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq -",
 "Eight Kings Chess":    "kkkkkkkk/pppppppp/8/8/8/8/PPPPPPPP/KKKKKKKK w - -",
@@ -3950,6 +3951,8 @@ function set_turn(color, historical)
         new_color = opposite_color(GAME_STATE.active_color);
     } else if (color === "black" || color === "white") {
         new_color = color;
+    } else if (color === "ask") {
+        new_color = confirm("Do you want black to start first?") ? "black" : "white";
     } else {
         assert(false, "set_turn(" + color + "): invalid color");
     }
@@ -5529,7 +5532,6 @@ function load_fen(fen, replay)
 
     parts = fen.split(" ");
 
-    assert(/^[wb]$/.test(parts[1]), "load_fen(" + fen + "): bad active color: " + parts[1]);
 
     castling = parts[2]; // parsed below, after know dimensions
 
@@ -5539,7 +5541,8 @@ function load_fen(fen, replay)
         GAME_STATE.ep_target = filerank2xy(parts[3]);
     }
 
-    color = {w:"white", b:"black"}[parts[1]];
+    color = {w:"white", b:"black", "?":"ask"}[parts[1]];
+    assert(color, "load_fen(" + fen + "): bad active color: " + parts[1]);
 
     GAME_STATE = dojo.clone(GAME_STATE_DEFAULT);
     if (!isNaN(parseInt(parts[4], 10))) {
