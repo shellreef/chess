@@ -2759,7 +2759,7 @@ function do_virtual_move(piece, move)
 
     // This flag prevents a move from causing the piece to capture itself
     // when it "moves" to the same square that it is on.
-    if (move.no_self_capture && did.captured === piece) {
+    if (move.ignore_self_capture && did.captured === piece) {
         return {};
     }
 
@@ -5115,10 +5115,10 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
 
             // Move rook. Use do_virtual_move instead of move_piece_to_square, since 
             // this rook move may not be valid otherwise. 
-            do_virtual_move(pc(come_from.short_x, square.y), {x:GAME_STATE.castle_moves.cshort.castle_to, y:square.y, no_self_capture:true});
+            do_virtual_move(pc(come_from.short_x, square.y), {x:GAME_STATE.castle_moves.cshort.castle_to, y:square.y, ignore_self_capture:true});
 
             // Move king to destination square, instead of over rook.
-            move = {x:GAME_STATE.castle_moves.cshort.king_to, y:square.y, no_self_capture:true};
+            move = {x:GAME_STATE.castle_moves.cshort.king_to, y:square.y, ignore_self_capture:true};
 
             if (!is_hypothetical) {
                 GAME_STATE.can_castle[GAME_STATE.active_color][come_from.short_file] = false;
@@ -5130,9 +5130,9 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
                      || square.x === come_from.long_x) 
                     ) {
 
-            do_virtual_move(pc(come_from.long_x, square.y), {x:GAME_STATE.castle_moves.clong.castle_to, y:square.y, no_self_capture:true});
+            do_virtual_move(pc(come_from.long_x, square.y), {x:GAME_STATE.castle_moves.clong.castle_to, y:square.y, ignore_self_capture:true});
 
-            move = {x:GAME_STATE.castle_moves.clong.king_to, y:square.y, no_self_capture:true};
+            move = {x:GAME_STATE.castle_moves.clong.king_to, y:square.y, ignore_self_capture:true};
 
             if (!is_hypothetical) {
                 GAME_STATE.can_castle[GAME_STATE.active_color][come_from.short_file] = false;
