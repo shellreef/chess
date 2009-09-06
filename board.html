@@ -912,6 +912,9 @@ var SAVED_BOARDS = {
     // http://chessvariants.org/index/mainquery.php?type=Any&orderby=LinkText&displayauthor=1&displayinventor=1&showimages=1&showtextnotes=1&listrecognizedonly=1&primarylinksonly=1&usethisheading=Recognized+Chess+Variants
     "Recognized": {
 // TODO: Indian Chess (Chaturanga)
+// TODO: Support Chaturanga pawns. No double move/en passant, and promotes to where started, but only if piece was captured.
+// Stalemate / bare king = win for stalemating player,
+//"Indian Chess (Chaturanga)": "rnekxfenr/pppppppp/8/8/8/8/PPPPPPPP/RNEKXFENR w - statemate=win",
 
 // Shatranj (2nd known variant), except that this rule is not implemented:
 // - Taking the last piece of your opponent wins, unless your opponent
@@ -949,9 +952,12 @@ var SAVED_BOARDS = {
 //"Taikyoku Shogi": "/ w - - ranks=36 files=36",
 // TODO: Modern variants
 // Ultima
-// Chess960
-// D-Chess http://www.d-chess.com/
 
+    },
+
+    "Randomized": {
+"Chess256": setup_chess256
+// TODO: D-Chess http://www.d-chess.com/
     },
 
     "New Pieces": {
@@ -998,9 +1004,6 @@ var SAVED_BOARDS = {
 // http://www.chessclub.com/helpcenter/tips/wild.html
 "Advance Chess":        "rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq -",
 "Atheist Chess": "rn1qk1nr/pppppppp/8/8/8/8/PPPPPPPP/RN1QK1NR w KQkq -",
-// TODO: Support Chaturanga pawns. No double move/en passant, and promotes to where started, but only if piece was captured.
-// Stalemate / bare king = win for stalemating player,
-//"Indian Chess (Chaturanga)": "rnekxfenr/pppppppp/8/8/8/8/PPPPPPPP/RNEKXFENR w -",
 "Church Chess":         "bbbbkbbb/pppppppp/8/8/8/8/PPPPPPPP/BBBBKBBB w - -",
 "Corner Chess":         "4rbqk/4rb1q/4r1bb/5rrr/RRR5/BB1R4/Q1BR4/KQBR4 w - -",
 "Corner Chess II":      "kbp2pbq/nrp2prn/pp4pp/8/8/PP4PP/NRP2PRN/QBP2PBK w - -",
