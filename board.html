@@ -3182,7 +3182,6 @@ function filtered_moves(piece, color, is_hypothetical)
 
             // Moved and lost castling privileges
             if (!GAME_STATE.can_castle[color][castle_from_file]) {
-                if (color==="white"&&flags.if_can_castle)console.log("ABC",x,y,color,castle_from_file);
                 continue;
             }
 
@@ -3213,17 +3212,50 @@ function filtered_moves(piece, color, is_hypothetical)
                 assert(false, "castling: castle_from_x === start.x (" + castle_from_x + " === " + start.x + ")");
             }
 
-            console.log("rook",castle_from_x,goes_to.castle_to);
-            dojo.forEach(inclusive_range(castle_from_x, goes_to.castle_to), function(x) {
-                console.log("TODO: rook check unblocked: " + xy2filerank(x,1));
-                push_highlight(sq(x,1),"yellow");
-            });
+            var first_rank = color === "white" ? 1 : GAME_STATE.ranks;
+            var castle_piece = VBOARD[castle_from_x][first_rank].piece;
+            if (!castle_piece) {
+                continue;
+            }
+
+            // Check the path that the rook takes during castling.
+            // It must be unobstructed, otherwise castling is temporarily not possible.
+            if (!dojo.every(inclusive_range(castle_from_x, goes_to.castle_to), function(x) {
+                var piece_between = VBOARD[x][first_rank].piece;
+                console.log(piece_between,piece,castle_piece);
+                if (piece_between && 
+                        piece_between.unique_id !== piece.unique_id &&          // king can be in the way
+                        piece_between.unique_id !== castle_piece.unique_id) {   // this rook only " " "
+                    push_highlight(sq(x,1),"yellow");
+                    return false;
+                }
+
+                // Return true if unblocked, or false if blocked and this move is invalid
+                return true;
+            })) {
+                continue;
+            }
 
             console.log("king",start.x,goes_to.king_to);
-            dojo.forEach(inclusive_range(start.x, goes_to.king_to), function(x) {
-                console.log("TODO: king check unblocked/unchecked: " + xy2filerank(x,1));
-                push_highlight(sq(x,1),"orange");
-            });
+
+            // King's path must be unobstructed, too.
+            if (!dojo.every(inclusive_range(start.x, goes_to.king_to), function(x) {
+                var piece_between = VBOARD[x][first_rank].piece;
+                console.log(piece_between,piece,castle_piece);
+                if (piece_between && 
+                        piece_between.unique_id !== piece.unique_id &&          // king can be in the way
+                        piece_between.unique_id !== castle_piece.unique_id) {   // castling rook only " " "
+                    push_highlight(sq(x,1),"orange");
+                    return false;
+                }
+
+                // TODO: Check if king would put itself in check, any time during the path!
+
+                return true;
+            })) {
+                continue;
+            }
+
             console.log("\n");
 
             /* TODO: look through path
