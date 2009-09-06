@@ -428,8 +428,8 @@ var PIECE_TYPES = {
              //"[3,0;absolute_x;if_can_castle=a;if_unblocked=-1,0;if_unblocked2=-2,0;if_unblocked3=-3,0], " +
              //"[7,0;absolute_x;if_can_castle=h;if_unblocked=1,0;if_unblocked2=2,0]",
              
-             "[3,0;absolute_x;if_can_castle=a], " +
-             "[7,0;absolute_x;if_can_castle=h]",
+             "[3,0;absolute_x;if_can_castle=long], " +
+             "[7,0;absolute_x;if_can_castle=short]",
           royal: true, letter: "K", figurines: ["\u2654", "\u265a"],
           castles_with: "rook", url:"pc:king"},
     queen: {parlett: "n*", letter: "Q", figurines: ["\u2655", "\u265b"], iccf_number: 1, url:"pc:queen"},
@@ -3072,6 +3072,7 @@ function filtered_moves(piece, color, is_hypothetical)
                     continue;
                 }
             }
+
             // Can't move to invincible piece
             if (PIECE_TYPES[capture_piece.type].invincible) {
                 continue;
@@ -3170,12 +3171,15 @@ function filtered_moves(piece, color, is_hypothetical)
 
         // Castling moves
         if (flags.if_can_castle) {
+            // long=a-side, short=h-side, but exact file depends on castles_come_from()
+            var castle_side = flags.if_can_castle;
             // Where the "castle" (such as a rook, NOT the king) comes from
-            var castle_from_file = flags.if_can_castle;
+            var castle_from_file = castles_come_from()[castle_side + "_file"];
             var castle_from_x = castle_from_file.charCodeAt(0) - "a".charCodeAt(0) + 1;
 
             // Moved and lost castling privileges
             if (!GAME_STATE.can_castle[color][castle_from_file]) {
+                if (color==="white"&&flags.if_can_castle)console.log("ABC",x,y,color,castle_from_file);
                 continue;
             }
 
@@ -3183,6 +3187,7 @@ function filtered_moves(piece, color, is_hypothetical)
             if (GAME_STATE.active_in_check) {
                 continue;
             }
+
 
             var found = false;
             var goes_to;
@@ -3218,6 +3223,7 @@ function filtered_moves(piece, color, is_hypothetical)
             });
             console.log("\n");
 
+            /* TODO: look through path
 
             // Cannot castle through check. Check if the square that the king
             // moves through is a valid regular move (which must have been listed
@@ -3232,7 +3238,7 @@ function filtered_moves(piece, color, is_hypothetical)
 
             if (!found) {
                 continue;
-            }
+            }*/
 
             // TODO: check if unimpeded here? instead of if_unblockedX in Parlett
         }
