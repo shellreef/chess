@@ -425,11 +425,11 @@ var PIECE_TYPES = {
     // TODO: @ for absolute, @3,0 and @4,0 short, then @7,0 for @6,0, in order to allow
     // Chess960 orthodox castling when rooks &amp; kings are not at known positions.
     king: {parlett: "1*, " +     // or ~0/1, ~1/1
-             "[3,0;absolute_x;if_can_castle=a;if_unblocked=-1,0;if_unblocked2=-2,0;if_unblocked3=-3,0], " +
-             "[7,0;absolute_x;if_can_castle=h;if_unblocked=1,0;if_unblocked2=2,0]",
+             //"[3,0;absolute_x;if_can_castle=a;if_unblocked=-1,0;if_unblocked2=-2,0;if_unblocked3=-3,0], " +
+             //"[7,0;absolute_x;if_can_castle=h;if_unblocked=1,0;if_unblocked2=2,0]",
              
-             //"[3,0;absolute_x;if_can_castle=a], " +
-             //"[7,0;absolute_x;if_can_castle=h]",
+             "[3,0;absolute_x;if_can_castle=a], " +
+             "[7,0;absolute_x;if_can_castle=h]",
           royal: true, letter: "K", figurines: ["\u2654", "\u265a"],
           castles_with: "rook", url:"pc:king"},
     queen: {parlett: "n*", letter: "Q", figurines: ["\u2655", "\u265b"], iccf_number: 1, url:"pc:queen"},
@@ -3047,7 +3047,7 @@ function filtered_moves(piece, color, is_hypothetical)
             if (flags.if_blocked_skip) {
                 i += flags.if_blocked_skip;
             }
-
+        
             // Can't move to self-occupied square
             if (capture_piece.color === color) {
                 // Castling moves can never guard, since the destination must be unoccupied
@@ -3056,7 +3056,15 @@ function filtered_moves(piece, color, is_hypothetical)
                     blocked_moves.push(abs_move);
                 }
 
-                continue;
+                if (flags.if_can_castle) {
+                    // You move your king over your rook to castle, so this _can_ be legal.
+                    if (!PIECE_TYPES[capture_piece.type].castle && !PIECE_TYPES[capture_piece.type].castles_with) {
+                        continue;
+                    }
+                } else {
+                    // Non-castling move to self-occupied square is illegal
+                    continue;
+                }
             }
             // Can't move to invincible piece
             if (PIECE_TYPES[capture_piece.type].invincible) {
@@ -3193,13 +3201,16 @@ function filtered_moves(piece, color, is_hypothetical)
 
             console.log("rook",castle_from_x,goes_to.castle_to);
             dojo.forEach(inclusive_range(castle_from_x, goes_to.castle_to), function(x) {
-                console.log("TODO: rook check unblocked: " + x);
+                console.log("TODO: rook check unblocked: " + xy2filerank(x,1));
+                push_highlight(sq(x,1),"yellow");
             });
 
             console.log("king",start.x,goes_to.king_to);
             dojo.forEach(inclusive_range(start.x, goes_to.king_to), function(x) {
-                console.log("TODO: king check unblocked/unchecked: " + x);
+                console.log("TODO: king check unblocked/unchecked: " + xy2filerank(x,1));
+                push_highlight(sq(x,1),"orange");
             });
+            console.log("\n");
 
 
             // Cannot castle through check. Check if the square that the king
