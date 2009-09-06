@@ -268,7 +268,19 @@ var DISPLAY = {
 
 // Predefined game rules for rs EPD opcode, makes it more compact to store non-FIDE games
 var RULE_SETS = {
-    shatranj: { uncheckered: true, ruled: true, stalemate: "win" },
+    shatranj: { 
+        uncheckered: true, 
+        ruled: true, 
+        stalemate: "win" 
+    },
+
+    // King moves three squares instead of two, useful for 8x10 board
+    triple_castle: {
+        castle_moves: {
+            clong: {castle_to: 4, king_to: 3},
+            cshort: {castle_to: 8, king_to: 9}
+        },
+    },
 
     // Xiangqi where pieces are on intersections
     xiangqi: {
@@ -320,9 +332,7 @@ var RULE_SETS = {
 
         ruled:true,
         transparent:true
-    },
-
-
+    }
 };
 
 // Info about the game
@@ -916,13 +926,13 @@ var SAVED_BOARDS = {
 // Counting rules on http://en.wikipedia.org/wiki/Makruk are not implemented
 "Thai Chess (Makruk)": "rnx(silvergeneral)x(ferz)x(lord)x(silvergeneral)nr/8/x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)/8/8/X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)/8/RNX(silvergeneral)X(lord)X(ferz)X(silvergeneral)NR w - -",
 "FIDE Chess": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -",
-"Chess960 (w/o castling)": setup_chess960,
+"Chess960": setup_chess960,
 "Chess256": setup_chess256,
 // TODO: D-Chess, ~8m random positions, use '?' for color to implement Fair First Move rule (asks who begins)
 
 // TODO: pawns promote to rook,knight,queen, no double-move
 "Los Alamos Chess": "rnqknr/x(losalamospawn)x(losalamospawn)x(losalamospawn)x(losalamospawn)x(losalamospawn)x(losalamospawn)/6/6/X(losalamospawn)X(losalamospawn)X(losalamospawn)X(losalamospawn)X(losalamospawn)X(losalamospawn)/RNQKNR w - - ranks=6 files=6",
-"Capablanca Chess (w/o castling)": "rnabqkbcnr/pppppppppp/8/8/8/8/PPPPPPPPPP/RNABQKBCNR w - - files=10 stalemate=win",
+"Capablanca Chess (w/o castling)": "rnabqkbcnr/pppppppppp/8/8/8/8/PPPPPPPPPP/RNABQKBCNR w - - files=10 stalemate=win rs=triple_castle",
 "Berolina Chess": "rnbqkbnr/xbxbxbxbxbxbxbxb/8/8/8/8/XBXBXBXBXBXBXBXB/RNBQKBNR w KQkq -",
 "Courier Chess": "rnybmkxfibynr/x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)/////X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)/RNYBMKXFIBYNR w - - files=12 ranks=8",
 "Wildebeest Chess (w/o castling)": "rnwwx(gnu)kqbbnr/ppppppppppp///////PPPPPPPPPPP/RNWWX(gnu)KQBBNR w - - files=11 ranks=10 stalemate=win"
@@ -4321,7 +4331,7 @@ function create_board()
         max_x -= 1;
     }
     
-    for (var x = 0; x < GAME_STATE.ranks; x += 1) {
+    for (var x = 0; x < GAME_STATE.files; x += 1) {
         // File labels
         var file = String.fromCharCode("a".charCodeAt(0) + x);
         ctx.fillStyle = DISPLAY.text_color;
