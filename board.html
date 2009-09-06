@@ -3222,7 +3222,6 @@ function filtered_moves(piece, color, is_hypothetical)
             // It must be unobstructed, otherwise castling is temporarily not possible.
             if (!dojo.every(inclusive_range(castle_from_x, goes_to.castle_to), function(x) {
                 var piece_between = VBOARD[x][first_rank].piece;
-                console.log(piece_between,piece,castle_piece);
                 if (piece_between && 
                         piece_between.unique_id !== piece.unique_id &&          // king can be in the way
                         piece_between.unique_id !== castle_piece.unique_id) {   // this rook only " " "
@@ -3236,12 +3235,9 @@ function filtered_moves(piece, color, is_hypothetical)
                 continue;
             }
 
-            console.log("king",start.x,goes_to.king_to);
-
             // King's path must be unobstructed, too.
             if (!dojo.every(inclusive_range(start.x, goes_to.king_to), function(x) {
                 var piece_between = VBOARD[x][first_rank].piece;
-                console.log(piece_between,piece,castle_piece);
                 if (piece_between && 
                         piece_between.unique_id !== piece.unique_id &&          // king can be in the way
                         piece_between.unique_id !== castle_piece.unique_id) {   // castling rook only " " "
@@ -3255,8 +3251,6 @@ function filtered_moves(piece, color, is_hypothetical)
             })) {
                 continue;
             }
-
-            console.log("\n");
 
             /* TODO: look through path
 
@@ -4886,18 +4880,20 @@ function change_loaded_board(menu)
 function piece_was_captured(piece, square)
 {
     // If rook captured, remove castling privileges
-    if (piece.type === "rook") {
+    if (PIECE_TYPES[piece.type].castle) {
         // Note that this is the first rank of the *other* player
         var opponent = opposite_color(GAME_STATE.active_color);
         var first_rank = opponent === "white" ? 1 : GAME_STATE.ranks;
-        
+       
+        var castles_at = castles_come_from();
+
         // TODO: really would like to not have to hardcode this
         if (square.y === first_rank) {
-            if (square.x === 1) {
-                GAME_STATE.can_castle[opponent].a = false;
+            if (square.x === castles_at.long_x) {
+                GAME_STATE.can_castle[opponent][castles_at.long_file] = false;
                 //console.log("no more long");
-            } else if (square.x === GAME_STATE.ranks) {
-                GAME_STATE.can_castle[opponent].h = false;
+            } else if (square.x === castles_at.short_x) {
+                GAME_STATE.can_castle[opponent][castles_at.short_file] = false;
                 //console.log("no more short");
             }
         }
@@ -5195,11 +5191,12 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
 
         // If moved either rook, can't castle on that side.
         if (PIECE_TYPES[piece.type].castle) {
-            // TODO: More generic, so will work with chess960 or 480
-            if (from_square.x === GAME_STATE.ranks) {
-                GAME_STATE.can_castle[GAME_STATE.active_color].h = false;
-            } else if (from_square.x === 1) {
-                GAME_STATE.can_castle[GAME_STATE.active_color].a = false;
+            var castles_at = castles_come_from();
+
+            if (from_square.x === castles_at.short_x) {
+                GAME_STATE.can_castle[GAME_STATE.active_color][castles_at.short_file] = false;
+            } else if (from_square.x === castles_at.long_x) {
+                GAME_STATE.can_castle[GAME_STATE.active_color][castles_at.long_file] = false;
             }
         }
 
