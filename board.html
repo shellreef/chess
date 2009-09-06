@@ -3192,14 +3192,14 @@ function filtered_moves(piece, color, is_hypothetical)
             }
 
             console.log("rook",castle_from_x,goes_to.castle_to);
-            for (j = castle_from_x; j < goes_to.castle_to; j += 1) {
-                console.log("TODO: rook check unblocked: " + j);
-            }
+            dojo.forEach(inclusive_range(castle_from_x, goes_to.castle_to), function(x) {
+                console.log("TODO: rook check unblocked: " + x);
+            });
 
             console.log("king",start.x,goes_to.king_to);
-            for (j = start.x; j < goes_to.king_to; j += 1) {
-                console.log("TODO: king check unblocked/unchecked: " + j);
-            }
+            dojo.forEach(inclusive_range(start.x, goes_to.king_to), function(x) {
+                console.log("TODO: king check unblocked/unchecked: " + x);
+            });
 
 
             // Cannot castle through check. Check if the square that the king
