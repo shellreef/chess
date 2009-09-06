@@ -6832,12 +6832,9 @@ function setup_chess256(code)
         setup.rank3.toUpperCase() + "/" + setup.rank2.toUpperCase() + "/RNBQKBNR w KQkq -";
 }
 
-
-// D-Chess http://www.d-chess.com/
-function setup_dchess(code)
+// Decode a D-Chess setup position. This is another custom encoding.
+function decode_dchess(code)
 {
-    var setup, fen;
-
     if (code === undefined) {
         code = Math.floor(Math.random() * 132710400);
     }
@@ -6847,9 +6844,46 @@ function setup_dchess(code)
     // squares, dark bishop the 4 other squares, and 6 other squares to fill.
     assert(code >= 0 && code <= 132710400, "setup_dchess(" + code + "): out of range 0-132710400, inclusive");
 
+
+}
+
+// Decode the D-Chess setup position for one side only. Since it encodes both
+// black and white, this should be called twice to get the full position.
+function decode_one_dchess(code)
+{
+    var dark_bishop, light_bishop, piece, array;
+
+    array = ["-", "-", "-", "-", "-", "-", "-", "-"];
+
+    // First dark and light bishop, on dark and light squares only.
+    dark_bishop = code % 4;
+    code -= dark_bishop;
+    code /= 4;
+    array[dark_bishop * 2] = "dB";
+
+    light_bishop = code % 4;
+    code -= light_bishop;
+    code /= 4;
+    array[light_bishop * 2 + 1] = "lB";
+
+    // Place knight, knight, rook, rook, queen, and king on first
+    // available Nth square as stored.
+    piece = code % 6;
+    code -= piece;
+    code /= 6;
+
+    array[array.indexOf("-")]
+
+    return array.join("");
+}
+
+// D-Chess http://www.d-chess.com/
+function setup_dchess(code)
+{
+    var setup, fen;
+
     setup = decode_dchess(code);
 
-    // TODO
     fen = setup.black + "/pppppppp/8/8/8/8/PPPPPPPP/" + setup.white + " ? - -";
 
     return fen;
@@ -7196,6 +7230,27 @@ function init_dnd()
 }
 
 //// LOW-LEVEL FUNCTIONS
+
+function nth_index_of(array, needle, n)
+{
+    var found;
+
+    do
+    {
+        found = array.indexOf(needle);
+        if (found === -1) {
+            break;
+        }
+
+        array.splice(0, found);
+
+        console.log(array);
+
+        n -= 1;
+    } while(n && found);
+
+    return found;
+}
 
 // Return an array including integers between a and b, inclusive.
 // inclusive_range(0, 5) and inclusive_range(5, 0) both return
