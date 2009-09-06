@@ -939,7 +939,6 @@ var SAVED_BOARDS = {
 "Thai Chess (Makruk)": "rnx(silvergeneral)x(ferz)x(lord)x(silvergeneral)nr/8/x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)/8/8/X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)/8/RNX(silvergeneral)X(lord)X(ferz)X(silvergeneral)NR w - -",
 "FIDE Chess": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -",
 "Chess960": setup_chess960,
-"Chess256": setup_chess256,
 // TODO: D-Chess, ~8m random positions, use '?' for color to implement Fair First Move rule (asks who begins)
 
 // TODO: pawns promote to rook,knight,queen, no double-move
@@ -6641,6 +6640,10 @@ function decode_chess960_s(number)
     var array = new Array(8);
     var light_bishop, dark_bishop, queen, krn_code, krn_array, available, i, j;
 
+    if (number === undefined) {
+        number = Math.floor(Math.random() * 960);
+    }
+
     assert(number >= 0 && number <= 959, "decode_chess960_s(" + number + "): out of range 0-959");
 
     // Bishops are placed on light and dark squares directly
@@ -6776,18 +6779,12 @@ function generate_castling_eligibility(setup_string)
 // Return the FEN for a Chess960/Fischerrandom game, either of the given S# code, or random if undefined
 function setup_chess960(code)
 {
-    var setup_string, fen, castling;
-
-    if (code === undefined) {
-        code = Math.floor(Math.random() * 960);
-    }
+    var setup_string, castling;
 
     setup_string = decode_chess960_s(code);
     castling = generate_castling_eligibility(setup_string);
 
-    fen = setup_string.toLowerCase() + "/pppppppp/8/8/8/8/PPPPPPPP/" + setup_string + " w " + castling + " -";
-
-    return fen;
+    return setup_string.toLowerCase() + "/pppppppp/8/8/8/8/PPPPPPPP/" + setup_string + " w " + castling + " -";
 }
 
 // Decode a Chess256 setup position code
@@ -6795,6 +6792,10 @@ function decode_chess256(code)
 {
     var ret, i, bit;
 
+    if (code === undefined) {
+        code = Math.floor(Math.random() * 255);
+    }
+    
     assert(code >= 0 && code <= 255, "decode_chess256(" + code + "): out of range 0-255, inclusive");
 
     // Code is an 8-bit binary number, where 1=pawn on 3rd rank, 2=on 2nd rank
@@ -6825,16 +6826,10 @@ function setup_chess256(code)
 {
     var fen, setup;
 
-    if (code === undefined) {
-        code = Math.floor(Math.random() * 255);
-    }
-    
     setup = decode_chess256(code);
 
-    fen = "rnbqkbnr/" + setup.rank2 + "/" + setup.rank3 + "/8/8/" + 
+    return "rnbqkbnr/" + setup.rank2 + "/" + setup.rank3 + "/8/8/" + 
         setup.rank3.toUpperCase() + "/" + setup.rank2.toUpperCase() + "/RNBQKBNR w KQkq -";
-
-    return fen;
 }
 
 
