@@ -939,8 +939,6 @@ var SAVED_BOARDS = {
 "Thai Chess (Makruk)": "rnx(silvergeneral)x(ferz)x(lord)x(silvergeneral)nr/8/x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)/8/8/X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)/8/RNX(silvergeneral)X(lord)X(ferz)X(silvergeneral)NR w - -",
 "FIDE Chess": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -",
 "Chess960": setup_chess960,
-// TODO: D-Chess, ~8m random positions, use '?' for color to implement Fair First Move rule (asks who begins)
-
 // TODO: pawns promote to rook,knight,queen, no double-move
 "Los Alamos Chess": "rnqknr/x(losalamospawn)x(losalamospawn)x(losalamospawn)x(losalamospawn)x(losalamospawn)x(losalamospawn)/6/6/X(losalamospawn)X(losalamospawn)X(losalamospawn)X(losalamospawn)X(losalamospawn)X(losalamospawn)/RNQKNR w - - ranks=6 files=6",
 "Capablanca Chess": "rnabqkbcnr/pppppppppp/8/8/8/8/PPPPPPPPPP/RNABQKBCNR w AJaj - files=10 stalemate=win rs=triple_castle",
@@ -955,8 +953,9 @@ var SAVED_BOARDS = {
     },
 
     "Randomized": {
-"Chess256": setup_chess256
-// TODO: D-Chess http://www.d-chess.com/
+"Chess960": setup_chess960,
+"Chess256": setup_chess256,
+"D-Chess (w/o swapping)": setup_dchess
     },
 
     "New Pieces": {
@@ -6835,6 +6834,8 @@ function setup_chess256(code)
 // Decode a D-Chess setup position. This is another custom encoding.
 function decode_dchess(code)
 {
+    var black_setup, white_setup, white_code, black_code;
+
     if (code === undefined) {
         code = Math.floor(Math.random() * 132710400);
     }
@@ -6844,7 +6845,15 @@ function decode_dchess(code)
     // squares, dark bishop the 4 other squares, and 6 other squares to fill.
     assert(code >= 0 && code <= 132710400, "setup_dchess(" + code + "): out of range 0-132710400, inclusive");
 
+    // Lower half is for white (11520 = sqrt(13710400) - 1)
+    white_code = code % 11520;
+    white_setup = decode_one_dchess(white_code);
 
+    // Upper is black.
+    black_code = (code - white_code) / 11520;
+    black_setup = decode_one_dchess(black_code).toLowerCase();
+
+    return {white:white_setup, black:black_setup};
 }
 
 // Decode the D-Chess setup position for one side only. Since it encodes both
@@ -6852,6 +6861,8 @@ function decode_dchess(code)
 function decode_one_dchess(code)
 {
     var dark_bishop, light_bishop, piece, array, pieces, spaces;
+    
+    assert(code >= 0 && code <= 11519, "decode_one_dchess(" + code + "): out of range 0-11519, inclusive");
 
     array = ["-", "-", "-", "-", "-", "-", "-", "-"];
 
@@ -6879,7 +6890,7 @@ function decode_one_dchess(code)
 
         array[nth_index_of(array, "-", piece)] = pieces[6 - spaces];
 
-        console.log("place",pieces[6-spaces]," at ",piece,"nth = ",array.join(""));
+        //console.log("place",pieces[6-spaces]," at ",piece,"nth = ",array.join(""));
 
     } while (spaces -= 1);
 
