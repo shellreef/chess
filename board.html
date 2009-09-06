@@ -189,22 +189,24 @@ var EXPORT_NOTATIONS = [
 
 // Preferences, not game state.
 var PREFS = {
-    revert_time: 350,           // ms to take to revert
+    revert_time: 350,             // ms to take to revert
 
     input_notation: "SAN",
 
     // What piece images to use  - TODO: option to change
     image_set: "alfaerieomega",   // See README in that directory
-    //image_set: "ariel",    // based on Ariel Unicode MS
+    //image_set: "ariel",          // based on Ariel Unicode MS
     //image_set: "chessos",
     
     engine: "http://jeff.tk:81/chess/crafty.cgi",
-    skill: 0,                 // engine strength, 0-100
+    skill: 0,                   // engine strength, 0-100
 
     flipped: false,             // True if from black's perspective instead of white
     setup_mode: false,          // Setup pieces, instead of playing game
 
     saved_games_path: "games/",
+
+    show_castling_impediments:false,    // Highlight squares preventing castling
 
     black: "#d18b47",           // Black square
     white: "#ffce9e",           // White square
@@ -425,9 +427,6 @@ var PIECE_TYPES = {
     // TODO: @ for absolute, @3,0 and @4,0 short, then @7,0 for @6,0, in order to allow
     // Chess960 orthodox castling when rooks &amp; kings are not at known positions.
     king: {parlett: "1*, " +     // or ~0/1, ~1/1
-             //"[3,0;absolute_x;if_can_castle=a;if_unblocked=-1,0;if_unblocked2=-2,0;if_unblocked3=-3,0], " +
-             //"[7,0;absolute_x;if_can_castle=h;if_unblocked=1,0;if_unblocked2=2,0]",
-             
              "[3,0;absolute_x;if_can_castle=long], " +
              "[7,0;absolute_x;if_can_castle=short]",
           royal: true, letter: "K", figurines: ["\u2654", "\u265a"],
@@ -3193,7 +3192,6 @@ function filtered_moves(piece, color, is_hypothetical)
 
             var found = false;
             var goes_to;
-            var kings_leap;
 
             // King captures rook
             abs_move.x = castle_from_x;
@@ -3202,12 +3200,10 @@ function filtered_moves(piece, color, is_hypothetical)
                 // a-side castling
                 abs_move.notation_override = "O-O-O";
                 goes_to = GAME_STATE.castle_moves.clong;
-                kings_leap = start.x - 1;
             } else if (castle_from_x > start.x) {
                 // h-side castling
                 abs_move.notation_override = "O-O";
                 goes_to = GAME_STATE.castle_moves.cshort;
-                kings_leap = start.x + 1;
             } else {
                 assert(false, "castling: castle_from_x === start.x (" + castle_from_x + " === " + start.x + ")");
             }
@@ -3225,7 +3221,9 @@ function filtered_moves(piece, color, is_hypothetical)
                 if (piece_between && 
                         piece_between.unique_id !== piece.unique_id &&          // king can be in the way
                         piece_between.unique_id !== castle_piece.unique_id) {   // this rook only " " "
-                    push_highlight(sq(x,1),"yellow");
+                    if (PREFS.show_castling_impediments) {
+                        push_highlight(sq(x,1),"orange");
+                    }
                     return false;
                 }
 
@@ -3241,7 +3239,9 @@ function filtered_moves(piece, color, is_hypothetical)
                 if (piece_between && 
                         piece_between.unique_id !== piece.unique_id &&          // king can be in the way
                         piece_between.unique_id !== castle_piece.unique_id) {   // castling rook only " " "
-                    push_highlight(sq(x,1),"orange");
+                    if (PREFS.show_castling_impediments) {
+                        push_highlight(sq(x,1),"darkorange");
+                    }
                     return false;
                 }
 
@@ -3251,25 +3251,6 @@ function filtered_moves(piece, color, is_hypothetical)
             })) {
                 continue;
             }
-
-            /* TODO: look through path
-
-            // Cannot castle through check. Check if the square that the king
-            // moves through is a valid regular move (which must have been listed
-            // before the castling move in Parlett). TODO: Rethink this for Chess960 castling, since the kings_leap square won't be a valid move.
-            // TODO: Need to get the *path* from the source to destination squares.
-            for (j = 0; j < moves.length; j += 1) {
-                if (moves[j].x === kings_leap && moves[j].y === start.y) {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) {
-                continue;
-            }*/
-
-            // TODO: check if unimpeded here? instead of if_unblockedX in Parlett
         }
 
         // Capture at relative location, instead of at destination square.
