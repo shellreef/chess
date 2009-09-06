@@ -5091,8 +5091,9 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
             // Move rook
             move_piece_to_square(pc(come_from.short_x, square.y), VBOARD[GAME_STATE.castle_moves.cshort.castle_to][square.y], true, true);
 
-            // TODO: Move king
-            //move_piece_to_square(piece, VBOARD[GAME_STATE.castle_moves.cshort.king_to][square.y], true, true);
+            // Move king
+            move = {x:GAME_STATE.castle_moves.cshort.king_to, y:square.y};
+
         } else if (GAME_STATE.can_castle[GAME_STATE.active_color][come_from.long_file] && 
                     (square.x === GAME_STATE.castle_moves.clong.king_to
                      || square.x === come_from.long_x) 
@@ -5101,8 +5102,8 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
             // Move rook
             move_piece_to_square(pc(come_from.long_x, square.y), VBOARD[GAME_STATE.castle_moves.clong.castle_to][square.y], true, true);
 
-            // TODO: Move king
-            //move_piece_to_square(piece, VBOARD[GAME_STATE.castle_moves.clong.king_to][square.y], true, true);
+            // Move king
+            move = {x:GAME_STATE.castle_moves.clong.king_to, y:square.y};
         }
 
         // TODO: allow moving king onto castle
