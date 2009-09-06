@@ -5782,7 +5782,7 @@ function load_starting_position(fen, replay)
     }
 }
 
-//// PIECE LIBRARY / INFO FUNCTIONS
+//// PIECE LIBRARY / INFO FUNCTIONS (War and Pieces)
 
 // Show all available images, even those without movement
 function show_library_images()
@@ -6631,7 +6631,7 @@ function sq(code, extra)
     return VBOARD[x][y];
 }
 
-//// CHESS960/FRC FUNCTIONS
+//// CHESS960(FRC)/256/RANDOMIZED CHESS SETUP FUNCTIONS
 
 
 // Decode the Chess960 S# (Scharnagl) code to a piece array
@@ -6790,22 +6790,17 @@ function setup_chess960(code)
     return fen;
 }
 
-// Return the FEN for a Chess256/Randompawns game, http://hem.passagen.se/melki9/randompawn.htm
-function setup_chess256(code)
+// Decode a Chess256 setup position code
+function decode_chess256(code)
 {
-    var fen, i, bit, rank2, rank3;
+    var ret, i, bit;
 
-    if (code === undefined) {
-        code = Math.floor(Math.random() * 255);
-    }
-
-    assert(code >= 0 && code <= 255, "setup_chess256(" + code + "): out of range 0-255, inclusive");
+    assert(code >= 0 && code <= 255, "decode_chess256(" + code + "): out of range 0-255, inclusive");
 
     // Code is an 8-bit binary number, where 1=pawn on 3rd rank, 2=on 2nd rank
-    // reading left-to-right, from white's perspective
-    
-    rank2 = [".", ".", ".", ".", ".", ".", ".", "."];
-    rank3 = [".", ".", ".", ".", ".", ".", ".", "."];
+    // reading left-to-right, from white's perspective. (This is my invention.)
+    var rank2 = [".", ".", ".", ".", ".", ".", ".", "."];
+    var rank3 = [".", ".", ".", ".", ".", ".", ".", "."];
 
     for (var i = 7; i != -1; i -= 1) {
         bit = code % 2;
@@ -6820,11 +6815,47 @@ function setup_chess256(code)
         code = Math.floor(code);
     }
 
-    rank2 = rank2.join("");
-    rank3 = rank3.join("");
+    ret = {rank2: rank2.join(""), rank3: rank3.join("")};
 
-    fen = "rnbqkbnr/" + rank2 + "/" + rank3 + "/8/8/" + 
-        rank3.toUpperCase() + "/" + rank2.toUpperCase() + "/RNBQKBNR w KQkq -";
+    return ret;
+}
+
+// Return the FEN for a Chess256/Randompawns game, http://hem.passagen.se/melki9/randompawn.htm
+function setup_chess256(code)
+{
+    var fen, setup;
+
+    if (code === undefined) {
+        code = Math.floor(Math.random() * 255);
+    }
+    
+    setup = decode_chess256(code);
+
+    fen = "rnbqkbnr/" + setup.rank2 + "/" + setup.rank3 + "/8/8/" + 
+        setup.rank3.toUpperCase() + "/" + setup.rank2.toUpperCase() + "/RNBQKBNR w KQkq -";
+
+    return fen;
+}
+
+
+// D-Chess http://www.d-chess.com/
+function setup_dchess(code)
+{
+    var setup, fen;
+
+    if (code === undefined) {
+        code = Math.floor(Math.random() * 132710400);
+    }
+
+    // Synder says there are 8,299,400 positions, which is (4*6!)^2, 
+    // but I get 132,710,400 = (4*4*6!)^2. Dark bishop can be on 4 different
+    // squares, dark bishop the 4 other squares, and 6 other squares to fill.
+    assert(code >= 0 && code <= 132710400, "setup_dchess(" + code + "): out of range 0-132710400, inclusive");
+
+    setup = decode_dchess(code);
+
+    // TODO
+    fen = setup.black + "/pppppppp/8/8/8/8/PPPPPPPP/" + setup.white + " ? - -";
 
     return fen;
 }
