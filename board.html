@@ -6851,7 +6851,7 @@ function decode_dchess(code)
 // black and white, this should be called twice to get the full position.
 function decode_one_dchess(code)
 {
-    var dark_bishop, light_bishop, piece, array;
+    var dark_bishop, light_bishop, piece, array, pieces, spaces;
 
     array = ["-", "-", "-", "-", "-", "-", "-", "-"];
 
@@ -6859,20 +6859,29 @@ function decode_one_dchess(code)
     dark_bishop = code % 4;
     code -= dark_bishop;
     code /= 4;
-    array[dark_bishop * 2] = "dB";
+    array[dark_bishop * 2] = "B";
 
     light_bishop = code % 4;
     code -= light_bishop;
     code /= 4;
-    array[light_bishop * 2 + 1] = "lB";
+    array[light_bishop * 2 + 1] = "B";
 
     // Place knight, knight, rook, rook, queen, and king on first
     // available Nth square as stored.
-    piece = code % 6;
-    code -= piece;
-    code /= 6;
+    pieces = ["N", "N", "R", "R", "Q", "K"];
+    spaces = 6;
 
-    array[array.indexOf("-")]
+    do
+    {
+        piece = code % spaces;
+        code -= piece;
+        code /= spaces;
+
+        array[nth_index_of(array, "-", piece)] = pieces[6 - spaces];
+
+        console.log("place",pieces[6-spaces]," at ",piece,"nth = ",array.join(""));
+
+    } while (spaces -= 1);
 
     return array.join("");
 }
@@ -7232,23 +7241,23 @@ function init_dnd()
 //// LOW-LEVEL FUNCTIONS
 
 // Get the index of the nth needle in the array. Like Array.indexOf(),
-// but nth can not only be 1st, but also 2nd, 3rd, etc. to ignore the
-// first or second occurrence.
+// when nth = 0. If nth = 1, the index of the 2nd occurrence is returned,
+// and so on.
 function nth_index_of(array, needle, nth)
 {
     var hits = 0;
 
     if (!nth) {
-        nth = 1;
+        nth = 0;
     }
 
     for (var i = 0; i < array.length; i += 1) {
         if (array[i] === needle) {
-            hits += 1;
-
             if (hits === nth) {
                 return i;
             }
+
+            hits += 1;
         }
     }
 
