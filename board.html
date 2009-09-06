@@ -282,6 +282,15 @@ var RULE_SETS = {
         },
     },
 
+    // ... and four squares
+    quad_castle: {
+        castle_moves: {
+            clong: {castle_to: 4, king_to: 3},
+            cshort: {castle_to: 9, king_to: 8}
+        },
+    },
+
+
     // Xiangqi where pieces are on intersections
     xiangqi: {
         on_intersections:true,
@@ -935,7 +944,8 @@ var SAVED_BOARDS = {
 "Capablanca Chess": "rnabqkbcnr/pppppppppp/8/8/8/8/PPPPPPPPPP/RNABQKBCNR w AJaj - files=10 stalemate=win rs=triple_castle",
 "Berolina Chess": "rnbqkbnr/xbxbxbxbxbxbxbxb/8/8/8/8/XBXBXBXBXBXBXBXB/RNBQKBNR w KQkq -",
 "Courier Chess": "rnybmkxfibynr/x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)/////X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)/RNYBMKXFIBYNR w - - files=12 ranks=8",
-"Wildebeest Chess (w/o castling)": "rnwwx(gnu)kqbbnr/ppppppppppp///////PPPPPPPPPPP/RNWWX(gnu)KQBBNR w - - files=11 ranks=10 stalemate=win"
+// Note that in this implementation, only 4-move castling is supported, but chessvariants.com describes how one, two, three, or four is supported.
+"Wildebeest Chess": "rnwwx(gnu)kqbbnr/ppppppppppp///////PPPPPPPPPPP/RNWWX(gnu)KQBBNR w AKak - files=11 ranks=10 stalemate=win rs=quad_castle shredder_castle"
 //"Taikyoku Shogi": "/ w - - ranks=36 files=36",
 // TODO: Modern variants
 // Ultima
@@ -5617,13 +5627,17 @@ function load_fen(fen, replay)
         }
         file = ch.toLowerCase();
 
-        // X-FEN / FEN compatibility, KQkq for corner rooks
-        if (file === "k") {
-            // "kingside" (a-side)
-            file = "a";
-        } else if (file === "q") {
-            // "queenside", furthest file from a-side (h-side on orthodox board)
-            file = String.fromCharCode("a".charCodeAt(0) - 1 + GAME_STATE.files);
+        // X-FEN / FEN compatibility, KQkq for corner rooks. Allowed by default,
+        // but for larger boards, K and Q are valid file names, so shredder_castle 
+        // disables this support.
+        if (!GAME_STATE.shredder_castle) {
+            if (file === "k") {
+                // "kingside" (a-side)
+                file = "a";
+            } else if (file === "q") {
+                // "queenside", furthest file from a-side (h-side on orthodox board)
+                file = String.fromCharCode("a".charCodeAt(0) - 1 + GAME_STATE.files);
+            }
         }
 
         GAME_STATE.can_castle[castle_color][file] = true;
