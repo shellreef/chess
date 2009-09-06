@@ -1077,8 +1077,10 @@ var SAVED_BOARDS = {
 "Test KBB + KBB opposite colors":     "k7/8/K7/8/8/8/3b1b/B2B b - - 0 30",
 "Test Castling K/Q": "1k/8/8/8/8/8/8/R3K2R w KQ -",
 "Test Castling Unable": "1k/8/8/8/8/8/8/R3K2R w - -",
-"Test Castling through Check":     "1k3r2/8/8/8/8/7Q/8/R3K2R w KQ -",
-"Test Castling through Check (pawn)": "rnbqkbnr/pppp2pp/8/6N1/4p3/3B4/PPPP2pP/RNBQK2R w KQkq - 0 7",
+"Test Castling Through Check Short":     "1k3r/8/8/8/8/7Q/8/R3K2R w KQ -",
+"Test Castling Through Check Long":     "1k1r/8/8/8/8/7Q/8/R3K2R w KQ -",
+"Test Castling Not Through Check (Rook)":     "1r/3k/8/8/8/5Q/8/R3K2R w KQ -",
+"Test Castling Through Check (pawn)": "rnbqkbnr/pppp2pp/8/6N1/4p3/3B4/PPPP2pP/RNBQK2R w KQkq - 0 7",
 "Test Castling out of Check":     "4r3/8/8/8/8/8/8/R3K2R w KQ -",
 "Test Castling A/H king B": "1k/8/8/8/8/8/8/RK5R w AH -",
 "Test Castling A/H king C": "1k/8/8/8/8/8/8/R1K4R w AH -",
@@ -3245,7 +3247,20 @@ function filtered_moves(piece, color, is_hypothetical)
                     return false;
                 }
 
-                // TODO: Check if king would put itself in check, any time during the path!
+                // Check that the king is not moving through check on its path
+                for (var attack_from in VALID_MOVES_OPP) {
+                    if (VALID_MOVES_OPP.hasOwnProperty(attack_from)) {
+                        var attacks = VALID_MOVES_OPP[attack_from];
+                        for (var k = 0; k < attacks.length; k += 1) 
+                        {
+                            var attack = attacks[k];
+
+                            if (attack.x === x && attack.y === first_rank) {
+                                return false;
+                            }
+                        }
+                    }
+                }
 
                 return true;
             })) {
