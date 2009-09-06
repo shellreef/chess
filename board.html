@@ -956,7 +956,7 @@ var SAVED_BOARDS = {
     "Randomized": {
 "Chess960": setup_chess960,
 "Chess256": setup_chess256,
-"D-Chess (w/o swapping)": setup_dchess
+"D-Chess (swap manually)": setup_dchess
     },
 
     "New Pieces": {
@@ -6670,9 +6670,6 @@ function decode_chess960_s(number)
     var array = new Array(8);
     var light_bishop, dark_bishop, queen, krn_code, krn_array, available, i, j;
 
-    if (number === undefined) {
-        number = Math.floor(Math.random() * 960);
-    }
 
     assert(number >= 0 && number <= 959, "decode_chess960_s(" + number + "): out of range 0-959");
 
@@ -6811,10 +6808,13 @@ function setup_chess960(code)
 {
     var setup_string, castling;
 
+    if (code === undefined) {
+        code = Math.floor(Math.random() * 960);
+    }
+
     setup_string = decode_chess960_s(code);
     castling = generate_castling_eligibility(setup_string);
 
-    console.log(code);
     set_variant_code(code, setup_chess960);
     return setup_string.toLowerCase() + "/pppppppp/8/8/8/8/PPPPPPPP/" + setup_string + " w " + castling + " -";
 }
@@ -6824,10 +6824,6 @@ function decode_chess256(code)
 {
     var ret, i, bit;
 
-    if (code === undefined) {
-        code = Math.floor(Math.random() * 255);
-    }
-    
     assert(code >= 0 && code <= 255, "decode_chess256(" + code + "): out of range 0-255, inclusive");
 
     // Code is an 8-bit binary number, where 1=pawn on 3rd rank, 2=on 2nd rank
@@ -6858,6 +6854,10 @@ function setup_chess256(code)
 {
     var fen, setup;
 
+    if (code === undefined) {
+        code = Math.floor(Math.random() * 255);
+    }
+
     setup = decode_chess256(code);
 
     set_variant_code(code, setup_chess256);
@@ -6870,10 +6870,6 @@ function setup_chess256(code)
 function decode_dchess(code)
 {
     var black_setup, white_setup, white_code, black_code;
-
-    if (code === undefined) {
-        code = Math.floor(Math.random() * 132710400);
-    }
 
     // Synder says there are 8,299,400 positions, which is (4*6!)^2, 
     // but I get 132,710,400 = (4*4*6!)^2. Dark bishop can be on 4 different
@@ -6936,6 +6932,10 @@ function decode_one_dchess(code)
 function setup_dchess(code)
 {
     var setup, fen;
+
+    if (code === undefined) {
+        code = Math.floor(Math.random() * 132710400);
+    }
 
     setup = decode_dchess(code);
 
