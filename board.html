@@ -2754,8 +2754,15 @@ function do_virtual_move(piece, move)
         did.capture_square = did.to_square;
     }
 
-    // The piece that was captured, not always where the piece moved to.
-    did.captured = did.capture_square.piece;
+    if (move.no_capture) {
+        // Capturing is disabled for this move. Allowed so can "move" to source 
+        // square, and not inadvertedly capture oneself.
+        console.log("NO CAPTURE");
+        did.captured = null;
+    } else {
+        // The piece that was captured, not always where the piece moved to.
+        did.captured = did.capture_square.piece;
+    }
 
     // Piece that was on destination square, if any. For restoring old piece.
     did.piece_moved_over = did.to_square.piece;
@@ -5108,11 +5115,14 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
                     ) {
 
             // Move rook. Use do_virtual_move instead of move_piece_to_square, since 
-            // this rook move may not be valid otherwise.
-            do_virtual_move(pc(come_from.short_x, square.y), {x:GAME_STATE.castle_moves.cshort.castle_to, y:square.y});
+            // this rook move may not be valid otherwise. 
+            // Note2: "no_capture" is used since we may "move" the rook/king to where
+            // it already is, and this flag avoids having it capture itself. This kind
+            // of "moving" is legal in Chess960 castling.
+            do_virtual_move(pc(come_from.short_x, square.y), {x:GAME_STATE.castle_moves.cshort.castle_to, y:square.y, no_capture:true});
 
             // Move king to destination square, instead of over rook.
-            move = {x:GAME_STATE.castle_moves.cshort.king_to, y:square.y};
+            move = {x:GAME_STATE.castle_moves.cshort.king_to, y:square.y, no_capture:true};
 
             if (!is_hypothetical) {
                 GAME_STATE.can_castle[GAME_STATE.active_color][come_from.short_file] = false;
@@ -5124,9 +5134,9 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
                      || square.x === come_from.long_x) 
                     ) {
 
-            do_virtual_move(pc(come_from.long_x, square.y), {x:GAME_STATE.castle_moves.clong.castle_to, y:square.y});
+            do_virtual_move(pc(come_from.long_x, square.y), {x:GAME_STATE.castle_moves.clong.castle_to, y:square.y, no_capture:true});
 
-            move = {x:GAME_STATE.castle_moves.clong.king_to, y:square.y};
+            move = {x:GAME_STATE.castle_moves.clong.king_to, y:square.y, no_capture:true};
 
             if (!is_hypothetical) {
                 GAME_STATE.can_castle[GAME_STATE.active_color][come_from.short_file] = false;
