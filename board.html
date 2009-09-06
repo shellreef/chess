@@ -4093,7 +4093,7 @@ function set_turn(color, historical)
     if (color === "next") { 
         GAME_STATE.position_after[ply] = new_state;
     }
-
+    
     set_copyable_link();
 
     return {text_move: text_move, text_end: text_end, repeats: repeats};
@@ -4162,6 +4162,8 @@ function set_copyable_link(this_position)
 function make_copyable_link(fen)
 {
     var base, base_split, query, href;
+
+    assert(fen, "make_copyable_link(" + fen + "): board is required");
 
     // Get current URL without query string
     base_split = document.URL.split("?");
@@ -5595,7 +5597,10 @@ function load_fen(fen, replay)
     color = {w:"white", b:"black", "?":"ask"}[parts[1]];
     assert(color, "load_fen(" + fen + "): bad active color: " + parts[1]);
 
-    GAME_STATE = dojo.clone(GAME_STATE_DEFAULT);
+    if (!replay) {
+        GAME_STATE = dojo.clone(GAME_STATE_DEFAULT);
+    }
+
     if (!isNaN(parseInt(parts[4], 10))) {
         // FEN has halfmove clock and fullmove number in 5th and 6th fields
         GAME_STATE.hmvc = parseInt(parts[4], 10);
