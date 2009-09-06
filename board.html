@@ -424,16 +424,12 @@ var PIECE_TYPES = {
     
     // TODO: @ for absolute, @3,0 and @4,0 short, then @7,0 for @6,0, in order to allow
     // Chess960 orthodox castling when rooks &amp; kings are not at known positions.
-    //king: {parlett: "1*", /*[@3,0;move_a_castle_to=@4,0], [@7,0;move_h_castle_to=@6,0]",*/
     king: {parlett: "1*, " +     // or ~0/1, ~1/1
-             //"[-2,0;if_can_castle=a;if_unblocked=-1,0;if_unblocked2=-2,0;if_unblocked3=-3,0], " +
-             //"[2,0;if_can_castle=h;if_unblocked=1,0;if_unblocked2=2,0]",
-            
-             "[3,0;absolute_x;if_can_castle=a;if_unblocked=-1,0;if_unblocked2=-2,0;if_unblocked3=-3,0], " +
-             "[7,0;absolute_x;if_can_castle=h;if_unblocked=1,0;if_unblocked2=2,0]",
+             //"[3,0;absolute_x;if_can_castle=a;if_unblocked=-1,0;if_unblocked2=-2,0;if_unblocked3=-3,0], " +
+             //"[7,0;absolute_x;if_can_castle=h;if_unblocked=1,0;if_unblocked2=2,0]",
              
-             //"[3,0;absolute_x;if_can_castle=a], " +
-             //"[7,0;absolute_x;if_can_castle=h]",
+             "[3,0;absolute_x;if_can_castle=a], " +
+             "[7,0;absolute_x;if_can_castle=h]",
           royal: true, letter: "K", figurines: ["\u2654", "\u265a"],
           castles_with: "rook", url:"pc:king"},
     queen: {parlett: "n*", letter: "Q", figurines: ["\u2655", "\u265b"], iccf_number: 1, url:"pc:queen"},
@@ -5064,7 +5060,7 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
         }
     }
 
-    assert(one, "execute_move(" + promote_to + ", choices): move not found!");
+    assert(one, "execute_move(" + promote_to + ", " + choices[promote_to] + "): move not found!");
 
     move = one.move;
     piece = one.piece;
@@ -5082,10 +5078,11 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
                      || square.x === come_from.short_x)                     // king captures rook (Chess960)
                     ) {
 
-            // Move rook
-            move_piece_to_square(pc(come_from.short_x, square.y), VBOARD[GAME_STATE.castle_moves.cshort.castle_to][square.y], true, true);
+            // Move rook. Use do_virtual_move instead of move_piece_to_square, since 
+            // this rook move may not be valid otherwise.
+            do_virtual_move(pc(come_from.short_x, square.y), {x:GAME_STATE.castle_moves.cshort.castle_to, y:square.y});
 
-            // Move king to destination square, instead of over rook
+            // Move king to destination square, instead of over rook.
             move = {x:GAME_STATE.castle_moves.cshort.king_to, y:square.y};
 
             if (!is_hypothetical) {
@@ -5098,7 +5095,7 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
                      || square.x === come_from.long_x) 
                     ) {
 
-            move_piece_to_square(pc(come_from.long_x, square.y), VBOARD[GAME_STATE.castle_moves.clong.castle_to][square.y], true, true);
+            do_virtual_move(pc(come_from.long_x, square.y), {x:GAME_STATE.castle_moves.clong.castle_to, y:square.y});
 
             move = {x:GAME_STATE.castle_moves.clong.king_to, y:square.y};
 
