@@ -4890,6 +4890,8 @@ function change_loaded_board(menu)
 
     fen = SAVED_BOARDS[group][name];
 
+    dojo.byId("variant_code").style.display = "none";
+
     load_fen(fen);
 }
 
