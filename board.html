@@ -4887,6 +4887,8 @@ function change_loaded_board(menu)
     dojo.cookie("board_group", group);
     dojo.cookie("board_name", name);
 
+    dojo.byId("game_name").innerHTML = escape_html(name);
+
     fen = SAVED_BOARDS[group][name];
 
     load_fen(fen);
@@ -7472,7 +7474,13 @@ onclick="edit_pgn()" class="show_White">
 <span id="status"></span> 
 <span id="dash" style="display: none">&mdash;</span>
 <span id="check"></span>
+<br>
+<small>
+<span id="game_name"></span>
+<span id="game_variant"></span>
+</small>
 </p>
+
 <p>
 <span id="promote_container"></span>
 </p>
