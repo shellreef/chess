@@ -152,8 +152,7 @@ var AVAILABLE_NOTATIONS = {
     coord:"Computer Coordinate Notation",// aka CCN     B5-C6       E7-E5
     smith:"Smith Notation",//                           b5c6n       e7e5
     descr:"English Descriptive Notation",// aka EDN     BxN         P-K4
-    adesc:"Algebraic Descriptive Notation",//           BxN         P-e4
-    raw:  "Fast Raw Notation"//                         /b5/c5/B    /e5/e7/p
+    adesc:"Algebraic Descriptive Notation"//            BxN         P-e4
 };
 
 // Notations to export with save_pgn(). The first notation is stored in
@@ -169,8 +168,7 @@ var EXPORT_NOTATIONS = [
     "coord",
     "smith",
     "descr",
-    "adesc",
-    "raw"
+    "adesc"
 ];
 
 // Preferences, not game state.
@@ -1719,35 +1717,18 @@ function load_pgn(pgn)
         var others = other_notations[ply] || {};
         others.SAN = move;
 
-        if (others && others.raw) {
-            // Fast move
-            // TODO: XXX: Use mv() but without calculate_moves()
-            //mv(others.raw, true, others);
-            var dr = decode_raw_move(others.raw);
-            do_virtual_move(dr.piece, dr.move);
-        } else {
-            //console.log("slow move",move);
-            mv(move, true, others);
-        }
+        mv(move, true, others);
     }
 
     realize_vboard();
 
-    // TODO: remove
-    if (others && others.raw) {
-        var last_ply = decode_ply(ply);
-        set_turn(last_ply.color);
-    }
-
     populate_make_a_move_list();
     show_move_history();
 
-    /*
     var time_took = new Date().getTime() - time_started;
     if (window.console) {
         alert("load_pgn took " + time_took + " ms");
     }
-    */
 }
 
 // Parse PGN into an array of dictionaries, one dictionary per game.
@@ -2012,31 +1993,20 @@ function encode_ply(color, fmvn)
 // and computer moves also use this function. 
 // If is_not_immediate is true, then the UI is not updated after the move; useful
 // for quickly making many moves without UI slowness.
-// notations is for specifying move notations of the raw move
 // Examples:
 // mv("e4")
 // mv("P-K4")
-// mv("/e2/e4/P", false, {SAN:"e4", descr:"P-K4"})
-function mv(alg_move, is_not_immediate, notations)
+function mv(alg_move, is_not_immediate)
 {
-    var piece_square, piece, square, is_raw;
+    var piece_square, piece, square;
 
     if (!alg_move) {
         assert(VALID_MOVE_NOTATIONS, "mv(" + alg_move + "): called with VALID_MOVE_NOTATIONS false");
         return own_properties(VALID_MOVE_NOTATIONS[PREFS.input_notation]);
     }
 
-    if (alg_move.substr(0, 1) === "/") {
-        // Raw move notation, parsed directly, no legal move checking. For
-        // loading in-progress games quickly, as no move calculation is
-        // needed.
-        piece_square = decode_raw_move(alg_move);
-        dojo.mixin(piece_square, {notations:notations});
-        is_raw = true;
-    } else {
-        // For ordinary notations, find move in precalculated notations. 
-        piece_square = find_legal_move(alg_move);
-    }
+    // Find move in precalculated notations. 
+    piece_square = find_legal_move(alg_move);
 
     assert(piece_square, "mv(" + alg_move + "): illegal move");
 
@@ -2047,7 +2017,7 @@ function mv(alg_move, is_not_immediate, notations)
     var choices = {};
     choices[promote_to] = piece_square;
 
-    execute_move(promote_to, choices, false, !is_not_immediate, is_raw);
+    execute_move(promote_to, choices, false, !is_not_immediate);
 }
 
 // Find a legal move, given the move text, precalculated already with
@@ -2504,9 +2474,6 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
             smith_capture_letter = "";
         }
         ps.smith.push([piece, square, [starting_filerank + dest_filerank + smith_capture_letter + promote_or_blank], move]);
-       
-        // Should NEVER need to lookup raw notation, but calculate here so it is treated like all the others
-        ps.raw.push([piece, square, [make_raw_notation(piece, move)], move]);
     });
 
     // TODO: check for cross-notation ambiguities. Inputs are tested in the order of
@@ -2607,7 +2574,7 @@ function disambiguate_notations(notations)
 function calculate_moves(color, is_hypothetical)
 {
     var valid_moves = {}, is_valid_move = {}, blocked_moves = {};
-    var possible_notations, notation, raw_notations = {};
+    var possible_notations, notation;
 
     if (!is_hypothetical) { 
         // Values are [ [ [piece, square ], [possible move names] ], ... ]
@@ -2900,79 +2867,6 @@ function disable_engine(why)
 
     // It'll have to do
     random_move();
-}
-
-// Codes for raw notation
-// TODO: generalize in raw notation and abs_move? 
-var RAW_NOTATION_FLAG_LONG2SHORT = {
-    en_passant_capture: "e",    // captures pawn behind destination square
-    snapback: "s",              // clears "destination square", piece doesn't move
-    self_destruct: "d"          // destination square is cleared
-};
-
-var RAW_NOTATION_FLAG_SHORT2LONG = {
-    e: "en_passant_capture",
-    s: "snapback",
-    d: "self_destruct"
-};
-
-// Decode a serialized "raw" notation and execute it using do_virtual_move().
-// This move notation allows moves to be made without calculating the valid
-// moves, a time-consuming process.
-// Syntax: /from_square/to_square/piece_code/flags
-// TODO: Use for quickly loading a saved game, in a URL, without calculating valid
-// moves (time consuming)
-function decode_raw_move(s)
-{
-    var a, piece, move, square, notations, flags;
-
-    assert(s.substr(0, 1) === "/", "do_raw_move(" + s + "): must begin with /");
-
-    // TODO: support X(...) piece codes
-    piece = decode_piece_letter(s.substring(5, 6));
-    piece.square = filerank2obj(s.substring(1, 3));
-    move = filerank2obj(s.substring(3, 5));
-    flags = s.substring(6);
-
-    for (var i = 0; i < flags.length; i += 1) {
-        var flag_code = flags.charAt(i);
-        var long_flag = RAW_NOTATION_FLAG_SHORT2LONG[flag_code];
-        
-        assert(long_flag, "decode_raw_move(" + s + "): invalid flag code: " + flag_code);
-        move[long_flag] = true;
-    }
-
-    
-    square = VBOARD[move.x][move.y];
-
-    // Populate move with flags
-    dojo.mixin(move, parse_move_flags(flags));
-
-    return {piece:piece, square:square, move:move};
-    //do_virtual_move(piece, move);
-}
-
-// Generate the raw move notation for a move
-function make_raw_notation(piece, move)
-{
-    var from_square, to_square, piece_code, flags;
-
-    from_square = xy2filerank([piece.square.x, piece.square.y]);
-    to_square = xy2filerank([move.x, move.y]);
-    piece_code = color_piece_prefix(piece);
-
-    flags = "";
-    for (var prop in move) 
-    {
-        if (move.hasOwnProperty(prop)) {
-            var code = RAW_NOTATION_FLAG_LONG2SHORT[prop];
-            if (code) {
-                flags += code;
-            }
-        }
-    }
-
-    return "/" + from_square + to_square + piece_code + flags;
 }
 
 // Make a move in the VBOARD, which can be undone. Only makes the move.
@@ -5361,7 +5255,7 @@ function highlight_recent_move(from_square, to_square)
 }
 
 // Make a move, or half-move, given choices.
-function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw) 
+function execute_move(promote_to, choices, is_hypothetical, is_immediate) 
 {
     var piece, square, promote_to;
     var from_square, move_text, filerank, only_move, move, choices, did, one;
@@ -5389,7 +5283,6 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
     one.from_square = one.piece.square;
 
     // If castling, move the rook in place. 
-    // Note: if pass this in abs_move/choices, need to save in raw move notation, too.
     if (PIECE_TYPES[piece.type].castles_with) {
         var come_from = castles_come_from();
 
@@ -5488,7 +5381,7 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
     } else {
         // If not a multi-move (moving rook in castling), log and go to next turn
         if (!is_hypothetical) {
-            finish_up_move(choices, is_immediate, undefined, is_raw);
+            finish_up_move(choices, is_immediate, undefined);
         }
     }
 
@@ -5501,7 +5394,7 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
 // Perform bookkeeping on the move after it has been actually made, 
 // in move_piece_to_square().
 // promote_to is the type for promotions, or undefined otherwise.
-function finish_up_move(tieback, is_immediate, promote_to, is_raw)
+function finish_up_move(tieback, is_immediate, promote_to)
 {
     var alg_move, ply, turn_info, move_text, info;
 
@@ -5515,7 +5408,6 @@ function finish_up_move(tieback, is_immediate, promote_to, is_raw)
     ply = encode_ply(GAME_STATE.active_color, GAME_STATE.fmvn);
   
     info.only_move = own_property_count(VALID_MOVE_NOTATIONS.SAN) === 1;
-    // TODO: skip move calculation if is_raw
     turn_info = set_turn("next", false);
 
     if (turn_info.text_move) { info.add_text = turn_info.text_move; }
