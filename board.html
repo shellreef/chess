@@ -1756,11 +1756,18 @@ function set_next_back_accesskeys(ply)
             x.removeAttribute("accesskey");
         });
 
+    // first
+    dojo.byId("ply_0").setAttribute("accesskey", ";"); // ctrl+option+;
+
+    // TODO: last
+   
+    // previous
     dojo.query("a#ply_" + (ply + 1)).forEach(function(x) {
             x.setAttribute("accesskey", ".");       // ctrl+option+.
             dojo.addClass(x, "accessible_move");
         });
-    
+   
+    // next
     dojo.query("a#ply_" + (ply - 1)).forEach(function(x) {
             x.setAttribute("accesskey", ",");       // ctrl+option+,
             dojo.addClass(x, "accessible_move");
@@ -1770,16 +1777,7 @@ function set_next_back_accesskeys(ply)
 // Make a link to a move, click it and it loads the board after it.
 function move_link(ply, text)
 {
-    var extra;
-
-    // ctrl+option+/ (at least on Safari 4) to go to initial position
-    if (ply === 0) {
-        extra = ' accesskey="/"';
-    } else {
-        extra = "";
-    }
-
-    return '<a' + extra + ' id="ply_' + ply + '" class="active_move" ' +
+    return '<a id="ply_' + ply + '" class="active_move" ' +
         'href="#" onclick="load_ply(' + 
             ply +
         ')">' + text + "<\/a>";
