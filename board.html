@@ -397,8 +397,6 @@ var GAME_STATE_DEFAULT = {
     // Not game state, but other globals
     dragging: false,
     active_in_check: false,
-    recent_piece: null,         // Recently moved piece
-    recent_square: null,        // Recently moved from square
     last_captured: null,        // export_captured() string _before_ current move 
     piece_under: null,          // Piece under cursor for piece inspector
     shift: false,               // Whether shift key is pressed
@@ -1751,8 +1749,6 @@ function output_pgn_dict(dict)
 // Load a move by ply. Used to navigate to past moves.
 function load_ply(ply)
 {
-    console.log("load_ply",ply);
-
     // TODO: would be cool to be able to also decode
     // color + fullmove number, for ease of human use.
     // Make "1." be ply 1, and "1..." or "1. ..." be ply 2.
@@ -1787,16 +1783,12 @@ function set_next_back_accesskeys(ply)
     // last
     dojo.byId("ply_" + (GAME_STATE.made_moves.length - 1)).setAttribute("accesskey", "'"); // ctrl+option+,
   
-    console.log(ply,dojo.byId("ply_" + (ply + 1)));
-
     // next
     next_link = dojo.byId("ply_" + (ply + 1));
     if (next_link) {
         // Not the last move.. there is another one ahead.
         next_link.setAttribute("accesskey", ".");       // ctrl+option+.
         dojo.addClass(next_link, "accessible_move");
-    } else {
-        console.log("last move");
     }
 
     prev_link = dojo.byId("ply_" + (ply - 1));
@@ -5189,6 +5181,13 @@ function castles_come_from()
     return ret;
 }
 
+// Highlight the squares a piece recently moved from and to
+function highlight_recent_move(from_square, to_square)
+{
+    push_highlight(from_square, DISPLAY["recent_move_" + from_square.color]);
+    push_highlight(to_square, DISPLAY["recent_move_" + to_square.color]);
+}
+
 // Make a move, or half-move, given choices.
 function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw) 
 {
@@ -5260,10 +5259,6 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
         // Pieces captured /before/ this move
         GAME_STATE.last_captured = export_captured();
 
-        // For highlighting recent move on board
-        GAME_STATE.recent_square = from_square;
-        GAME_STATE.recent_piece = piece;
-
         // If moved either rook, can't castle on that side.
         if (PIECE_TYPES[piece.type].castle) {
             var castles_at = castles_come_from();
@@ -5282,8 +5277,7 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
             GAME_STATE.hmvc += 1;
         }
 
-        push_highlight(from_square, DISPLAY["recent_move_" + from_square.color]);
-        push_highlight(square, DISPLAY["recent_move_" + square.color]);
+        highlight_recent_move(from_square, square);
     }
 
     did = do_virtual_move(piece, move);
