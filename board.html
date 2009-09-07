@@ -1761,6 +1761,13 @@ function load_ply(ply)
     dojo.addClass(dojo.byId("ply_" + ply), "active_move");
 
     set_next_back_accesskeys(ply);
+   
+    unhighlight_all();
+
+    if (ply !== 0) {
+        highlight_recent_move(GAME_STATE.made_moves[ply].from_square, 
+                GAME_STATE.made_moves[ply].square);
+    }
 }
 
 // Setup accesskeys for next and back given the current ply.
@@ -5038,6 +5045,7 @@ function get_notations(piece, square, promote_to)
                             finds[key] = {
                                 move: this_move, 
                                 square: this_square,
+                                from_square: this_piece.square,
                                 piece: this_piece,
                                 notations: {}};
                         }
@@ -5214,6 +5222,7 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
     piece = one.piece;
     square = one.square;
     from_square = piece.square;
+    one.from_square = one.piece.square;
 
     // If castling, move the rook in place. 
     // Note: if pass this in abs_move/choices, need to save in raw move notation, too.
