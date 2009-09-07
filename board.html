@@ -1866,6 +1866,8 @@ function mv(alg_move, is_not_immediate, notations)
     var choices = {};
     choices[promote_to] = piece_square;
 
+    unhighlight_all();
+
     execute_move(promote_to, choices, false, !is_not_immediate, is_raw);
 }
 
