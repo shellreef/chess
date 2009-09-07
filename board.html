@@ -1567,6 +1567,8 @@ function load_pgn(pgn)
         }
     }
 
+    realize_vboard();
+
     // TODO: remove
     if (others && others.raw) {
         var last_ply = decode_ply(ply);
