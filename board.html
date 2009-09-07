@@ -1866,8 +1866,6 @@ function mv(alg_move, is_not_immediate, notations)
     var choices = {};
     choices[promote_to] = piece_square;
 
-    unhighlight_all();
-
     execute_move(promote_to, choices, false, !is_not_immediate, is_raw);
 }
 
@@ -5180,6 +5178,8 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate, is_raw
 {
     var piece, square, promote_to;
     var from_square, move_text, filerank, only_move, move, choices, did, one;
+
+    unhighlight_all();
   
     if (choices[promote_to]) {
         one = choices[promote_to];
@@ -5480,7 +5480,6 @@ function move_dropped_piece(piece, square, event)
 
     // Move the piece in the virtual board and realize it.
     setTimeout(function() { 
-            unhighlight_all();
             move_piece_to_square(virtual_piece, virtual_square, false, true) 
         }, 0);
 }
