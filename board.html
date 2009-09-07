@@ -207,6 +207,7 @@ var PREFS = {
     saved_games_path: "games/",
 
     show_castling_impediments:false,    // Highlight squares preventing castling
+    verbose_pgn:false,                  // Include extraneous PGN tags (CurrentFEN, Moves_[notations])
     variant_generator:null              // Setup function for randomized games
 
 };
@@ -1418,8 +1419,10 @@ function save_pgn()
         dict.Captured = captured;
     }
 
-    // Non-standard: current board state. The standard tags are FEN and SetUp, for starting position only.
-    dict.CurrentFEN = save_fen(); 
+    if (PREFS.verbose_pgn) {
+        // Non-standard: current board state. The standard tags are FEN and SetUp, for starting position only.
+        dict.CurrentFEN = save_fen(); 
+    }
 
     // Generate move text (not in a tag) 
     var move_texts = [];
@@ -1436,6 +1439,7 @@ function save_pgn()
         if (ply_info.color === "white") {
             move_texts.push(ply_info.fmvn + ". ");
         }
+        // TODO: include +, #, ?, !, $n notations
         move_texts.push(made.notations[EXPORT_NOTATIONS[0]]);
         move_texts.push(" ");
 
@@ -1447,22 +1451,25 @@ function save_pgn()
             other_move_texts[notation][ply] = made.notations[notation];
         }
     }
- 
-    // Alternate moves, in tag
-    for (notation in other_move_texts) {
-        if (other_move_texts.hasOwnProperty(notation)) {
-            var texts = [];
-            for (ply = 1; ply < other_move_texts[notation].length; ply += 1) {
-                texts.push(other_move_texts[notation][ply] + " ");
+
+    if (PREFS.verbose_pgn) {
+        // Alternate moves, in tag
+        for (notation in other_move_texts) {
+            if (other_move_texts.hasOwnProperty(notation)) {
+                var texts = [];
+                for (ply = 1; ply < other_move_texts[notation].length; ply += 1) {
+                    texts.push(other_move_texts[notation][ply] + " ");
+                }
+
+                dict["Moves_" + notation] = texts.join("");
             }
-
-            dict["Moves_" + notation] = texts.join("");
         }
-    }
 
-   
+    } 
+
     pgns.push(output_pgn_dict(dict));
-    pgns.push(move_texts.join(""));
+    pgns.push("");
+    pgns.push(move_texts.join("") + (GAME_STATE.ended ? " " + GAME_STATE.ended : ""));
 
     return pgns.join("\n");
 }
