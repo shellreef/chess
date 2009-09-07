@@ -207,11 +207,8 @@ var PREFS = {
     saved_games_path: "games/",
 
     show_castling_impediments:false,    // Highlight squares preventing castling
-    variant_generator:null,             // Setup function for randomized games
+    variant_generator:null              // Setup function for randomized games
 
-    black: "#d18b47",           // Black square
-    white: "#ffce9e",           // White square
-    square_size: "55px"
 };
 
 // Board display and drawing settings
@@ -240,8 +237,22 @@ var DISPLAY = {
 
    
     // Squares
-    black:"#d18b47",
-    white:"#ffce9e",
+    black:"#d18b47", white:"#ffce9e", // a pleasant tan
+
+    // Use Applications/Utilities/DigitalColor Meter to get hex colors
+
+    // From ExaChess
+    /*
+    black:"#9999ff", white:"#ffffcc", // blue
+    black:"#cc9966", white:"#ffdcab", // brown
+    black:"#bbbbbb", white:"#eeeeee", // gray
+    black:"#339933", white:"#eeeeee", // green
+    */
+
+    // From Chess with Friends (but has shadows)
+    //black:"#8b8bb1", white:"#ecece7", // medium blue
+
+    // Shredder, Yahoo Chess use textured boards
 
     // Highlighting of legal moves on mouseover
     legal_move_white: "seagreen",
