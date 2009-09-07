@@ -425,6 +425,35 @@ var DROP = {
     offboard: false     // whether dropping offboard or not
 };
 
+var ANNOTATIONS = {
+    "!!": "Very good move",
+    "!": "Good move",
+    "!?": "Interesting move",
+    "?!": "Dubious move",
+    "?": "Bad move",
+    "??": "Very bad move",
+
+    "+-": "White winning",
+    "+/-": White advantange",
+    "+/=": "White better",
+    "=": "Equality",
+    "=/+": "Black better",
+    "-/+": "Black advantage",
+    "-+": "Black winning",
+    "(oo)": "Unclear",
+    "(N)": "Novelty",
+    "(&)": "Compensation",
+    "(<->)": "With counterplay",
+    "(^)": "With initiative",
+    "(->)": "With attack",
+    "(tm)": "Time trouble",
+    "([])": "Only move",
+    "(=)": "Draw offered"
+};
+
+var NAGS = [
+];
+
 // Moves that can be made right now, for each active piece.
 var VALID_MOVES = null;             // Keyed by filerank of source, array of moves, x, y and any flags
 var IS_VALID_MOVE = null;           // Keyed by filerank of source, then filerank of dest
@@ -436,7 +465,6 @@ var ALT_MOVE_NOTATIONS = null;      // Same as above, but non-canonical, longer 
 
 
 // Board 
-var SQUARES = null;                 // Get table cell square node by rank and file
 var VBOARD = null;                  // Virtual in-memory board
 var CLIPBOARD = null;               // ZeroClipboard instance
 
@@ -4710,14 +4738,12 @@ function flip()
 // Internally name the square cells with their (x,y) coordinates
 // and filerank notation, once when the page loads. This is only code so I
 // don't have to manually type <td x=0 y=0 filerank=a8> etc. in all the cells.
-// Also populates SQUARES for fast lookup, and VBOARD virtual board.
+// Also populates VBOARD virtual board.
 // If flipped is true, then the board is from black's perspective, instead of white's.
 function label_board(flipped)
 {
-    SQUARES = [];
     VBOARD = [];
     for (var x = 1; x <= GAME_STATE.files; x += 1) {
-        SQUARES[x] = [];
         VBOARD[x] = [];
         for (var y = 1; y <= GAME_STATE.ranks; y += 1) {
             VBOARD[x][y] = {virtual:true};
