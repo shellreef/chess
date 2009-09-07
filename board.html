@@ -5689,7 +5689,11 @@ function load_fen(fen, replay)
    
     load_starting_position(parts[0], replay);
 
-    if (!replay) { 
+    if (replay) { 
+        // TODO: clear recent move, XYZ
+        GAME_STATE.recent_piece = null;
+    } else {
+        // Game loading initialization
         GAME_STATE.position_moves = {}; 
         GAME_STATE.position_after = [fen];  // 0th ply = initial state
 
@@ -6389,7 +6393,7 @@ function out_piece(piece, event)
 
     var square = highlight_moves(piece, false);
     if (square) {
-        pop_highlight(square, false);
+        pop_highlight(square);
     }
    
     if (!event.shiftKey) {
