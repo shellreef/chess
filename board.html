@@ -1335,7 +1335,7 @@ function edit_pgn()
 
     game_ui.innerHTML = "<textarea id='edited_pgn' name='edited_pgn' cols='80' rows='35'>" + escape_html(save_pgn()) + 
         "<\/textarea>" + 
-        "<button type='button' name='ok' accesskey='o' " + 
+        "<button type='button' name='ok' accesskey='k' " + 
         "onclick='reload_pgn()'>OK<\/button>" +
         "<button type='button' name='cancel' onclick='restore_edit()' accesskey='x'>Cancel<\/button>";
 
@@ -1759,7 +1759,8 @@ function set_next_back_accesskeys(ply)
     // first
     dojo.byId("ply_0").setAttribute("accesskey", ";"); // ctrl+option+;
 
-    // TODO: last
+    // last
+    dojo.byId("ply_" + (GAME_STATE.made_moves.length - 1)).setAttribute("accesskey", "'"); // ctrl+option+,
    
     // previous
     dojo.query("a#ply_" + (ply + 1)).forEach(function(x) {
@@ -1774,7 +1775,7 @@ function set_next_back_accesskeys(ply)
         });
 }
 
-// Make a link to a move, click it and it loads the board after it.
+// Make a link to a ply, which can be clicked to load the board after this move was made.
 function move_link(ply, text)
 {
     return '<a id="ply_' + ply + '" class="active_move" ' +
