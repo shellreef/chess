@@ -1803,18 +1803,32 @@ function parse_pgn(pgn)
         var tokens = dict.move_text.split(" ");
         delete dict.move_text;  // not for anyone but this function
         var fmvn = 1, outcome, moves = [], move_annotations = [], color = "white";
-        var in_comment = false;
+        var in_comment = false, comment = [];
 
         for (i = 0; i < tokens.length; i += 1) {
             var token = tokens[i];
+            var ply = encode_ply(color, fmvn);
 
             if (token === "") {
                 // Skip
             } else if (in_comment) {
                 if (token.substr(token.length - 1) === "}") {
                     in_comment = false;
+
+                    if (!move_annotations[ply]) {
+                        move_annotations[ply] = [];
+                    }
+                    move_annotations[ply].push(comment.join(" "));
+                    comment = [];
+                } else {
+                    comment.push(token);
                 }
-                // TODO: support annotations
+            } else if (token.charAt(0) === "$") {
+                // NAG, Numerical Annotation Glyph
+                if (!move_annotations[ply]) {
+                    move_annotations[ply] = [];
+                }
+                move_annotations[ply].push(token);
             } else if (token.substring(token.length - 1) === ".") {
                 fmvn = parseInt(token, 10);
 
@@ -1824,9 +1838,6 @@ function parse_pgn(pgn)
                 } else {
                     color = "white";
                 }
-            } else if (token.charAt(0) === "$") {
-                // TODO: parse NAG
-                console.log(token);
             } else if (token === "1-0") {
                 outcome = "White wins";
             } else if (token === "0-1") {
@@ -1839,9 +1850,8 @@ function parse_pgn(pgn)
                 in_comment = true;
             } else {
                 // Move 
-                
-                var ply = encode_ply(color, fmvn);
                 // TODO: handle #, + for checkmate and check, part of move
+                // and TODO: handle ?, !, ??, !?, etc. in move_annotations
                 moves[ply] = token;
 
                 // white, then black
@@ -1853,6 +1863,7 @@ function parse_pgn(pgn)
 
         dict.outcome = outcome;
         dict.moves = moves;
+        dict.move_annotations = move_annotations;
     }
 
     return dicts;
