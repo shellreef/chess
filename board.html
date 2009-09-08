@@ -1749,6 +1749,9 @@ function parse_pgn(pgn)
 
             if (token === "") {
                 // Skip
+            } else if (token.substr(0, 1) === "{") {
+                in_comment = true;
+                comment.push(token.substring(1));
             } else if (in_comment) {
                 if (token.substr(token.length - 1) === "}") {
                     in_comment = false;
@@ -1784,8 +1787,6 @@ function parse_pgn(pgn)
                 outcome = "Draw";
             } else if (token === "*") { 
                 outcome = "(In progress)";
-            } else if (token.substr(0, 1) === "{") {
-                in_comment = true;
             } else {
                 // Move 
                 // TODO: handle #, + for checkmate and check, part of move
@@ -5445,16 +5446,19 @@ function show_move_history()
 
         if (GAME_STATE.annotations[ply]) {
             // TODO: decode NAGs, like $n, into !!
-            htmls.push(' <span class="move_annotation">');
+            htmls.push('<span class="move_annotation">');
             for (var a = 0; a < GAME_STATE.annotations[ply].length; a += 1) {
                 var note = GAME_STATE.annotations[ply][a];
-                var note_text;
+                var note_text = "";
 
                 if (note.charAt(0) === "$") {
                     var nag_code = parseInt(note.substring(1), 10);
-                    note_text = NAGS[nag_code];
+                    if (NAGS[nag_code].length > 2) {
+                        note_text = " ";
+                    } 
+                    note_text += NAGS[nag_code];
                 } else {
-                    note_text = note;
+                    note_text = " " + note;
                 }
                 htmls.push(note_text + " ");
             }
