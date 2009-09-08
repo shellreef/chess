@@ -3318,6 +3318,16 @@ function filtered_moves(piece, color, is_hypothetical)
                 continue;
             }
 
+            if (start.y !== (color === "white" ? 1 : (GAME_STATE.ranks))) {
+                // It is not the job of this function to determine whether the
+                // castle or king has moved; we rely on the castling eligibility codes.
+                // They are probably incorrect if this happens, since the king is not
+                // on its first rank.
+                console.log(GAME_STATE);
+                assert(false, "filtered_moves: " + color + " is eligible to castle, but the king is on rank start.y=" + start.y + ", instead of the first rank. Is the castling eligibility correct?");
+            }
+
+
             // Can't castle if in check
             if (GAME_STATE.active_in_check) {
                 continue;
@@ -3339,7 +3349,7 @@ function filtered_moves(piece, color, is_hypothetical)
                 abs_move.notation_override = "O-O";
                 goes_to = GAME_STATE.castle_moves.cshort;
             } else {
-                assert(false, "castling: castle_from_x === start.x (" + castle_from_x + " === " + start.x + ")");
+                assert(false, "filtered_moves: castling: castle_from_x === start.x (" + castle_from_x + " === " + start.x + "). This may happen if the FEN says that castling is possible, but in fact the king or rook have moved.");
             }
 
             var first_rank = color === "white" ? 1 : GAME_STATE.ranks;
@@ -5017,7 +5027,7 @@ function piece_was_captured(piece, square)
        
         var castles_at = castles_come_from();
 
-        // TODO: really would like to not have to hardcode this
+        // Capturing rook means can't castle with it
         if (square.y === first_rank) {
             if (square.x === castles_at.long_x) {
                 GAME_STATE.can_castle[opponent][castles_at.long_file] = false;
@@ -5325,16 +5335,23 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate)
         // Pieces captured /before/ this move
         GAME_STATE.last_captured = export_captured();
 
+        var castles_at = castles_come_from();
+
         // If moved either rook, can't castle on that side.
         if (PIECE_TYPES[piece.type].castle) {
-            var castles_at = castles_come_from();
-
             if (from_square.x === castles_at.short_x) {
                 GAME_STATE.can_castle[GAME_STATE.active_color][castles_at.short_file] = false;
             } else if (from_square.x === castles_at.long_x) {
                 GAME_STATE.can_castle[GAME_STATE.active_color][castles_at.long_file] = false;
             }
         }
+
+        // If moved king, cannot castle on either side.
+        if (PIECE_TYPES[piece.type].castles_with) {
+            GAME_STATE.can_castle[GAME_STATE.active_color][castles_at.short_file] = false;
+            GAME_STATE.can_castle[GAME_STATE.active_color][castles_at.long_file] = false;
+        }
+
 
         // If moved pawn, or was a capture, reset fifty move rule counter
         if (move.capture || PIECE_TYPES[piece.type].resets_50move) {
@@ -5621,13 +5638,29 @@ function save_fen()
         fens.push("b");
     }
 
-    // Castling availability
+    // Castling availability. Use Shredder-FEN or classical FEN as appropriate.
+    // Unfortunately, this allows for a mix of both if one castle is at the edge (K/Q),
+    // and the other isn't (B-G).
     fens.push(" ");
     castles = false;
-    if (GAME_STATE.can_castle.white.h) { fens.push("K"); castles = true; }
-    if (GAME_STATE.can_castle.white.a)  { fens.push("Q"); castles = true; }
-    if (GAME_STATE.can_castle.black.h) { fens.push("k"); castles = true; }
-    if (GAME_STATE.can_castle.black.a)  { fens.push("q"); castles = true; }
+    var come_from = castles_come_from();
+
+    if (GAME_STATE.can_castle.white[come_from.short_file]) { 
+        fens.push(come_from.short_x === GAME_STATE.files ? "K" : come_from.short_file.toUpperCase()); 
+        castles = true; 
+    }
+    if (GAME_STATE.can_castle.white[come_from.long_file])  { 
+        fens.push(come_from.long_x === 1 ? "Q" : come_from.long_file.toUpperCase()); 
+        castles = true; 
+    }
+    if (GAME_STATE.can_castle.black[come_from.short_file]) { 
+        fens.push(come_from.short_x === GAME_STATE.files ? "k" : come_from.short_file); 
+        castles = true; 
+    }
+    if (GAME_STATE.can_castle.black[come_from.long_file])  { 
+        fens.push(come_from.long_x === 1 ? "q" : come_from.long_file); 
+        castles = true; 
+    }
     if (!castles) { fens.push("-"); }
 
     // En passant target square
