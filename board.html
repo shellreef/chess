@@ -155,22 +155,6 @@ var AVAILABLE_NOTATIONS = {
     adesc:"Algebraic Descriptive Notation"//            BxN         P-e4
 };
 
-// Notations to export with save_pgn(). The first notation is stored in
-// the PGN move text, others in special tags.
-// TODO: export all by default, but then only include these for email?
-var EXPORT_NOTATIONS = [
-    "SAN",
-    "LAN",
-    "MAN",
-    "CRAN",
-    "FAN",
-    "ICCF",
-    "coord",
-    "smith",
-    "descr",
-    "adesc"
-];
-
 // Preferences, not game state.
 var PREFS = {
     revert_time: 350,             // ms to take to revert
@@ -191,7 +175,6 @@ var PREFS = {
     saved_games_path: "games/",
 
     show_castling_impediments:false,    // Highlight squares preventing castling
-    verbose_pgn:false,                  // Include extraneous PGN tags (CurrentFEN, Moves_[notations])
     variant_generator:null              // Setup function for randomized games
 
 };
@@ -1576,14 +1559,8 @@ function save_pgn()
         dict.Captured = captured;
     }
 
-    if (PREFS.verbose_pgn) {
-        // Non-standard: current board state. The standard tags are FEN and SetUp, for starting position only.
-        dict.CurrentFEN = save_fen(); 
-    }
-
     // Generate move text (not in a tag) 
     var move_texts = [];
-    var other_move_texts = {};
     for (var ply = 1; ply < GAME_STATE.made_moves.length; ply += 1) {
         var made = GAME_STATE.made_moves[ply];
         if (!made) {
@@ -1597,32 +1574,9 @@ function save_pgn()
             move_texts.push(ply_info.fmvn + ". ");
         }
         // TODO: include +, #, ?, !, $n notations
-        move_texts.push(made.notations[EXPORT_NOTATIONS[0]]);
+        move_texts.push(made.notations.SAN);
         move_texts.push(" ");
-
-        for (var i = 1; i < EXPORT_NOTATIONS.length; i += 1) {
-            var notation = EXPORT_NOTATIONS[i];
-            if (!other_move_texts[notation]) {
-                other_move_texts[notation] = [];
-            }
-            other_move_texts[notation][ply] = made.notations[notation];
-        }
     }
-
-    if (PREFS.verbose_pgn) {
-        // Alternate moves, in tag
-        for (notation in other_move_texts) {
-            if (other_move_texts.hasOwnProperty(notation)) {
-                var texts = [];
-                for (ply = 1; ply < other_move_texts[notation].length; ply += 1) {
-                    texts.push(other_move_texts[notation][ply] + " ");
-                }
-
-                dict["Moves_" + notation] = texts.join("");
-            }
-        }
-
-    } 
 
     pgns.push(output_pgn_dict(dict));
     pgns.push("");
@@ -1692,32 +1646,11 @@ function load_pgn(pgn)
         update_captured_piece_images();
     }
 
-
-    // Alternate notations for moves given in tags
-    var other_notations = [];
-    for (i = 0; i < EXPORT_NOTATIONS.length; i += 1) {
-        var not = EXPORT_NOTATIONS[i];
-        if (game["Moves_" + not]) {
-            var ns = game["Moves_" + not].split(" ");
-
-            for (var j = 0; j < ns.length; j += 1) {
-                var ply = j + 1;
-                if (!other_notations[ply]) {
-                    other_notations[ply] = {};
-                }
-                other_notations[ply][not] = ns[j];
-            }
-        }
-    }
-
     // Movetext given in SAN
     for (ply = 1; ply < game.moves.length; ply += 1) {
         var move = game.moves[ply];
 
-        var others = other_notations[ply] || {};
-        others.SAN = move;
-
-        mv(move, true, others);
+        mv(move, true);
     }
 
     realize_vboard();
