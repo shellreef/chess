@@ -5019,6 +5019,7 @@ function change_loaded_board(menu)
 // does all the board manipulation. 
 function piece_was_captured(piece, square)
 {
+    console.log("captured",piece.type);
     // If rook captured, remove castling privileges
     if (PIECE_TYPES[piece.type].castle) {
         // Note that this is the first rank of the *other* player
@@ -5027,7 +5028,7 @@ function piece_was_captured(piece, square)
        
         var castles_at = castles_come_from();
 
-        // Capturing rook means can't castle with it
+        // If captured rook, opponent cannot castle with it.
         if (square.y === first_rank) {
             if (square.x === castles_at.long_x) {
                 GAME_STATE.can_castle[opponent][castles_at.long_file] = false;
@@ -5313,7 +5314,6 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate)
                 GAME_STATE.can_castle[GAME_STATE.active_color][come_from.short_file] = false;
                 GAME_STATE.can_castle[GAME_STATE.active_color][come_from.long_file] = false;
             }
-
         } else if (GAME_STATE.can_castle[GAME_STATE.active_color][come_from.long_file] && 
                     (square.x === GAME_STATE.castle_moves.clong.king_to
                      || square.x === come_from.long_x) 
@@ -5327,6 +5327,9 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate)
                 GAME_STATE.can_castle[GAME_STATE.active_color][come_from.short_file] = false;
                 GAME_STATE.can_castle[GAME_STATE.active_color][come_from.long_file] = false;
             }
+
+            console.log("No more castle for " + GAME_STATE.active_color);
+            console.log(dojo.toJson(GAME_STATE.can_castle));
         }
     }
 
@@ -5350,6 +5353,9 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate)
         if (PIECE_TYPES[piece.type].castles_with) {
             GAME_STATE.can_castle[GAME_STATE.active_color][castles_at.short_file] = false;
             GAME_STATE.can_castle[GAME_STATE.active_color][castles_at.long_file] = false;
+
+            console.log("Moved king so ",GAME_STATE.active_color," can not castle");
+            console.log(dojo.toJson(GAME_STATE.can_castle));
         }
 
 
@@ -5767,6 +5773,7 @@ function load_fen(fen, replay)
     }
 
     // Now that know rank & file count, parse castling eligibilities
+    GAME_STATE.can_castle = {white:{}, black:{}};
     for (var i = 0; i < castling.length; i += 1) {
         var ch = castling.charAt(i);
         var castle_color, file;
@@ -5838,6 +5845,8 @@ function load_fen(fen, replay)
     // Now that everything is loaded, set the turn.
     set_turn(color, replay);
     populate_make_a_move_list();
+
+    console.log(dojo.toJson(GAME_STATE.can_castle));
 }
 
 // Create a palace or river feature
