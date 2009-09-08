@@ -352,6 +352,7 @@ var GAME_STATE_DEFAULT = {
     position_moves: {},         // Board position -> move IDs, for 3n move repetition
     position_after: [],         // Board positions at each move, for quick playback
     made_moves: [],             // Piece, square and each move notation for past moves
+    annotations: [],            // Array of arrays of optional notes about each move
     ended: false,               // Game is done (drawn, won)
     captured: {white:[], black:[]}, // Captured pieces
 
@@ -1647,10 +1648,13 @@ function load_pgn(pgn)
     }
 
     // Movetext given in SAN
+    GAME_STATE.annotations = [];
     for (ply = 1; ply < game.moves.length; ply += 1) {
         var move = game.moves[ply];
 
         mv(move, true);
+
+        GAME_STATE.annotations[ply] = game.move_annotations[ply];
     }
 
     realize_vboard();
@@ -5436,6 +5440,13 @@ function show_move_history()
         if (move_info.only_move) {
             // NAG for "only move", see http://www.markalowery.net/Chess/Notation/NAG.html
             htmls.push("$7 ");
+        }
+
+        if (GAME_STATE.annotations[ply]) {
+            // TODO: decode NAGs, like $n, into !!
+            htmls.push(" <em>");
+            htmls.push(GAME_STATE.annotations[ply].join(" "));
+            htmls.push("</em>");
         }
 
         if (move_info.add_text) {
