@@ -1725,10 +1725,12 @@ function load_pgn(pgn)
     populate_make_a_move_list();
     show_move_history();
 
+    /*
     var time_took = new Date().getTime() - time_started;
     if (window.console) {
         alert("load_pgn took " + time_took + " ms");
     }
+    */
 }
 
 // Parse PGN into an array of dictionaries, one dictionary per game.
@@ -3323,7 +3325,6 @@ function filtered_moves(piece, color, is_hypothetical)
                 // castle or king has moved; we rely on the castling eligibility codes.
                 // They are probably incorrect if this happens, since the king is not
                 // on its first rank.
-                console.log(GAME_STATE);
                 assert(false, "filtered_moves: " + color + " is eligible to castle, but the king is on rank start.y=" + start.y + ", instead of the first rank. Is the castling eligibility correct?");
             }
 
@@ -5019,7 +5020,6 @@ function change_loaded_board(menu)
 // does all the board manipulation. 
 function piece_was_captured(piece, square)
 {
-    console.log("captured",piece.type);
     // If rook captured, remove castling privileges
     if (PIECE_TYPES[piece.type].castle) {
         // Note that this is the first rank of the *other* player
@@ -5032,10 +5032,8 @@ function piece_was_captured(piece, square)
         if (square.y === first_rank) {
             if (square.x === castles_at.long_x) {
                 GAME_STATE.can_castle[opponent][castles_at.long_file] = false;
-                //console.log("no more long");
             } else if (square.x === castles_at.short_x) {
                 GAME_STATE.can_castle[opponent][castles_at.short_file] = false;
-                //console.log("no more short");
             }
         }
     }
@@ -5327,9 +5325,6 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate)
                 GAME_STATE.can_castle[GAME_STATE.active_color][come_from.short_file] = false;
                 GAME_STATE.can_castle[GAME_STATE.active_color][come_from.long_file] = false;
             }
-
-            console.log("No more castle for " + GAME_STATE.active_color);
-            console.log(dojo.toJson(GAME_STATE.can_castle));
         }
     }
 
@@ -5353,9 +5348,6 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate)
         if (PIECE_TYPES[piece.type].castles_with) {
             GAME_STATE.can_castle[GAME_STATE.active_color][castles_at.short_file] = false;
             GAME_STATE.can_castle[GAME_STATE.active_color][castles_at.long_file] = false;
-
-            console.log("Moved king so ",GAME_STATE.active_color," can not castle");
-            console.log(dojo.toJson(GAME_STATE.can_castle));
         }
 
 
@@ -5845,8 +5837,6 @@ function load_fen(fen, replay)
     // Now that everything is loaded, set the turn.
     set_turn(color, replay);
     populate_make_a_move_list();
-
-    console.log(dojo.toJson(GAME_STATE.can_castle));
 }
 
 // Create a palace or river feature
@@ -7426,7 +7416,6 @@ function drop_or_revert()
         return;
     }
 
-    //console.log("drop",piece,square);
     move_dropped_piece(piece, square, null);
 }
 
