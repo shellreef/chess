@@ -33,6 +33,7 @@ span.player_elo { font-size: small; }
 
 /* PGN */
 span.fmvn { font-weight: bold; }
+span.move_annotation { font: medium 'Times'; }
 a.active_move { border-bottom: 1px dashed; }
 /*a.repeated_move { text-decoration: underline; }*/     /* goes well with dots and dashes */
 /*a.repeated_move { background-color: yellow; }*/   /* highlight */
@@ -425,12 +426,12 @@ var ANNOTATIONS = {
 // Numerical Annotation GlyphsNAG for "only move", see http://www.markalowery.net/Chess/Notation/NAG.html
 var NAGS = [
     "Null",
-    "Good move",
-    "Poor move",
-    "Brilliant move",
-    "Very poor move",
-    "Speculative move",
-    "Questionable move",
+    "!",
+    "?",
+    "!!",
+    "??",
+    "!?",
+    "?!",
 
     "Forced move (all others lose quickly)",
     "Singular move (no reasonable alternatives)",
@@ -5444,9 +5445,21 @@ function show_move_history()
 
         if (GAME_STATE.annotations[ply]) {
             // TODO: decode NAGs, like $n, into !!
-            htmls.push(" <em>");
-            htmls.push(GAME_STATE.annotations[ply].join(" "));
-            htmls.push("</em>");
+            htmls.push(' <span class="move_annotation">');
+            for (var a = 0; a < GAME_STATE.annotations[ply].length; a += 1) {
+                var note = GAME_STATE.annotations[ply][a];
+                var note_text;
+
+                if (note.charAt(0) === "$") {
+                    var nag_code = parseInt(note.substring(1), 10);
+                    note_text = NAGS[nag_code];
+                } else {
+                    note_text = note;
+                }
+                htmls.push(note_text + " ");
+            }
+
+            htmls.push("</span>");
         }
 
         if (move_info.add_text) {
