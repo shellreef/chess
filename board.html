@@ -1802,7 +1802,7 @@ function parse_pgn(pgn)
         // Parse move text
         var tokens = dict.move_text.split(" ");
         delete dict.move_text;  // not for anyone but this function
-        var fmvn = 1, outcome, moves = [], color = "white";
+        var fmvn = 1, outcome, moves = [], move_annotations = [], color = "white";
         var in_comment = false;
 
         for (i = 0; i < tokens.length; i += 1) {
@@ -1824,7 +1824,9 @@ function parse_pgn(pgn)
                 } else {
                     color = "white";
                 }
-
+            } else if (token.charAt(0) === "$") {
+                // TODO: parse NAG
+                console.log(token);
             } else if (token === "1-0") {
                 outcome = "White wins";
             } else if (token === "0-1") {
