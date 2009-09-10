@@ -7,14 +7,29 @@
 use strict;
 use warnings;
 
+use File::Find;
+
 # install with: sudo cpan Chess::Pgn
 use Chess::Pgn;
 
-my $p = Chess::Pgn->new("historical/classics.pgn");
-while ($p->ReadGame()) {
-    my @a = ($p->white, $p->black);
-    print join("\t", @a), "\n";
+find(\&process_file, ".");
+
+sub process_file
+{
+    my ($filename) = $_;
+    my ($pgn);
+
+    return if $filename !~ m/[.]pgn$/;
+
+    print "$File::Find::name\n";
+    $pgn = Chess::Pgn->new($filename);
+    # Bug: hangs on ctew/2.1.queen-checkmate-position.pgn, which is a game with no moves (position only)
+    while ($pgn->ReadGame()) {
+        my @a = ($pgn->white, $pgn->black);
+        print join("\t", @a), "\n";
+    }
+    $pgn->quit();
 }
-$p->quit();
+
 
 
