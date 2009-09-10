@@ -9,8 +9,8 @@ use warnings;
 
 use File::Find;
 
-# install with: sudo cpan Chess::Pgn
-use Chess::Pgn;
+# install with: sudo cpan Chess::PGN::Parse
+use Chess::PGN::Parse;
 
 find(\&process_file, ".");
 
@@ -22,13 +22,12 @@ sub process_file
     return if $filename !~ m/[.]pgn$/;
 
     print "$File::Find::name\n";
-    $pgn = Chess::Pgn->new($filename);
-    # Bug: hangs on ctew/2.1.queen-checkmate-position.pgn, which is a game with no moves (position only)
-    while ($pgn->ReadGame()) {
+    $pgn = Chess::PGN::Parse->new($filename);
+
+    while ($pgn->read_game()) {
         my @a = ($pgn->white, $pgn->black);
         print join("\t", @a), "\n";
     }
-    $pgn->quit();
 }
 
 
