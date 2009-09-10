@@ -5448,11 +5448,19 @@ function show_move_history()
         fmvn = color_fullmove.fmvn;
 
         move_info = GAME_STATE.made_moves[ply];
-        if (!move_info) {
+        if (!move_info && ply > 1) {
+            // Skip missing moves, except ply 1
             continue;
         }
 
-        move_text = move_info.notations[form_value("output_notation")];
+        if (move_info) {
+            move_text = move_info.notations[form_value("output_notation")];
+        } else {
+            // Ply 1 does not exist. Include the fmvn, but not the link,
+            // so that the period can link to ply_0.
+            move_text = null;
+            move_info = {};
+        }
         
         if (color === "white") {
             htmls.push('<span class="fmvn">' + fmvn + '<\/span>');
@@ -5468,7 +5476,9 @@ function show_move_history()
             }
         }
 
-        htmls.push(" " + move_link(ply, move_text));
+        if (move_text !== null) {
+            htmls.push(" " + move_link(ply, move_text));
+        }
 
         if (move_info.only_move) {
             // NAG for "only move", see http://www.markalowery.net/Chess/Notation/NAG.html
