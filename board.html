@@ -1597,6 +1597,20 @@ function reload_pgn()
     load_pgn(pgn);
 }
 
+// Load a game from a URL, at the given textual offset
+function load_pgn_from_url(url, offset)
+{
+    dojo.xhrGet({
+        url: url,
+        load: function(text) {
+                load_pgn(text.substring(offset));
+            },
+        error: function(text) {
+                alert("load_pgn_from_url(" + url + ", " + offset + "): xhrGet error: " + text);
+            }
+        });
+}
+
 // Load Portable Game Notation data
 // TODO: support a tag for captured pieces, and tags for FEN at each move so don't need to compute
 // TODO: http://www.mafiascum.net/wiki/index.php?title=Chess
@@ -4345,27 +4359,37 @@ function game_file_list()
     dojo.xhrGet({url: PREFS.saved_games_path + "index",
         load:function(text) {
             var array = text.split("\n");
+            var browser = dojo.byId("game-browser");
+            var htmls = ["<ul>"];
 
             for (var i = 0; i < array.length; i += 1) {
-                var filename = array[i];
+                var line = array[i];
+                if (line === "") {
+                    continue;
+                }
+                var a = line.split("\t");
 
-                dojo.xhrGet({url: PREFS.saved_games_path + filename,
-                    load:function(pgn_text) {
-                        var games;
-                       
-                        // Large files take too long to parse. TODO: web worker?
-                        if (pgn_text.length < 1000)
-                            games = parse_pgn(pgn_text);
+                var filename = a.shift();
+                var offset = a.shift();
+                var white = a.shift();
+                var black = a.shift();
+                var event = a.shift();
+                var result = a.shift();
+                var opening = a.shift();
+                var size = a.shift();
 
-                        console.log(games);
-
-                        var browser = dojo.byId("game-browser");
-
-                        browser.style.display = "";
-                        browser.innerHTML += pgn_text.length + "<br>";
-                }});
+                htmls.push('<li><a href="#" onclick="load_pgn_from_url(PREFS.saved_games_path + \'' + 
+                        filename + '\', ' + '\'' + offset + '\')">' + 
+                        event + '</a>');
             }
-        }});
+
+            browser.innerHTML = htmls.join("\n");
+            browser.style.display = "";
+        },
+        error:function(text) {
+                  alert("game_file_list XHR error: " + text);
+            }
+    });
 }
 
 //// DISPLAY FUNCTIONS
