@@ -1895,7 +1895,7 @@ function load_ply(ply)
 // Setup accesskeys for next and back given the current ply.
 function set_next_back_accesskeys(ply)
 {
-    var next_link, prev_link;
+    var next_link, prev_link, last;
 
     dojo.query("a.accessible_move").forEach(function(x) {
             dojo.removeClass(x, "accessible_move");
@@ -1910,7 +1910,10 @@ function set_next_back_accesskeys(ply)
     dojo.byId("ply_0").setAttribute("accesskey", ";"); // ctrl+option+;
 
     // last
-    dojo.byId("ply_" + (GAME_STATE.made_moves.length - 1)).setAttribute("accesskey", "'"); // ctrl+option+,
+    last = dojo.byId("ply_" + (GAME_STATE.made_moves.length - 1));
+    if (last) {
+        last.setAttribute("accesskey", "'"); // ctrl+option+,
+    }
   
     // next
     next_link = dojo.byId("ply_" + (ply + 1));
