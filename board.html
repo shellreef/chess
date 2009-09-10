@@ -1604,6 +1604,7 @@ function load_pgn_from_url(url, offset)
         url: url,
         load: function(text) {
                 load_pgn(text.substring(offset));
+                dojo.byId("game-browser").style.display = "none";
             },
         error: function(text) {
                 alert("load_pgn_from_url(" + url + ", " + offset + "): xhrGet error: " + text);
@@ -4394,7 +4395,7 @@ function game_file_list()
 
                 htmls.push('<li><a href="#" onclick="load_pgn_from_url(PREFS.saved_games_path + \'' + 
                         filename + '\', ' + '\'' + offset + '\')">' + 
-                        event + '</a>');
+                        white + " - " + black + " " + event + '</a>');
             }
 
             browser.innerHTML = htmls.join("\n");
