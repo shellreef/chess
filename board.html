@@ -1905,6 +1905,9 @@ function set_next_back_accesskeys(ply)
 
     // Note: first/last keys won't work on the 1st and penultimate move,
     // since the accesskey attributes are overwritten by the next/prev!
+    // Note2: HTML5 allows multiple, space-separated accesskeys, which would solve this problem:
+    // http://www.whatwg.org/specs/web-apps/current-work/#the-accesskey-attribute
+    // "If specified, the value must be an ordered set of unique space-separated tokens, each of which must be exactly one Unicode code point in length."
 
     // first
     dojo.byId("ply_0").setAttribute("accesskey", ";"); // ctrl+option+;
