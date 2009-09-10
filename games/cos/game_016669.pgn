@@ -1,0 +1,26 @@
+[Event "ChesSOS Game"]
+[Site "http://www.chessos.com"]
+[Date "2009.05.20"]
+[Round "-"]
+[White "shellreef"]
+[Black "Dema9o9ue"]
+[WhiteElo "1552"]
+[BlackElo "1417"]
+[Result "0-1"]
+[Variant "Fischerandom"]
+[Setup "1"]
+[FEN "nnbqrbkr/pppppppp/8/8/8/8/PPPPPPPP/NNBQRBKR w KQkq - 0 1"]
+
+1. e4 e5 2. d4 Bb4 3. c3 Ba5 4. Nb3 c6 5. Be3 d5 6. N3d2 exd4 
+7. Bd4 h5 8. b4 Bb6 9. Bd3 Bd4 10. cxd4 dxe4 11. Ne4 f5 12. Bc4 
+Kf8 13. Qf3 g5 14. O-O-O g4 15. Qf4 Na6 16. f3 Nb4 17. fxg4 hxg4 
+18. Qb8 Nb6 19. Rhf1 Nc4 20. Qa7 Re4 21. Qc5 Ke8 22. Qc4 Nbd5 
+23. Nc3 Nc3 24. Qc3 Rh2 25. Qg3 Qg5 26. Kb1 Qh5 27. Rh1 Rh1 28. Kc1 
+Rd1 29. Kd1 Rd4 30. Ke2 b5 31. Qe5 Be6 32. Qe6 Kd8 33. Qf6 Kc7 
+34. Qd4 g3 35. Kd3 Qd1 36. Ke3 Qg1 37. Kd3 Qg2 38. Qa7 Kd6 39. Qb8 
+Kc5 40. Qe5 Kb4 41. Qc3 Ka4 42. Qb3 Ka5 43. Qa3 Kb6 44. Kd4 Qf2 
+45. Qe3 Qe3 46. Ke3 c5 47. Kf3 c4 48. Kg3 c3 49. Kf4 c2 50. Kg5 
+c1=Q 51. Kg6 f4 52. Kf5 f3 53. a4 bxa4 54. Kg4 f2 55. Kg3 f1=Q 
+56. Kg4 Qff4 57. Kh5 Qh1 58. Kg6 a3 59. Kg7 a2 60. Kg6 Qg1 61. Kh5 
+Qgg4 
+0-1

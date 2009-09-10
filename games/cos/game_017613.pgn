@@ -1,0 +1,24 @@
+[Event "ChesSOS Game"]
+[Site "http://www.chessos.com"]
+[Date "2009.06.23"]
+[Round "-"]
+[White "Dema9o9ue"]
+[Black "shellreef"]
+[WhiteElo "1470"]
+[BlackElo "1490"]
+[Result "0-1"]
+[Variant "Fischerandom"]
+[Setup "1"]
+[FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"]
+
+1. c4 d5 2. cxd5 Qd5 3. Nc3 Qd8 4. g3 e5 5. Bg2 Bf5 6. Bb7 Nd7 
+7. Ba8 Qa8 8. f3 e4 9. fxe4 Be4 10. Ne4 Qe4 11. Ngf3 Ne5 12. d3 
+Nf3 13. Kf1 Nd2 14. Kf2 Bc5 15. Ke1 Qh1 16. Kd2 Qd1 17. Kd1 Nf6 
+18. Bd2 O-O 19. b4 Bd4 20. Rc1 Nd5 21. e4 Bb2 22. Rc2 Bc3 23. exd5 
+Bd4 24. Rc7 Rd8 25. Bc3 Bb6 26. Rc6 Rd5 27. d4 f5 28. a4 Bd4 
+29. Bd4 Rd4 30. Kc2 Rb4 31. a5 g5 32. a6 f4 33. Kc3 Rb1 34. gxf4 
+gxf4 35. Rc7 Rc1 36. Kd3 Rc7 37. Ke4 Rf7 38. h4 f3 39. Ke5 f2 
+40. h5 f1=Q 41. h6 Qf4 42. Kd5 Rf6 43. Kc5 Qe5 44. Kc4 Rf4 45. Kd3 
+Qe4 46. Kc3 Qd4 47. Kb3 Rf3 48. Kc2 Qc3 49. Kd1 Qd3 50. Kc1 Qe2 
+51. Kb1 Rf1 
+0-1

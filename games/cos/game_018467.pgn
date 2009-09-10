@@ -1,0 +1,21 @@
+[Event "ChesSOS Game"]
+[Site "http://www.chessos.com"]
+[Date "2009.08.03"]
+[Round "-"]
+[White "mudpots"]
+[Black "shellreef"]
+[WhiteElo "1500"]
+[BlackElo "1520"]
+[Result "0-1"]
+[Variant "Fischerandom"]
+[Setup "1"]
+[FEN "nbrnkqbr/pppppppp/8/8/8/8/PPPPPPPP/NBRNKQBR w KQkq - 0 1"]
+
+1. Nb3 f5 2. f4 c5 3. Qf2 c4 4. Nd4 Ne6 5. b4 Nf4 6. e3 Nd5 7. Qf5 
+Qf5 8. Nf5 Be6 9. e4 O-O 10. exd5 Bf5 11. Bc5 d6 12. Bd4 Be4 
+13. Rf1 Bg2 14. Rg1 e5 15. Bf2 Bd5 16. d3 cxd3 17. c4 Bc4 18. Ne3 
+b5 19. Rg4 e4 20. Re4 d5 21. Nd5 Bd5 22. Bd3 Be4 23. Rd1 Bd3 
+24. Rd3 Bh2 25. Ba7 Bb8 26. Bc5 Rfe8 27. Kd2 Rcd8 28. Bcd4 Nc7 
+29. Re3 Re3 30. Ke3 Nd5 31. Ke4 Nb4 32. a3 Nc2 33. Bg7 Kg7 34. a4 
+bxa4 
+0-1

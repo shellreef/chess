@@ -1,0 +1,22 @@
+[Event "ChesSOS Game"]
+[Site "http://www.chessos.com"]
+[Date "2009.05.30"]
+[Round "-"]
+[White "Psychonaut"]
+[Black "shellreef"]
+[WhiteElo "1469"]
+[BlackElo "1497"]
+[Result "0-1"]
+[Variant "Fischerandom"]
+[Setup "1"]
+[FEN "brknqnrb/pppppppp/8/8/8/8/PPPPPPPP/BRKNQNRB w KQkq - 0 1"]
+
+1. e4 e5 2. b4 g6 3. g3 b5 4. Nde3 Nfe6 5. f4 f5 6. d3 exf4 7. gxf4 
+Nf4 8. Bh8 Rh8 9. Qf2 Nh3 10. Qg2 Ng1 11. Qg1 Ne6 12. exf5 Nd4 
+13. fxg6 Ne2 14. Kd1 Ng1 15. gxh7 Qh5 16. Kc1 Bh1 17. c4 Qh7 
+18. Rb3 bxc4 19. Nc4 Bd5 20. Ra3 Bc4 21. dxc4 Rb4 22. Nd2 Qh2 
+23. Kc2 Re8 24. Kc3 Rb6 25. c5 Rc6 26. Ne4 Qe5 27. Kd3 Rc5 28. Nc5 
+Qc5 29. Rc3 Qe3 30. Kc4 Qc3 31. Kc3 d5 32. a4 Rd8 33. Kd4 Nf3 
+34. Ke3 d4 35. Kf3 d3 36. Ke4 d2 37. Ke5 d1=Q 38. Ke6 Qg4 39. Ke7 
+Qg6 40. a5 Qd6 41. Kf7 Rd7 42. Kg8 Qe7 43. a6 
+0-1

@@ -1,0 +1,15 @@
+[Event "ChesSOS Game"]
+[Site "http://www.chessos.com"]
+[Date "2009.08.26"]
+[Round "-"]
+[White "shellreef"]
+[Black "mudpots"]
+[WhiteElo "1538"]
+[BlackElo "1429"]
+[Result "1-0"]
+[Variant "Fischerandom"]
+[Setup "1"]
+[FEN "nrbkrbnq/pppppppp/8/8/8/8/PPPPPPPP/NRBKRBNQ w KQkq - 0 1"]
+
+1. e4 
+1-0
