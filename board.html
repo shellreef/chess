@@ -1990,7 +1990,15 @@ function mv(alg_move, is_not_immediate)
     // Find move in precalculated notations. 
     piece_square = find_legal_move(alg_move);
 
-    assert(piece_square, "mv(" + alg_move + "): illegal move");
+    // Illegal move.. This can happen on over-the-board games where the
+    // move is not recognized as illegal, or with buggy software.
+    if (!piece_square) {
+        // Give some context of what happened.
+        realize_vboard();
+        show_move_history();
+
+        assert(false, "mv(" + alg_move + "): illegal move");
+    }
 
     // TODO: do some moving animation, optionally (make two functions)
  
@@ -4395,7 +4403,7 @@ function game_file_list()
 
                 htmls.push('<li><a href="#" onclick="load_pgn_from_url(PREFS.saved_games_path + \'' + 
                         filename + '\', ' + '\'' + offset + '\')">' + 
-                        white + " - " + black + " " + event + '</a>');
+                        filename + ": " + white + " - " + black + " " + event + " " + result + '</a>');
             }
 
             browser.innerHTML = htmls.join("\n");
