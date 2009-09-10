@@ -1692,6 +1692,9 @@ function parse_pgn(pgn)
     var dicts = [dict];
     var move_texts = [];
 
+    // DOS-style ^M newline
+    pgn = pgn.replace("\r", "\n");
+
     // Parse headers into dictionaries
     for (var i = 0; i < pgn.length; i += 1) {
         var ch = pgn.charAt(i);
@@ -1801,6 +1804,9 @@ function parse_pgn(pgn)
                 outcome = "Draw";
             } else if (token === "*") { 
                 outcome = "(In progress)";
+            } else if (token.match(/^[\r\n ]+$/)) {
+                // Ignore whitespace
+                continue;
             } else {
                 // Move 
                 // TODO: handle #, + for checkmate and check, part of move
@@ -1819,6 +1825,7 @@ function parse_pgn(pgn)
         dict.move_annotations = move_annotations;
     }
 
+    console.log(dicts.moves);
     return dicts;
 }
 
