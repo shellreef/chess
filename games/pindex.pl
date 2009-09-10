@@ -17,15 +17,19 @@ find(\&process_file, ".");
 sub process_file
 {
     my ($filename) = $_;
+    my ($full_filename) = $File::Find::name;
     my ($pgn);
 
     return if $filename !~ m/[.]pgn$/;
 
-    print "$File::Find::name\n";
+    $full_filename =~ s/^[.]\///;
     $pgn = Chess::PGN::Parse->new($filename);
 
     while ($pgn->read_game()) {
-        my @a = ($pgn->white, $pgn->black);
+        my $offset = 0;
+        my @moves = $pgn->moves();
+        # TODO: get offset somehow??
+        my @a = ($full_filename, $offset, $pgn->white(), $pgn->black(), $pgn->event(), $pgn->result(), "", scalar @moves);
         print join("\t", @a), "\n";
     }
 }
