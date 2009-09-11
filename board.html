@@ -4380,30 +4380,17 @@ function check_repetition(ply)
 function game_file_list()
 {
     dojo.xhrGet({url: PREFS.saved_games_path + "index",
-        load:function(text) {
-            var array = text.split("\n");
+        handleAs: "json",
+        load: function(games) {
             var browser = dojo.byId("game-browser");
             var htmls = ["<ul>"];
 
-            for (var i = 0; i < array.length; i += 1) {
-                var line = array[i];
-                if (line === "") {
-                    continue;
-                }
-                var a = line.split("\t");
-
-                var filename = a.shift();
-                var offset = a.shift();
-                var white = a.shift();
-                var black = a.shift();
-                var event = a.shift();
-                var result = a.shift();
-                var opening = a.shift();
-                var size = a.shift();
+            for (var i = 0; i < games.length; i += 1) {
+                var game = games[i];
 
                 htmls.push('<li><a href="#" onclick="load_pgn_from_url(PREFS.saved_games_path + \'' + 
-                        filename + '\', ' + '\'' + offset + '\')">' + 
-                        filename + ": " + white + " - " + black + " " + event + " " + result + '</a>');
+                        game.filename + '\', ' + '\'' + game.offset + '\')">' + 
+                        game.filename + ": " + game.white + " - " + game.black + " " + game.event + " " + game.result + '</a>');
             }
 
             browser.innerHTML = htmls.join("\n");
