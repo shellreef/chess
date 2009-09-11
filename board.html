@@ -4379,29 +4379,50 @@ function check_repetition(ply)
 // TODO: parse games in PGNs, offer to load
 function show_game_browser()
 {
-    dojo.xhrGet({url: PREFS.saved_games_path + "index",
-        handleAs: "json",
-        load: function(games) {
-            var browser = dojo.byId("game-browser");
-            var htmls = [];
+    dojo.require("dojox.grid.DataGrid");
+    dojo.require("dojo.data.ItemFileWriteStore");
+    dojo.addOnLoad(function() {
+        dojo.xhrGet({url: PREFS.saved_games_path + "index",
+            handleAs: "json",
+            load: function(games) {
+                var browser = dojo.byId("game-browser");
+                var grid = new dojox.grid.DataGrid({
+                    id: "grid",
+                    store: new dojo.data.ItemFileWriteStore({data: 
+                            {identifier: "id",
+                            label: "id",
+                            items: [
+                                {col1: "foo", col2: "bar"},
+                                {col1: "baz", col2: "quux"}]
+                        }}),
+                    structure: [[
+                        {name: "Column 1", field: "col1"},
+                        {name: "Column 2", field: "col2"}
+                    ]]}, document.createElement("div"));
+                browser.appendChild(grid.domNode);
+                grid.startup();
 
-            // TODO: dojox.grid
+                browser.style.display = "";
+                return;
 
-            htmls.push("<ul>");
-            for (var i = 0; i < games.length; i += 1) {
-                var game = games[i];
+                var htmls = [];
+ 
+                htmls.push("<ul>");
+                for (var i = 0; i < games.length; i += 1) {
+                    var game = games[i];
 
-                htmls.push('<li><a href="#" onclick="load_pgn_from_url(PREFS.saved_games_path + \'' + 
-                        game.filename + '\', ' + '\'' + game.offset + '\')">' + 
-                        game.filename + ": " + game.white + " - " + game.black + " " + game.event + " " + game.result + '</a>');
-            }
+                    htmls.push('<li><a href="#" onclick="load_pgn_from_url(PREFS.saved_games_path + \'' + 
+                            game.filename + '\', ' + '\'' + game.offset + '\')">' + 
+                            game.filename + ": " + game.white + " - " + game.black + " " + game.event + " " + game.result + '</a>');
+                }
 
-            browser.innerHTML = htmls.join("\n");
-            browser.style.display = "";
-        },
-        error:function(text) {
-                  alert("show_game_browser XHR error: " + text);
-            }
+                browser.innerHTML = htmls.join("\n");
+                browser.style.display = "";
+            },
+            error:function(text) {
+                      alert("show_game_browser XHR error: " + text);
+                }
+        });
     });
 }
 
