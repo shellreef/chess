@@ -4377,7 +4377,7 @@ function check_repetition(ply)
 //// REMOTE SAVED GAME FUNCTIONS
 //
 // TODO: parse games in PGNs, offer to load
-function game_file_list()
+function show_game_browser()
 {
     dojo.xhrGet({url: PREFS.saved_games_path + "index",
         handleAs: "json",
@@ -4397,7 +4397,7 @@ function game_file_list()
             browser.style.display = "";
         },
         error:function(text) {
-                  alert("game_file_list XHR error: " + text);
+                  alert("show_game_browser XHR error: " + text);
             }
     });
 }
@@ -7702,7 +7702,7 @@ onclick="edit_pgn()" class="show_White">
 <!-- TODO: disclosure triangles -->
 <p><a href="#" onclick="var _c=dojo.byId('controls');_c.style.display=_c.style.display==='none'?'':'none'">controls</a> | 
 <a href="#" onclick="toggle_piece_library();">setup</a> |
-<a href="#" onclick="game_file_list()">saved</a>
+<a href="#" onclick="show_game_browser()">saved</a>
 
 <div id="controls" style="display: none; border-left: 2px solid blue">
 <div>
