@@ -4381,6 +4381,7 @@ function show_game_browser()
 {
     dojo.require("dojox.grid.DataGrid");
     dojo.require("dojo.data.ItemFileWriteStore");
+
     dojo.addOnLoad(function() {
         dojo.xhrGet({url: PREFS.saved_games_path + "index",
             handleAs: "json",
@@ -4392,17 +4393,17 @@ function show_game_browser()
                             {identifier: "id",
                             label: "id",
                             items: [
-                                {col1: "foo", col2: "bar"},
-                                {col1: "baz", col2: "quux"}]
+                                {id:0, col1: "foo", col2: "bar"},
+                                {id:1, col1: "baz", col2: "quux"}]
                         }}),
                     structure: [[
                         {name: "Column 1", field: "col1"},
                         {name: "Column 2", field: "col2"}
                     ]]}, document.createElement("div"));
+                browser.style.display = "";
                 browser.appendChild(grid.domNode);
                 grid.startup();
 
-                browser.style.display = "";
                 return;
 
                 var htmls = [];
