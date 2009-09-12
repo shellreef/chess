@@ -171,11 +171,10 @@ var PREFS = {
     input_notation: "SAN",
 
     // What piece images to use  - TODO: option to change
-    image_set: "alfaerieomega",   // See README in that directory
-    //image_set: "ariel",          // based on Ariel Unicode MS
-    //image_set: "chessos",
-    image_set: "classic",
-    image_extension: ".png",
+    image_set: "alfaerieomega", image_extension: ".gif",   // See README in that directory
+    //image_set: "ariel", image_extension: ".gif",         // based on Ariel Unicode MS
+    //image_set: "chessos", image_extension: ".gif",
+    //image_set: "classic", image_extension: ".png",
     
     engine: "http://jeff.tk:81/chess/crafty.cgi",
     skill: 0,                   // engine strength, 0-100
@@ -203,11 +202,12 @@ var DISPLAY = {
 
     // TODO: support smaller squares for larger boards like taikyoku shogi (3x36)? Since:
     // <rdar://problem/7128886> Cmd+ doesn't zoom canvas elements
-    /*square_width:55,
-    square_height:55,*/
+    square_width:55,
+    square_height:55,
 
-    square_width:50,
-    square_height:50,
+    // for 'classic' piece set
+    /*square_width:50,
+    square_height:50,*/
 
     // Colors
  /* TODO: yellow - piece to promote
