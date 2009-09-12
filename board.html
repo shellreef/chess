@@ -40,7 +40,7 @@ span.player_elo { font-size: small; }
 span.fmvn { font-weight: bold; }
 span.move_annotation { font: medium 'Times'; }
 a { text-decoration: none; border: 1px solid #fff; }
-/* Yellow highlights and borders - inspired by http://www.chess.com/article/view/tal-attacks-or-did-i-repeat-myself */
+/* Yellow highlights and borders - inspired by http://www.chess.com/emboard.html?id=353899 */
 a:hover { color: #060; background-color: #ff9; border-bottom: 1px dotted; }
 a.active_move { border-bottom: 1px dashed; background-color: #ff0; border: 1px solid #fc0; }
 /*a.repeated_move { text-decoration: underline; }*/     /* goes well with dots and dashes */
@@ -4814,18 +4814,20 @@ function realize_vboard()
 // Toggle perspective of board
 function flip()
 {
-    // TODO: actually relabel canvas!!
-    label_board(!PREFS.flipped);
+    alert("TODO");
+
+    PREFS.flipped = !PREFS.flipped;
+    dojo.byId("enable_flip").checked = PREFS.flipped;
+
+    create_board();
     load_fen(save_fen(), true);
+
     // BUG: if edit board, then flip it, lose changes. TODO: fix
 }
 
-// Internally name the square cells with their (x,y) coordinates
-// and filerank notation, once when the page loads. This is only code so I
-// don't have to manually type <td x=0 y=0 filerank=a8> etc. in all the cells.
-// Also populates VBOARD virtual board.
-// If flipped is true, then the board is from black's perspective, instead of white's.
-function label_board(flipped)
+// Internally name the VBOARD square cells with their (x,y) coordinates
+// and filerank notation, once when the page loads. 
+function label_board()
 {
     VBOARD = [];
     for (var x = 1; x <= GAME_STATE.files; x += 1) {
@@ -4846,9 +4848,6 @@ function label_board(flipped)
             square.descriptive.black = xy2descriptive("black", [x, y]);
         }
     }
-
-    PREFS.flipped = flipped;
-    dojo.byId("enable_flip").checked = flipped;
 }
 
 // Initialize the board - menu, load from query string if present.
@@ -5966,7 +5965,7 @@ function set_board_boundary(str)
 function clear_board()
 {
     // Initializes VBOARD
-    label_board(GAME_STATE.flipped);
+    label_board();
 }
 
 
