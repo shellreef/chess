@@ -1509,7 +1509,7 @@ function restore_edit()
     dojo.byId("game_ui").innerHTML = ORIGINAL_UI_HTML;
 }
 
-// Return a string of color-coded captured piece codes, or null if none.
+// Return a string of color-coded captured piece codes.
 function export_captured()
 {
     var captureds = [];
@@ -1522,17 +1522,20 @@ function export_captured()
         var p = GAME_STATE.captured.black[i];
         captureds.push(color_piece_prefix(p));
     }
-    if (captureds.length === 0) {
-        return null;
-    } else {
-        return captureds.join("");
-    }
+
+    return captureds.join("");
 }
 
 
 // Import a color-coded string of captured pieces from export_captured() into GAME_STATE
 function import_captured(captured)
 {
+    GAME_STATE.captured = {white:[], black:[]};
+
+    if (!captured) {
+        return;
+    }
+
     for (var i = 0; i < captured.length; i += 1) {
         var length = piece_code_length(captured.substr(i));
         var letter = captured.substr(i, length);
@@ -1562,7 +1565,7 @@ function save_pgn()
 
     // Non-standard: captured pieces
     captured = export_captured();
-    if (captured) {
+    if (captured !== "") {
         dict.Captured = captured;
     }
 
@@ -4253,7 +4256,7 @@ function set_copyable_link(this_position)
         perspective = GAME_STATE.active_color === "black" ? ";f=1" : "";
     }
 
-    if (captured) {
+    if (captured !== "") {
         captured = ";c=" + captured;
     } else {
         captured = "";
@@ -5690,9 +5693,9 @@ function save_fen()
         fens.push("b");
     }
 
-    // Castling availability. Use Shredder-FEN or classical FEN as appropriate.
-    // Unfortunately, this allows for a mix of both if one castle is at the edge (K/Q),
-    // and the other isn't (B-G).
+    // Castling availability. Use Shredder-FEN for non-corner rooks, or 
+    // classical FEN if corner rooks. Unfortunately, this allows for a 
+    // mix of both if one castle is at the edge (K/Q), and the other isn't (B-G).
     fens.push(" ");
     castles = false;
     var come_from = castles_come_from();
@@ -5728,8 +5731,11 @@ function save_fen()
         var tag = GAME_STATE.tags[i];
         fens.push(" " + tag);
         if (tag */
-    fens.push(" " + GAME_STATE.hmvc);
-    fens.push(" " + GAME_STATE.fmvn);
+    fens.push(" hmvc=" + GAME_STATE.hmvc);
+    fens.push(" fmvn=" + GAME_STATE.fmvn);
+
+    // Captured pieces
+    fens.push(" captured_pieces=" + export_captured());
 
     return fens.join("");
 }
@@ -5817,7 +5823,11 @@ function load_fen(fen, replay)
         // Game "rule set"
         dojo.mixin(GAME_STATE, RULE_SETS[GAME_STATE.rs]);
     }
-   
+
+    // Captured pieces (if no EPD tag present, initializes to empty)
+    import_captured(GAME_STATE.captured_pieces);
+    update_captured_piece_images();
+  
     back_castles = load_starting_position(parts[0], replay);
 
     // Now that know rank & file count, and where the castles are, parse castling eligibilities
@@ -5855,8 +5865,8 @@ function load_fen(fen, replay)
         GAME_STATE.can_castle[castle_color][file] = true;
     }
 
+
     if (replay) { 
-        // TODO: clear recent move, XYZ
         GAME_STATE.recent_piece = null;
     } else {
         // Game loading initialization
@@ -5867,7 +5877,6 @@ function load_fen(fen, replay)
         GAME_STATE.position_after[ply] = fen;
 
         GAME_STATE.ended = null; 
-        GAME_STATE.captured = {white:[], black:[]};
         GAME_STATE.made_moves = [null];
         GAME_STATE.made_moves[ply] = null;
 
