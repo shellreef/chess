@@ -15,7 +15,8 @@ use Chess::PGN::Parse;
 # sudo cpan JSON
 use JSON;
 
-our @result;
+our (@result, $id);
+$id = 0;
 
 find(\&process_file, ".");
 
@@ -52,6 +53,9 @@ sub process_file
 
     if (@games == 1) {
         # TODO: print all games. we only print one now, since load_pgn parses all.
+       
+        $id += 1;
+        $games[0]{id} = $id;
         push @result, $games[0];
     }
 }

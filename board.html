@@ -4393,12 +4393,6 @@ function show_game_browser()
             load: function(games) {
                 var browser = dojo.byId("game-browser");
 
-                for (var i = 0; i < games.length; i += 1) {
-                    games[i].id = i;
-                }
-
-
-                // TODO: get working
                 var grid = new dojox.grid.DataGrid({
                     id: "grid",
                     store: new dojo.data.ItemFileWriteStore({data: 
@@ -4415,7 +4409,7 @@ function show_game_browser()
                         {name: "Size", field: "size"}
                     ]]}, document.createElement("div"));
                 browser.appendChild(grid.domNode);
-                grid.domNode.style.height = "150px";
+                grid.domNode.style.height = "500px";
                 grid.startup();
                 browser.style.display = "";
 
