@@ -3309,6 +3309,11 @@ function filtered_moves(piece, color, is_hypothetical)
             var castle_side = flags.if_can_castle;
             // Where the "castle" (such as a rook, NOT the king) comes from
             var castle_from_file = castles_come_from()[castle_side + "_file"];
+            if (!castle_from_file) {
+                // No privileges, no information available
+                continue;
+            }
+
             var castle_from_x = castle_from_file.charCodeAt(0) - "a".charCodeAt(0) + 1;
 
             // Moved and lost castling privileges
@@ -5735,7 +5740,10 @@ function save_fen()
     fens.push(" fmvn=" + GAME_STATE.fmvn);
 
     // Captured pieces
-    fens.push(" captured_pieces=" + export_captured());
+    var captured = export_captured();
+    if (captured) {
+        fens.push(" captured_pieces=" + captured);
+    }
 
     return fens.join("");
 }
