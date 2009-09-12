@@ -4676,13 +4676,13 @@ function unhighlight_all()
 // Get the upper-left x coordinate of a square given file
 function get_square_x(file)
 {
-    return DISPLAY.board_left + DISPLAY.board_border/2 + (file - 1) * DISPLAY.square_width;
+    return DISPLAY.board_left + DISPLAY.board_border/2 + (PREFS.flipped ? GAME_STATE.files - file : file - 1) * DISPLAY.square_width;
 }
 
 // Get the upper-left y coordinate of a square given rank
 function get_square_y(rank)
 {
-    return DISPLAY.board_top + DISPLAY.board_border/2 + (GAME_STATE.ranks - rank) * DISPLAY.square_height;
+    return DISPLAY.board_top + DISPLAY.board_border/2 + (PREFS.flipped ? rank - 1 : GAME_STATE.ranks - rank) * DISPLAY.square_height;
 }
 
 // Highlight a square with a given color, or unhighlight it if color is false
