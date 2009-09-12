@@ -9,6 +9,7 @@ use warnings;
 
 use File::Find;
 use Data::Dumper;
+use POSIX qw(ceil);
 
 # install with: sudo cpan Chess::PGN::Parse
 use Chess::PGN::Parse;
@@ -41,7 +42,8 @@ sub process_file
         my %h = %{$pgn->tags()};
         $h{Filename} = $full_filename;
         $h{Offset} = $offset;   # TODO: get offset somehow??
-        $h{Size} = scalar @$moves;
+        $h{PlyCount} ||= scalar @$moves;
+        $h{MoveCount} = ceil($h{PlyCount} / 2);
         $h{SmallResult} = ($h{Result} eq "1/2-1/2" ? "1/2" : $h{Result}), 
         $h{Opening} = ""; # TODO
 
