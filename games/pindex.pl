@@ -35,7 +35,8 @@ sub process_file
 
     while ($pgn->read_game()) {
         my $offset = 0;
-        my @moves = $pgn->moves();
+        $pgn->parse_game(); # parses moves
+        my $moves = $pgn->moves();
         # TODO: get offset somehow??
         my %h = (
             filename => $full_filename, 
@@ -45,8 +46,8 @@ sub process_file
             event => $pgn->event(), 
             result => ($pgn->result() eq "1/2-1/2" ? "1/2" : $pgn->result()), 
             opening => "",   # TODO
-            size => scalar @moves);
-    
+            size => scalar @$moves);
+
         $count += 1;
         push @games, \%h;
     }
