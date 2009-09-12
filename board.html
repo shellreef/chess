@@ -4421,11 +4421,12 @@ function make_game_browser()
                             items: games,
                         }}),
                     structure: [[
-                        {name: "White", field: "white", width:"120px"},
-                        {name: "Black", field: "black", width:"120px"},
-                        {name: "Event", field: "event", width:"150px"},
-                        {name: "Res", field: "result", width:"50px"},
-                        {name: "#", field: "size", width:"35px"}
+                        {name: "White", field: "white", width: "120px"},
+                        {name: "Black", field: "black", width: "120px"},
+                        {name: "Event", field: "event", width: "150px"},
+                        {name: "Date", field: "date", width: "100px"},
+                        {name: "Result", field: "result", width: "70px"},
+                        {name: "Moves", field: "size", width: "70px"}
                     ]]}, document.createElement("div"));
                 browser.appendChild(grid.domNode);
 
@@ -7808,8 +7809,6 @@ not to implement chess AI. But having automatic moves is useful for testing. -->
  </div>
  <!-- end piece library -->
 
- <div id="game-browser" style="display: none"></div>
-
   <div id="captured_piece_images" style="width: 250px;"></div>
   <div id="moves_container" style="width: 500px; text-align: justify">
   <!-- TODO: scrollbar, http://livepipe.net/control/scrollbar -->
@@ -7821,6 +7820,8 @@ not to implement chess AI. But having automatic moves is useful for testing. -->
  </td>
 </tr>
 </table>
+
+<div id="game-browser" style="display: none; position: absolute; top: 0px; left: 0px; width: 1000px; z-index: 2"></div>
 
 </body>
 </html>

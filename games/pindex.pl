@@ -8,6 +8,7 @@ use strict;
 use warnings;
 
 use File::Find;
+use Data::Dumper;
 
 # install with: sudo cpan Chess::PGN::Parse
 use Chess::PGN::Parse;
@@ -44,7 +45,9 @@ sub process_file
             white => $pgn->white(), 
             black => $pgn->black(), 
             event => $pgn->event(), 
+            date => $pgn->date(),
             result => ($pgn->result() eq "1/2-1/2" ? "1/2" : $pgn->result()), 
+            variant => $pgn->tags()->{Variant},
             opening => "",   # TODO
             size => scalar @$moves);
 
