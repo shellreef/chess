@@ -4426,13 +4426,16 @@ function make_game_browser()
                         {name: "Event", field: "Event", width: "150px"},
                         {name: "Date", field: "Date", width: "100px"},
                         {name: "Result", field: "SmallResult", width: "70px"},
-                        {name: "Moves", field: "Size", width: "70px"}
+                        {name: "Moves", field: "Size", width: "90px"},
+                        {name: "WhiteElo", field: "WhiteElo", width: "90px"},
+                        {name: "BlackElo", field: "BlackElo", width: "90px"}
+
                     ]]}, document.createElement("div"));
                 browser.appendChild(grid.domNode);
 
                 dojo.connect(grid, "onRowClick", function(event) {
                         var item = grid.getItem(event.rowIndex);
-                        load_pgn_from_url(PREFS.saved_games_path + item.filename[0], item.offset[0]);
+                        load_pgn_from_url(PREFS.saved_games_path + item.Filename[0], item.Offset[0]);
                     });
 
                 // TODO: autoHeight
@@ -7821,7 +7824,7 @@ not to implement chess AI. But having automatic moves is useful for testing. -->
 </tr>
 </table>
 
-<div id="game-browser" style="display: none; position: absolute; top: 0px; left: 0px; width: 1000px; z-index: 2"></div>
+<div id="game-browser" style="display: none; position: absolute; top: 0px; left: 0px; width: 100%; z-index: 2"></div>
 
 </body>
 </html>
