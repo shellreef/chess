@@ -4787,17 +4787,10 @@ function realize_vboard()
                 piece.unique_id = v.piece.unique_id;
 
                 piece.style.position = "absolute";
-                // TODO: get_square_x/get_square_y
-                //piece.style.left = 55 * (x - 1) + 20 + "px";
-                //piece.style.top = 55 * (GAME_STATE.ranks - y) + 30 + "px";
-
-                piece.style.left = DISPLAY.square_width * (x - 1) + 25 + "px";
-                piece.style.top = DISPLAY.square_height * (GAME_STATE.ranks - y) + 30 + "px";
-
 
                 // TODO: find out why this is off
-                //piece.style.left = get_square_x(x) + "px";
-                //piece.style.top = get_square_y(y) + "px";
+                piece.style.left = get_square_x(x) + 4 + "px";
+                piece.style.top = get_square_y(y) + 3 + "px";
                 dojo.body().appendChild(piece);
             }
         }
