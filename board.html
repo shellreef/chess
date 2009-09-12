@@ -4743,7 +4743,7 @@ function realize_vboard()
 
     // Delete all prior onboard pieces
     dojo.query(".piece").forEach(function(piece) {
-            if (!dojo.hasClass(piece, "tear-off")) {
+            if (!dojo.hasClass(piece, "tear-off") && !dojo.hasClass(piece, "captured")) {
                 piece.parentNode.removeChild(piece);
             }
     });
