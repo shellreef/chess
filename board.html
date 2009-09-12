@@ -4380,9 +4380,23 @@ function check_repetition(ply)
 }
 
 //// REMOTE SAVED GAME FUNCTIONS
-//
-// TODO: parse games in PGNs, offer to load
-function show_game_browser()
+
+// Toggle display of the saved game browser.
+function toggle_game_browser()
+{
+    var browser = dojo.byId("game-browser");
+    var grid = dojo.byId("grid");
+
+    if (!grid) {
+        // Create once, lazily.
+        make_game_browser();
+    }
+
+    browser.style.display = (browser.style.display === "none" ? "" : "none");
+}
+
+// Create the game library browser widgets.
+function make_game_browser()
 {
     dojo.require("dojox.grid.DataGrid");
     dojo.require("dojo.data.ItemFileWriteStore");
@@ -4392,7 +4406,6 @@ function show_game_browser()
             handleAs: "json",
             load: function(games) {
                 var browser = dojo.byId("game-browser");
-
                 var grid = new dojox.grid.DataGrid({
                     id: "grid",
                     store: new dojo.data.ItemFileWriteStore({data: 
@@ -4408,6 +4421,8 @@ function show_game_browser()
                         {name: "#", field: "size", width:"35px"}
                     ]]}, document.createElement("div"));
                 browser.appendChild(grid.domNode);
+
+                // TODO: autoHeight
                 grid.domNode.style.height = "500px";
                 grid.startup();
                 browser.style.display = "";
@@ -4429,7 +4444,7 @@ function show_game_browser()
                 browser.style.display = "";
             },
             error:function(text) {
-                      alert("show_game_browser XHR error: " + text);
+                      alert("toggle_game_browser XHR error: " + text);
                 }
         });
     });
@@ -7736,7 +7751,7 @@ onclick="edit_pgn()" class="show_White">
 <!-- TODO: disclosure triangles -->
 <p><a href="#" onclick="var _c=dojo.byId('controls');_c.style.display=_c.style.display==='none'?'':'none'">controls</a> | 
 <a href="#" onclick="toggle_piece_library();">setup</a> |
-<a href="#" onclick="show_game_browser()">saved</a>
+<a href="#" onclick="toggle_game_browser()">saved</a>
 
 <div id="controls" style="display: none; border-left: 2px solid blue">
 <div>
