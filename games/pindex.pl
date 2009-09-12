@@ -22,7 +22,7 @@ $id = 0;
 
 find(\&process_file, ".");
 
-print to_json(\@result), "\n";
+print to_json([reverse @result]), "\n";
 
 sub process_file
 {
