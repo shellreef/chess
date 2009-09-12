@@ -28,9 +28,6 @@ body {
     border: 0;
 }
 
-a { text-decoration: none; }
-a:hover { border-bottom: 1px dotted; }
-
 /* Header */
 span.players { font-size: large; }
 span.player_name { font-weight: bold; }
@@ -42,7 +39,10 @@ span.player_elo { font-size: small; }
 /* PGN */
 span.fmvn { font-weight: bold; }
 span.move_annotation { font: medium 'Times'; }
-a.active_move { border-bottom: 1px dashed; }
+a { text-decoration: none; border: 1px solid #fff; }
+/* Yellow highlights and borders - inspired by http://www.chess.com/article/view/tal-attacks-or-did-i-repeat-myself */
+a:hover { color: #060; background-color: #ff9; border-bottom: 1px dotted; }
+a.active_move { border-bottom: 1px dashed; background-color: #ff0; border: 1px solid #fc0; }
 /*a.repeated_move { text-decoration: underline; }*/     /* goes well with dots and dashes */
 /*a.repeated_move { background-color: yellow; }*/   /* highlight */
 
@@ -222,6 +222,10 @@ var DISPLAY = {
     black:"#d18b47", white:"#ffce9e", // a pleasant tan
 
     // Use Applications/Utilities/DigitalColor Meter to get hex colors
+    
+    // From Chess.com
+    //black: "#739254", white:"#e9e9ce",  // soft green
+    //black: "#4d6d92", white:"#ebebd6",  // soft blue
 
     // From ExaChess
     //black:"#9999ff", white:"#ffffcc", // light blue
