@@ -43,7 +43,7 @@ sub process_file
             white => $pgn->white(), 
             black => $pgn->black(), 
             event => $pgn->event(), 
-            result => $pgn->result(), 
+            result => ($pgn->result() eq "1/2-1/2" ? "1/2" : $pgn->result()), 
             opening => "",   # TODO
             size => scalar @moves);
     
