@@ -38,21 +38,15 @@ sub process_file
         my $offset = 0;
         $pgn->parse_game(); # parses moves
         my $moves = $pgn->moves();
-        # TODO: get offset somehow??
-        my %h = (
-            filename => $full_filename, 
-            offset => $offset, 
-            white => $pgn->white(), 
-            black => $pgn->black(), 
-            event => $pgn->event(), 
-            date => $pgn->date(),
-            result => ($pgn->result() eq "1/2-1/2" ? "1/2" : $pgn->result()), 
-            variant => $pgn->tags()->{Variant},
-            opening => "",   # TODO
-            size => scalar @$moves);
+        my %h = %{$pgn->tags()};
+        $h{Filename} = $full_filename;
+        $h{Offset} = $offset;   # TODO: get offset somehow??
+        $h{Size} = scalar @$moves;
+        $h{SmallResult} = ($h{Result} eq "1/2-1/2" ? "1/2" : $h{Result}), 
+        $h{Opening} = ""; # TODO
 
         $count += 1;
-        push @games, \%h;
+        push @games, {%h};
     }
 
     if (@games == 1) {
