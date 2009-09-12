@@ -174,6 +174,8 @@ var PREFS = {
     image_set: "alfaerieomega",   // See README in that directory
     //image_set: "ariel",          // based on Ariel Unicode MS
     //image_set: "chessos",
+    image_set: "classic",
+    image_extension: ".png",
     
     engine: "http://jeff.tk:81/chess/crafty.cgi",
     skill: 0,                   // engine strength, 0-100
@@ -810,7 +812,7 @@ var PIECE_TYPES = {
     // or http://members.shaw.ca/quadibloc/chess/ch03.htm or 
     // http://www.chessvariants.com/graphics.dir/alfaerie/
     equesrex: {parlett: "#king, #knight", image:"equesrex", royal: true},
-    //centaur: {parlett: "#knight, #man", url:"pc:centaur"},         // not royal, so not an equesrex  TODO: remove cross, make bcentaur.gif? also, ~0/1, ~1/1, ~1/2. K+N
+    //centaur: {parlett: "#knight, #man", url:"pc:centaur"},         // not royal, so not an equesrex  TODO: remove cross, make bcentaur? also, ~0/1, ~1/1, ~1/2. K+N
     amazon: {parlett: "#queen, #knight", letter: "XV", url:"pc:amazon", aka:["superqueen"]},
     amazonrider: {parlett: "#queen, #nightrider", aka:["queenofthenight"]},
     //banshee: {parlett: "#bishop, #nightrider", url:"http://www.mayhematics.com/v/v_gm.htm"}, // TODO: image
@@ -4444,8 +4446,7 @@ function make_game_browser()
                     });
 
                 grid.columnReordering = true;
-                // TODO: autoHeight
-                grid.domNode.style.height = "500px";
+                //grid.domNode.style.height = "100%";
                 grid.domNode.style.overflow = "hidden";
                 grid.startup();
                 browser.style.display = "";
@@ -6075,8 +6076,8 @@ function show_library_images()
                 continue;
             }
 
-            var wpath = root + "w" + image + ".gif";
-            var bpath = root + "b" + image + ".gif";
+            var wpath = root + "w" + image + PREFS.image_extension;
+            var bpath = root + "b" + image + PREFS.image_extension;
 
             document.write('<tr>');
             document.write('<td>' + i + '.</td>');
@@ -6498,7 +6499,7 @@ function image_path_for(type, color, all)
     
     paths = [];
     for (var i = 0; i < bases.length; i += 1) {
-        paths.push(["images/", PREFS.image_set, "/", {white:"w", black:"b"}[color], bases[i], ".gif"].join(""));
+        paths.push(["images/", PREFS.image_set, "/", {white:"w", black:"b"}[color], bases[i], PREFS.image_extension].join(""));
     }
 
     return all ? paths : paths[0];
@@ -7831,7 +7832,7 @@ not to implement chess AI. But having automatic moves is useful for testing. -->
 </tr>
 </table>
 
-<div id="game-browser" style="display: none; position: absolute; top: 0px; left: 0px; width: 100%; z-index: 2"></div>
+<div id="game-browser" style="display: none; position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 2"></div>
 
 </body>
 </html>
