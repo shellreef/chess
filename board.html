@@ -12,9 +12,9 @@
 <!-- Created:20090411 -->
 <style type="text/css">
 
-/* TODO: programmatically load only when game browser is displayed 
+/* TODO: programmatically load only when game browser is displayed */
 @import "http://o.aolcdn.com/dojo/1.3.1/dojox/grid/resources/tundraGrid.css";
-@import "http://o.aolcdn.com/dojo/1.3.1/dojox/grid/resources/Grid.css";*/
+@import "http://o.aolcdn.com/dojo/1.3.1/dojox/grid/resources/Grid.css";
 
 body {
     font: medium 'Gill Sans', sans-serif;
@@ -4393,7 +4393,7 @@ function show_game_browser()
             load: function(games) {
                 var browser = dojo.byId("game-browser");
 
-                /* TODO: get working
+                // TODO: get working
                 var grid = new dojox.grid.DataGrid({
                     id: "grid",
                     store: new dojo.data.ItemFileWriteStore({data: 
@@ -4407,11 +4407,12 @@ function show_game_browser()
                         {name: "Column 1", field: "col1"},
                         {name: "Column 2", field: "col2"}
                     ]]}, document.createElement("div"));
-                browser.style.display = "";
                 browser.appendChild(grid.domNode);
+                grid.domNode.style.height = "150px";
                 grid.startup();
+                browser.style.display = "";
 
-                return;*/
+                return;
 
                 var htmls = [];
  
