@@ -4243,7 +4243,7 @@ function set_copyable_link(this_position)
     if (this_position) {
         fen = save_fen();
         captured = export_captured();
-        perspective = GAME_STATE.flipped;
+        perspective = PREFS.flipped;
     } else {
         last = GAME_STATE.position_after.slice(-1)[0];
         prior = GAME_STATE.position_after.slice(-2)[0];
@@ -4517,7 +4517,7 @@ function create_board()
     
     for (var x = 0; x < GAME_STATE.files; x += 1) {
         // File labels
-        var file = String.fromCharCode("a".charCodeAt(0) + x);
+        var file = String.fromCharCode("a".charCodeAt(0) + (PREFS.flipped ? GAME_STATE.files - x - 1 : x));
         ctx.fillStyle = DISPLAY.text_color;
         ctx.fillText(file, 
                 DISPLAY.board_left + DISPLAY.file_labels_left + x * DISPLAY.square_width,
@@ -4559,7 +4559,7 @@ function create_board()
     ctx.fillStyle = DISPLAY.text_color;
     ctx.textAlign = "center";
     for (var y = 0; y < GAME_STATE.ranks; y += 1) {
-        var rank = GAME_STATE.ranks - y;
+        var rank = PREFS.flipped ? y + 1 : GAME_STATE.ranks - y;
 
         ctx.fillText(rank, DISPLAY.rank_labels_left, 
                 DISPLAY.rank_labels_top + DISPLAY.square_height * (y + 1), DISPLAY.board_left);
@@ -4814,8 +4814,6 @@ function realize_vboard()
 // Toggle perspective of board
 function flip()
 {
-    alert("TODO");
-
     PREFS.flipped = !PREFS.flipped;
     dojo.byId("enable_flip").checked = PREFS.flipped;
 
