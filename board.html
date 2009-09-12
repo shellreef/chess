@@ -4401,11 +4401,11 @@ function show_game_browser()
                             items: games,
                         }}),
                     structure: [[
-                        {name: "Black", field: "black"},
-                        {name: "White", field: "white"},
-                        {name: "Event", field: "event"},
-                        {name: "Result", field: "result"},
-                        {name: "Size", field: "size"}
+                        {name: "Black", field: "black", width:"120px"},
+                        {name: "White", field: "white", width:"120px"},
+                        {name: "Event", field: "event", width:"150px"},
+                        {name: "Res", field: "result", width:"50px"},
+                        {name: "#", field: "size", width:"30px"}
                     ]]}, document.createElement("div"));
                 browser.appendChild(grid.domNode);
                 grid.domNode.style.height = "500px";
