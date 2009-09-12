@@ -4401,11 +4401,11 @@ function show_game_browser()
                             items: games,
                         }}),
                     structure: [[
-                        {name: "Black", field: "black", width:"120px"},
                         {name: "White", field: "white", width:"120px"},
+                        {name: "Black", field: "black", width:"120px"},
                         {name: "Event", field: "event", width:"150px"},
                         {name: "Res", field: "result", width:"50px"},
-                        {name: "#", field: "size", width:"30px"}
+                        {name: "#", field: "size", width:"35px"}
                     ]]}, document.createElement("div"));
                 browser.appendChild(grid.domNode);
                 grid.domNode.style.height = "500px";
@@ -7680,7 +7680,7 @@ function enable_document_selection(enable, element)
 dojo.addOnLoad(main);
 </script>
 </head>
-<body>
+<body class="tundra">
 <table id="outer">
 <tr>
 <td style="vertical-align: top">
