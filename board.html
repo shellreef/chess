@@ -4422,25 +4422,14 @@ function make_game_browser()
                     ]]}, document.createElement("div"));
                 browser.appendChild(grid.domNode);
 
+                dojo.connect(grid, "onRowClick", function(event) {
+                        var item = grid.getItem(event.rowIndex);
+                        load_pgn_from_url(PREFS.saved_games_path + item.filename[0], item.offset[0]);
+                    });
+
                 // TODO: autoHeight
                 grid.domNode.style.height = "500px";
                 grid.startup();
-                browser.style.display = "";
-
-                return;
-
-                var htmls = [];
- 
-                htmls.push("<ul>");
-                for (var i = 0; i < games.length; i += 1) {
-                    var game = games[i];
-
-                    htmls.push('<li><a href="#" onclick="load_pgn_from_url(PREFS.saved_games_path + \'' + 
-                            game.filename + '\', ' + '\'' + game.offset + '\')">' + 
-                            game.filename + ": " + game.white + " - " + game.black + " " + game.event + " " + game.result + '</a>');
-                }
-
-                browser.innerHTML = htmls.join("\n");
                 browser.style.display = "";
             },
             error:function(text) {
