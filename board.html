@@ -4393,19 +4393,26 @@ function show_game_browser()
             load: function(games) {
                 var browser = dojo.byId("game-browser");
 
+                for (var i = 0; i < games.length; i += 1) {
+                    games[i].id = i;
+                }
+
+
                 // TODO: get working
                 var grid = new dojox.grid.DataGrid({
                     id: "grid",
                     store: new dojo.data.ItemFileWriteStore({data: 
                             {identifier: "id",
                             label: "id",
-                            items: [
-                                {id:0, col1: "foo", col2: "bar"},
-                                {id:1, col1: "baz", col2: "quux"}]
+                            items: games,
                         }}),
                     structure: [[
-                        {name: "Column 1", field: "col1"},
-                        {name: "Column 2", field: "col2"}
+                        {name: "Filename", field: "filename"},
+                        {name: "Black", field: "black"},
+                        {name: "White", field: "white"},
+                        {name: "Event", field: "event"},
+                        {name: "Result", field: "result"},
+                        {name: "Size", field: "size"}
                     ]]}, document.createElement("div"));
                 browser.appendChild(grid.domNode);
                 grid.domNode.style.height = "150px";
