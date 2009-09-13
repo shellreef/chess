@@ -4782,6 +4782,9 @@ function realize_vboard()
 
             if (v.piece) {
                 piece = create_piece(v.piece.color, v.piece.type);
+
+                dojo.attr(piece, "id", "piece-at-" + xy2filerank([x, y]));
+
                 piece.square = VBOARD[x][y];
                 // TODO: what about descriptive_name, adescriptive_name?? It is important.
                 piece.unique_id = v.piece.unique_id;
