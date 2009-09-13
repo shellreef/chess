@@ -166,7 +166,8 @@ var AVAILABLE_NOTATIONS = {
 
 // Preferences, not game state.
 var PREFS = {
-    revert_time: 350,             // ms to take to revert
+    revert_time: 350,               // ms to take to revert
+    movement_animation_time: 100,   // ms to animate moving of pieces
 
     input_notation: "SAN",
 
@@ -1992,8 +1993,9 @@ function encode_ply(color, fmvn)
 // Make a move using any notation. Useful to use for moving within the JavaScript
 // console (Develop -> Show Error Console in Safari), if you prefer CLI over GUI,
 // and computer moves also use this function. 
-// If is_not_immediate is true, then the UI is not updated after the move; useful
-// for quickly making many moves without UI slowness.
+// If is_not_immediate is true, then the UI is not updated after the move (the
+// piece images are not physically moved, nor animated); useful for quickly making 
+// many moves without UI slowness.
 // Examples:
 // mv("e4")
 // mv("P-K4")
@@ -5306,10 +5308,14 @@ function highlight_recent_move(from_square, to_square)
 }
 
 // Make a move, or half-move, given choices.
+// promote_to is either the name of a piece to promote to, or undefined
+// choices is an object keyed by the list of choices to promote to
+// If is_hypothetical, the consequences of the move are not updated
+// If is_immediate, the UI is updated
 function execute_move(promote_to, choices, is_hypothetical, is_immediate) 
 {
-    var piece, square, promote_to;
-    var from_square, move_text, filerank, only_move, move, choices, did, one;
+    var piece, square, promote_to, animate;
+    var from_square, move_text, filerank, only_move, move, one;
 
     unhighlight_all();
   
@@ -5400,8 +5406,32 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate)
             GAME_STATE.hmvc += 1;
         }
 
-        highlight_recent_move(from_square, square);
+        if (is_immediate) {
+            // Animate the movement
+            var from_image = dojo.byId("piece-at-" + from_square.filerank);
+            dojo.anim(from_image, {left:get_square_x(square.x) + 4,
+                    top:get_square_y(square.y) + 3}, PREFS.movement_animation_time, null, function() {
+                        highlight_recent_move(from_square, square);
+                        continue_execute_move(piece, square, move, 
+                            is_hypothetical, choices, promote_to, is_immediate);
+                    } 
+                    );
+        } else {
+            // Not immediate, so do not animate or highlight square. 
+            // Caller doesn't want any UI changes.
+            continue_execute_move(piece, square, move, 
+                is_hypothetical, choices, promote_to, is_immediate);
+        }
+    } else {
+        continue_execute_move(piece, square, move, 
+                is_hypothetical, choices, promote_to, is_immediate);
     }
+}
+
+// Continue execute_move(), after animating the piece movement, if desired.
+function continue_execute_move(piece, square, move, is_hypothetical, choices, promote_to, is_immediate)
+{
+    var did, filerank;
 
     did = do_virtual_move(piece, move);
     if (did.captured) {
@@ -5446,6 +5476,7 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate)
     // TODO: return from finish_up_move, deferred? promotions..
     // To allow undo_virtual_move
     //return did;
+
 }
 
 // Perform bookkeeping on the move after it has been actually made, 
