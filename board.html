@@ -1836,11 +1836,18 @@ function parse_pgn(pgn)
                 // TODO: handle #, + for checkmate and check, part of move
                 // and TODO: handle ?, !, ??, !?, etc. in move_annotations
 
-                moves[ply] = token;
-
-                // white, then black
-                if (color === "white") {
+                if (moves[ply] === undefined) {
+                    // White's move
+                    moves[ply] = token;
+                } else {
+                    // White has already moved, now it is black's turn for this fmvn.
+                    // The color has to be alternated here, not just after reading 
+                    // white's move, since white could have arbitrarily many annotations
+                    // associated with the ply, following the move text.
                     color = opposite_color(color);
+                    ply = encode_ply(color, fmvn);
+
+                    moves[ply] = token;
                 } 
             }
         }
