@@ -1792,8 +1792,9 @@ function parse_pgn(pgn)
                 in_comment = true;
                 comment.push(token.substring(1));
             } else if (in_comment) {
-                comment.push(token);
                 if (token.substr(token.length - 1) === "}") {
+                    comment.push(token.substr(0, token.length - 1));
+
                     in_comment = false;
 
                     if (!move_annotations[ply]) {
@@ -1801,7 +1802,9 @@ function parse_pgn(pgn)
                     }
                     move_annotations[ply].push(comment.join(" "));
                     comment = [];
-                } 
+                }  else {
+                    comment.push(token);
+                }
             } else if (token.charAt(0) === "$") {
                 // NAG, Numerical Annotation Glyph
                 if (!move_annotations[ply]) {
@@ -1832,6 +1835,7 @@ function parse_pgn(pgn)
                 // Move 
                 // TODO: handle #, + for checkmate and check, part of move
                 // and TODO: handle ?, !, ??, !?, etc. in move_annotations
+
                 moves[ply] = token;
 
                 // white, then black
