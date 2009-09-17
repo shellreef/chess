@@ -1,1 +1,12 @@
-[Event "?"][Site "?"][Date "????.??.??"][Round "?"][White "Untitled"][Black "?"][Result "*"][PlyCount "8"]1. e4 e5 2. Nf3 Nc6 3. Bc4 f6 $2 {the sacrifice below is incorrect (Black willwin)} 4. Nxe5 $2 Nxe5  *
+[Event "?"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "Untitled"]
+[Black "?"]
+[Result "*"]
+[PlyCount "8"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bc4 f6 $2 {the sacrifice below is incorrect (Black will
+win)} 4. Nxe5 $2 Nxe5  *
+

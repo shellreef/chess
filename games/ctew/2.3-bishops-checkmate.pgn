@@ -1,1 +1,17 @@
-[Event "?"][Site "?"][Date "????.??.??"][Round "?"][White "Untitled"][Black "?"][Result "1-0"][PlyCount "47"][SetUp "1"][FEN "8/8/3B4/K7/3k4/8/8/3B4 w - - 0 1"]1. Bf3 Kd3 2. Bc6 Kd4 3. Kb4 Kd3 4. Be5 Ke3 5. Kc4 Kd2 6. Bd4 Ke2 7. Kc3 Kf1 8.Bf3 Ke1 9. Bg2 Ke2 10. Bc5 Ke1 11. Kd3 Kd1 12. Bb4 Kc1 13. Bf3 Kb2 14. Bd1 Kc115. Ba4 Kb1 16. Kd2 Kb2 17. Kd1 Kb1 18. Bc3 Ka2 19. Kc2 Ka3 20. Bb5 Ka2 21. Bb4Ka1 22. Bd3 Ka2 23. Bc4+ Ka1 24. Bc3# 1-0 
+[Event "?"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "Untitled"]
+[Black "?"]
+[Result "1-0"]
+[PlyCount "47"]
+[SetUp "1"]
+[FEN "8/8/3B4/K7/3k4/8/8/3B4 w - - 0 1"]
+
+
+1. Bf3 Kd3 2. Bc6 Kd4 3. Kb4 Kd3 4. Be5 Ke3 5. Kc4 Kd2 6. Bd4 Ke2 7. Kc3 Kf1 8.
+Bf3 Ke1 9. Bg2 Ke2 10. Bc5 Ke1 11. Kd3 Kd1 12. Bb4 Kc1 13. Bf3 Kb2 14. Bd1 Kc1
+15. Ba4 Kb1 16. Kd2 Kb2 17. Kd1 Kb1 18. Bc3 Ka2 19. Kc2 Ka3 20. Bb5 Ka2 21. Bb4
+Ka1 22. Bd3 Ka2 23. Bc4+ Ka1 24. Bc3# 1-0 
+

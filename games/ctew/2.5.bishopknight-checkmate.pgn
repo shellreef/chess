@@ -1,1 +1,16 @@
-[Event "?"][Site "?"][Date "????.??.??"][Round "?"][White "Untitled"][Black "?"][Result "1-0"][PlyCount "37"][SetUp "1"][FEN "6k1/5N2/5K2/5B2/8/8/8/8 w - - 0 1"]1. Be4 Kf8 2. Bh7 $1 Ke8 3. Ne5 Kd8 4. Ke6 Kc7 5. Nd7 Kb7 6. Bd3 Kc6 7. Ba6 Kc78. Bb5 Kd8 9. Nb6 Kc7 10. Nd5+ Kd8 11. Kd6 Kc8 12. Ke7 Kb7 13. Kd7 Kb8 14. Ba6Ka7 15. Bc8 Kb8 16. Ne7 Ka7 17. Kc7 Ka8 18. Bb7+ Ka7 19. Nc6# 1-0 
+[Event "?"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "Untitled"]
+[Black "?"]
+[Result "1-0"]
+[PlyCount "37"]
+[SetUp "1"]
+[FEN "6k1/5N2/5K2/5B2/8/8/8/8 w - - 0 1"]
+
+
+1. Be4 Kf8 2. Bh7 $1 Ke8 3. Ne5 Kd8 4. Ke6 Kc7 5. Nd7 Kb7 6. Bd3 Kc6 7. Ba6 Kc7
+8. Bb5 Kd8 9. Nb6 Kc7 10. Nd5+ Kd8 11. Kd6 Kc8 12. Ke7 Kb7 13. Kd7 Kb8 14. Ba6
+Ka7 15. Bc8 Kb8 16. Ne7 Ka7 17. Kc7 Ka8 18. Bb7+ Ka7 19. Nc6# 1-0 
+

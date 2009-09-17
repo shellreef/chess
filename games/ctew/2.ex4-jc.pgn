@@ -1,1 +1,14 @@
-[Event "?"][Site "?"][Date "????.??.??"][Round "?"][White "Untitled"][Black "?"][Result "1-0"][PlyCount "3"][SetUp "1"][FEN "2k5/8/2KR4/8/8/8/8/8 w - - 0 1"]1. Kb6 Kb8 2. Rd8# 1-0 
+[Event "?"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "Untitled"]
+[Black "?"]
+[Result "1-0"]
+[PlyCount "3"]
+[SetUp "1"]
+[FEN "2k5/8/2KR4/8/8/8/8/8 w - - 0 1"]
+
+
+1. Kb6 Kb8 2. Rd8# 1-0 
+
