@@ -45,7 +45,15 @@ sub process_file
         $h{PlyCount} ||= scalar @$moves;
         $h{MoveCount} = ceil($h{PlyCount} / 2);
         $h{SmallResult} = ($h{Result} eq "1/2-1/2" ? "1/2" : $h{Result}), 
-        $h{Opening} = ""; # TODO
+        $h{OpeningName} = ""; # TODO: scid.eco
+
+        if ($h{FEN} && $h{FEN} ne "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -") {
+            # FIDE Chess
+            $h{OpeningMoves} = $h{Game};
+        } else {
+            # Non-standard startup position, so opening moves wouldn't be very useful.
+            $h{OpeningMoves} = "pos";
+        }
 
         $count += 1;
         push @games, {%h};
