@@ -12,10 +12,6 @@
 <!-- Created:20090411 -->
 <style type="text/css">
 
-/* TODO: programmatically load only when game browser is displayed */
-@import "http://o.aolcdn.com/dojo/1.3.1/dojox/grid/resources/tundraGrid.css";
-@import "http://o.aolcdn.com/dojo/1.3.1/dojox/grid/resources/Grid.css";
-
 /* Do not wrap game browser opening content. */
 .dojoxGridCell { white-space: nowrap; }
 
@@ -4410,7 +4406,7 @@ function check_repetition(ply)
     return null;
 }
 
-//// REMOTE SAVED GAME FUNCTIONS
+//// GAME BROWSER FUNCTIONS
 
 // Toggle display of the saved game browser.
 function toggle_game_browser()
@@ -4432,6 +4428,10 @@ function make_game_browser()
     dojo.require("dojox.grid.DataGrid");
     dojo.require("dojo.data.ItemFileWriteStore");
 
+    // Required CSS, loaded on-demand for faster page load
+    load_css("http://o.aolcdn.com/dojo/1.3.1/dojox/grid/resources/tundraGrid.css");
+    load_css("http://o.aolcdn.com/dojo/1.3.1/dojox/grid/resources/Grid.css");
+
     dojo.addOnLoad(function() {
         dojo.xhrGet({url: PREFS.saved_games_path + "index",
             handleAs: "json",
@@ -4445,9 +4445,9 @@ function make_game_browser()
                             items: games,
                         }}),
                     structure: [[
-                        {name: "White", field: "White", width: "120px"},
-                        {name: "Black", field: "Black", width: "120px"},
-                        {name: "Event", field: "Event", width: "150px"},
+                        {name: "White", field: "White", width: "105px"},
+                        {name: "Black", field: "Black", width: "105px"},
+                        {name: "Event", field: "Event", width: "180px"},
                         {name: "Date", field: "Date", width: "100px"},
                         {name: "Result", field: "SmallResult", width: "70px"},
                         {name: "Moves", field: "MoveCount", width: "90px"},
@@ -4475,6 +4475,17 @@ function make_game_browser()
                 }
         });
     });
+}
+
+// Dynamically load a Cascading Style Sheet
+function load_css(url)
+{
+    var link, head;
+
+    // Based on http://www.javascriptkit.com/javatutors/loadjavascriptcss.shtml
+    link = dojo.create("link", {rel: "stylesheet", type:"text/css", href:url});
+    head = dojo.query("head")[0];
+    head.appendChild(link);
 }
 
 //// DISPLAY FUNCTIONS
