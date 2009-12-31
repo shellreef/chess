@@ -5155,6 +5155,9 @@ function get_notations(piece, square, promote_to)
     var finds = {};
     var last_key;
 
+    assert(piece.unique_id !== undefined, "get_notations(" + piece + ", " + square +
+            ", " + promote_to + "): unique_id not defined for piece");
+
     for (var notation in AVAILABLE_NOTATIONS) {
         if (AVAILABLE_NOTATIONS.hasOwnProperty(notation)) {
             var texts = VALID_MOVE_NOTATIONS[notation];
@@ -5684,6 +5687,10 @@ function move_dropped_piece(piece, square, event)
     if (PREFS.setup_mode) {
         var from_square = piece.square;
 
+        if (piece.unique_id === undefined) {
+            // Assign unique ID to new piece
+            piece.unique_id = xy2filerank(square.x, square.y) + full_piece_prefix(piece);
+        }
         do_virtual_move(piece, {x:square.x, y:square.y});
         unhighlight_all();
 
