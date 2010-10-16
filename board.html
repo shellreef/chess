@@ -167,6 +167,8 @@ var PREFS = {
 
     input_notation: "SAN",
 
+    //image_root: "images/",
+    image_root: "http://camelpawn.appspot.com/images/",    // on Google App Engine
     // What piece images to use  - TODO: option to change
     image_set: "alfaerieomega", image_extension: ".gif",   // See README in that directory
     //image_set: "ariel", image_extension: ".gif",         // based on Ariel Unicode MS
@@ -6088,7 +6090,7 @@ function load_starting_position(fen, replay)
 // Show all available images, even those without movement
 function show_library_images()
 {
-    var root = "images/" + PREFS.image_set + "/";
+    var root = PREFS.image_root + PREFS.image_set + "/";
     var used_paths = {}, count;
 
     count = 0;
@@ -6114,8 +6116,8 @@ function show_library_images()
         document.write("<h2>" + count + " of " + images.length + " (" + 
             Math.round(count / images.length * 100) + "%) defined" + "</h2>");
         document.write("<p>This is a list of all blue and white piece images available in the <b>" + PREFS.image_set + "</b> image set, including those that are not assigned to a piece. See also: <ul>");
-        document.write("<li><a href=\"images/" + PREFS.image_set + "\">Directory listing</a>");
-        document.write("<li><a href=\"images/" + PREFS.image_set + "/README.html\">README</a>");
+        document.write("<li><a href=\"" + PREFS.image_root + PREFS.image_set + "\">Directory listing</a>");
+        document.write("<li><a href=\"" + PREFS.image_root + PREFS.image_set + "/README.html\">README</a>");
         document.write("</ul>");
 
         document.write("<table>");
@@ -6549,7 +6551,7 @@ function image_path_for(type, color, all)
     
     paths = [];
     for (var i = 0; i < bases.length; i += 1) {
-        paths.push(["images/", PREFS.image_set, "/", {white:"w", black:"b"}[color], bases[i], PREFS.image_extension].join(""));
+        paths.push([PREFS.image_root, PREFS.image_set, "/", {white:"w", black:"b"}[color], bases[i], PREFS.image_extension].join(""));
     }
 
     return all ? paths : paths[0];
