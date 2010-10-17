@@ -3042,16 +3042,20 @@ function initRemoteServer()
 
     updateSession();
 
-    // TODO: dynamically load pusher
     // http://pusherapp.com/docs/quickstart
-    /* Can't do this, its not same domain
-    dojo.xhrGet({url:"http://js.pusherapp.com/1.5/pusher.min.js",
-            handleAs:"javascript",
-            load:function() {
-                console.log("loaded pusher");
-            }
-            });
-            */
+    loadScript("http://js.pusherapp.com/1.5/pusher.min.js");
+}
+
+// Dynamically load a remote JavaScript
+function loadScript(url) {
+    var script;
+    
+    // Note: xhrGet has handleAs:"javascript", but XHR cross-domain is restricted.
+    // So we have to create a new <script> tag and insert it
+    script = dojo.create("script", {src:url, type:"text/javascript"});
+
+
+    dojo.body().appendChild(script);
 }
 
 // Return whether we're running on a local disk, and don't have server access
