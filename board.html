@@ -3158,6 +3158,13 @@ function send_remote_move(color, move_text)
 
     // TODO: send move to server
     console.log("TODO: send ",color,move_text);
+    dojo.xhrPost({url:PREFS.server + "game", content:{authenticity_token:SESSION.auth_token},
+            load:function(response) {
+                console.log("load",response);
+            },
+            error:function(response) {
+                console.log("error",response);
+            }});
 }
 
 //// PARLETT NOTATION FUNCTIONS
