@@ -175,8 +175,10 @@ var PREFS = {
     //image_set: "chessos", image_extension: ".gif",
     //image_set: "classic", image_extension: ".png",
     
+    server: "http://chess.heroku.com/",           // Remote backend game server (note: actually overwritten from document.location!)
+
     engine: "http://jeff.tk:81/chess/crafty.cgi",
-    skill: 0,                   // engine strength, 0-100
+    skill: 0,                                     // engine strength, 0-100
 
     flipped: false,             // True if from black's perspective instead of white
     setup_mode: false,          // Setup pieces, instead of playing game
@@ -388,7 +390,11 @@ var GAME_STATE_DEFAULT = {
     shift: false,               // Whether shift key is pressed
     update_custom: false,       // Whether custom movement field is focused and being typed in
     alert_assert: true          // Whether to alert assertion errors
-};    
+}; 
+
+var SESSION = {
+    logged_in: false
+};
 
 /// Drag and drop globals
 var DRAG = 
@@ -1386,6 +1392,8 @@ dojo.cookie=function(_2,_3,_4){var c=document.cookie;if(arguments.length==1){var
     // Hide address bar. TODO: Get this working
     //setTimeout(function() { window.scrollTo(0, 1); }, 0);
 
+    updateSession();
+
     // Let the games begin
     load_notations();
     init_board();
@@ -1448,7 +1456,7 @@ pgn = load_pgn(
 
 }
 
-// PGN (PORTABLE GAME NOTATION) FUNCTIONS
+//// PGN (PORTABLE GAME NOTATION) FUNCTIONS
 
 // Load the chess notations into the input/output notation select boxes
 function load_notations()
@@ -2755,140 +2763,6 @@ function populate_make_a_move_list()
     menu.selectedIndex = 0;
 }
 
-// Called when the make a move menu is changed, either to change the
-// input notation or actually make a move by the menu.
-function make_move_by_menu(menu)
-{
-    var choice = form_value("make_move_menu");
-
-    // Notation change
-    if (choice.indexOf("change_") === 0) {
-        var new_notation = choice.substring("change_".length);
-   
-        PREFS.input_notation = new_notation;
-        populate_make_a_move_list();
-        return;
-    }
-
-    mv(choice);
-}
-
-// AI - artificial intelligence 
-// Do this after a delay, so that when playing computer vs. computer, you can
-// see the move, since they are not animated (Effect.Move) yet.
-function computer_move_if_applicable(clicked)
-{
-    if (clicked) {
-        if (form_value("black_computer") || form_value("white_computer")) {
-            dojo.byId("skill_level").value = PREFS.skill;
-            dojo.byId("show_skill").style.display = "";
-        } else {
-            dojo.byId("show_skill").style.display = "none";
-        }
-    }
-
-    if (!form_value(GAME_STATE.active_color + "_computer")) {
-        return;
-    }
-
-    // TODO: better variables
-    if (dojo.byId("check").innerHTML.indexOf("Checkmate") !== -1 ||
-        dojo.byId("check").innerHTML.indexOf("Draw") !== -1) {
-        // Game is completed, don't bug the computer
-        return;
-    }
-
-    unhighlight_all();
-
-    if (PREFS.skill === 0) {
-        setTimeout(random_move, 1);
-    } else {
-        schedule_engine_move(PREFS.skill);
-    }
-}
-
-// Update the skill level when the user changes the form field.
-// TODO: Use HTML5 <input type="range">
-function update_skill(element)
-{
-    var skill = parseInt(element.value, 10);
-
-    if (skill < 0) {
-        skill = 0;
-    }  else if (skill > 100) {
-        skill = 100;
-    }
-
-    element.value = skill;
-
-    PREFS.skill = skill;
-}
-
-// Make a random move with equal probability. No intelligence.
-function random_move()
-{
-    // simply choose a random move
-    var keys = own_properties(VALID_MOVE_NOTATIONS.SAN);
-    var alg_move = keys[randint(0, keys.length - 1)];
-    //var alg_move = keys[0];
-
-    //var piece_square = VALID_MOVE_NOTATIONS.SAN[alg_move];
-
-    // TODO: do some animation when moving, Effect.Move, to slow it down so we can see it.
-    mv(alg_move);
-}
-
-// Ask a chess engine, via Ajax, for its move and the board score.
-// TODO: also allow remote human moves, for realtime games?
-function schedule_engine_move(skill)
-{
-    var query;
-
-    // TODO: pass skill, too.
-    
-    query = "?skill=" + skill + ";fen=" + encodeURIComponent(active_fen());
-
-    dojo.xhrGet({
-        url: PREFS.engine + query,
-        handleAs: "json",
-        load: got_engine_move,
-        error: got_engine_error
-        });
-
-    set_check_message("Analyzing...");
-}
-
-// Callback for when the chess engine Ajax request move is received.
-function got_engine_move(response)
-{
-    if (!response.error) {
-        set_check_message("");
-        mv(response.next_move);
-        // TODO: show a meter for the board position
-        dojo.byId("score").innerHTML = "Score: " + response.score;
-    } else {
-        disable_engine("Engine error: " + response.error);
-    }
-}
-
-// Called when the Ajax request fails
-function got_engine_error(response)
-{
-    disable_engine("Engine unavailable: " + response);
-}
-
-// Disable the external chess engine usage and make a random move in its place.
-function disable_engine(why)
-{
-    PREFS.skill = 0;
-    dojo.byId("skill_level").value = PREFS.skill;
-    dojo.byId("skill_level").title = "Reset because of: " + why;
-    window.status = "Skill level reset because: " + why;
-
-    // It'll have to do
-    random_move();
-}
-
 // Make a move in the VBOARD, which can be undone. Only makes the move.
 function do_virtual_move(piece, move)
 {
@@ -3016,6 +2890,228 @@ function piece_moved(piece)
     } else {
         assert("piece_moved(" + piece + "): neither white nor black");
     }
+}
+
+
+// Called when the make a move menu is changed, either to change the
+// input notation or actually make a move by the menu.
+function make_move_by_menu(menu)
+{
+    var choice = form_value("make_move_menu");
+
+    // Notation change
+    if (choice.indexOf("change_") === 0) {
+        var new_notation = choice.substring("change_".length);
+   
+        PREFS.input_notation = new_notation;
+        populate_make_a_move_list();
+        return;
+    }
+
+    mv(choice);
+}
+
+//// AI - COMPUTER MOVES
+
+// Do this after a delay, so that when playing computer vs. computer, you can
+// see the move, since they are not animated (Effect.Move) yet.
+function computer_move_if_applicable(clicked)
+{
+    if (clicked) {
+        if (form_value("black_computer") || form_value("white_computer")) {
+            dojo.byId("skill_level").value = PREFS.skill;
+            dojo.byId("show_skill").style.display = "";
+        } else {
+            dojo.byId("show_skill").style.display = "none";
+        }
+    }
+
+    if (!form_value(GAME_STATE.active_color + "_computer")) {
+        return;
+    }
+
+    // TODO: better variables
+    if (dojo.byId("check").innerHTML.indexOf("Checkmate") !== -1 ||
+        dojo.byId("check").innerHTML.indexOf("Draw") !== -1) {
+        // Game is completed, don't bug the computer
+        return;
+    }
+
+    unhighlight_all();
+
+    if (PREFS.skill === 0) {
+        setTimeout(random_move, 1);
+    } else {
+        schedule_engine_move(PREFS.skill);
+    }
+}
+
+// Update the skill level when the user changes the form field.
+// TODO: Use HTML5 <input type="range">
+function update_skill(element)
+{
+    var skill = parseInt(element.value, 10);
+
+    if (skill < 0) {
+        skill = 0;
+    }  else if (skill > 100) {
+        skill = 100;
+    }
+
+    element.value = skill;
+
+    PREFS.skill = skill;
+}
+
+// Make a random move with equal probability. No intelligence.
+function random_move()
+{
+    // simply choose a random move
+    var keys = own_properties(VALID_MOVE_NOTATIONS.SAN);
+    var alg_move = keys[randint(0, keys.length - 1)];
+    //var alg_move = keys[0];
+
+    //var piece_square = VALID_MOVE_NOTATIONS.SAN[alg_move];
+
+    // TODO: do some animation when moving, Effect.Move, to slow it down so we can see it.
+    mv(alg_move);
+}
+
+// Ask a chess engine, via Ajax, for its move and the board score.
+// TODO: also allow remote human moves, for realtime games?
+function schedule_engine_move(skill)
+{
+    var query;
+
+    // TODO: pass skill, too.
+    
+    query = "?skill=" + skill + ";fen=" + encodeURIComponent(active_fen());
+
+    dojo.xhrGet({
+        url: PREFS.engine + query,
+        handleAs: "json",
+        load: got_engine_move,
+        error: got_engine_error
+        });
+
+    set_check_message("Analyzing...");
+}
+
+// Callback for when the chess engine Ajax request move is received.
+function got_engine_move(response)
+{
+    if (!response.error) {
+        set_check_message("");
+        mv(response.next_move);
+        // TODO: show a meter for the board position
+        dojo.byId("score").innerHTML = "Score: " + response.score;
+    } else {
+        disable_engine("Engine error: " + response.error);
+    }
+}
+
+// Called when the Ajax request fails
+function got_engine_error(response)
+{
+    disable_engine("Engine unavailable: " + response);
+}
+
+// Disable the external chess engine usage and make a random move in its place.
+function disable_engine(why)
+{
+    PREFS.skill = 0;
+    dojo.byId("skill_level").value = PREFS.skill;
+    dojo.byId("skill_level").title = "Reset because of: " + why;
+    window.status = "Skill level reset because: " + why;
+
+    // It'll have to do
+    random_move();
+}
+
+//// REMOTE / SERVER-SIDE BACKEND / MULTIPLAYER
+// These functions are for interacting with the backend server (this app can
+// also be used standalone, with no server - but not this functionality).
+
+// Return whether we're running on a local disk, and don't have server access
+function runningLocally()
+{
+    return document.location.protocol === "file:";
+}
+
+// Clear the session
+function logout()
+{
+    dojo.xhr("DELETE", {url:PREFS.server + "session",
+            load:function(response, args) {
+                console.log("Logout successful");
+                updateSession();
+            },
+            error:function(response, args) {
+                assert(False, "Failed to logout: " + response);
+            }
+            });
+}
+
+// Login with Google Accounts
+function login()
+{
+
+    // TODO: allow logging in without leaving the page and losing state!
+    /* 
+    dojo.byId("login_iframe").style.display = "";
+    dojo.byId("login_iframe").src = PREFS.server + "session/new";
+    */
+
+    
+    location = PREFS.server + "session/new";
+    // redirected back here
+}
+
+// Update the login state and session information from the remote server
+function updateSession()
+{
+    if (runningLocally()) {
+        //console.log("Not updating server session");
+        return;
+    }
+   
+    // So we work served off of localhost
+    PREFS.server = location.protocol + "//" + location.hostname + ":" + location.port + "/";
+
+    dojo.xhr("GET", {url:PREFS.server + "session.json", handleAs: "json",
+            load:function(response, args) {
+                if (response.player) {
+                    console.log("Logged in");
+                    SESSION = response.player;
+                    SESSION.logged_in = true;
+                } else {
+                    console.log("Not logged in");
+                    SESSION = {logged_in: false};
+                }
+                updateSessionWelcome();
+            },
+            error:function(response, args) {
+                console.log("Error updating session");
+                console.log("Response: " + response);
+            }
+            });
+}
+
+// Welcome the user
+function updateSessionWelcome()
+{
+    var html;
+
+    if (SESSION.logged_in) {
+        dojo.byId("welcome_name").innerText = SESSION.first_name;
+    }
+
+    dojo.byId("not_logged_in").style.display = SESSION.logged_in ? "none": "";
+    dojo.byId("login_link").style.display = SESSION.logged_in ? "none" : "";
+
+    dojo.byId("logout_link").style.display = SESSION.logged_in ? "" : "none";
+    dojo.byId("welcome").style.display = SESSION.logged_in ? "" : "none"
+
 }
 
 //// PARLETT NOTATION FUNCTIONS
@@ -7778,6 +7874,7 @@ dojo.addOnLoad(main);
 </script>
 </head>
 <body class="tundra">
+
 <table id="outer">
 <tr>
 <td style="vertical-align: top">
@@ -7886,5 +7983,13 @@ not to implement chess AI. But having automatic moves is useful for testing. -->
 
 <div id="game-browser" style="display: none; position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 2"></div>
 
+<p id="welcome" style="display: none">Welcome, <span id="welcome_name">unknown</span></p>
+<p id="not_logged_in" style="display: none">You are not logged in.</p>
+<p id="logout_link" style="display: none"><a href="#" onclick="logout()">Logout</a>
+<p id="login_link" style="display: none"><a href="#" onclick="login()">Login</a>
+<!--
+<p>
+<iframe src="about:blank" id="login_iframe" style="display: none; position: absolute; top: 0px; left: 0px; width: 100%; height: 100%"></iframe>
+-->
 </body>
 </html>
