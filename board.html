@@ -1392,7 +1392,7 @@ dojo.cookie=function(_2,_3,_4){var c=document.cookie;if(arguments.length==1){var
     // Hide address bar. TODO: Get this working
     //setTimeout(function() { window.scrollTo(0, 1); }, 0);
 
-    initRemoteServer();
+    init_remote_server();
 
     // Let the games begin
     load_notations();
@@ -3033,18 +3033,18 @@ function disable_engine(why)
 // also be used standalone, with no server - but not this functionality).
 
 // Initialize remote server connections
-function initRemoteServer()
+function init_remote_server()
 {
-    if (runningLocally()) {
+    if (running_locally()) {
         //console.log("Not updating server session");
         return;
     }
 
-    updateSession();
+    update_session();
 
     // Receive push events
     // http://pusherapp.com/docs/quickstart
-    loadScript("http://js.pusherapp.com/1.5/pusher.min.js", function() {
+    load_script("http://js.pusherapp.com/1.5/pusher.min.js", function() {
         var pusher, channel;
 
         pusher = new Pusher("5d47347e06c56e1bd292");
@@ -3060,7 +3060,7 @@ function initRemoteServer()
 }
 
 // Dynamically load a remote JavaScript
-function loadScript(url, onload) {
+function load_script(url, onload) {
     var script;
     
     // Note: xhrGet has handleAs:"javascript", but XHR cross-domain is restricted.
@@ -3071,7 +3071,7 @@ function loadScript(url, onload) {
 }
 
 // Return whether we're running on a local disk, and don't have server access
-function runningLocally()
+function running_locally()
 {
     return document.location.protocol === "file:";
 }
@@ -3082,7 +3082,7 @@ function logout()
     dojo.xhr("DELETE", {url:PREFS.server + "session",
             load:function(response, args) {
                 console.log("Logout successful");
-                updateSession();
+                update_session();
             },
             error:function(response, args) {
                 assert(False, "Failed to logout: " + response);
@@ -3106,7 +3106,7 @@ function login()
 }
 
 // Update the login state and session information from the remote server
-function updateSession()
+function update_session()
 {
    
     // So we work served off of localhost
@@ -3122,7 +3122,7 @@ function updateSession()
                     console.log("Not logged in");
                     SESSION = {logged_in: false};
                 }
-                updateSessionWelcome();
+                update_session_welcome();
             },
             error:function(response, args) {
                 console.log("Error updating session");
@@ -3132,7 +3132,7 @@ function updateSession()
 }
 
 // Welcome the user
-function updateSessionWelcome()
+function update_session_welcome()
 {
     var html;
 
