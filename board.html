@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <!-- TODO <base href="http://xyzzy.freeshell.org/chess/"> -->
 <title>Chess by Jeff</title>
-<!-- Copyright (C) 2009 Jeff Connelly -->
+<!-- Copyright (C) 2009-2010 Jeff Connelly -->
 <!-- Created:20090411 -->
 <style type="text/css">
 
@@ -3148,6 +3148,18 @@ function update_session_welcome()
 
 }
 
+
+// Send move to remote server, if logged in
+function send_remote_move(color, move_text)
+{
+    if (!SESSION.logged_in) {
+        return;
+    }
+
+    // TODO: send move to server
+    console.log("TODO: send ",color,move_text);
+}
+
 //// PARLETT NOTATION FUNCTIONS
 
 // Convert an unfiltered moves array into a textual graphical representation
@@ -5699,6 +5711,7 @@ function show_move_history()
             continue;
         }
 
+
         if (move_info) {
             move_text = move_info.notations[form_value("output_notation")];
         } else {
@@ -5707,7 +5720,10 @@ function show_move_history()
             move_text = null;
             move_info = {};
         }
-        
+
+        // Remotely send move to server if logged in
+        send_remote_move(color, move_info.notations.SAN);
+       
         if (color === "white") {
             htmls.push('<span class="fmvn">' + fmvn + '<\/span>');
             // Period goes to initial position, kind of strange, but its uninstrusive
