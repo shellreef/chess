@@ -3042,18 +3042,30 @@ function initRemoteServer()
 
     updateSession();
 
+    // Receive push events
     // http://pusherapp.com/docs/quickstart
-    loadScript("http://js.pusherapp.com/1.5/pusher.min.js");
+    loadScript("http://js.pusherapp.com/1.5/pusher.min.js", function() {
+        var pusher, channel;
+
+        pusher = new Pusher("5d47347e06c56e1bd292");
+        channel = pusher.subscribe("test_channel");
+
+        channel.bind("my_event", function(event) {
+            console.log("Got a push: ", event);
+
+            // TODO: moves, chats. Send remote moves via backend.
+            mv(event);
+        });
+    });
 }
 
 // Dynamically load a remote JavaScript
-function loadScript(url) {
+function loadScript(url, onload) {
     var script;
     
     // Note: xhrGet has handleAs:"javascript", but XHR cross-domain is restricted.
     // So we have to create a new <script> tag and insert it
-    script = dojo.create("script", {src:url, type:"text/javascript"});
-
+    script = dojo.create("script", {src:url, type:"text/javascript", onload:onload});
 
     dojo.body().appendChild(script);
 }
