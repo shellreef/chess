@@ -1392,7 +1392,7 @@ dojo.cookie=function(_2,_3,_4){var c=document.cookie;if(arguments.length==1){var
     // Hide address bar. TODO: Get this working
     //setTimeout(function() { window.scrollTo(0, 1); }, 0);
 
-    updateSession();
+    initRemoteServer();
 
     // Let the games begin
     load_notations();
@@ -3032,6 +3032,28 @@ function disable_engine(why)
 // These functions are for interacting with the backend server (this app can
 // also be used standalone, with no server - but not this functionality).
 
+// Initialize remote server connections
+function initRemoteServer()
+{
+    if (runningLocally()) {
+        //console.log("Not updating server session");
+        return;
+    }
+
+    updateSession();
+
+    // TODO: dynamically load pusher
+    // http://pusherapp.com/docs/quickstart
+    /* Can't do this, its not same domain
+    dojo.xhrGet({url:"http://js.pusherapp.com/1.5/pusher.min.js",
+            handleAs:"javascript",
+            load:function() {
+                console.log("loaded pusher");
+            }
+            });
+            */
+}
+
 // Return whether we're running on a local disk, and don't have server access
 function runningLocally()
 {
@@ -3070,10 +3092,6 @@ function login()
 // Update the login state and session information from the remote server
 function updateSession()
 {
-    if (runningLocally()) {
-        //console.log("Not updating server session");
-        return;
-    }
    
     // So we work served off of localhost
     PREFS.server = location.protocol + "//" + location.hostname + ":" + location.port + "/";
