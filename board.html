@@ -3048,14 +3048,10 @@ function init_remote_server()
         var pusher, channel;
 
         pusher = new Pusher("5d47347e06c56e1bd292");
-        channel = pusher.subscribe("test_channel");
+        channel = pusher.subscribe("game-5"); // TODO: game id
 
-        channel.bind("my_event", function(event) {
-            console.log("Got a push: ", event);
-
-            // TODO: moves, chats. Send remote moves via backend.
-            mv(event);
-        });
+        channel.bind("move", receive_remote_move);
+        //TODO: channel.bind("chat"
     });
 }
 
@@ -3150,20 +3146,45 @@ function update_session_welcome()
 
 
 // Send move to remote server, if logged in
-function send_remote_move(color, move_text)
+function send_remote_move(color, move_text, fen, ply)
 {
     if (!SESSION.logged_in) {
         return;
     }
 
-    // TODO: send move to server
-    console.log("TODO: send ",color,move_text);
-    dojo.xhrPost({url:PREFS.server + "game", content:{authenticity_token:SESSION.auth_token},
+    // Send move to server
+    console.log("Send remote:",color,move_text);
+    dojo.xhrPut({url:PREFS.server + "games/5", content:{color:color, move:move_text, fen:fen, ply:ply},
             load:function(response) {
-                console.log("load",response);
+                //console.log("load xhrPut",response);
             },
             error:function(response) {
-                console.log("error",response);
+                console.log("error xhrPut",response);
+            }});
+}
+
+// Process an move from the server, which could be from our opponents
+function receive_remote_move(event) 
+{
+    // Received move from backend
+    console.log("Got a push: ", JSON.stringify(event));
+
+    console.log(event.ply);
+    if (!GAME_STATE.made_moves[event.ply]) {   // if move wasn't already made
+        mv(event.move);
+    }
+}
+
+// TODO: Create a new remote game
+function new_remote_game()
+{
+    // TODO: white, black remote players
+    dojo.xhrPost({url:PREFS.server + "game", content:{color:color, move:move_text},  //authenticity_token:SESSION.auth_token},
+            load:function(response) {
+                console.log("load xhrPost",response);
+            },
+            error:function(response) {
+                console.log("error xhrPost",response);
             }});
 }
 
@@ -5693,10 +5714,13 @@ function finish_up_move(tieback, is_immediate, promote_to)
     if (is_immediate) {
         set_copyable_link();
 
+        // TODO: don't send if was remote! 
+        send_remote_move(GAME_STATE.active_color, tieback[promote_to].notations.SAN, active_fen(true), ply);
+
         show_move_history();
         populate_make_a_move_list();
         computer_move_if_applicable();
-    }
+   }
 }
 
 // Fill in move_history with the move history
@@ -5728,9 +5752,6 @@ function show_move_history()
             move_info = {};
         }
 
-        // Remotely send move to server if logged in
-        send_remote_move(color, move_info.notations.SAN);
-       
         if (color === "white") {
             htmls.push('<span class="fmvn">' + fmvn + '<\/span>');
             // Period goes to initial position, kind of strange, but its uninstrusive
