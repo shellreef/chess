@@ -7959,6 +7959,15 @@ dojo.addOnLoad(main);
 
 <canvas id="canvas-board">Sorry, you are using a browser that does not support HTML5. Time to upgrade. Or you can use the <a href="oldtableboard.html">old HTML-table-based</a> version, but it is no longer maintained.</canvas>
 
+<p id="welcome" style="display: none">Welcome, <span id="welcome_name">unknown</span></p>
+<p id="not_logged_in" style="display: none">You are not logged in.</p>
+<p id="logout_link" style="display: none"><a href="#" onclick="logout()">Logout</a>
+<p id="login_link" style="display: none"><a href="#" onclick="login()">Login</a>
+<!--
+<p>
+<iframe src="about:blank" id="login_iframe" style="display: none; position: absolute; top: 0px; left: 0px; width: 100%; height: 100%"></iframe>
+-->
+
 </td><td style="vertical-align: top">
 <noscript><p>JavaScript is disabled, nothing will work!</p></noscript>
 
@@ -8061,13 +8070,5 @@ not to implement chess AI. But having automatic moves is useful for testing. -->
 
 <div id="game-browser" style="display: none; position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 2"></div>
 
-<p id="welcome" style="display: none">Welcome, <span id="welcome_name">unknown</span></p>
-<p id="not_logged_in" style="display: none">You are not logged in.</p>
-<p id="logout_link" style="display: none"><a href="#" onclick="logout()">Logout</a>
-<p id="login_link" style="display: none"><a href="#" onclick="login()">Login</a>
-<!--
-<p>
-<iframe src="about:blank" id="login_iframe" style="display: none; position: absolute; top: 0px; left: 0px; width: 100%; height: 100%"></iframe>
--->
 </body>
 </html>
