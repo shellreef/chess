@@ -1651,7 +1651,10 @@ function load_pgn_from_url(url, offset)
 }
 
 // Load Portable Game Notation data
-// TODO: support a tag for captured pieces, and tags for FEN at each move so don't need to compute
+// TODO: support a tag for captured pieces
+// TODO: support tags for FEN at each move so don't need to compute ("Fast-FEN"). This is
+//  especially important for quickly loading remote games. Iterate through FEN-# tags and
+//  populate GAME_STATE.position_after
 // TODO: http://www.mafiascum.net/wiki/index.php?title=Chess
 function load_pgn(pgn)
 {
@@ -7979,6 +7982,9 @@ dojo.addOnLoad(main);
 <p id="not_logged_in" style="display: none">You are not logged in.</p>
 <p id="logout_link" style="display: none"><a href="#" onclick="logout()">Logout</a>
 <p id="login_link" style="display: none"><a href="#" onclick="login()">Login</a>
+
+<!-- TODO: remote game selection, if logged in. Maybe a CSS class to toggle only when logged in, too. -->
+
 <!--
 <p>
 <iframe src="about:blank" id="login_iframe" style="display: none; position: absolute; top: 0px; left: 0px; width: 100%; height: 100%"></iframe>
