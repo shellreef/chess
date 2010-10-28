@@ -3115,8 +3115,7 @@ function login()
 // Update the login state and session information from the remote server
 function update_session()
 {
-   
-    // So we work served off of localhost
+    // So we were served off of localhost
     PREFS.server = location.protocol + "//" + location.hostname + ":" + location.port + "/";
 
     dojo.xhr("GET", {url:PREFS.server + "session.json", handleAs: "json",
@@ -3130,6 +3129,7 @@ function update_session()
                     SESSION = {logged_in: false};
                 }
                 update_session_welcome();
+                load_remote_game(active_remote_game());
             },
             error:function(response, args) {
                 console.log("Error updating session");
@@ -3195,6 +3195,19 @@ function active_remote_game()
     // Return most recent
     // TODO: selection of active
     return SESSION.active_games[n - 1];
+}
+
+// Load a remote game from the server
+function load_remote_game(id)
+{
+    dojo.xhrGet({url:PREFS.server + "games/" + id + ".pgn",
+            load:function(response) {
+                console.log("load_remote_game(" + id + "): got response", response);
+                // TODO: load_pgn
+            },
+            error:function(response) {
+                console.log("load_remote_game(" + id + "): failed", response);
+            }});
 }
 
 // TODO: Create a new remote game
