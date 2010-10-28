@@ -3203,7 +3203,7 @@ function load_remote_game(id)
     dojo.xhrGet({url:PREFS.server + "games/" + id + ".pgn",
             load:function(response) {
                 console.log("load_remote_game(" + id + "): got response", response);
-                // TODO: load_pgn
+                load_pgn(response);
             },
             error:function(response) {
                 console.log("load_remote_game(" + id + "): failed", response);
