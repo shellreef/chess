@@ -137,7 +137,6 @@ div.inspector-diagram-cell {
 <script src="dojo.xd.js"></script>
 
 <!--<script src="http://o.aolcdn.com/dojo/1.3.1/dojo/dojo.xd.js" djConfig="parseOnLoad: true"></script>-->
-<script src="ZeroClipboard.js"></script>
 
 <script type="text/javascript">
 /*jslint bitwise: true, browser: true, eqeqeq: true, immed: true, newcap: true, nomen: true, plusplus: true, regexp: true, undef: true*/
@@ -602,7 +601,6 @@ var ALT_MOVE_NOTATIONS = null;      // Same as above, but non-canonical, longer 
 
 // Board 
 var VBOARD = null;                  // Virtual in-memory board
-var CLIPBOARD = null;               // ZeroClipboard instance
 
 var AMP = String.fromCharCode(38);  // To avoid "not well-formed"
 
@@ -613,6 +611,11 @@ var PIECE_TYPES = {
     // letter: uppercase character representing the piece in FEN
     // alg_letter: uppercase character for algebraic notation [defaults to FEN letter]
     // figurines: [white, black] Unicode strings for Figurine Algebraic Notation
+    // hex: plane 1 (or higher) Unicode hex string, one character representing the piece
+    //   U+#####. This is not a \u escape because that only accepts 4 hex digits!
+    //   Also note, it is only one character, not two because there is not black/white (as with the figurines)
+    //   (Not yet used, but intended to allow using arbitrary Unicode characters as pieces)
+    //   Lots of interesting symbols at http://www.unicode.org/charts/PDF/Unicode-6.0/U60-1F300.pdf
     // iccf_number: number for ICCF Numberic Notation
     // royal: if true, if checked, must make move that unthreatens, otherwise checkmate
     // resets_50move: if true, resets the counter for the 50-move rule (pawns)
@@ -665,7 +668,7 @@ var PIECE_TYPES = {
     berolinapawn: {parlett: "o1X>, c1>, io2X>", letter: "XB", image:"berolinapawn", resets_50move: true, url:"pc:berolina"},
     //berolinapluspawn: {parlett: "#berolinapawn, c1=", url:"pc:berolina-plus"}, // TODO: image
     
-    dragon: {parlett: "#pawn, #knight", image: ["dragon", "dragon2", "knightpawn", "pawnknight"], url:"pc:dragon"},   
+    dragon: {parlett: "#pawn, #knight", image: ["dragon", "dragon2", "knightpawn", "pawnknight"], url:"pc:dragon", hex:"U+1F409"},   
 
     // David's pawn
     pawnattackrook: {parlett: "#pawn, c#rook", image:"pawn135cw", promote: ["dragon", "rookpawn"]},
@@ -686,12 +689,12 @@ var PIECE_TYPES = {
  
 
     // Hippogonal leapers
-    man: {parlett: "1*", letter: "M", image:["mann2", "man", "guard", "wazirferz"], url:"pc:man"},    // same as king, but not royale (also known as commoner, guard)
+    man: {parlett: "1*", letter: "M", image:["mann2", "man", "guard", "wazirferz"], url:"pc:man", hex:"U+1F468"},    // same as king, but not royale (also known as commoner, guard)
     warmachine: {parlett: "~0/2", letter: "D", url:"pc:dabbabah"},  // or ~2+
     alfil: {parlett: "~2/2", letter: "Y", image:["elephant2", "elephantrev2", "elephant"], url:"pc:alfil"},       //  or ~2X
-    threeheadmonster: {parlett: "~3/0", aka:"threeleaper"},
-    bird: {parlett: "~3/3", letter: "XT", image:["bird", "bird2"], aka:"tripper"},
-    camel: {parlett: "~1/3", letter: "W", image:["camel", "camel2", "camelrev2"], url:"pc:camel"},  // TODO: Timur's game
+    threeheadmonster: {parlett: "~3/0", aka:"threeleaper", hex:"U+1F47E"},
+    bird: {parlett: "~3/3", letter: "XT", image:["bird", "bird2"], aka:"tripper", hex:"U+1F426"},
+    camel: {parlett: "~1/3", letter: "W", image:["camel", "camel2", "camelrev2"], url:"pc:camel", hex:"U+1F42A"/*dromedary*/},  // TODO: Timur's game
     zebra: {parlett:"~2/3", letter: "Z", url:"pc:zebra"},
     giraffe: {parlett: "~1/4", letter: "XG", url:"pc:giraffe"},
     fourleaper: {parlett: "~0/4",url:"http://www.ktn.freeuk.com/9a.htm#(2)"},
@@ -703,14 +706,14 @@ var PIECE_TYPES = {
 
     // Amphibians (combined leapers)
     squirrel: {parlett: "~0/2, ~1/2, ~2/2", letter: "S", url:"pc:squirrel"},
-    frog: {parlett: "~1/1, ~0/3", letter: "F"},     
+    frog: {parlett: "~1/1, ~0/3", letter: "F", hex:"U+1F438"},     
     duke: {parlett: "~0/2, ~1/1", url:"akm"},      // #ferz, #warmachine
     //bison: {parlett: "~1/3, ~2/3", url:"pc:bison"},                     // TODO: image (camel+antelope)
     gnu: {parlett: "~1/2, ~1/3", image:"knightcamel", url:"pc:gnus", aka:["wildebeest"]},
     //rootfiftyleaper: {parlett: "~5/5, ~7/1", url:"pc:root50"},         // TODO: image
     fiveleaper: {parlett: "~0/5, ~3/4", url:"http://www.ktn.freeuk.com/9a.htm#(3)", image:"butterfly"},
     // TODO: root-65 leaper, bat, see http://members.shaw.ca/quadibloc/chess/ch03.htm
-    //buffalo: {parlett: "~1/2, ~1/3, ~2/3", url:"pc:buffalo"},             // TODO: image
+    //buffalo: {parlett: "~1/2, ~1/3, ~2/3", url:"pc:buffalo", hex:"U+1F403"},             // TODO: image
     //wazaba: {parlett: "~0/1, ~0/2", url:"http://www.ktn.freeuk.com/9a.htm#(3)"}, // TODO: image
     //diamond: {parlett: "~1/1, ~0/2", url:"http://www.ktn.freeuk.com/9a.htm#(3)"}, // TODO: image
     emperor: {parlett: "~0/1, ~1/2", url:"http://www.ktn.freeuk.com/9a.htm#(3)", image:"knightwazir"}, 
@@ -831,7 +834,7 @@ var PIECE_TYPES = {
     chancellor: {parlett: "#rook, #knight", letter: "C", image:["chancellor", "chancellor1", "empress2", "marshal2", "rookknight2"], url:"pc:rook-knight", aka:["empress", "marshal", "NR"]},   // R+N
     chancellorrider: {parlett: "#rook, #nightrider", aka:["raven"]},
     chancellorwazir: {parlett: "#chancellor, #wazir"},
-    archbishop: {parlett: "#bishop, #knight", letter: "A", image: ["cardinal", "cardinal1", "cardinal2", "princess", "bishopknight2"], url:"pc:bishop-knight", aka:["cardinal", "princess", "janus", "NB"]}, // B+N
+    archbishop: {parlett: "#bishop, #knight", letter: "A", image: ["cardinal", "cardinal1", "cardinal2", "princess", "bishopknight2"], url:"pc:bishop-knight", aka:["cardinal", "princess", "janus", "NB"], hex:"U+1F478"}, // B+N
     archbishoprider: {parlett: "#archbishop, #nightrider", image:"cardinalrider"},
     cardinalferz: {parlett: "#archbishop, #ferz"},
     dragonhorse: {parlett: "#bishop, #wazir", image: "promotedbishop", url:"pc:dragonhorse"},
@@ -851,7 +854,7 @@ var PIECE_TYPES = {
     rookpawn: {parlett: "#rook, #pawn"},
     knightwizard: {parlett: "#knight, #wizard", image:"horsezzmoon"},
     horsewazir: {parlett: "#honorablehorse, #wazir"},  
-    guardknight: {parlett: "#knight, #man", image:["guardknight2", "guardknight"]}, 
+    guardknight: {parlett: "#knight, #man", image:["guardknight2", "guardknight"], hex:"U+1F482"}, 
     elephantwazir: {parlett: "#elephant, #wazir"},
     elephantferzwarmachine: {parlett: "#elephant, #ferz, #warmachine"},
     camelferz: {parlett: "#camel, #ferz", image:["camelferz", "camel2ferz"]},
@@ -868,7 +871,7 @@ var PIECE_TYPES = {
     crabferz: {parlett: "#crab, #ferz"},
     crabwazir: {parlett: "#crab, #wazir"},
     crabshortrook: {parlett: "#crab, #r4"},
-    elephantcamel: {parlett: "#elephant, #camel"},
+    elephantcamel: {parlett: "#elephant, #camel", hex:"U+1F42B"/*bactrian*/},
     elephantcamelrider: {parlett: "#elephant, #camelrider"},
     elephantferz: {parlett: "#elephant, #ferz", image:["elephantferz", "elephant2ferz"]},
     elephantferzrook: {parlett: "#elephant, #ferz, #rook"},
@@ -922,7 +925,7 @@ var PIECE_TYPES = {
     knikin: {parlett: "o#knight, c#king", image:"fknightbking", royal:true},
     knique: {parlett: "o#knight, c#queen", image:"fknightbqueen"},
 
-    tiger: {parlett: "o#bishop, c#knight"},
+    tiger: {parlett: "o#bishop, c#knight", hex:"U+1F405"},
     bede: {parlett: "#warmachine, #bishop", image:"bishopwarmachine", url:"pc:bd"},
     canvasser: {parlett: "#camel, #rook", image:"camelrook", url:"pc:canvassr"}, // yes, url is canvassr (no e)
     carpenter: {parlett: "#knight, #warmachine", image:"knightwarmachine", url:"pc:carpentr"},
@@ -934,7 +937,7 @@ var PIECE_TYPES = {
     general: {parlett: "#wazir", royal: true, url:"pc:general", image:["general2", "general"], aka:["chineseking"]}, 
     kangaroo: {parlett: "#knight, #alfil", url:"pc:cangaroo"},  // Newton kangaroo, different than pc:kangaroo
     // http://www.mayhematics.com/v/v_gm.htm has a different definition of wizard
-    wizard: {parlett: "#camel, #ferz", image:"moon",  url:"pc:wizard"},
+    wizard: {parlett: "#camel, #ferz", image:"moon",  url:"pc:wizard", hex: "U+1F319"},
     waffle: {parlett: "#wazir, #alfil", image:"elephantwazir", url:"pc:waffle", aka:["WA"]},
     fad: {parlett: "#ferz, #alfil, #warmachine", image:["elephantferzwarmachine"], url:"pc:fad"},
     bede: {parlett: "#bishop, #warmachine", image:"bishopwarmachine"},
@@ -949,7 +952,7 @@ var PIECE_TYPES = {
     
     // Despite appearances, this is not ~1/2>, since that would allow also
     // allow the forward moves [2,-1] and [-2,1].
-    honorablehorse: {parlett: "[-1,2], [1,2]", image:"shogiknight", url:"pc:shogiknight", aka:["kei", "keima"]},
+    honorablehorse: {parlett: "[-1,2], [1,2]", image:"shogiknight", url:"pc:shogiknight", aka:["kei", "keima"], hex:"U+1F40E"},
 
     //chineseknight: {parlett: "1//2"}, // TODO: intervening must be unblocked
     lance: {parlett: "n>", url:"pc:lance", image:["lance", "lance1"], aka:["kyosha", "yari", "fragrantchariot"]},     // TODO: promote to hakku from http://filer.case.edu/org/cwrums/games/chu-pieces.html
@@ -957,12 +960,12 @@ var PIECE_TYPES = {
 
     //murray_lion: {parlett: "~0/2, ~2/2, c1*", letter: "XM"}, // TODO: image
     lion: {parlett: "~n*", letter: "XL", url:"pc:lion"},
-    elephant: {parlett: "2X", letter: "E", image:["elephantmodern", "elephant1"], url:"pc:elephant", aka:["minister"]},  // Not a leaper, path can be blocked (unlike alfil, ~2X)
+    elephant: {parlett: "2X", letter: "E", image:["elephantmodern", "elephant1"], url:"pc:elephant", aka:["minister"], hex:"U+1F418"},  // Not a leaper, path can be blocked (unlike alfil, ~2X)
     //khohn: {parlett: "1X, 1>", letter: "XK"}, // TODO: image
 
     // TODO: support ~0/0 for "null move" (---), but don't let drop to null, instead show a button
     //kraken: {parlett: "~n/m ~0/0"},     // any square, not realistic since always checkmates! TODO: image
-    //octopus: {parlett: "o~n/m ~0/0", letter: "XD"}, // any square (8x8, octo, get it?) but can't capture, much less powerful TODO: image
+    //octopus: {parlett: "o~n/m ~0/0", letter: "XD", hex:"U+1F419"}, // any square (8x8, octo, get it?) but can't capture, much less powerful TODO: image
     universal_leaper: {parlett: "~n/m", image:"ubiubi"},// like kraken, but can't go to square it is on (like a zero) TODO: image
     allseeingeye: {parlett: "o~n/m", image:"allseeingeye2"},       // anywhere
 
@@ -1005,7 +1008,7 @@ var PIECE_TYPES = {
     nwall: {parlett: "o1>, o1=", invincible: true},
 
     // Kamikaze pieces - disappear when making a capture 
-    bomb: {parlett: "o1*, {c1*;self_destruct}", image:"medusa", invincible:true},
+    bomb: {parlett: "o1*, {c1*;self_destruct}", image:"medusa", invincible:true, hex:"U+1F4A3"},
     superbomb: {parlett: "on*, {c~n*;self_destruct}", image:"gorgona"},
 
     // Pieces from chess-3
@@ -1043,7 +1046,7 @@ var PIECE_TYPES = {
     griffon: {parlett: "[1,0](n+>), [1,0](n+<), [0,1](n+>>), [0,1](n+<<), [-1,0](n+<), [-1,0](n+>), [0,-1](n+<<), [0,-1](n+>>)", 
         image:"gryphon", url:"pc:griffon"}, 
 
-    panda: {parlett: "[0,-1](~2/0>&), [0,1](~2/0<&), [1,0](~2/0<<&), [-1,0](~2/0>>&)", image:["panda", "sliprook"], url:"http://www.chessvariants.org/unequal.dir/seeping-switchers.html"},
+    panda: {parlett: "[0,-1](~2/0>&), [0,1](~2/0<&), [1,0](~2/0<<&), [-1,0](~2/0>>&)", image:["panda", "sliprook"], url:"http://www.chessvariants.org/unequal.dir/seeping-switchers.html", hex:"U+1F43C"},
 
     slipbishop: {parlett: "[1,-1](~2/2↖&), [-1,-1](~2/2↗&), [-1,1](~2/2↘&), [1,1](~2/2↙&)"},
     slipqueen: {parlett: "#panda, #slipbishop"},
@@ -1060,7 +1063,7 @@ var PIECE_TYPES = {
     // Explicit movements
     crab: {parlett: "[1,2], [-1,2], [-2,-1], [2,-1]", image: ["betzancrab", "crab2", "crab"], url:"pc:crab"},
     barc: {parlett: "[1,-2], [-1,-2], [-2,1], [2,1]", image: ["barc2", "barc"], url:"pc:barc"},
-    mushroom: {parlett: "[-1,2], [1,2], [3,1], [-3,1], [1,-1], [1,-2], [-1,-1], [-1,-2]", url:"pc:mushroom"},
+    mushroom: {parlett: "[-1,2], [1,2], [3,1], [-3,1], [1,-1], [1,-2], [-1,-1], [-1,-2]", url:"pc:mushroom", hex: "U+1F344"},
     sausage: {parlett: "1X, 1=, ~0/3<>, [1,2], [-1,2], [1,-2], [-1,-2]", url:"http://www.chessvariants.org/unequal.dir/pizza-kings.html", castle:true},
     pepperoni: {parlett: "2=, 1X, 1<, 1>, ~2/2>"},
     meatball: {parlett: "#ferz, #wazir, #alfil, #warmachine, [1,2], [-1,2]", url:"http://www.chessvariants.org/unequal.dir/pizza-kings.html"},
@@ -1384,6 +1387,14 @@ function main() {
 // http://o.aolcdn.com/dojo/1.0.0/dojo/cookie.xd.js
 // This file is small enough to just include here (without the module provisions)
 dojo.cookie=function(_2,_3,_4){var c=document.cookie;if(arguments.length==1){var _6=c.lastIndexOf(_2+"=");if(_6==-1){return null;}var _7=_6+_2.length+1;var _8=c.indexOf(";",_6+_2.length+1);if(_8==-1){_8=c.length;}return decodeURIComponent(c.substring(_7,_8));}else{_4=_4||{};_3=encodeURIComponent(_3);if(typeof (_4.expires)=="number"){var d=new Date();d.setTime(d.getTime()+(_4.expires*24*60*60*1000));_4.expires=d;}document.cookie=_2+"="+_3+(_4.expires?"; expires="+_4.expires.toUTCString():"")+(_4.path?"; path="+_4.path:"")+(_4.domain?"; domain="+_4.domain:"")+(_4.secure?"; secure":"");return null;}}
+
+    // Log each argument individually since only the first 8586917 argument is logged
+    /*
+    window.log = function() {
+        for (var i = 0; i < arguments.length; i += 1) {
+            console.log(arguments[i]);
+        }
+    }*/
 
 
     // Safari and IE7: Disable text selection to stop interfering with dragging 
@@ -3133,7 +3144,7 @@ function update_session_welcome()
     var html;
 
     if (SESSION.logged_in) {
-        dojo.byId("welcome_name").innerText = SESSION.first_name;
+        dojo.byId("welcome_name").textContent = SESSION.first_name + " (user #" + SESSION.player_id + ")";
     }
 
     dojo.byId("not_logged_in").style.display = SESSION.logged_in ? "none": "";
@@ -3153,8 +3164,8 @@ function send_remote_move(color, move_text, fen, ply)
     }
 
     // Send move to server
-    console.log("Send remote:",color,move_text);
-    dojo.xhrPut({url:PREFS.server + "games/5", content:{color:color, move:move_text, fen:fen, ply:ply},
+    console.log("Send remote:"+color+" "+move_text);
+    dojo.xhrPut({url:PREFS.server + "games/" + active_remote_game(), content:{color:color, move:move_text, fen:fen, ply:ply},
             load:function(response) {
                 //console.log("load xhrPut",response);
             },
@@ -3167,12 +3178,23 @@ function send_remote_move(color, move_text, fen, ply)
 function receive_remote_move(event) 
 {
     // Received move from backend
-    console.log("Got a push: ", JSON.stringify(event));
+    console.log("Got a push: "+JSON.stringify(event));
 
-    console.log(event.ply);
     if (!GAME_STATE.made_moves[event.ply]) {   // if move wasn't already made
         mv(event.move);
     }
+}
+
+// Get the active remote game ID
+function active_remote_game()
+{
+    var n = SESSION.active_games.length;
+
+    assert(n > 0, "No active remote games!");
+
+    // Return most recent
+    // TODO: selection of active
+    return SESSION.active_games[n - 1];
 }
 
 // TODO: Create a new remote game
@@ -4461,15 +4483,6 @@ function set_copyable_link(this_position)
 
     url = make_copyable_link(fen) + captured + last_move + perspective;
     dojo.byId("copyable_link").href = url;
-
-    if (document.URL.indexOf("file:") === 0 || !CLIPBOARD) {
-        dojo.byId("copy_link").onclick = function() {
-            prompt("Manually copy this:", email_board(true));
-        };
-    } else {
-        CLIPBOARD.setText(email_board(true));
-    }
-
 }
 
 // Make a URL that can be clicked to go to this board state
@@ -5130,16 +5143,6 @@ function init_board()
             GAME_STATE.alert_assert = should_alert;
         }
 
-    }
-
-    if (document.URL.indexOf("file:") === 0) {
-        // For some reason, copying with ZeroClipboard doesn't work with local files
-        ;
-    } else {
-        if (window.ZeroClipboard) {
-            CLIPBOARD = new ZeroClipboard.Client();
-            CLIPBOARD.glue(dojo.byId("copy_link"));
-        }
     }
 
     // Get board name in cookie, if any. This lets the user select
@@ -8003,7 +8006,7 @@ onclick="edit_pgn()" class="show_White">
 <span id="promote_container"></span>
 </p>
 
-<p><a id="copyable_link">link</a> (<span onclick="alert('You need to click higher up (the cursor should turn to a hand).')" id="copy_link" style="color: blue">copy</span>, <a href="#" onclick="email_board()">email</a>)
+<p><a id="copyable_link">link</a> (<a href="#" onclick="email_board()">email</a>)
 <p><span id="opening_name"></span>
 
 <div id="piece-inspector" style="display: none; z-index: 2">
