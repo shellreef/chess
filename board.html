@@ -1662,6 +1662,7 @@ function load_pgn(pgn)
     var game;
     var tags = ["White", "WhiteElo", "Black", "BlackElo", "Event", "Round", "Site", "Date", "Time"];
     var time_started = new Date().getTime();
+    var fast_fen = false;
 
     // TODO: UI to list all games in a PGN and pick one to load, move out parsing from this function
     assert(games.length === 1,
@@ -1704,12 +1705,26 @@ function load_pgn(pgn)
         update_captured_piece_images();
     }
 
+    // Does this PGN have "FastFEN" tags? FEN-<ply> stores the  board state after 
+    // each ply, so it loads faster, without having to replay each move.
+    fast_fen = !!game["FEN-1"];
+
     // Movetext given in SAN
     GAME_STATE.annotations = [];
     for (ply = 1; ply < game.moves.length; ply += 1) {
         var move = game.moves[ply];
 
-        mv(move, true);
+        if (fast_fen) {
+            var fen = game["FEN-" + ply];
+
+            GAME_STATE.position_after[ply] = fen;
+
+            // Adds to GAME_STATE.position_moves
+            check_repetition(ply, fen);
+            // TODO: populate GAME_STATE.move_annotations from movetext
+        } else {
+            mv(move, true);
+        }
 
         GAME_STATE.annotations[ply] = game.move_annotations[ply];
     }
@@ -1719,12 +1734,11 @@ function load_pgn(pgn)
     populate_make_a_move_list();
     show_move_history();
 
-    /*
+    // Benchmark
     var time_took = new Date().getTime() - time_started;
     if (window.console) {
-        alert("load_pgn took " + time_took + " ms");
+        console.log("load_pgn took " + time_took + " ms");
     }
-    */
 }
 
 // Parse PGN into an array of dictionaries, one dictionary per game.
@@ -4439,7 +4453,7 @@ function set_turn(color, historical)
     }
 
     if (!historical) {
-        repeats = check_repetition(ply);
+        repeats = check_repetition(ply, active_fen(true));
     }
     
     if (color === "next") { 
@@ -4577,9 +4591,8 @@ function check_insufficient_material()
 }
 
 // Check for three-move repetition, which allows a draw to be claimed (not compulsory)
-function check_repetition(ply)
+function check_repetition(ply, new_state)
 {
-    var new_state = active_fen(true);
     var reps;
 
     // Save new board state for three-move repetition
