@@ -166,8 +166,8 @@ var PREFS = {
 
     input_notation: "SAN",
 
-    //image_root: "images/",
-    image_root: "http://camelpawn.appspot.com/images/",    // on Google App Engine
+    image_root: "images/",
+    //image_root: "http://camelpawn.appspot.com/images/",    // on Google App Engine (TODO: update)
     // What piece images to use  - TODO: option to change
     image_set: "alfaerieomega", image_extension: ".gif",   // See README in that directory
     //image_set: "ariel", image_extension: ".gif",         // based on Ariel Unicode MS
@@ -729,7 +729,7 @@ var PIECE_TYPES = {
     halfduck: {parlett: "~1/1, ~0/2, ~0/3", url:"http://www.chessvariants.com/d.betza/chessvar/dan/rookies.html", image:["greatwarmachinewazir"]}, 
 
     // Royal pieces
-    royalknight: {parlett: "#knight", letter: "XR", royal: true, image:["bigknightking", "royalknight", "kingknight2"]}, 
+    royalknight: {parlett: "#knight", letter: "XR", royal: true, image:["bigknightking", "royalknight"]},
     royalpawn: {parlett: "#pawn", royal: true},
     royalrook: {parlett: "#rook", royal: true},
     royalbishop: {parlett: "#bishop", royal: true},
@@ -738,6 +738,7 @@ var PIECE_TYPES = {
     supermaharajah: {parlett: "#amazon, #camel", royal: true, image:"supermaharajaschah"},
     kingpawn: {parlett: "#king, #pawn", royal: true},
     kingrook: {parlett: "#king, #rook", royal: true},
+    kingknight: {parlett: "#king, #knight", royal:true, image:"kingknight2"},
 
     // Generals from http://www.mayhematics.com/v/v_gm.htm
     // and some names from http://filer.case.edu/org/cwrums/games/chu-pieces.html#hiroku
@@ -753,9 +754,9 @@ var PIECE_TYPES = {
     //notcoppergeneral: {parlett: "1>, 1X>", url:"akm"},     // akm says can't move backwards, but shogi disagrees
     advancedsoldier: {parlett: "1>, 1=", url:"akm", aka:"drunkensoldier"},  // for Xiangqi after passing the river
     //ferzwazirhunter: {parlett: "1>, 1X<", url:"akm"}, // TODO: image
-    //adjutant: {parlett: "1>, 1<", url:"akm", aka:["tsiu-yin", "chuuuin", "gobetween", "doublefootsoldier"]}, 
+    adjutant: {parlett: "1>, 1<", url:"akm", aka:["tsiu-yin", "chuuuin", "gobetween", "doublefootsoldier"], image:"general3"}, 
     //sidewinder: {parlett: "1X>, 1=", url:"akm"}, // TODO: image
-    ferz: {parlett: "1X", letter: "XF", image:["ferz", "ferz2", "1bishop"], url:"pc:ferz", aka:["adviser", "firzin"]}, // or ~1/1
+    ferz: {parlett: "1X", letter: "XF", image:["ferz", "ferz2", "1bishop", "1bishop2"], url:"pc:ferz", aka:["adviser", "firzin"]}, // or ~1/1
     //wazirferzhunter: {parlett: "1X>, 1<", url:"akm"}, // TODO: image
     drunkensailor: {parlett: "1=, 1X<", image:"shipinv", url:"akm"}, 
     //drunkenbackslider: {parlett: "1=, 1<", url:"akm", aka:["reversesoldier"]}, // TODO: image
@@ -770,7 +771,7 @@ var PIECE_TYPES = {
     //yen: {parlett: "1X>, 1=, 1<", url:"akm"}, // TODO: image
     //invertedsilver: {parlett: "1X+, 1<", url:"akm"}, // TODO: image
     //drunkendeserter: {parlett: "1=, 1X<, 1<", url:"akm"}, // TODO: image
-    drunkenelephant: {parlett: "1X, 1>, 1=", url:"akm", image:"drunkelephant", aka:["suizo"]},
+    drunkenelephant: {parlett: "1X, 1>, 1=", url:"akm", image:["drunkelephant", "drunkelephant2"], aka:["suizo"]},
     goldgeneral: {parlett: "1+, 1X>, 1=, 1<", url:"pc:goldgeneral", aka:["kinsho", "tokin"]},  // or: #wazir, [1,1], [-1,1]
     //crane: {parlett: "1+, 1>, 1<", url:"akm", aka:["horriblepanther", "mauhau", "mohyou", "ferciousleopard"]}, // TODO: image
     //drunkengorilla: {parlett: "1>, 1X<, 1=, 1<", url:"akm"}, // TODO: image
@@ -783,6 +784,7 @@ var PIECE_TYPES = {
     "2moveferz": {parlett: "2X, 2+"},       // one move like a ferz, then another from that square
     "2movewazir": {parlett: "2+, 1*"},      // ..
     "2movewazirferz": {parlett: "#2moveferz, #2movewazir"},
+    //"oliphant": {parlett: "TODO", url:"http://chessvariants.wikidot.com/pcp-ao:oliphant"},
 
     // Diminished pieces
     b3: {parlett: "nX.3"},
@@ -828,7 +830,7 @@ var PIECE_TYPES = {
     // http://www.chessvariants.com/graphics.dir/alfaerie/
     equesrex: {parlett: "#king, #knight", image:"equesrex", royal: true},
     //centaur: {parlett: "#knight, #man", url:"pc:centaur"},         // not royal, so not an equesrex  TODO: remove cross, make bcentaur? also, ~0/1, ~1/1, ~1/2. K+N
-    amazon: {parlett: "#queen, #knight", letter: "XV", url:"pc:amazon", aka:["superqueen"]},
+    amazon: {parlett: "#queen, #knight", letter: "XV", url:"pc:amazon", aka:["superqueen", "queenknight2"]},
     amazonrider: {parlett: "#queen, #nightrider", aka:["queenofthenight"]},
     //banshee: {parlett: "#bishop, #nightrider", url:"http://www.mayhematics.com/v/v_gm.htm"}, // TODO: image
     chancellor: {parlett: "#rook, #knight", letter: "C", image:["chancellor", "chancellor1", "empress2", "marshal2", "rookknight2"], url:"pc:rook-knight", aka:["empress", "marshal", "NR"]},   // R+N
@@ -885,6 +887,7 @@ var PIECE_TYPES = {
     giraffewazir: {parlett: "#giraffe, #wazir"},
     knightcamelzebra: {parlett: "#knight, #camel, #zebra"},
     knightwarmachineferz: {parlett: "#knight, #warmachine, #ferz", image:"knightdababaferz"},
+    knightwarmachinewazir: {parlett: "#knight, #warmachine, #wazir", image:["knightwarmachinewazir2", "knightwarmachinewazir"]},
     knightwazirwarmachine: {parlett: "#knight, #wazir, #warmachine"},
     rookwarmachine: {parlett: "#rook, #warmachine", image:"rookdabbaba"},
     rookelephantrider: {parlett: "#rook, #alfilrider"},
@@ -905,6 +908,8 @@ var PIECE_TYPES = {
     warmachineriderwazir: {parlett: "#warmachinerider, #wazir"},
     warmachineferz: {parlett: "#warmachine, #ferz"},
     warmachineferzrider: {parlett: "#warmachinerider, #ferz"},
+    warmachineriderferz: {parlett: "#warmachinerider, #ferz", image:"dababbahriderferz", aka:["dabbabahriderferz"]},
+    warmachineriderwazir: {parlett: "#warmachinerider, #wazir", image:"dababbahriderwazir2", aka:["dababbahriderwazir"]},
     wizardrider: {parlett: "#camelrider, #ferz", image:"moonrider"},
     //witch: {parlett: "#rook, #bishop, #nightrider, #camelrider, #zebrarider"}, // TODO: image
     zebracamel: {parlett: "#zebra, #camel"},
@@ -924,11 +929,12 @@ var PIECE_TYPES = {
     kinkni: {parlett: "o#king, c#knight", image:"fkingbknight", royal:true, castles_with:"rook"},
     knikin: {parlett: "o#knight, c#king", image:"fknightbking", royal:true},
     knique: {parlett: "o#knight, c#queen", image:"fknightbqueen"},
+    quekni: {parlett: "o#queen, c#knight", image: "fqueenbknight"},
 
     tiger: {parlett: "o#bishop, c#knight", hex:"U+1F405"},
     bede: {parlett: "#warmachine, #bishop", image:"bishopwarmachine", url:"pc:bd"},
     canvasser: {parlett: "#camel, #rook", image:"camelrook", url:"pc:canvassr"}, // yes, url is canvassr (no e)
-    carpenter: {parlett: "#knight, #warmachine", image:"knightwarmachine", url:"pc:carpentr"},
+    carpenter: {parlett: "#knight, #warmachine", image:["knightwarmachine2", "knightwarmachine"], url:"pc:carpentr"},
     champion: {parlett: "#wazir, #alfil, #warmachine", url:"pc:champion"},
     //crownedrook: {parlett: "#rook, #ferz"},       // TODO: image
     crownedcamel: {parlett: "#camel, #ferz"},
@@ -1024,12 +1030,12 @@ var PIECE_TYPES = {
     vicar: {parlett: "#bishop, o2+", letter: "V", image: "yellowbishop"},
 
     // Ralph Betza's crazy pieces
-    chargingrook: {parlett: "n+>=, 1<, 1X<", image:"forwardrookbackwardsprince", url:"http://www.chessvariants.com/unequal.dir/cwda.html", castle:true},
+    chargingrook: {parlett: "n+>=, 1<, 1X<", image:"frookbprince", url:"http://www.chessvariants.com/unequal.dir/cwda.html", castle:true},
     fibnif: {parlett: "#ferz, [1,2], [-1,2], [1,-2], [-1,-2]", url:"pc:fibnif", image:"narrowknightferz"},
-    chargingknight: {parlett: "~1/2>, 1<, 1=", image:"forwardknightbackwardsprince", url:"http://www.chessvariants.com/unequal.dir/cwda.html"},
+    chargingknight: {parlett: "~1/2>, 1<, 1=", image:"fknightbprince", url:"http://www.chessvariants.com/unequal.dir/cwda.html"},
     colonel: {parlett: "n>, n=, ~1/2>, 1*", letter: "XC", url:"http://www.chessvariants.com/unequal.dir/cwda.html", image:"forwardchancellorprince"},
-    //furlrulbakking: {parlett: "n=, n>, 1<, 1<X", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/frlrrlbk.html"}, // TODO: image, from http://mafiascum.net/cgi-bin/wiki.pl/SandBox?
-    //forfnifbakking: {parlett: "~1/2>, 1<, 1<X", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/fhnrlbk.html"}, // TODO: image, verify
+    furlrurlbakking: {parlett: "n=, n>, 1<, 1<X", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/frlrrlbk.html"}, 
+    forfnibakking: {parlett: "~1/2>, 1<, 1<X", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/fhnrlbk.html"}, 
     //forfnifurlrurking: {parlett: "~1/2>, n=, n>, 1*", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/fhnfrlrk.html"}, // TODO: image
  
     // Hoppers
@@ -1717,16 +1723,26 @@ function load_pgn(pgn)
         if (fast_fen) {
             var fen = game["FEN-" + ply];
 
+            if (!fen) {
+                console.log("Warning: FastFEN: tag missing: FEN-" + ply);
+                continue;
+            }
+
             GAME_STATE.position_after[ply] = fen;
+           
+            // TODO: all other notations; all other move info! Necessary for 
+            // full fidelity in FastFEN.
+            info = {notations:{SAN:move}};
+            GAME_STATE.made_moves[ply] = info;
 
             // Adds to GAME_STATE.position_moves
             check_repetition(ply, fen);
             // TODO: populate GAME_STATE.move_annotations from movetext
         } else {
             mv(move, true);
-        }
 
-        GAME_STATE.annotations[ply] = game.move_annotations[ply];
+            GAME_STATE.annotations[ply] = game.move_annotations[ply];
+        }
     }
 
     realize_vboard();
@@ -4378,7 +4394,7 @@ function set_turn(color, historical)
     }
 
     GAME_STATE.active_color = new_color;
-   
+
     // Active player in check?
     var all_opp = calculate_moves(opposite_color(new_color), true);
     VALID_MOVES_OPP = all_opp.moves;
@@ -4404,8 +4420,8 @@ function set_turn(color, historical)
             set_check_message("Draw (stalemate)");
             text_end = "&frac12;-&frac12;";
 
-        // Other rules for stalemate for variants, see:
-        // http://en.wikipedia.org/wiki/Stalemate#History_of_the_stalemate_rule
+            // Other rules for stalemate for variants, see:
+            // http://en.wikipedia.org/wiki/Stalemate#History_of_the_stalemate_rule
         } else if (GAME_STATE.stalemate === "win") {
             // Win for player administering the stalemate (Shatranj, medieval Europe)
             set_check_message(ucfirst(old_color) + " wins (stalemate)");
@@ -4455,11 +4471,11 @@ function set_turn(color, historical)
     if (!historical) {
         repeats = check_repetition(ply, active_fen(true));
     }
-    
+
     if (color === "next") { 
         GAME_STATE.position_after[ply] = new_state;
     }
-    
+
     set_copyable_link();
 
     return {text_move: text_move, text_end: text_end, repeats: repeats};
@@ -6526,7 +6542,7 @@ function open_piece_url(piece)
     if (type_info.url) {
         var url = type_info.url;
         if (url === "akm") { 
-            url = "http://www.mayhematics.com/v/v_gm.htm";
+            url = "http://www.mayhematics.com/v/gm.htm";
         } else if (url.substr(0, 3) === "pc:") {
             url = "http://www.chessvariants.org/piececlopedia.dir/" + url.substr(3) + ".html";
         }
