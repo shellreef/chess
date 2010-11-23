@@ -2671,8 +2671,13 @@ function calculate_moves(color, is_hypothetical)
             square_from = VBOARD[x][y];
             piece = square_from.piece;
  
-            // Skip blank squares and inactive pieces
-            if (!piece || piece.color !== color) {
+            // Skip blank squares 
+            if (!piece) {
+                continue;
+            }
+
+            // Skip inactive pieces: not player's color, and not neutral (anyone can move it) 
+ 	    if (piece.color !== color && piece.color !== "neutral") {
                 continue;
             }
 
@@ -3404,7 +3409,8 @@ function filtered_moves(piece, color, is_hypothetical)
         //var capture_at_dx = flags.capture_at_dx, capture_at_dy = flags.capture_at_dy;
         var mark_ep_target_dx = flags.mark_ep_target_dx, mark_ep_target_dy = flags.mark_ep_target_dy;
 
-        // Positive is forwards, so mirror for black.
+        // Positive is forwards, so mirror for black (this is the player's color, so it also
+        // applies to neutral pieces being moved by the black player)
         if (color === "black") {
             rel_y = -rel_y;
             // Reverse any embedded relative coordinates.
@@ -6959,8 +6965,8 @@ function highlight_moves(piece, enable, skip_legal)
         return null;
     }
    
-    if (piece.color === GAME_STATE.active_color) {
-        // Active player's pieces
+    if (piece.color === GAME_STATE.active_color || piece.color === "neutral") {
+        // Active player's pieces, or neutral
         moves = VALID_MOVES[from_square.filerank];
         blocked_moves = BLOCKED_MOVES[from_square.filerank];
     } else {
