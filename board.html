@@ -7537,8 +7537,9 @@ function mousedown(event)
         open_piece_url(target);
     }
 
-    if (target.className.indexOf("tear-off") !== -1) {
-        // This is from the piece library, so allow a new copy
+    if (target.className.indexOf("tear-off") !== -1 || (event.altKey && PREFS.setup_mode)) {
+        // This is from the piece library -- or being option-dragged from
+        // the board to be cloned -- so allow a new copy
         // of the piece to be torn off.
         var tear = create_piece(target.color, target.type);
 
