@@ -4991,6 +4991,10 @@ function pop_highlight(square)
 {
     var stack, color, old_color;
 
+    if (!square) { 
+        return;
+    }
+
     stack = DISPLAY.highlights[square.filerank];
 
     if (!stack || stack.length === 0) {
