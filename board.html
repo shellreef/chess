@@ -75,6 +75,7 @@ img.captured
 
 img.black {}
 img.white {}
+img.neutral {}
 
 .canvas-board
 {
@@ -769,7 +770,7 @@ var PIECE_TYPES = {
     //gorilla: {parlett: "1=, 1X<, 1<", url:"akm"}, // TODO: image
     //diabolo: {parlett: "1+, 1=", url:"akm"}, // TODO: image
     //yen: {parlett: "1X>, 1=, 1<", url:"akm"}, // TODO: image
-    //invertedsilver: {parlett: "1X+, 1<", url:"akm"}, // TODO: image
+    invertedsilver: {parlett: "1X+, 1<", url:"akm", image:"backwardssilvergeneral"}, // TODO: image
     //drunkendeserter: {parlett: "1=, 1X<, 1<", url:"akm"}, // TODO: image
     drunkenelephant: {parlett: "1X, 1>, 1=", url:"akm", image:["drunkelephant", "drunkelephant2"], aka:["suizo"]},
     goldgeneral: {parlett: "1+, 1X>, 1=, 1<", url:"pc:goldgeneral", aka:["kinsho", "tokin"]},  // or: #wazir, [1,1], [-1,1]
@@ -954,7 +955,7 @@ var PIECE_TYPES = {
     // and even better, Piecelopedia 
     // http://chessvariants.wikidot.com/pcp:piececlopedia
  
-    //hornedfalcon: {parlett: "n=x, 2>"},    // from Parlett, TODO: image
+    hornedfalcon: {parlett: "n=x, 2>", image:"kakuo_hornedfalcon"},    // from Parlett, TODO: fix invalid direction
     
     // Despite appearances, this is not ~1/2>, since that would allow also
     // allow the forward moves [2,-1] and [-2,1].
@@ -6381,7 +6382,7 @@ function set_setup_mode(on)
 // Show the piece library, of readily usable pieces with defined movement
 function toggle_piece_library()
 {
-    var table, lib, want_setup_mode, parent, i, wp, bp;
+    var table, lib, want_setup_mode, parent, i;
 
     parent = dojo.byId("piece-library-parent");
     want_setup_mode = parent.style.display === "none";
@@ -6409,8 +6410,9 @@ function toggle_piece_library()
     i = 0;
     for (var type in PIECE_TYPES) {
         if (PIECE_TYPES.hasOwnProperty(type)) {
-            wp = create_piece("white", type);
-            bp = create_piece("black", type);
+            var wp = create_piece("white", type);
+            var bp = create_piece("black", type);
+            var np = create_piece("neutral", type);
 
             // Not directly draggable, since these elements are absolutely 
             // positioned inside a relatively positioned element. But keep
@@ -6418,12 +6420,15 @@ function toggle_piece_library()
             // inspector.
             dojo.addClass(wp, "tear-off");
             dojo.addClass(bp, "tear-off");
+            dojo.addClass(np, "tear-off");
 
             var row = dojo.create("tr");
             var white_cell = dojo.create("td", {"class": "square"}, row);
             white_cell.appendChild(wp);
             var black_cell = dojo.create("td", {"class": "square"}, row);
             black_cell.appendChild(bp);
+            var neutral_cell = dojo.create("td", {"class": "square"}, row);
+            neutral_cell.appendChild(np);
 
             dojo.create("td", {innerHTML:PIECE_TYPES[type].letter || ""}, row);
 
@@ -6773,7 +6778,7 @@ function image_path_for(type, color, all)
     
     paths = [];
     for (var i = 0; i < bases.length; i += 1) {
-        paths.push([PREFS.image_root, PREFS.image_set, "/", {white:"w", black:"b"}[color], bases[i], PREFS.image_extension].join(""));
+        paths.push([PREFS.image_root, PREFS.image_set, "/", {white:"w", black:"b", neutral:"e"}[color], bases[i], PREFS.image_extension].join(""));
     }
 
     return all ? paths : paths[0];
