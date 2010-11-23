@@ -174,6 +174,7 @@ var PREFS = {
     //image_set: "ariel", image_extension: ".gif",         // based on Ariel Unicode MS
     //image_set: "chessos", image_extension: ".gif",
     //image_set: "classic", image_extension: ".png",
+    image_prefixes: {white:"w", black:"b", neutral:"e"},
     
     server: "http://chess.heroku.com/",           // Remote backend game server (note: actually overwritten from document.location!)
 
@@ -6410,25 +6411,21 @@ function toggle_piece_library()
     i = 0;
     for (var type in PIECE_TYPES) {
         if (PIECE_TYPES.hasOwnProperty(type)) {
-            var wp = create_piece("white", type);
-            var bp = create_piece("black", type);
-            var np = create_piece("neutral", type);
-
-            // Not directly draggable, since these elements are absolutely 
-            // positioned inside a relatively positioned element. But keep
-            // them as pieces so you can shift-hover to open the piece
-            // inspector.
-            dojo.addClass(wp, "tear-off");
-            dojo.addClass(bp, "tear-off");
-            dojo.addClass(np, "tear-off");
-
             var row = dojo.create("tr");
-            var white_cell = dojo.create("td", {"class": "square"}, row);
-            white_cell.appendChild(wp);
-            var black_cell = dojo.create("td", {"class": "square"}, row);
-            black_cell.appendChild(bp);
-            var neutral_cell = dojo.create("td", {"class": "square"}, row);
-            neutral_cell.appendChild(np);
+            var piece_colors = ["white", "black", "neutral"];
+            for (var j = 0; j < piece_colors.length; j += 1) {
+                var color = piece_colors[j];
+
+                var piece = create_piece(color, type);
+
+                // Not directly draggable, since these elements are absolutely 
+                // positioned inside a relatively positioned element. But keep
+                // them as pieces so you can shift-hover to open the piece inspector.
+                dojo.addClass(piece, "tear-off");
+
+                var cell = dojo.create("td", {"class": "square"}, row);
+                cell.appendChild(piece);
+            }
 
             dojo.create("td", {innerHTML:PIECE_TYPES[type].letter || ""}, row);
 
@@ -6778,7 +6775,7 @@ function image_path_for(type, color, all)
     
     paths = [];
     for (var i = 0; i < bases.length; i += 1) {
-        paths.push([PREFS.image_root, PREFS.image_set, "/", {white:"w", black:"b", neutral:"e"}[color], bases[i], PREFS.image_extension].join(""));
+        paths.push([PREFS.image_root, PREFS.image_set, "/", PREFS.image_prefixes[color], bases[i], PREFS.image_extension].join(""));
     }
 
     return all ? paths : paths[0];
