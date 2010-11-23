@@ -6390,6 +6390,14 @@ function set_setup_mode(on)
     }
 }
 
+// TODO: update piece library search
+function update_piece_library()
+{
+    var q = dojo.byId("piece-q").value;
+
+    console.log(q);
+}
+
 // Show the piece library, of readily usable pieces with defined movement
 function toggle_piece_library()
 {
@@ -6412,6 +6420,8 @@ function toggle_piece_library()
 
     // TODO: sortable columns, searchable table, so can list by symbol, alphabetically,
     // royal pieces first, pieces that promote, and find what you want.
+    var search = dojo.create("input", {id:"piece-q", name:"piece-q", type:"search", style:"width: 100%", onchange:"update_piece_library()"}, lib);  // TODO: add event handler
+
     // IE7 chokes due to the fix for http://dev.rubyonrails.org/ticket/2707
     // TODO: Find out why this table doesn't display in IE7
     table = dojo.create("table", {id:"piece-library-table"});
