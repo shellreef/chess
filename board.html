@@ -5109,6 +5109,82 @@ function clear_board()
     }
 }
 
+// Key is pressed
+function onkeydown(event)
+{
+    event = event || window.event;
+
+    if (!event.keyCode) { 
+	return;
+    }
+    // TODO: type move to do it
+
+    // Shift opens piece inspector. Usually it is invoked on mouse
+    // over if shiftKey is held down; this case catches if shift is
+    // pressed while the mouse is /already/ over the piece.
+    if (event.keyCode === 16) {
+	GAME_STATE.shift = true;
+	if (GAME_STATE.piece_under) {
+	    show_piece_inspector(GAME_STATE.piece_under);
+	    over_piece(GAME_STATE.piece_under, {});
+	}
+    }
+}
+
+// Key is released
+function onkeyup(event) 
+{
+    event = event || window.event;
+
+    if (!event.keyCode) {
+        return;
+    }
+
+    // Releasing shift closes piece inspector
+    if (event.keyCode === 16) {
+        if (GAME_STATE.shift === 1) {
+            // When releasing shift, unhighlight opponent's moves, if any
+            var save = GAME_STATE.piece_under;
+            out_piece(GAME_STATE.piece_under, {});
+            GAME_STATE.piece_under = save;
+        } else if (GAME_STATE.shift && GAME_STATE.piece_under) {
+            // When releasing shift, unhighlight our own blocked moves.
+            highlight_moves(GAME_STATE.piece_under, false, false);
+
+            // TODO: fix highlights when mousing over w/ shift
+            pop_highlight(GAME_STATE.piece_under.square);
+        }
+
+        GAME_STATE.shift = false;
+        hide_piece_inspector();
+    }
+
+    // If typing in custom movement field, update it
+    if (GAME_STATE.update_custom) {
+        var control = dojo.byId("custom-movement");
+        var custom_pieces = dojo.query(".custom.piece");
+        var should_alert = GAME_STATE.alert_assert;
+
+        unhighlight_all();
+
+        PIECE_TYPES.custom.parlett = control.value;
+        GAME_STATE.alert_assert = false;
+        try {
+            calculate_moves(GAME_STATE.active_color);
+            control.style.backgroundColor = "";
+            dojo.attr(control, "title", "");
+        } catch(err) {
+            control.style.backgroundColor = "red";
+            dojo.attr(control, "title", "Error: " + err);
+        }
+        for (var i = 0; i < custom_pieces.length; i += 1) {
+            highlight_moves(custom_pieces[i], true);
+        }
+
+        GAME_STATE.alert_assert = should_alert;
+    }
+}
+
 // Initialize the board - menu, load from query string if present.
 // Only needs to be performed once per page load.
 function init_board()
@@ -5128,79 +5204,9 @@ function init_board()
         }
     }
 
-    document.onkeydown = function(event) {
-            event = event || window.event;
+    document.onkeydown = onkeydown;
+    document.onkeyup = onkeyup;
 
-            if (!event.keyCode) { 
-                return;
-            }
-            // TODO: type move to do it
-
-            // Shift opens piece inspector. Usually it is invoked on mouse
-            // over if shiftKey is held down; this case catches if shift is
-            // pressed while the mouse is /already/ over the piece.
-            if (event.keyCode === 16) {
-                GAME_STATE.shift = true;
-                if (GAME_STATE.piece_under) {
-                    show_piece_inspector(GAME_STATE.piece_under);
-                    over_piece(GAME_STATE.piece_under, {});
-                }
-            }
-
-        };
-
-    document.onkeyup = function(event) {
-        event = event || window.event;
-
-        if (!event.keyCode) {
-            return;
-        }
-
-        // Releasing shift closes piece inspector
-        if (event.keyCode === 16) {
-            if (GAME_STATE.shift === 1) {
-                // When releasing shift, unhighlight opponent's moves, if any
-                var save = GAME_STATE.piece_under;
-                out_piece(GAME_STATE.piece_under, {});
-                GAME_STATE.piece_under = save;
-            } else if (GAME_STATE.shift && GAME_STATE.piece_under) {
-                // When releasing shift, unhighlight our own blocked moves.
-                highlight_moves(GAME_STATE.piece_under, false, false);
-
-                // TODO: fix highlights when mousing over w/ shift
-                pop_highlight(GAME_STATE.piece_under.square);
-            }
-
-            GAME_STATE.shift = false;
-            hide_piece_inspector();
-        }
-
-        // If typing in custom movement field, update it
-        if (GAME_STATE.update_custom) {
-            var control = dojo.byId("custom-movement");
-            var custom_pieces = dojo.query(".custom.piece");
-            var should_alert = GAME_STATE.alert_assert;
-
-            unhighlight_all();
-
-            PIECE_TYPES.custom.parlett = control.value;
-            GAME_STATE.alert_assert = false;
-            try {
-                calculate_moves(GAME_STATE.active_color);
-                control.style.backgroundColor = "";
-                dojo.attr(control, "title", "");
-            } catch(err) {
-                control.style.backgroundColor = "red";
-                dojo.attr(control, "title", "Error: " + err);
-            }
-            for (var i = 0; i < custom_pieces.length; i += 1) {
-                highlight_moves(custom_pieces[i], true);
-            }
-
-            GAME_STATE.alert_assert = should_alert;
-        }
-
-    }
 
     // Get board name in cookie, if any. This lets the user select
     // their favorite board, and revisit the page, and it will
@@ -6420,7 +6426,7 @@ function toggle_piece_library()
 
     // TODO: sortable columns, searchable table, so can list by symbol, alphabetically,
     // royal pieces first, pieces that promote, and find what you want.
-    var search = dojo.create("input", {id:"piece-q", name:"piece-q", type:"search", style:"width: 100%", onchange:"update_piece_library()"}, lib);  // TODO: add event handler
+    var search = dojo.create("input", {id:"piece-q", name:"piece-q", type:"search", style:"width: 100%"}, lib);  // TODO: add event handler
 
     // IE7 chokes due to the fix for http://dev.rubyonrails.org/ticket/2707
     // TODO: Find out why this table doesn't display in IE7
