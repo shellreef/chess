@@ -761,7 +761,7 @@ var PIECE_TYPES = {
     drunkensailor: {parlett: "1=, 1X<", image:"shipinv", url:"akm"}, 
     //drunkenbackslider: {parlett: "1=, 1<", url:"akm", aka:["reversesoldier"]}, // TODO: image
     deserter: {parlett: "1<, 1X<", url:"akm", image:"pawninv"}, 
-    //pikeman: {parlett: "1>, 1X>, 1=", url:"akm", image:"redpawn"}, // TODO: image
+    pikeman: {parlett: "1>, 1X>, 1=", url:"akm", image:"ganypikeman"}, 
     silvergeneral: {parlett: "1>, 1X", url:"pc:silvergeneral",aka:["ginsho"]},
     coppergeneral: {parlett: "1=, 1X>, 1<", url:"http://filer.case.edu/org/cwrums/games/chu-pieces.html#dou", aka:["dousho"]}, 
     //drunkenmarine: {parlett: "1>, 1=, 1X<", image:"pinkpawn"}, // TODO: image
@@ -775,7 +775,7 @@ var PIECE_TYPES = {
     goldgeneral: {parlett: "1+, 1X>, 1=, 1<", url:"pc:goldgeneral", aka:["kinsho", "tokin"]},  // or: #wazir, [1,1], [-1,1]
     //crane: {parlett: "1+, 1>, 1<", url:"akm", aka:["horriblepanther", "mauhau", "mohyou", "ferciousleopard"]}, // TODO: image
     //drunkengorilla: {parlett: "1>, 1X<, 1=, 1<", url:"akm"}, // TODO: image
-    blindtiger: {parlett: "1X, 1=, 1<", url:"akm", image:"moko_blindtiger", aka:["reversegold", "mouko"]}, 
+    blindtiger: {parlett: "1X, 1=, 1<", url:"akm", image:["blindtiger", "moko_blindtiger"], aka:["reversegold", "mouko"]}, 
 
     // Asymmetric generals
     rightpawn: {parlett: "[1,0]", image:"pawn45cw"},
@@ -973,7 +973,7 @@ var PIECE_TYPES = {
     //kraken: {parlett: "~n/m ~0/0"},     // any square, not realistic since always checkmates! TODO: image
     //octopus: {parlett: "o~n/m ~0/0", letter: "XD", hex:"U+1F419"}, // any square (8x8, octo, get it?) but can't capture, much less powerful TODO: image
     universal_leaper: {parlett: "~n/m", image:"ubiubi"},// like kraken, but can't go to square it is on (like a zero) TODO: image
-    allseeingeye: {parlett: "o~n/m", image:"allseeingeye2"},       // anywhere
+    allseeingeye: {parlett: "o~n/m", image:["allseeingeye2", "allseeingeye"]},       // anywhere
 
     // Riders
     nightrider: {parlett: "~1/2&", letter:"XN", image:["nightrider", "knightinv"], url:"pc:knightrider"},  // Wikipedia says n(1/2), but Parlett says ~1/2&
