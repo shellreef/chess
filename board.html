@@ -6410,10 +6410,7 @@ function update_piece_library()
     tbody = dojo.byId("piece-library-tbody");
     q = dojo.byId("piece-q").value;
 
-    tbody.children = [];
-
-    // TODO: search piece library
-    console.log(q);
+    dojo.empty(tbody);
 
     i = 0;
     for (var type in PIECE_TYPES) {
@@ -6455,7 +6452,8 @@ function update_piece_library()
 
     var summary_row = dojo.create("tr", {colspan:10}, tbody);
     var summary_cell = dojo.create("td", {colspan:10}, summary_row);
-    dojo.create("p", {innerHTML: i + " pieces available"}, summary_cell);
+    dojo.create("p", {innerHTML: i + " pieces found"}, summary_cell);
+    window.status = i + " pieces found";
     dojo.create("a", {href: "#", onclick:"show_library_images()", innerHTML:"show all images (clears page)"}, summary_cell);
 
 }
