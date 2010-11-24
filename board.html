@@ -634,11 +634,11 @@ var PIECE_TYPES = {
              "[3,0;absolute_x;if_can_castle=long], " +
              "[7,0;absolute_x;if_can_castle=short]",
           royal: true, letter: "K", figurines: ["\u2654", "\u265a"],
-          castles_with: "rook", url:"pc:king"},
-    queen: {parlett: "n*", letter: "Q", figurines: ["\u2655", "\u265b"], iccf_number: 1, url:"pc:queen"},
-    rook: {parlett: "n+", letter: "R", castle: true, figurines: ["\u2656", "\u265c"], iccf_number: 2, url:"pc:rook", aka:["chariot", "car"]},
-    bishop: {parlett: "nX", letter: "B", figurines: ["\u2657", "\u265d"], iccf_number: 3, url:"pc:bishop", aka:["courier"]},
-    knight: {parlett: "~1/2", letter: "N", figurines: ["\u2658", "\u265e"], iccf_number: 4, url:"pc:knight"},
+          castles_with: "rook", url:"pc:king", tags:"fide "},
+    queen: {parlett: "n*", letter: "Q", figurines: ["\u2655", "\u265b"], iccf_number: 1, url:"pc:queen", tags:"fide "},
+    rook: {parlett: "n+", letter: "R", castle: true, figurines: ["\u2656", "\u265c"], iccf_number: 2, url:"pc:rook", aka:["chariot", "car"], tags:"fide "},
+    bishop: {parlett: "nX", letter: "B", figurines: ["\u2657", "\u265d"], iccf_number: 3, url:"pc:bishop", aka:["courier"], tags:"fide "},
+    knight: {parlett: "~1/2", letter: "N", figurines: ["\u2658", "\u265e"], iccf_number: 4, url:"pc:knight", tags:"fide "},
 
 
     // Pawns
@@ -653,7 +653,8 @@ var PIECE_TYPES = {
         letter: "P",
         alg_letter: "",
         resets_50move: true,     // a pawn move resets the halfmove counter for the 50-move rule
-        url: "pc:pawn"
+        url: "pc:pawn",
+        tags:"fide "
     },
     optingpawn: {parlett:    // can make double-move on any rank
         "o1>, c1X>, " + 
@@ -745,44 +746,44 @@ var PIECE_TYPES = {
 
     // Generals from http://www.mayhematics.com/v/gm.htm
     // and some names from http://filer.case.edu/org/cwrums/games/chu-pieces.html#hiroku
-    shogipawn: {parlett: "1>", url:"http://en.wikipedia.org/wiki/Shogi", aka:["soldier"]/*, promotion_rank:9*/}, // TODO: optional promotion
+    shogipawn: {parlett: "1>", url:"http://en.wikipedia.org/wiki/Shogi", aka:["soldier"]/*, promotion_rank:9*/, tags:"generals "}, // TODO: optional promotion
 
     // 1>, but when crosses "river", promotes and can move 1=
-    chinesepawn: {parlett: "1>", url:"pc:pawn-xiangqi", promote:["advancedsoldier"], promotion_rank:6}, // TODO
-    goose: {parlett: "o1X>", url:"akm", image:"goose"},
-    swan: {parlett: "1X>", image:"ferzf"},
-    drunk: {parlett: "1=", url:"akm", image:["pawn90cw", "pawn90ccw"]},
-    sailor: {parlett: "1X<", image:["ship", "ferzb"], url:"akm"}, 
-    backslider: {parlett: "1<", url:"akm"}, 
-    //notcoppergeneral: {parlett: "1>, 1X>", url:"akm"},     // akm says can't move backwards, but shogi disagrees
-    advancedsoldier: {parlett: "1>, 1=", url:"akm", aka:"drunkensoldier"},  // for Xiangqi after passing the river
-    //ferzwazirhunter: {parlett: "1>, 1X<", url:"akm"}, // TODO: image
-    adjutant: {parlett: "1>, 1<", url:"akm", aka:["tsiu-yin", "chuuuin", "gobetween", "doublefootsoldier"], image:"general3"}, 
-    //sidewinder: {parlett: "1X>, 1=", url:"akm"}, // TODO: image
-    ferz: {parlett: "1X", letter: "XF", image:["ferz", "ferz2", "1bishop", "1bishop2"], url:"pc:ferz", aka:["adviser", "firzin"]}, // or ~1/1
-    //wazirferzhunter: {parlett: "1X>, 1<", url:"akm"}, // TODO: image
-    drunkensailor: {parlett: "1=, 1X<", image:"shipinv", url:"akm"}, 
-    //drunkenbackslider: {parlett: "1=, 1<", url:"akm", aka:["reversesoldier"]}, // TODO: image
-    deserter: {parlett: "1<, 1X<", url:"akm", image:"pawninv"}, 
-    pikeman: {parlett: "1>, 1X>, 1=", url:"akm", image:"ganypikeman"}, 
-    silvergeneral: {parlett: "1>, 1X", url:"pc:silvergeneral",aka:["ginsho"]},
-    coppergeneral: {parlett: "1=, 1X>, 1<", url:"http://filer.case.edu/org/cwrums/games/chu-pieces.html#dou", aka:["dousho"]}, 
-    //drunkenmarine: {parlett: "1>, 1=, 1X<", image:"pinkpawn"}, // TODO: image
-    wazir: {parlett: "1+", letter: "I", url:"pc:wazir", image:["wazir", "1rook2"]},    // or ~0/1
-    //gorilla: {parlett: "1=, 1X<, 1<", url:"akm"}, // TODO: image
-    //diabolo: {parlett: "1+, 1=", url:"akm"}, // TODO: image
-    //yen: {parlett: "1X>, 1=, 1<", url:"akm"}, // TODO: image
-    invertedsilver: {parlett: "1X+, 1<", url:"akm", image:"backwardssilvergeneral"}, // TODO: image
-    //drunkendeserter: {parlett: "1=, 1X<, 1<", url:"akm"}, // TODO: image
-    drunkenelephant: {parlett: "1X, 1>, 1=", url:"akm", image:["drunkelephant", "drunkelephant2"], aka:["suizo"]},
-    goldgeneral: {parlett: "1+, 1X>, 1=, 1<", url:"pc:goldgeneral", aka:["kinsho", "tokin"]},  // or: #wazir, [1,1], [-1,1]
-    ferociousleopard: {parlett: "1+, 1>, 1<", url:"akm", aka:["crane", "horriblepanther", "mauhau", "mohyou"], image:"mohyo_ferociousleopard"}, // TODO: image
-    //drunkengorilla: {parlett: "1>, 1X<, 1=, 1<", url:"akm"}, // TODO: image
-    blindtiger: {parlett: "1X, 1=, 1<", url:"akm", image:["blindtiger", "moko_blindtiger"], aka:["reversegold", "mouko"]}, 
+    chinesepawn: {parlett: "1>", url:"pc:pawn-xiangqi", promote:["advancedsoldier"], promotion_rank:6, tags:"generals "}, // TODO
+    goose: {parlett: "o1X>", url:"akm", image:"goose", tags:"generals "},
+    swan: {parlett: "1X>", image:"ferzf", tags:"generals "},
+    drunk: {parlett: "1=", url:"akm", image:["pawn90cw", "pawn90ccw"], tags:"generals "},
+    sailor: {parlett: "1X<", image:["ship", "ferzb"], url:"akm", tags:"generals "}, 
+    backslider: {parlett: "1<", url:"akm", tags:"generals "}, 
+    //notcoppergeneral: {parlett: "1>, 1X>", url:"akm", tags:"generals "},     // akm says can't move backwards, but shogi disagrees
+    advancedsoldier: {parlett: "1>, 1=", url:"akm", aka:"drunkensoldier", tags:"generals "},  // for Xiangqi after passing the river
+    //ferzwazirhunter: {parlett: "1>, 1X<", url:"akm", tags:"generals "}, // TODO: image
+    adjutant: {parlett: "1>, 1<", url:"akm", aka:["tsiu-yin", "chuuuin", "gobetween", "doublefootsoldier"], image:"general3", tags:"generals "}, 
+    //sidewinder: {parlett: "1X>, 1=", url:"akm", tags:"generals "}, // TODO: image
+    ferz: {parlett: "1X", letter: "XF", image:["ferz", "ferz2", "1bishop", "1bishop2"], url:"pc:ferz", aka:["adviser", "firzin"], tags:"generals "}, // or ~1/1
+    //wazirferzhunter: {parlett: "1X>, 1<", url:"akm", tags:"generals "}, // TODO: image
+    drunkensailor: {parlett: "1=, 1X<", image:"shipinv", url:"akm", tags:"generals "}, 
+    //drunkenbackslider: {parlett: "1=, 1<", url:"akm", aka:["reversesoldier"], tags:"generals "}, // TODO: image
+    deserter: {parlett: "1<, 1X<", url:"akm", image:"pawninv", tags:"generals "}, 
+    pikeman: {parlett: "1>, 1X>, 1=", url:"akm", image:"ganypikeman", tags:"generals "}, 
+    silvergeneral: {parlett: "1>, 1X", url:"pc:silvergeneral",aka:["ginsho"], tags:"generals "},
+    coppergeneral: {parlett: "1=, 1X>, 1<", url:"http://filer.case.edu/org/cwrums/games/chu-pieces.html#dou", aka:["dousho"], tags:"generals "}, 
+    //drunkenmarine: {parlett: "1>, 1=, 1X<", image:"pinkpawn", tags:"generals "}, // TODO: image
+    wazir: {parlett: "1+", letter: "I", url:"pc:wazir", image:["wazir", "1rook2"], tags:"generals "},    // or ~0/1
+    //gorilla: {parlett: "1=, 1X<, 1<", url:"akm", tags:"generals "}, // TODO: image
+    //diabolo: {parlett: "1+, 1=", url:"akm", tags:"generals "}, // TODO: image
+    //yen: {parlett: "1X>, 1=, 1<", url:"akm", tags:"generals "}, // TODO: image
+    invertedsilver: {parlett: "1X+, 1<", url:"akm", image:"backwardssilvergeneral", tags:"generals "}, // TODO: image
+    //drunkendeserter: {parlett: "1=, 1X<, 1<", url:"akm", tags:"generals "}, // TODO: image
+    drunkenelephant: {parlett: "1X, 1>, 1=", url:"akm", image:["drunkelephant", "drunkelephant2"], aka:["suizo"], tags:"generals "},
+    goldgeneral: {parlett: "1+, 1X>, 1=, 1<", url:"pc:goldgeneral", aka:["kinsho", "tokin"], tags:"generals "},  // or: #wazir, [1,1], [-1,1]
+    ferociousleopard: {parlett: "1+, 1>, 1<", url:"akm", aka:["crane", "horriblepanther", "mauhau", "mohyou"], image:"mohyo_ferociousleopard", tags:"generals "}, // TODO: image
+    //drunkengorilla: {parlett: "1>, 1X<, 1=, 1<", url:"akm", tags:"generals "}, // TODO: image
+    blindtiger: {parlett: "1X, 1=, 1<", url:"akm", image:["blindtiger", "moko_blindtiger"], aka:["reversegold", "mouko"], tags:"generals "}, 
 
     // Asymmetric generals
-    rightpawn: {parlett: "[1,0]", image:"pawn45cw"},
-    leftpawn: {parlett: "[-1,0]", image:"pawn45ccw"},
+    rightpawn: {parlett: "[1,0]", image:"pawn45cw", tags:"asymmetric "},
+    leftpawn: {parlett: "[-1,0]", image:"pawn45ccw", tags:"asymmetric "},
 
     "2moveferz": {parlett: "2X, 2+"},       // one move like a ferz, then another from that square
     "2movewazir": {parlett: "2+, 1*"},      // ..
@@ -790,19 +791,19 @@ var PIECE_TYPES = {
     //"oliphant": {parlett: "TODO", url:"http://chessvariants.wikidot.com/pcp-ao:oliphant"},
 
     // Diminished pieces
-    b3: {parlett: "nX.3"},
-    b4: {parlett: "nX.4", image:["b4", "halfbishop"]},
-    b4wazir: {parlett: "#b4, #wazir"},
-    b4nd: {parlett: "#b4, #elephant", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/b4nd.html"},
-    bw3: {parlett: "#b3, #wazir"},
-    r2: {parlett: "n+.2", image:"1rook", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/shortrook.html"},
-    r3: {parlett: "n+.3"},
-    r4: {parlett: "n+.4", castle: true, image:["r4", "halfrook"]},
-    //r5: {parlett: "n+.5", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/shortrook.html"}, // TODO: image
-    //r6: {parlett: "n+.6", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/shortrook.html"}, // TODO: image
-    fourfer: {parlett: "#r4, 1X", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/fr4.html"},
-    narrowknight: {parlett: "[1,2], [1,-2], [-1,2], [-1,-2]"},
-    wideknight: {parlett: "[2,1], [2,-1], [-2,1], [-2,-1]"},
+    b3: {parlett: "nX.3", tags:"diminished "},
+    b4: {parlett: "nX.4", image:["b4", "halfbishop"], tags:"diminished "},
+    b4wazir: {parlett: "#b4, #wazir", tags:"diminished "},
+    b4nd: {parlett: "#b4, #elephant", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/b4nd.html", tags:"diminished "},
+    bw3: {parlett: "#b3, #wazir", tags:"diminished "},
+    r2: {parlett: "n+.2", image:"1rook", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/shortrook.html", tags:"diminished "},
+    r3: {parlett: "n+.3", tags:"diminished "},
+    r4: {parlett: "n+.4", castle: true, image:["r4", "halfrook"], tags:"diminished "},
+    //r5: {parlett: "n+.5", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/shortrook.html", tags:"diminished "}, // TODO: image
+    //r6: {parlett: "n+.6", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/shortrook.html", tags:"diminished "}, // TODO: image
+    fourfer: {parlett: "#r4, 1X", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/fr4.html", tags:"diminished "},
+    narrowknight: {parlett: "[1,2], [1,-2], [-1,2], [-1,-2]", tags:"diminished "},
+    wideknight: {parlett: "[2,1], [2,-1], [-2,1], [-2,-1]", tags:"diminished "},
     // Like knight, but can be blocked on orthogonal. 
     // Can almost do with this with n+.2\\45\\ or 1X(1+), but not quite (extra moves in intervening squares).
     // Would be really nice if could offset moves, blockable, in that way, though.
@@ -810,21 +811,21 @@ var PIECE_TYPES = {
         "[2,1;if_unblocked=1,0], [2,-1;if_unblocked=1,0], " +
         "[1,-2;if_unblocked=0,-1], [-1,-2;if_unblocked=0,-1], " +
         "[-2,1;if_unblocked=-1,0], [-2,-1;if_unblocked=-1,0]",
-        image:["mao", "horse"], url:"pc:mao", letter:"H"},
+        image:["mao", "horse"], url:"pc:mao", letter:"H", tags:"diminished "},
     moa: {parlett: "[1,2;if_unblocked=1,1], [2,1;if_unblocked=1,1], " +
         "[2,-1;if_unblocked=1,-1], [1,-2;if_unblocked=1,-1], " +
         "[-1,-2;if_unblocked=-1,-1], [-2,-1;if_unblocked=-1,-1], " +
-        "[-2,1;if_unblocked=-1,1], [-1,2;if_unblocked=-1,1]"
+        "[-2,1;if_unblocked=-1,1], [-1,2;if_unblocked=-1,1]", tags:"diminished "
     },
-    moo: {parlett: "#mao, #moa", url:"http://chessvariants.wikidot.com/pcp-am:moo"}, 
+    moo: {parlett: "#mao, #moa", url:"http://chessvariants.wikidot.com/pcp-am:moo", tags:"diminished "}, 
 
-    lord: {parlett: "1*", royal: true, url:"http://en.wikipedia.org/wiki/Shatranj#Rules", aka:["shah", "khun"]},  // like a king, but no castling 
-    r4ferz: {parlett: "#r4, #ferz"},
-    n2r4: {parlett: "#r4, 2(~1/2)"},
-    alfilr4: {parlett: "#alfil, #r4"},
-    mastodon: {parlett: "n*.2", url:"http://www.quadibloc.com/chess/ch0502.htm"},
-    q3: {parlett: "n*.3"},
-    q4: {parlett: "n*.4", image:["q4", "halfqueen"]},
+    lord: {parlett: "1*", royal: true, url:"http://en.wikipedia.org/wiki/Shatranj#Rules", aka:["shah", "khun"], tags:"diminished "},  // like a king, but no castling 
+    r4ferz: {parlett: "#r4, #ferz", tags:"diminished "},
+    n2r4: {parlett: "#r4, 2(~1/2)", tags:"diminished "},
+    alfilr4: {parlett: "#alfil, #r4", tags:"diminished "},
+    mastodon: {parlett: "n*.2", url:"http://www.quadibloc.com/chess/ch0502.htm", tags:"diminished "},
+    q3: {parlett: "n*.3", tags:"diminished "},
+    q4: {parlett: "n*.4", image:["q4", "halfqueen"], tags:"diminished "},
 
     // Combined pieces (compound pieces)
     // TODO: aanca http://chessvariants.wikidot.com/pcp-aa:aanca
@@ -6415,8 +6416,8 @@ function update_piece_library()
     i = 0;
     for (var type in PIECE_TYPES) {
         if (PIECE_TYPES.hasOwnProperty(type)) {
-            // Filter matches TODO: more advanced querying
-            if (type.indexOf(q) == -1) {
+            // Filter matches based on tags 
+            if (PIECE_TYPES[type].tags.indexOf(q) == -1) {
                 continue;
             }
 
@@ -6458,6 +6459,35 @@ function update_piece_library()
 
 }
 
+// Programmatically add tags to the pieces in the library for searching
+function tag_piece_library()
+{
+    for (var type in PIECE_TYPES) {
+        if (PIECE_TYPES.hasOwnProperty(type)) {
+            var piece = PIECE_TYPES[type];
+            var tags = piece.tags;
+
+            if (tags === undefined) { tags = ""; }
+
+            // Add some tags automatically based on their movement
+            if (piece.royal) { tags += "royal "; }
+            if (piece.parlett.indexOf(", #") !== -1) { tags += "compound "; }
+            if (piece.parlett.indexOf("~") !== -1) { tags += "leaper "; }
+            if (piece.parlett.indexOf(", ~") !== -1) { tags += "amphibian "; }
+            if (piece.parlett.indexOf("o#") !== -1 && piece.parlett.indexOf("c#") !== -1) { tags += "snipers "; }
+            if (piece.parlett.indexOf("snapback") !== -1) { tags += "projectile "; }
+            if (piece.invincible) { tags += "invincible "; }
+            if (piece.parlett.indexOf("self_destruct") !== -1) { tags += "kamikaze "; }
+            if (piece.parlett.indexOf("[") !== -1) { tags += "explicit "; }
+
+            // Piece name itself
+            tags += type;
+
+            piece.tags = tags;
+        }
+    }
+}
+
 // Show the piece library, of readily usable pieces with defined movement
 function toggle_piece_library()
 {
@@ -6474,7 +6504,9 @@ function toggle_piece_library()
     lib = dojo.byId("piece-library");
     if (dojo.byId("piece-library-table")) {
         return;
-    }
+    } 
+
+    tag_piece_library();
 
     enable_document_selection(false, lib);
 
@@ -6528,6 +6560,7 @@ function show_piece_inspector(piece)
 
     dojo.byId("inspector-image").innerHTML = image_htmls.join(" ");
     dojo.byId("inspector-movement").innerHTML = escape_html(type_info.parlett);
+    dojo.byId("inspector-tags").innerHTML = escape_html(type_info.tags.replace(piece.type, ""));
 
     dojo.byId("inspector-diagram").innerHTML = movement_diagram(unfiltered_moves(type_info.parlett));
 
@@ -8110,6 +8143,7 @@ onclick="edit_pgn()" class="show_White">
 <div id="piece-inspector" style="display: none; z-index: 2">
 <p><span style="vertical-align: middle" id="inspector-image"></span> <span id="inspector-type" style="font-weight: bold">type</span>
 <p>Movement: <span id="inspector-movement">movement</span>
+<p>Tags: <span id="inspector-tags">tags</span>
 <p>Symbols: <span id="inspector-symbols">symbols</span>
 <p><span id="inspector-info">other info</span>
 <p><div id="inspector-diagram"></div>
