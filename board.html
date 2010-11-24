@@ -675,7 +675,7 @@ var PIECE_TYPES = {
     dragon: {parlett: "#pawn, #knight", image: ["dragon", "dragon2", "knightpawn", "pawnknight"], url:"pc:dragon", hex:"U+1F409"},   
 
     // David's pawn
-    pawnattackrook: {parlett: "#pawn, c#rook", image:"pawn135cw", promote: ["dragon", "rookpawn"]},
+    dog: {parlett: "#pawn, c#rook", aka:["pawnattackrook", "davidspawn"], promote: ["dragon", "rookpawn"]},
 
     breakthru: {parlett: "o1>, 1X>", promote:["universal_leaper"], image:"pawn135ccw", url:"http://en.wikipedia.org/wiki/Breakthrough_(board_game)"},
     
@@ -705,7 +705,7 @@ var PIECE_TYPES = {
     lancer: {parlett: "~2/4",url:"http://www.ktn.freeuk.com/9a.htm#(2)", image:"lance2"}, // TODO: image
     //antelope: {parlett: "~3/4", url:"pc:antelope"},    // TODO: image
     //commuter: {parlett: "~4/4", url:"http://www.ktn.freeuk.com/9a.htm#(2)"}, // TODO: image
-    //flamingo: {parlett: "~1/6", url:"pc:flamingo"},    // TODO: image
+    flamingo: {parlett: "~1/6", url:"pc:flamingo"},
     bat: {parlett: "~1/8, ~7/4", url:"http://www.quadibloc.com/chess/ch0201.htm"},
 
     // Amphibians (combined leapers)
@@ -799,8 +799,8 @@ var PIECE_TYPES = {
     r2: {parlett: "n+.2", image:"1rook", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/shortrook.html", tags:"diminished "},
     r3: {parlett: "n+.3", tags:"diminished "},
     r4: {parlett: "n+.4", castle: true, image:["r4", "halfrook"], tags:"diminished "},
-    //r5: {parlett: "n+.5", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/shortrook.html", tags:"diminished "}, // TODO: image
-    //r6: {parlett: "n+.6", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/shortrook.html", tags:"diminished "}, // TODO: image
+    r5: {parlett: "n+.5", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/shortrook.html", tags:"diminished "},
+    r6: {parlett: "n+.6", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/shortrook.html", tags:"diminished "},
     fourfer: {parlett: "#r4, 1X", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/fr4.html", tags:"diminished "},
     narrowknight: {parlett: "[1,2], [1,-2], [-1,2], [-1,-2]", tags:"diminished "},
     wideknight: {parlett: "[2,1], [2,-1], [-2,1], [-2,-1]", tags:"diminished "},
