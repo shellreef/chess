@@ -693,22 +693,32 @@ var PIECE_TYPES = {
  
 
     // Hippogonal leapers
-    man: {parlett: "1*", letter: "M", image:["mann2", "man", "guard", "wazirferz"], url:"pc:man", hex:"U+1F468"},    // same as king, but not royale (also known as commoner, guard)
+    // See also: ~0/1 is wazir
     warmachine: {parlett: "~0/2", letter: "D", url:"pc:dabbabah"},  // or ~2+
-    alfil: {parlett: "~2/2", letter: "Y", image:["elephant2", "elephantrev2", "elephant"], url:"pc:alfil"},       //  or ~2X
-    threeheadmonster: {parlett: "~3/0", aka:"threeleaper", hex:"U+1F47E"},
-    bird: {parlett: "~3/3", letter: "XT", image:["bird", "bird2"], aka:"tripper", hex:"U+1F426"},
+    threeheadmonster: {parlett: "~0/3", aka:"threeleaper", hex:"U+1F47E"},
+    fourleaper: {parlett: "~0/4", url:"http://www.ktn.freeuk.com/9a.htm#(2)"},
+    // TODO: ~0/5; ~0/6; ~0/7
+    // See also: ~1/1 is ferz; ~1/2 is knight
     camel: {parlett: "~1/3", letter: "W", image:["camel", "camel2", "camelrev2"], url:"pc:camel", hex:"U+1F42A"/*dromedary*/},  // TODO: Timur's game
-    zebra: {parlett:"~2/3", letter: "Z", url:"pc:zebra"},
     giraffe: {parlett: "~1/4", letter: "XG", url:"pc:giraffe"},
-    fourleaper: {parlett: "~0/4",url:"http://www.ktn.freeuk.com/9a.htm#(2)"},
-    lancer: {parlett: "~2/4",url:"http://www.ktn.freeuk.com/9a.htm#(2)", image:"lance2"}, // TODO: image
-    //antelope: {parlett: "~3/4", url:"pc:antelope"},    // TODO: image
-    //commuter: {parlett: "~4/4", url:"http://www.ktn.freeuk.com/9a.htm#(2)"}, // TODO: image
+    // TODO: ~1/5 
     flamingo: {parlett: "~1/6", url:"pc:flamingo"},
-    bat: {parlett: "~1/8, ~7/4", url:"http://www.quadibloc.com/chess/ch0201.htm"},
+    // TODO: ~1/7
+    alfil: {parlett: "~2/2", letter: "Y", image:["elephant2", "elephantrev2", "elephant"], url:"pc:alfil"},       //  or ~2X
+    zebra: {parlett:"~2/3", letter: "Z", url:"pc:zebra"},
+    lancer: {parlett: "~2/4",url:"http://www.ktn.freeuk.com/9a.htm#(2)", image:"lance2"}, 
+    // TODO: ~2/5; ~2/6; ~2/7
+    bird: {parlett: "~3/3", letter: "XT", image:["bird", "bird2"], aka:"tripper", hex:"U+1F426"},
+    //antelope: {parlett: "~3/4", url:"pc:antelope"},    // TODO: image
+    // TODO: ~3/5; ~3/6; ~3/7
+    //commuter: {parlett: "~4/4", url:"http://www.ktn.freeuk.com/9a.htm#(2)"}, // TODO: image
+    // TODO: ~4/5; ~4/6; ~4/7
+    // TODO: ~5/5; ~5/6; ~5/7
+    // TODO: ~6/6; ~6/7
+    // TODO: ~7/7
 
     // Amphibians (combined leapers)
+    bat: {parlett: "~1/8, ~7/4", url:"http://www.quadibloc.com/chess/ch0201.htm"},
     squirrel: {parlett: "~0/2, ~1/2, ~2/2", letter: "S", url:"pc:squirrel"},
     frog: {parlett: "~1/1, ~0/3", letter: "F", hex:"U+1F438"},     
     duke: {parlett: "~0/2, ~1/1", url:"akm"},      // #ferz, #warmachine
@@ -726,6 +736,7 @@ var PIECE_TYPES = {
     templar: {parlett: "~0/2, ~1/2", url:"http://www.ktn.freeuk.com/9a.htm#(3)", image:["templar2", "templar"]},
     //ferfil: {parlett: "~1/1, ~2/2", url:"http://www.ktn.freeuk.com/9a.htm#(3)"}, // TODO: image
     alibaba: {parlett: "~2*", letter: "L", image:"elephantwarmachine", url:"pc:alibaba"},   // or: #alfil, #warmachine = ~0/2, ~2/2
+    man: {parlett: "1*", letter: "M", image:["mann2", "man", "guard", "wazirferz"], url:"pc:man", hex:"U+1F468"},    // same as king, but not royale (also known as commoner, guard), or: ~0/1, ~1/1
     // http://www.ktn.freeuk.com/9a.htm#(3) says caliph is ~0/1, ~2/2 (wazir + alfil), but Piececlopedia says it is camel+bishop
     hospitaler: {parlett: "~1/2, ~2/2", url:"http://www.ktn.freeuk.com/9a.htm#(3)"},
     // http://www.ktn.freeuk.com/9a.htm#(3) says caliph is ~0/1, ~2/2 (wazir + alfil)
