@@ -7664,6 +7664,7 @@ function dragging_over(element, left, top)
         x < DROP.area.right && y < DROP.area.bottom) {
 
         DROP.offboard = false;
+        set_cursor("move");
 
         // Find cell mathematically
         var cell_x = Math.ceil((x - DROP.area.left) / DISPLAY.square_width);
@@ -7695,6 +7696,7 @@ function dragging_over(element, left, top)
     } else {
         // Outside droppable area
         DROP.offboard = true;
+        //set_cursor("wait");
         
         if (DROP.square) {
             dojo.removeClass(DROP.square, "dropping-square");
@@ -7705,9 +7707,20 @@ function dragging_over(element, left, top)
     }
 }
 
+// Change mouse cursor
+function set_cursor(cursor)
+{
+    console.log("cursor",cursor);
+
+    // Have to use html, not body, because body will only take affect when over body
+    document.getElementsByTagName("html")[0].style.cursor = cursor;
+}
+
+
 // Drop or revert on mouse up
 function mouseup()
 {
+    set_cursor("auto");
     if (DRAG.element_m === null) {
         return;
     }
