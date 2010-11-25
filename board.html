@@ -772,40 +772,44 @@ var PIECE_TYPES = {
 
     // Generals from http://www.mayhematics.com/v/gm.htm
     // and some names from http://filer.case.edu/org/cwrums/games/chu-pieces.html#hiroku
-    shogipawn: {parlett: "1>", url:"http://en.wikipedia.org/wiki/Shogi", aka:["soldier"]/*, promotion_rank:9*/, tags:"generals "}, // TODO: optional promotion
-
-    // 1>, but when crosses "river", promotes and can move 1=
-    chinesepawn: {parlett: "1>", url:"pc:pawn-xiangqi", promote:["advancedsoldier"], promotion_rank:6, tags:"generals "}, // TODO
-    goose: {parlett: "o1X>", url:"akm", image:"goose", tags:"generals "},
+    //   2 1 2
+    //   3 * 3
+    //   4 5 4
+    /*1*/ soldier: {parlett: "1>", url:"http://en.wikipedia.org/wiki/Shogi", image:"shogipawn", aka:["shogipawn", "fu"]/*, promotion_rank:9*/, tags:"generals "}, // TODO: optional promotion
+    chinesepawn: {parlett: "1>", url:"pc:pawn-xiangqi", aka:["chinesepawn", "fu"], 
+	// 1>, but when crosses "river", promotes and can move 1=
+	promote:["advancedsoldier"], promotion_rank:6, tags:"generals "}, 
+    /*2*/ goose: {parlett: "o1X>", url:"akm", image:"goose", tags:"generals "},
     swan: {parlett: "1X>", image:"ferzf", tags:"generals "},
-    drunk: {parlett: "1=", url:"akm", image:["pawn90cw", "pawn90ccw"], tags:"generals "},
-    sailor: {parlett: "1X<", image:["ship", "ferzb"], url:"akm", tags:"generals "}, 
-    backslider: {parlett: "1<", url:"akm", tags:"generals "}, 
-    //notcoppergeneral: {parlett: "1>, 1X>", url:"akm", tags:"generals "},     // akm says can't move backwards, but shogi disagrees
-    advancedsoldier: {parlett: "1>, 1=", url:"akm", aka:"drunkensoldier", tags:"generals "},  // for Xiangqi after passing the river
-    //ferzwazirhunter: {parlett: "1>, 1X<", url:"akm", tags:"generals "}, // TODO: image
-    adjutant: {parlett: "1>, 1<", url:"akm", aka:["tsiu-yin", "chuuuin", "gobetween", "doublefootsoldier"], image:"general3", tags:"generals "}, 
-    sidewinder: {parlett: "1X>, 1=", url:"akm", tags:"generals "}, 
-    ferz: {parlett: "1X", letter: "XF", image:["ferz", "ferz2", "1bishop", "1bishop2"], url:"pc:ferz", aka:["adviser", "firzin"], tags:"generals "}, // or ~1/1
-    //wazirferzhunter: {parlett: "1X>, 1<", url:"akm", tags:"generals "}, // TODO: image
-    drunkensailor: {parlett: "1=, 1X<", image:"shipinv", url:"akm", tags:"generals "}, 
-    drunkenbackslider: {parlett: "1=, 1<", url:"akm", aka:["reversesoldier"], tags:"generals ", image:["drunkbackslider2", "drunkbackslider"]},
-    deserter: {parlett: "1<, 1X<", url:"akm", image:"pawninv", tags:"generals "}, 
-    pikeman: {parlett: "1>, 1X>, 1=", url:"akm", image:"ganypikeman", tags:"generals "}, 
-    silvergeneral: {parlett: "1>, 1X", url:"pc:silvergeneral",aka:["ginsho"], tags:"generals "},
-    coppergeneral: {parlett: "1=, 1X>, 1<", url:"http://filer.case.edu/org/cwrums/games/chu-pieces.html#dou", aka:["dousho"], tags:"generals "}, 
-    //drunkenmarine: {parlett: "1>, 1=, 1X<", image:"pinkpawn", tags:"generals "}, // TODO: image
-    wazir: {parlett: "1+", letter: "I", url:"pc:wazir", image:["wazir", "1rook2"], tags:"generals "},    // or ~0/1
-    //gorilla: {parlett: "1=, 1X<, 1<", url:"akm", tags:"generals "}, // TODO: image
-    diabolo: {parlett: "1X, 1=", url:"akm", aka:"drunkenferz", tags:"generals ", image:"daemon"},
-    yen: {parlett: "1X>, 1=, 1<", url:"akm", tags:"generals "},
-    invertedsilver: {parlett: "1X+, 1<", url:"akm", image:"backwardssilvergeneral", tags:"generals "},
-    //drunkendeserter: {parlett: "1=, 1X<, 1<", url:"akm", tags:"generals "}, // TODO: image
-    drunkenelephant: {parlett: "1X, 1>, 1=", url:"akm", image:["drunkelephant", "drunkelephant2"], aka:["suizo"], tags:"generals "},
-    goldgeneral: {parlett: "1+, 1X>, 1=, 1<", url:"pc:goldgeneral", aka:["kinsho", "tokin"], tags:"generals "},  // or: #wazir, [1,1], [-1,1]
-    ferociousleopard: {parlett: "1+, 1>, 1<", url:"akm", aka:["crane", "horriblepanther", "mauhau", "mohyou"], image:"mohyo_ferociousleopard", tags:"generals "}, // TODO: image
-    //drunkengorilla: {parlett: "1>, 1X<, 1=, 1<", url:"akm", tags:"generals "}, // TODO: image
-    blindtiger: {parlett: "1X, 1=, 1<", url:"akm", image:["blindtiger2", "blindtiger", "moko_blindtiger"], aka:["reversegold", "mouko"], tags:"generals "}, 
+    /*3*/ drunk: {parlett: "1=", url:"akm", image:["pawn90cw", "pawn90ccw"], tags:"generals "},
+    /*4*/ sailor: {parlett: "1X<", image:["ship", "ferzb"], url:"akm", tags:"generals "}, 
+    /*5*/ backslider: {parlett: "1<", url:"akm", tags:"generals "}, 
+    /*12*/ plasticgeneral: {parlett: "1>, 1X>", url:"akm", tags:"generals "},     // akm says coppergeneral can't move backwards, but shogi disagrees, so I call it plasticgeneral
+    /*13*/ advancedsoldier: {parlett: "1>, 1=", url:"akm", aka:"drunkensoldier", tags:"generals "},  // for Xiangqi after passing the river
+    /*14*/ //marine: {parlett: "1X>, 1<", url:"akm", aka:"wazirferzhunter", tags:"generals "}, // TODO: image
+    /*15*/ adjutant: {parlett: "1>, 1<", url:"akm", aka:["tsiu-yin", "chuuuin", "gobetween", "doublefootsoldier"], image:"general3", tags:"generals "}, 
+    /*23*/ sidewinder: {parlett: "1X>, 1=", url:"akm", tags:"generals "}, 
+    /*24*/ ferz: {parlett: "1X", letter: "XF", image:["ferz", "ferz2", "1bishop", "1bishop2"], url:"pc:ferz", aka:["adviser", "firzin"], tags:"generals "}, // or ~1/1
+    /*25*/ //ferzwazirhunter: {parlett: "1<, 1X>", url:"akm", tags:"generals "}, // TODO: image
+    /*34*/ drunkensailor: {parlett: "1=, 1X<", image:"shipinv", url:"akm", tags:"generals "}, 
+    /*35*/ drunkenbackslider: {parlett: "1=, 1<", url:"akm", aka:["reversesoldier"], tags:"generals ", image:["drunkbackslider2", "drunkbackslider"]},
+    /*45*/ deserter: {parlett: "1<, 1X<", aka:"backwardpawn", url:"akm", image:"pawninv", tags:"generals "}, 
+    /*123*/ pikeman: {parlett: "1>, 1X>, 1=", url:"akm", aka:"drunkenpawn", image:"ganypikeman", tags:"generals "}, 
+    /*124*/ silvergeneral: {parlett: "1>, 1X", url:"pc:silvergeneral",aka:["gin-sho"], tags:"generals "},
+    /*125*/ //yale: {parlett: "1>, 1X>, 1<"}, // TODO: image
+    /*134*/ //drunkenmarine: {parlett: "1>, 1=, 1X<", image:"pinkpawn", tags:"generals "}, // TODO: image
+    /*135*/ wazir: {parlett: "1+", letter: "I", aka:"drunkenadjuant", url:"pc:wazir", image:["wazir", "1rook2"], tags:"generals "},    // or ~0/1
+    /*145*/ //gorilla: {parlett: "1=, 1X<, 1<", aka:"guerilla", url:"akm", tags:"generals "}, // TODO: image
+    /*234*/ diabolo: {parlett: "1X, 1=", url:"akm", aka:"drunkenferz", tags:"generals ", image:"daemon"},
+    /*235*/ coppergeneral: {parlett: "1X>, 1=, 1<", image:["coppergeneral", "yen"], aka:["yen", "dou-sho", "drunkenyale"], url:"http://filer.case.edu/org/cwrums/games/chu-pieces.html#dou", tags:"generals "},
+    /*245*/ invertedsilver: {parlett: "1X+, 1<", aka:"backwardelephant", url:"akm", image:"backwardssilvergeneral", tags:"generals "},
+    /*345*/ //drunkendeserter: {parlett: "1=, 1X<, 1<", url:"akm", tags:"generals "}, // TODO: image
+    /*1234*/ drunkenelephant: {parlett: "1X, 1>, 1=", url:"akm", aka:"siu-zo", image:["drunkelephant", "drunkelephant2"], aka:["suizo"], tags:"generals "},
+    /*1235*/ goldgeneral: {parlett: "1+, 1X>, 1=, 1<", url:"pc:goldgeneral", aka:["kin-sho", "tokin", "goldengeneral"], tags:"generals "},  // or: #wazir, [1,1], [-1,1]
+    /*1245*/ ferociousleopard: {parlett: "1+, 1>, 1<", url:"akm", aka:["crane", "horriblepanther", "mau-hau", "mohyou"], image:"mohyo_ferociousleopard", tags:"generals "}, // TODO: image
+    /*1345*/ //drunkengorilla: {parlett: "1>, 1X<, 1=, 1<", url:"akm", tags:"generals "}, // TODO: image
+    /*2345*/ blindtiger: {parlett: "1X, 1=, 1<", url:"akm", image:["blindtiger2", "blindtiger", "moko_blindtiger"], aka:["reversegold", "mouko"], tags:"generals "}, 
+    /*12345*/ lord: {parlett: "1*", royal: true, url:"http://en.wikipedia.org/wiki/Shatranj#Rules", aka:["shah", "khun", "o-sho", "jeweledgeneral"], tags:"diminished "},  // like a king, but no castling 
 
     // Asymmetric generals
     rightpawn: {parlett: "[1,0]", image:"pawn45cw", tags:"asymmetric "},
@@ -845,7 +849,6 @@ var PIECE_TYPES = {
     },
     moo: {parlett: "#mao, #moa", url:"http://chessvariants.wikidot.com/pcp-am:moo", tags:"diminished "}, 
 
-    lord: {parlett: "1*", royal: true, url:"http://en.wikipedia.org/wiki/Shatranj#Rules", aka:["shah", "khun"], tags:"diminished "},  // like a king, but no castling 
     r4ferz: {parlett: "#r4, #ferz", tags:"diminished "},
     n2r4: {parlett: "#r4, 2(~1/2)", tags:"diminished "},
     alfilr4: {parlett: "#alfil, #r4", tags:"diminished "},
