@@ -729,6 +729,7 @@ var PIECE_TYPES = {
     // TODO: ~7/7
 
     // Amphibians (combined leapers)
+    dolphin: {parlett: "~7/7, ~0/7, ~0/6, ~6/6"},
     bat: {parlett: "~1/8, ~7/4", url:"http://www.quadibloc.com/chess/ch0201.htm"},
     squirrel: {parlett: "~0/2, ~1/2, ~2/2", letter: "S", url:"pc:squirrel"},
     frog: {parlett: "~1/1, ~0/3", letter: "F", hex:"U+1F438"},     
@@ -877,8 +878,9 @@ var PIECE_TYPES = {
     duchess: {parlett: "#bishop, #warmachinerider", image:["duchess", "bishopwarmachinerider"], url:"http://www.mayhematics.com/v/gm.htm"},
     elephantwarmachine: {parlett: "#elephant, #warmachine"},
     elephantwarmachinewazir: {parlett: "#elephant, #warmachine, #wazir"},
+    elephantwarmachinewizard: {parlett: "#elephant, #warmachine, #wizard", image:"elephantwarmachinezzmoon"},
     dayrider: {parlett: "#alfilrider, #warmachinerider", image:"elephantwarmachinerider", aka:["alibabarider", "skipqueen"]},
-    //duck: {parlett: "#ferz, #warmachinerider"},   // TODO: image
+    duck: {parlett: "#ferz, #warmachinerider"}, 
     rookpawn: {parlett: "#rook, #pawn"},
     knightwizard: {parlett: "#knight, #wizard", image:"horsezzmoon"},
     horsewazir: {parlett: "#honorablehorse, #wazir"},  
@@ -936,8 +938,9 @@ var PIECE_TYPES = {
     warmachineferzrider: {parlett: "#warmachinerider, #ferz"},
     warmachineriderferz: {parlett: "#warmachinerider, #ferz", image:"dababbahriderferz", aka:["dabbabahriderferz"]},
     warmachineriderwazir: {parlett: "#warmachinerider, #wazir", image:"dababbahriderwazir2", aka:["dababbahriderwazir"]},
+    warmachinewizard: {parlett: "#warmachine, #wizard", image:"warmachinezzmoon"},
     wizardrider: {parlett: "#camelrider, #ferz", image:"moonrider"},
-    //witch: {parlett: "#rook, #bishop, #nightrider, #camelrider, #zebrarider"}, // TODO: image
+    witch: {parlett: "#rook, #bishop, #nightrider, #camelrider, #zebrarider"},
     zebracamel: {parlett: "#zebra, #camel"},
     zebracamelrider: {parlett: "#zebra, #camelrider"},
     zebraferz: {parlett: "#zebra, #ferz"},
