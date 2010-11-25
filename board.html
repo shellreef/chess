@@ -669,7 +669,9 @@ var PIECE_TYPES = {
     shatranjpawn: {parlett: "#weakpawn", promote:["ferz"], url:"http://en.wikipedia.org/wiki/Shatranj#Rules"},
     makrukpawn: {parlett: "#weakpawn", promote:["ferz"], promotion_rank:6, url:"http://en.wikipedia.org/wiki/Makruk#Pieces"},
     superpawn: {parlett: "on>, cnX>", letter: "XP", image:"quickpawn"},
-    berolinapawn: {parlett: "o1X>, c1>, io2X>", letter: "XB", image:"berolinapawn", resets_50move: true, url:"pc:berolina"},
+    berolinapawn: {parlett: "o1X>, c1>, io2X>", letter: "XB", resets_50move: true, url:"pc:berolina"},
+    leftberolinapawn: {parlett: "o1↖, c1>, io2↖", letter: "XB", resets_50move: true},
+    rightberolinapawn: {parlett: "o1↗, c1>, io2↗", letter: "XB", resets_50move: true},
     berolinapluspawn: {parlett: "#berolinapawn, c1=", url:"pc:berolina-plus"}, 
     
     dragon: {parlett: "#pawn, #knight", image: ["dragon", "dragon2", "knightpawn", "pawnknight"], url:"pc:dragon", hex:"U+1F409"},   
@@ -859,7 +861,7 @@ var PIECE_TYPES = {
     //centaur: {parlett: "#knight, #man", url:"pc:centaur"},         // not royal, so not an equesrex  TODO: remove cross, make bcentaur? also, ~0/1, ~1/1, ~1/2. K+N
     amazon: {parlett: "#queen, #knight", letter: "XV", url:"pc:amazon", aka:["superqueen", "queenknight2"]},
     amazonrider: {parlett: "#queen, #nightrider", aka:["queenofthenight"]},
-    //banshee: {parlett: "#bishop, #nightrider", url:"http://www.mayhematics.com/v/gm.htm"}, // TODO: image
+    banshee: {parlett: "#bishop, #nightrider", url:"http://www.mayhematics.com/v/gm.htm"},
     chancellor: {parlett: "#rook, #knight", letter: "C", image:["chancellor", "chancellor1", "empress2", "marshal2", "rookknight2"], url:"pc:rook-knight", aka:["empress", "marshal", "NR"]},   // R+N
     chancellorrider: {parlett: "#rook, #nightrider", aka:["raven"]},
     chancellorwazir: {parlett: "#chancellor, #wazir"},
