@@ -736,7 +736,7 @@ var PIECE_TYPES = {
     duke: {parlett: "~0/2, ~1/1", url:"akm"},      // #ferz, #warmachine
     //bison: {parlett: "~1/3, ~2/3", url:"pc:bison"},                     // TODO: image (camel+antelope)
     gnu: {parlett: "~1/2, ~1/3", image:"knightcamel", url:"pc:gnus", aka:["wildebeest"]},
-    //rootfiftyleaper: {parlett: "~5/5, ~7/1", url:"pc:root50"},         // TODO: image
+    rootfiftyleaper: {parlett: "~5/5, ~7/1", url:"pc:root50"},
     fiveleaper: {parlett: "~0/5, ~3/4", url:"http://www.ktn.freeuk.com/9a.htm#(3)", image:"butterfly"},
     // TODO: root-65 leaper, bat, see http://members.shaw.ca/quadibloc/chess/ch03.htm
     //buffalo: {parlett: "~1/2, ~1/3, ~2/3", url:"pc:buffalo", hex:"U+1F403"},             // TODO: image
@@ -786,7 +786,7 @@ var PIECE_TYPES = {
     ferz: {parlett: "1X", letter: "XF", image:["ferz", "ferz2", "1bishop", "1bishop2"], url:"pc:ferz", aka:["adviser", "firzin"], tags:"generals "}, // or ~1/1
     //wazirferzhunter: {parlett: "1X>, 1<", url:"akm", tags:"generals "}, // TODO: image
     drunkensailor: {parlett: "1=, 1X<", image:"shipinv", url:"akm", tags:"generals "}, 
-    //drunkenbackslider: {parlett: "1=, 1<", url:"akm", aka:["reversesoldier"], tags:"generals "}, // TODO: image
+    drunkenbackslider: {parlett: "1=, 1<", url:"akm", aka:["reversesoldier"], tags:"generals ", image:["drunkbackslider2", "drunkbackslider"]},
     deserter: {parlett: "1<, 1X<", url:"akm", image:"pawninv", tags:"generals "}, 
     pikeman: {parlett: "1>, 1X>, 1=", url:"akm", image:"ganypikeman", tags:"generals "}, 
     silvergeneral: {parlett: "1>, 1X", url:"pc:silvergeneral",aka:["ginsho"], tags:"generals "},
@@ -794,15 +794,15 @@ var PIECE_TYPES = {
     //drunkenmarine: {parlett: "1>, 1=, 1X<", image:"pinkpawn", tags:"generals "}, // TODO: image
     wazir: {parlett: "1+", letter: "I", url:"pc:wazir", image:["wazir", "1rook2"], tags:"generals "},    // or ~0/1
     //gorilla: {parlett: "1=, 1X<, 1<", url:"akm", tags:"generals "}, // TODO: image
-    //diabolo: {parlett: "1+, 1=", url:"akm", tags:"generals "}, // TODO: image
-    //yen: {parlett: "1X>, 1=, 1<", url:"akm", tags:"generals "}, // TODO: image
-    invertedsilver: {parlett: "1X+, 1<", url:"akm", image:"backwardssilvergeneral", tags:"generals "}, // TODO: image
+    diabolo: {parlett: "1X, 1=", url:"akm", aka:"drunkenferz", tags:"generals ", image:"daemon"},
+    yen: {parlett: "1X>, 1=, 1<", url:"akm", tags:"generals "},
+    invertedsilver: {parlett: "1X+, 1<", url:"akm", image:"backwardssilvergeneral", tags:"generals "},
     //drunkendeserter: {parlett: "1=, 1X<, 1<", url:"akm", tags:"generals "}, // TODO: image
     drunkenelephant: {parlett: "1X, 1>, 1=", url:"akm", image:["drunkelephant", "drunkelephant2"], aka:["suizo"], tags:"generals "},
     goldgeneral: {parlett: "1+, 1X>, 1=, 1<", url:"pc:goldgeneral", aka:["kinsho", "tokin"], tags:"generals "},  // or: #wazir, [1,1], [-1,1]
     ferociousleopard: {parlett: "1+, 1>, 1<", url:"akm", aka:["crane", "horriblepanther", "mauhau", "mohyou"], image:"mohyo_ferociousleopard", tags:"generals "}, // TODO: image
     //drunkengorilla: {parlett: "1>, 1X<, 1=, 1<", url:"akm", tags:"generals "}, // TODO: image
-    blindtiger: {parlett: "1X, 1=, 1<", url:"akm", image:["blindtiger", "moko_blindtiger"], aka:["reversegold", "mouko"], tags:"generals "}, 
+    blindtiger: {parlett: "1X, 1=, 1<", url:"akm", image:["blindtiger2", "blindtiger", "moko_blindtiger"], aka:["reversegold", "mouko"], tags:"generals "}, 
 
     // Asymmetric generals
     rightpawn: {parlett: "[1,0]", image:"pawn45cw", tags:"asymmetric "},
