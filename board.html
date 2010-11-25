@@ -635,10 +635,10 @@ var PIECE_TYPES = {
              "[7,0;absolute_x;if_can_castle=short]",
           royal: true, letter: "K", figurines: ["\u2654", "\u265a"],
           castles_with: "rook", url:"pc:king", tags:"fide "},
-    queen: {parlett: "n*", letter: "Q", figurines: ["\u2655", "\u265b"], iccf_number: 1, url:"pc:queen", tags:"fide "},
+    queen: {parlett: "n*", letter: "Q", figurines: ["\u2655", "\u265b"], iccf_number: 1, url:"pc:queen", tags:"fide ", tags:"dame"},
     rook: {parlett: "n+", letter: "R", castle: true, figurines: ["\u2656", "\u265c"], iccf_number: 2, url:"pc:rook", aka:["chariot", "car"], tags:"fide "},
-    bishop: {parlett: "nX", letter: "B", figurines: ["\u2657", "\u265d"], iccf_number: 3, url:"pc:bishop", aka:["courier"], tags:"fide "},
-    knight: {parlett: "~1/2", letter: "N", figurines: ["\u2658", "\u265e"], iccf_number: 4, url:"pc:knight", tags:"fide "},
+    bishop: {parlett: "nX", letter: "B", figurines: ["\u2657", "\u265d"], iccf_number: 3, url:"pc:bishop", aka:["courier", "alfieri"], tags:"fide "},
+    knight: {parlett: "~1/2", letter: "N", figurines: ["\u2658", "\u265e"], iccf_number: 4, url:"pc:knight", tags:"fide ", aka:"cavalier"},
 
 
     // Pawns
@@ -654,7 +654,8 @@ var PIECE_TYPES = {
         alg_letter: "",
         resets_50move: true,     // a pawn move resets the halfmove counter for the 50-move rule
         url: "pc:pawn",
-        tags:"fide "
+        tags:"fide ",
+        aka:"bauer"
     },
     optingpawn: {parlett:    // can make double-move on any rank
         "o1>, c1X>, " + 
@@ -736,12 +737,12 @@ var PIECE_TYPES = {
     squirrel: {parlett: "~0/2, ~1/2, ~2/2", letter: "S", url:"pc:squirrel"},
     frog: {parlett: "~1/1, ~0/3", letter: "F", hex:"U+1F438"},     
     duke: {parlett: "~0/2, ~1/1", url:"akm"},      // #ferz, #warmachine
-    //bison: {parlett: "~1/3, ~2/3", url:"pc:bison"},                     // TODO: image (camel+antelope)
+    bison: {parlett: "~1/3, ~2/3", url:"pc:bison"},
     gnu: {parlett: "~1/2, ~1/3", image:"knightcamel", url:"pc:gnus", aka:["wildebeest"]},
     rootfiftyleaper: {parlett: "~5/5, ~7/1", url:"pc:root50"},
     fiveleaper: {parlett: "~0/5, ~3/4", url:"http://www.ktn.freeuk.com/9a.htm#(3)", image:"butterfly"},
     // TODO: root-65 leaper, bat, see http://members.shaw.ca/quadibloc/chess/ch03.htm
-    //buffalo: {parlett: "~1/2, ~1/3, ~2/3", url:"pc:buffalo", hex:"U+1F403"},             // TODO: image
+    buffalo: {parlett: "~1/2, ~1/3, ~2/3", url:"pc:buffalo", hex:"U+1F403"},
     //wazaba: {parlett: "~0/1, ~0/2", url:"http://www.ktn.freeuk.com/9a.htm#(3)"}, // TODO: image
     diamond: {parlett: "~1/1, ~0/2", url:"http://www.ktn.freeuk.com/9a.htm#(3)", image:"square45"},
     emperor: {parlett: "~0/1, ~1/2", url:"http://www.ktn.freeuk.com/9a.htm#(3)", image:"knightwazir"}, 
@@ -858,10 +859,10 @@ var PIECE_TYPES = {
     // or http://members.shaw.ca/quadibloc/chess/ch03.htm or 
     // http://www.chessvariants.com/graphics.dir/alfaerie/
     equesrex: {parlett: "#king, #knight", image:"equesrex", royal: true},
-    //centaur: {parlett: "#knight, #man", url:"pc:centaur"},         // not royal, so not an equesrex  TODO: remove cross, make bcentaur? also, ~0/1, ~1/1, ~1/2. K+N
-    amazon: {parlett: "#queen, #knight", letter: "XV", url:"pc:amazon", aka:["superqueen", "queenknight2"]},
+    centaur: {parlett: "#knight, #man", url:"pc:centaur"},         // not royal, so not an equesrex  (also, ~0/1, ~1/1, ~1/2. K+N)
+    amazon: {parlett: "#queen, #knight", letter: "XV", url:"pc:amazon", image:["amazon", "queenknight2"], aka:["superqueen", "queenknight"]},
     amazonrider: {parlett: "#queen, #nightrider", aka:["queenofthenight"]},
-    banshee: {parlett: "#bishop, #nightrider", url:"http://www.mayhematics.com/v/gm.htm"},
+    banshee: {parlett: "#bishop, #nightrider", url:"akm"},
     chancellor: {parlett: "#rook, #knight", letter: "C", image:["chancellor", "chancellor1", "empress2", "marshal2", "rookknight2"], url:"pc:rook-knight", aka:["empress", "marshal", "NR"]},   // R+N
     chancellorrider: {parlett: "#rook, #nightrider", aka:["raven"]},
     chancellorwazir: {parlett: "#chancellor, #wazir"},
@@ -877,7 +878,7 @@ var PIECE_TYPES = {
     alfilbishop: {parlett: "#alfil, #bishop"},
     bishoppawn: {parlett: "#bishop, #pawn"},
     crookedbishopwazir: {parlett: "#crookedbishop, #wazir"},
-    duchess: {parlett: "#bishop, #warmachinerider", image:["duchess", "bishopwarmachinerider"], url:"http://www.mayhematics.com/v/gm.htm"},
+    duchess: {parlett: "#bishop, #warmachinerider", image:["duchess", "bishopwarmachinerider"], url:"akm"},
     elephantwarmachine: {parlett: "#elephant, #warmachine"},
     elephantwarmachinewazir: {parlett: "#elephant, #warmachine, #wazir"},
     elephantwarmachinewizard: {parlett: "#elephant, #warmachine, #wizard", image:"elephantwarmachinezzmoon"},
@@ -894,10 +895,10 @@ var PIECE_TYPES = {
     camelwarmachine: {parlett: "#camel, #warmachine"},
     camelwazir: {parlett: "#camel, #wazir", image:["camelwazir", "camel2wazir"]},
     camelbishoprider: {parlett: "#camelrider, #bishop"},
-    starrider: {parlett: "#camelrider, #knight, #antelope", url:"http://www.mayhematics.com/v/gm.htm", image:"knightzzstar"}, 
+    starrider: {parlett: "#camelrider, #knight, #antelope", url:"akm", image:"knightzzstar"}, 
     camelpawn: {parlett: "#camel, #pawn"},
     camelwarmachinerider: {parlett: "#camel, #warmachinerider"},
-    //camelopard: {parlett: "#camelrider, #fiveleaper", url:"http://www.mayhematics.com/v/gm.htm"}, // TODO: image
+    camelopard: {parlett: "#camelrider, #fiveleaper", url:"akm"}, // TODO: is this supposed to be "cameleopard"?
     crabalfil: {parlett: "#crab, #alfil"},
     crabwarmachine: {parlett: "#crab, #warmachine", image:"crabdabbaba"},
     crabferz: {parlett: "#crab, #ferz"},
