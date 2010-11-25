@@ -169,8 +169,8 @@ var PREFS = {
 
     image_root: "images/",
     //image_root: "http://camelpawn.appspot.com/images/",    // on Google App Engine (TODO: update)
-    // What piece images to use  - TODO: option to change
-    image_set: "alfaerieomega", image_extension: ".gif",   // See README in that directory
+    // What piece images to use
+    image_set: "alfaerieomega", image_extension: ".gif",   // most comprehensive
     //image_set: "ariel", image_extension: ".gif",         // based on Ariel Unicode MS
     //image_set: "chessos", image_extension: ".gif",
     //image_set: "classic", image_extension: ".png",
@@ -202,8 +202,8 @@ var DISPLAY = {
     rank_labels_top:4,
     board_border:2,
 
-    // TODO: support smaller squares for larger boards like taikyoku shogi (3x36)? Since:
-    // <rdar://problem/7128886> Cmd+ doesn't zoom canvas elements
+    // TODO: support smaller squares for larger boards like Taikyoku Shogi (36x36)? 
+    // It is possible to zoom out with Cmd-(-), but only to an extent
     square_width:55,
     square_height:55,
 
@@ -1161,8 +1161,8 @@ var SAVED_BOARDS = {
 "Berolina Chess": "rnbqkbnr/xbxbxbxbxbxbxbxb/8/8/8/8/XBXBXBXBXBXBXBXB/RNBQKBNR w KQkq -",
 "Courier Chess": "rnybmkxfibynr/x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)/////X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)/RNYBMKXFIBYNR w - - files=12 ranks=8",
 // Note that in this implementation, only 4-move castling is supported, but chessvariants.com describes how one, two, three, or four is supported.
-"Wildebeest Chess": "rnwwx(gnu)kqbbnr/ppppppppppp///////PPPPPPPPPPP/RNWWX(gnu)KQBBNR w AKak - files=11 ranks=10 stalemate=win rs=quad_castle shredder_castle"
-//"Taikyoku Shogi": "/ w - - ranks=36 files=36",
+"Wildebeest Chess": "rnwwx(gnu)kqbbnr/ppppppppppp///////PPPPPPPPPPP/RNWWX(gnu)KQBBNR w AKak - files=11 ranks=10 stalemate=win rs=quad_castle shredder_castle",
+//"Taikyoku Shogi": "/ w - - ranks=36 files=36",  // TODO
 // TODO: Modern variants
 // Ultima
 
@@ -1207,6 +1207,7 @@ var SAVED_BOARDS = {
 /// http://en.wikipedia.org/wiki/Chess_with_different_armies#cite_note-2
 // http://www.chessvariants.org/unequal.dir/pizza-kings.html
 "Pizza Kings": "x(sausage)x(mushroom)x(pepperoni)x(meatball)kx(pepperoni)x(mushroom)x(sausage)/x(pkpawn)x(pkpawn)x(pkpawn)x(pkpawn)x(pkpawn)x(pkpawn)x(pkpawn)x(pkpawn)/8/8/8/8/X(pkpawn)X(pkpawn)X(pkpawn)X(pkpawn)X(pkpawn)X(pkpawn)X(pkpawn)X(pkpawn)/X(sausage)X(mushroom)X(pepperoni)X(meatball)KX(pepperoni)X(mushroom)X(sausage) w KQkq -"
+
     },
 
     "Miniature Variants": {
@@ -7132,7 +7133,9 @@ function highlight_moves(piece, enable, skip_legal)
 // square is labeled a8. The bottom-right square (8,1) is filerank's h1.
 function filerank2xy(code)
 {
+    // TODO: allow files after z, aa, ab, ...
     var x = code.charCodeAt(0) - "a".charCodeAt(0) + 1; // corresponds to file (horizontal)
+    // TODO: allow ranks >9; xy2filerank can encode but this function cannot decode :(
     var y = code.charCodeAt(1) - "1".charCodeAt(0) + 1; // corresponds to rank (vertical)
 
     //assert(x >= 1 && x <= GAME_STATE.files, "filerank2xy(" + code + "): bad x: " + x);
@@ -7167,6 +7170,7 @@ function xy2filerank(x, y)
     //assert(x >= 1 && x <= GAME_STATE.files, "xy2filerank(" + x + ", " + y + "): bad x: " + x);
     //assert(y === "" || (y >= 1 && y <= GAME_STATE.ranks), "xy2filerank(" + x + ", " + y + "): bad y: " + y);
 
+    // TODO: after z, allow aa, ab, ...
     filerank = String.fromCharCode(x + "a".charCodeAt(0) - 1);
     if (y !== "") {
         filerank += String.fromCharCode(y + "1".charCodeAt(0) - 1);
