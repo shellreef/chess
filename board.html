@@ -157,7 +157,9 @@ var AVAILABLE_NOTATIONS = {
     coord:"Computer Coordinate Notation",// aka CCN     B5-C6       E7-E5
     smith:"Smith Notation",//                           b5c6n       e7e5
     descr:"English Descriptive Notation",// aka EDN     BxN         P-K4
-    adesc:"Algebraic Descriptive Notation"//            BxN         P-e4
+    adesc:"Algebraic Descriptive Notation",//           BxN         P-e4
+    cnx:  "Chinese Chess (Xiangqi)"//                   TODO
+    // TODO: http://en.wikipedia.org/wiki/Xiangqi#Notational_system_1 and http://en.wikipedia.org/wiki/Xiangqi#Notational_system_3_.28unofficial.2C_for_players_of_Western_Chess.29
 };
 
 // Preferences, not game state.
@@ -315,8 +317,11 @@ var RULE_SETS = {
             {cross:true, over:true, color:"black", file:4, rank:3, width:2, height:2, shift_y:true, shift_x:true},
         ],
 
+        //TODO: player_colors:{"red", "green"},
+
         ruled:true,
         uncheckered:true
+        // TODO: decorations around some points, like on http://www.goddesschess.com/graphics/xiangqi1.jpg
      },
 
      // "Westernized" Xiangqi, where pieces sit on squares
@@ -353,6 +358,7 @@ var GAME_STATE = null;
 var GAME_STATE_DEFAULT = {
     // Whose turn it is
     active_color: '',
+    //TODO: player_colors: ["white", "black"],
     
     // Castling privileges, keyed by file of castle (a or h for chess1)
     can_castle: {white: {}, black: {}},
@@ -2368,10 +2374,15 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
         // Building blocks
         var dest_filerank = xy2filerank(move.x, move.y);        // e4
         var dest_file = dest_filerank.substr(0, 1);             // e
+        var dest_file_number = move.x;                          // 5
         var dest_rank = dest_filerank.substr(1, 1);             // 4
+        var dest_rank_from_perspective = rank_from_perspective(color, move.y);
         // starting_filerank (passed in as parameter)           // e2
-        var starting_file = starting_filerank.substr(0, 1);     // e
-        var starting_rank = starting_filerank.substr(1, 1);     // 2
+        var starting_file = starting_filerank.substr(0, 1);     // e 
+        var starting_file_number = filerank2xy(starting_filerank)[0];                               // 5
+        var starting_rank_number = filerank2xy(starting_filerank)[1];                               // 2
+        var starting_rank = starting_filerank.substr(1, 1);                                         // 2
+        var starting_rank_from_perspective = rank_from_perspective(color, starting_rank_number);    // 2
         var descriptive_origin = xy2descriptive(color, filerank2xy(starting_filerank));             // K2
         var adescriptive_origin = xy2adescriptive(color, filerank2xy(starting_filerank));           // e2
         var descriptive_dest = xy2descriptive(color, move);                                         // K4
@@ -2602,6 +2613,38 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
             smith_capture_letter = "";
         }
         ps.smith.push([piece, square, [starting_filerank + dest_filerank + smith_capture_letter + promote_or_blank], move]);
+
+        // Chinese Chess (Xiangqi), as used in _First Syllabus on Xiangqi: Chinese Chess 1_ by David H. Li
+        var has_horizontal_component = starting_file_number !== move.x;
+        var has_vertical_component = starting_rank_number !== move.y;
+        var direction, cnx_dest;
+        if (has_horizontal_component && !has_vertical_component) {
+            // K4=# lateral (sideways) to # file
+            direction = "=";
+            cnx_dest = dest_file_number;
+        } else if (has_vertical_component && !has_horizontal_component) {
+            // Up/down is from from player's perspective
+            var points_up = dest_rank_from_perspective - starting_rank_from_perspective;
+            if (points_up > 0) {
+                // K4+# up relative # point(s)
+                direction = "+";
+            } else {
+                // K4-# down relative # point(s)
+                direction = "-";
+            }
+            cnx_dest = Math.abs(points_up);
+            console.log(points_up, dest_rank_from_perspective, starting_rank_from_perspective);
+        } else {
+            // A4+# diagonal to # file
+            if (dest_rank_from_perspective > starting_rank_from_perspective) {
+                direction = "+";
+            } else {
+                direction = "-";
+            }
+            cnx_dest = dest_file_number.toString();
+        }
+        // TODO: add " xP" if capture, etc., as optional
+        ps.cnx.push([piece, square, [piece_letter + starting_file_number.toString() + direction + cnx_dest], move]);
     });
 
     // TODO: check for cross-notation ambiguities. Inputs are tested in the order of
@@ -7229,7 +7272,7 @@ function xy2descriptive(color, xy)
     assert(x >= 1 && x <= GAME_STATE.files, "xy2descriptive(" + x + ", " + y + "): bad x: " + x);
     assert(y === "" || (y >= 1 && y <= GAME_STATE.ranks), "xy2descriptive(" + x + ", " + y + "): bad y: " + y);
 
-    return [null, "QR", "QN", "QB", "Q", "K", "KB", "KN", "KR"][x] + (color === "white" ? y : (GAME_STATE.ranks + 1) - y);
+    return [null, "QR", "QN", "QB", "Q", "K", "KB", "KN", "KR"][x] + rank_from_perspective(color, y);
 }
 
 // Return name of square from color's perspective in "algebraic descriptive notation".
@@ -7252,8 +7295,16 @@ function xy2adescriptive(color, xy)
     assert(x >= 1 && x <= GAME_STATE.files, "xy2adescriptive(" + x + ", " + y + "): bad x: " + x);
     assert(y >= 1 && y <= GAME_STATE.ranks, "xy2adescriptive(" + x + ", " + y + "): bad y: " + y);
 
-    return xy2filerank(x, "") + (color === "white" ? y : (GAME_STATE.ranks + 1) - y);
+    return xy2filerank(x, "") + rank_from_perspective(color, y);
 }
+
+// Return the rank given the y coordinate, from the player's perspective
+// White is natural, but black is mirrored
+function rank_from_perspective(color, y)
+{
+    return color === "white" ? y : (GAME_STATE.ranks + 1) - y;
+}
+
 
 // Shorten a file name, in descriptive notation, to a possibly-ambiguous name.
 // QR for queen's rook file is shortened to R, and so is KR for king's rook. 
