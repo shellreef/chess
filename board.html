@@ -7253,6 +7253,22 @@ function x2file(x)
     return String.fromCharCode(x + "a".charCodeAt(0) - 1);
 }
 
+// Convert a number to a lowercase Roman numeral
+function number2roman(n)
+{
+    // TODO: algorithmic calculation?, as to convert up to 3,999,999
+    // http://en.wikipedia.org/wiki/Roman_numerals#Modern_Roman_numerals
+    //return {1:"i", 2:"ii", 3:"iii", 4:"iv", 5:"v", 6:"vi", 7:"vii", 8:"viii", 9:"ix", 10:"x"}[n]; 
+    return {1:"ⅰ", 2:"ⅱ", 3:"ⅲ", 4:"ⅳ", 5:"ⅴ", 6:"ⅵ", 7:"ⅶ", 8:"ⅷ", 9:"ⅸ", 10:"ⅹ"}[n]; 
+}
+
+// Convert an X coordinate to a Roman numeral file number from the player's perspective
+// TODO: use this for labels!
+function x2file_cnx(color, x)
+{
+    return number2roman((color === "white" ? x + 1: (GAME_STATE.files + 1) - x));
+}
+
 // Convert a Y coordinate to a human readable representation of a rank
 function y2rank(y) 
 {
