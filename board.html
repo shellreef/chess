@@ -2399,22 +2399,16 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
         var descriptive_dest_rank = y_from_perspective(color, move.y).toString();                   // 4
         var descriptive_dest = descriptive_dest_file + descriptive_dest_rank;                       // K4
 
-// TODO: kill
-var xy2adescriptive = function(color, obj) {
-    return x2file(obj.x) + y_from_perspective(color, obj.y).toString();
-};
+        // TODO: kill
+        var adescriptive_dest_file = dest_file;                                                 // e
+        var adescriptive_dest_rank = y_from_perspective(color, move.y).toString();              // 4
+        var adescriptive_dest = adescriptive_dest_file + adescriptive_dest_rank;                // e4
 
-        var adescriptive_origin = xy2adescriptive(color, starting);                                 // e2
-        var adescriptive_dest = xy2adescriptive(color, move);                                       // e4
+        var adescriptive_origin_file = starting_file;                                           // e
+        var adescriptive_origin_rank = y_from_perspective(color, move.y).toString();            // 2
+        var adescriptive_origin = adescriptive_origin_file + adescriptive_origin_rank;          // e2
 
-        var descriptive_dest_rank = descriptive_dest &&
-            descriptive_dest.substr(descriptive_dest.length - 1);                                   //  4
 
-        //var adescriptive_dest_file = adescriptive_dest.substr(0, 1);                              // e
-        //var adescriptive_dest_rank = adescriptive_dest.substr(1, 1);                              //  4
-        // TODO: use proper decoding functions so adescriptive can handle large boards
-        var adescriptive_origin_file = adescriptive_origin.substr(0, 1);                            // e
-        var adescriptive_origin_rank = adescriptive_dest.substr(1, 1);                              //  4
 
         var capture_x;                  // x/blank
         var capture_slash;              // slash/blank
