@@ -318,6 +318,10 @@ var RULE_SETS = {
             {cross:true, over:true, color:"black", file:4, rank:3, width:2, height:2, shift_y:true, shift_x:true},
         ],
 
+        PREFS:{
+            output_notation:"cnx"
+        },
+
         //TODO: player_colors:{"red", "green"},
 
         ruled:true,
@@ -2634,7 +2638,6 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
                 direction = "-";
             }
             cnx_dest = Math.abs(points_up);
-            console.log(points_up, dest_rank_from_perspective, starting_rank_from_perspective);
         } else {
             // A4+# diagonal to # file
             if (dest_rank_from_perspective > starting_rank_from_perspective) {
@@ -6246,6 +6249,13 @@ function load_fen(fen, replay)
     if (GAME_STATE.rs) {
         // Game "rule set"
         dojo.mixin(GAME_STATE, RULE_SETS[GAME_STATE.rs]);
+
+        if (RULE_SETS[GAME_STATE.rs].PREFS) {
+            // Default preferences for this rule set
+            delete GAME_STATE.PREFS;
+            dojo.mixin(PREFS, RULE_SETS[GAME_STATE.rs].PREFS);
+            dojo.byId("output_notation").value = PREFS.output_notation; // TODO: cleaner
+        }
     }
 
     // Captured pieces (if no EPD tag present, initializes to empty)
