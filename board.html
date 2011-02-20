@@ -2139,7 +2139,7 @@ function mv(alg_move, is_not_immediate)
     }
 
     // Find move in precalculated notations. 
-    piece_square = find_legal_move(alg_move);
+    piece_square = find_legal_move(alg_move) || find_legal_move(alg_move, true);
 
     // Illegal move.. This can happen on over-the-board games where the
     // move is not recognized as illegal, or with buggy software.
@@ -2161,20 +2161,22 @@ function mv(alg_move, is_not_immediate)
     execute_move(promote_to, choices, false, !is_not_immediate);
 }
 
-// Find a legal move, given the move text, precalculated already with
-// calculate_notations().
-function find_legal_move(text)
+// Find a legal move, given the move text, precalculated already with calculate_notations().
+// If lenient, replace or replace superfluous characters
+function find_legal_move(text, lenient)
 {
     var piece_square;
 
-    // Accept digits, but prefer the letter oh.
-    text = text.replace("0-0-0", "O-O-O").replace("0-0", "O-O");
+    if (lenient) {
+        // Accept digits, but prefer the letter oh.
+        text = text.replace("0-0-0", "O-O-O").replace("0-0", "O-O");
 
-    // Check/mate indicators not part of move.
-    text = text.replace("+", "").replace("#", "");
+        // Check/mate indicators not part of move.
+        text = text.replace("+", "").replace("#", "");
 
-    // Promotions, e1=Q, not needed, e1Q is fine
-    text = text.replace("=", "")
+        // Promotions, e1=Q, not needed, e1Q is fine
+        text = text.replace("=", "")
+    }
 
     // Prefer these move notations, in this order.
     for (var notation in AVAILABLE_NOTATIONS) {
