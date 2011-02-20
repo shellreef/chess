@@ -7242,15 +7242,21 @@ function filerank2xy(code)
 // Convert from x,y coordinates to filerank notation for human consumption. Can either pass
 // xy2filerank(1, 8) === "a8"
 // xy2filerank([1, 8]) === "a8"
+// xy2filerank({x:1, y:8}) === "a8"
 // xy2filerank(1, "") === "a"
 function xy2filerank(x, y)
 {
     var filerank;
 
     if (y === undefined) {
-        // Passed array
-        y = x[1];
-        x = x[0];
+        if (x.x) {
+            y = x.y;
+            x = x.x;
+        } else {
+            // Passed array
+            y = x[1];
+            x = x[0];
+        }
     }
 
     //assert(x >= 1 && x <= GAME_STATE.files, "xy2filerank(" + x + ", " + y + "): bad x: " + x);
