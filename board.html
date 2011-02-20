@@ -2362,7 +2362,7 @@ function in_check(victim_color, all_moves)
 
                     if (move.x === square.x && move.y === square.y) { 
                         // Being attacked!
-                        //console.log("CHECKED BY",piece,filerank,xy2filerank(move.x, move.y));
+                        //console.log("CHECKED BY",piece,filerank,xy2filerank(move));
                         attacked = true;
                     }
                 });
@@ -2381,7 +2381,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
         var square = VBOARD[move.x][move.y];
 
         // Building blocks
-        var dest_filerank = xy2filerank(move.x, move.y);        // e4
+        var dest_filerank = xy2filerank(move);                  // e4
         var dest_file = dest_filerank.substr(0, 1);             // e
         var dest_file_number = move.x;                          // 5
         var dest_rank = dest_filerank.substr(1, 1);             // 4
@@ -2814,7 +2814,7 @@ function calculate_moves(color, is_hypothetical)
                 // Lookup for accepts()
                 is_valid_move[starting_filerank] = {};
                 dojo.forEach(moves, function(m) {
-                    is_valid_move[starting_filerank][xy2filerank([m.x, m.y])] = m;
+                    is_valid_move[starting_filerank][xy2filerank(m)] = m;
                 });
             }
 
@@ -3668,17 +3668,15 @@ function filtered_moves(piece, color, is_hypothetical)
 
         if (!is_hypothetical) {
            if (mark_ep_target_dx !== undefined) {
-                abs_move.create_ep_target = [
-                    mark_ep_target_dx + start_x, 
-                    mark_ep_target_dy + start_y];
+                abs_move.create_ep_target = {x: mark_ep_target_dx + start_x, y:mark_ep_target_dy + start_y};
             }
 
         }
 
         // Only valid if this move is to an ep target.
         if (flags.if_ep_target) {
-            if (!GAME_STATE.ep_target || GAME_STATE.ep_target[0] !== x ||
-                GAME_STATE.ep_target[1] !== y)  {
+            if (!GAME_STATE.ep_target || GAME_STATE.ep_target.x !== x ||
+                GAME_STATE.ep_target.y !== y)  {
                 continue;
             }
 
@@ -3805,7 +3803,7 @@ function filtered_moves(piece, color, is_hypothetical)
            }
 
            var capture = VBOARD[cx][cy].piece;
-           //console.log("C",xy2filerank([cx,cy]));
+           //console.log("C",xy2filerank({x:cx,y:cy}));
            if (capture) {
                abs_move.capture = capture;
            } else {
@@ -5162,7 +5160,7 @@ function realize_vboard()
             if (v.piece) {
                 piece = create_piece(v.piece.color, v.piece.type);
 
-                dojo.attr(piece, "id", "piece-at-" + xy2filerank([x, y]));
+                dojo.attr(piece, "id", "piece-at-" + xy2filerank({x:x, y:y}));
 
                 piece.square = VBOARD[x][y];
                 // TODO: what about descriptive_name, adescriptive_name?? It is important.
@@ -5211,7 +5209,7 @@ function clear_board()
 
             square.x = x;
             square.y = y;
-            square.filerank = xy2filerank(x, y);
+            square.filerank = xy2filerank({x:x, y:y});
             // Store the square color here once, so can always lookup .color, 
             // never have to check the white/black class name again.
             square.color = (x + y % 2) % 2 ? "white" : "black";
@@ -5823,7 +5821,7 @@ function continue_execute_move(piece, square, move, is_hypothetical, choices, pr
 
     if (!is_hypothetical) {
         // If double pawn move, this creates an en passant target square
-        filerank = xy2filerank([square.x, square.y]);
+        filerank = xy2filerank(square);
         if (move.create_ep_target) {
             GAME_STATE.ep_target = move.create_ep_target;
         } else {
@@ -6049,7 +6047,7 @@ function move_dropped_piece(piece, square, event)
 
         if (piece.unique_id === undefined) {
             // Assign unique ID to new piece
-            piece.unique_id = xy2filerank(square.x, square.y) + full_piece_prefix(piece);
+            piece.unique_id = xy2filerank(square) + full_piece_prefix(piece);
         }
         do_virtual_move(piece, {x:square.x, y:square.y});
         unhighlight_all();
@@ -6790,7 +6788,7 @@ function name_pieces()
 
 
         // Algebraic descriptive notation
-        var afile = xy2filerank(file_number, "");
+        var afile = x2file(file_number);
         for (var white_rank = 1; white_rank <= GAME_STATE.ranks; white_rank += 1) {
             var black_rank = (GAME_STATE.ranks + 1) - white_rank;
             piece = pc(file_number, white_rank);
@@ -7239,33 +7237,18 @@ function filerank2xy(code)
     return {x:x, y:y};
 }
 
-// Convert from x,y coordinates to filerank notation for human consumption. Can either pass
-// xy2filerank(1, 8) === "a8"
-// xy2filerank([1, 8]) === "a8"
+// Convert from x,y coordinates to filerank notation for human consumption. 
 // xy2filerank({x:1, y:8}) === "a8"
-// xy2filerank(1, "") === "a"
-function xy2filerank(x, y)
+// Note that this code often passes in an object with other properties, but only x and y are used
+function xy2filerank(obj)
 {
-    var filerank;
-
-    if (y === undefined) {
-        if (x.x) {
-            y = x.y;
-            x = x.x;
-        } else {
-            // Passed array
-            y = x[1];
-            x = x[0];
-        }
-    }
-
-    return x2file(x) + y2rank(y);
+    return x2file(obj.x) + y2rank(obj.y);
 }
 
 // Convert an X coordinate to a human readable representation of a file
 function x2file(x)
 {
-    //assert(x >= 1 && x <= GAME_STATE.files, "xy2filerank(" + x + ", " + y + "): bad x: " + x);
+    //assert(x >= 1 && x <= GAME_STATE.files, "xy2file(" + x + "): bad x: " + x);
 
     // TODO: after z, allow aa, ab, ...
     // TODO: Chinese, digits (reflected!)
@@ -7279,7 +7262,7 @@ function y2rank(y)
         return "";  // TODO: remove grossness
     }
 
-    //assert(y === "" || (y >= 1 && y <= GAME_STATE.ranks), "xy2filerank(" + x + ", " + y + "): bad y: " + y);
+    //assert(y === "" || (y >= 1 && y <= GAME_STATE.ranks), "y2rank(" + y + "): bad y: " + y);
 
     // TODO: Chinese, lowercase Roman numerals 
     return String.fromCharCode(y + "1".charCodeAt(0) - 1);
@@ -7331,7 +7314,7 @@ function xy2adescriptive(color, xy)
     assert(x >= 1 && x <= GAME_STATE.files, "xy2adescriptive(" + x + ", " + y + "): bad x: " + x);
     assert(y >= 1 && y <= GAME_STATE.ranks, "xy2adescriptive(" + x + ", " + y + "): bad y: " + y);
 
-    return xy2filerank(x, "") + rank_from_perspective(color, y);
+    return x2file(x) + rank_from_perspective(color, y);
 }
 
 // Return the rank given the y coordinate, from the player's perspective
