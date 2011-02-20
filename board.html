@@ -2392,15 +2392,14 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
         var starting_y_from_perspective = y_from_perspective(color, starting.y);                    // 2
 
         var descriptive_origin_file = x2descriptive(starting.x);                                    // K
-        var descriptive_origin_rank = y_from_perspective(starting.y).toString();                    // 2
+        var descriptive_origin_rank = y_from_perspective(color, starting.y).toString();             // 2
         var descriptive_origin = descriptive_origin_file + descriptive_origin_rank;                 // K2
 
         var descriptive_dest_file = x2descriptive(move.x);                                          // K
-        var descriptive_dest_rank = y_from_perspective(move.y).toString();                          // 4
+        var descriptive_dest_rank = y_from_perspective(color, move.y).toString();                   // 4
         var descriptive_dest = descriptive_dest_file + descriptive_dest_rank;                       // K4
 
         var adescriptive_origin = xy2adescriptive(color, starting);                                 // e2
-        var descriptive_dest = xy2descriptive(color, move);                                         // K4
         var adescriptive_dest = xy2adescriptive(color, move);                                       // e4
         var descriptive_dest_file = descriptive_dest &&
             descriptive_dest.substr(0, descriptive_dest.length - 1);                                // K
@@ -7298,7 +7297,7 @@ function xy2descriptive(color, xy)
     assert(x >= 1 && x <= GAME_STATE.files, "xy2descriptive(" + x + ", " + y + "): bad x: " + x);
     assert(y === "" || (y >= 1 && y <= GAME_STATE.ranks), "xy2descriptive(" + x + ", " + y + "): bad y: " + y);
 
-    return x2descriptive(x) + y_from_perspective(color, y);
+    return x2descriptive(x) + y_from_perspective(color, y).toString();
 }
 function x2descriptive(x) 
 {
