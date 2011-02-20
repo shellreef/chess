@@ -7259,17 +7259,33 @@ function xy2filerank(x, y)
         }
     }
 
+    return x2file(x) + y2rank(y);
+}
+
+// Convert an X coordinate to a human readable representation of a file
+function x2file(x)
+{
     //assert(x >= 1 && x <= GAME_STATE.files, "xy2filerank(" + x + ", " + y + "): bad x: " + x);
-    //assert(y === "" || (y >= 1 && y <= GAME_STATE.ranks), "xy2filerank(" + x + ", " + y + "): bad y: " + y);
 
     // TODO: after z, allow aa, ab, ...
-    filerank = String.fromCharCode(x + "a".charCodeAt(0) - 1);
-    if (y !== "") {
-        filerank += String.fromCharCode(y + "1".charCodeAt(0) - 1);
+    // TODO: Chinese, digits (reflected!)
+    return String.fromCharCode(x + "a".charCodeAt(0) - 1);
+}
+
+// Convert a Y coordinate to a human readable representation of a rank
+function y2rank(y) 
+{
+    if (y === "") {
+        return "";  // TODO: remove grossness
     }
 
-    return filerank;
+    //assert(y === "" || (y >= 1 && y <= GAME_STATE.ranks), "xy2filerank(" + x + ", " + y + "): bad y: " + y);
+
+    // TODO: Chinese, lowercase Roman numerals 
+    return String.fromCharCode(y + "1".charCodeAt(0) - 1);
 }
+
+
 
 
 // Return name of square from color's perspective in English descriptive notation
