@@ -2381,16 +2381,16 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
         var square = VBOARD[move.x][move.y];
 
         // Building blocks
+        // TODO: remove these ugly and limited substr()s, use x2file and y2rank
         var dest_filerank = xy2filerank(move);                  // e4
         var dest_file = dest_filerank.substr(0, 1);             // e
         var dest_rank = dest_filerank.substr(1, 1);             // 4
         var dest_y_from_perspective = y_from_perspective(color, move.y);
         // starting_filerank (passed in as parameter)           // e2
+        var starting = filerank2xy(starting_filerank);          // {x:5, y:2}
         var starting_file = starting_filerank.substr(0, 1);     // e 
-        var starting_file_number = filerank2xy(starting_filerank).x;                                // 5
-        var starting_rank_number = filerank2xy(starting_filerank).y;                                // 2
-        var starting_rank = starting_filerank.substr(1, 1);                                         // 2
-        var starting_y_from_perspective = y_from_perspective(color, starting_rank_number);          // 2
+        var starting_rank = starting_filerank.substr(1, 1);     // 2
+        var starting_y_from_perspective = y_from_perspective(color, starting.y);                    // 2
         var descriptive_origin = xy2descriptive(color, filerank2xy(starting_filerank));             // K2
         var adescriptive_origin = xy2adescriptive(color, filerank2xy(starting_filerank));           // e2
         var descriptive_dest = xy2descriptive(color, move);                                         // K4
@@ -2622,8 +2622,8 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
         ps.smith.push([piece, square, [starting_filerank + dest_filerank + smith_capture_letter + promote_or_blank], move]);
 
         // Chinese Chess (Xiangqi), as used in _First Syllabus on Xiangqi: Chinese Chess 1_ by David H. Li
-        var has_horizontal_component = starting_file_number !== move.x;
-        var has_vertical_component = starting_rank_number !== move.y;
+        var has_horizontal_component = starting.x !== move.x;
+        var has_vertical_component = starting.y !== move.y;
         var direction, cnx_dest;
         if (has_horizontal_component && !has_vertical_component) {
             // K4=# lateral (sideways) to # file
@@ -2653,13 +2653,13 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
         // TODO: may need to disambiguate rooks! with RR and FR
         var cnx_piece_letter = PIECE_TYPES[piece.type].cnx_letter || piece_letter;
 
-        ps.cnx.push([piece, square,     [cnx_piece_letter + file_from_perspective(color, starting_file_number) + direction + cnx_dest                                        ], move]);
+        ps.cnx.push([piece, square,     [cnx_piece_letter + file_from_perspective(color, starting.x) + direction + cnx_dest                                        ], move]);
 
         // Optional " xP" if capture
         var cnx_capture = "";
         if (captured_piece) {
             var cnx_captured_letter = PIECE_TYPES[captured_piece.type].cnx_letter || captured_letter;
-            ps.cnx.push([piece, square, [cnx_piece_letter + file_from_perspective(color, starting_file_number) + direction + cnx_dest + " " + capture_x + cnx_captured_letter], move]);
+            ps.cnx.push([piece, square, [cnx_piece_letter + file_from_perspective(color, starting.x) + direction + cnx_dest + " " + capture_x + cnx_captured_letter], move]);
         } 
     });
 
