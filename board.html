@@ -2383,15 +2383,14 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
         // Building blocks
         var dest_filerank = xy2filerank(move);                  // e4
         var dest_file = dest_filerank.substr(0, 1);             // e
-        var dest_file_number = move.x;                          // 5
         var dest_rank = dest_filerank.substr(1, 1);             // 4
-        var dest_rank_from_perspective = rank_from_perspective(color, move.y);
+        var dest_y_from_perspective = y_from_perspective(color, move.y);
         // starting_filerank (passed in as parameter)           // e2
         var starting_file = starting_filerank.substr(0, 1);     // e 
         var starting_file_number = filerank2xy(starting_filerank).x;                                // 5
         var starting_rank_number = filerank2xy(starting_filerank).y;                                // 2
         var starting_rank = starting_filerank.substr(1, 1);                                         // 2
-        var starting_rank_from_perspective = rank_from_perspective(color, starting_rank_number);    // 2
+        var starting_y_from_perspective = y_from_perspective(color, starting_rank_number);          // 2
         var descriptive_origin = xy2descriptive(color, filerank2xy(starting_filerank));             // K2
         var adescriptive_origin = xy2adescriptive(color, filerank2xy(starting_filerank));           // e2
         var descriptive_dest = xy2descriptive(color, move);                                         // K4
@@ -2629,10 +2628,10 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
         if (has_horizontal_component && !has_vertical_component) {
             // K4=# lateral (sideways) to # file
             direction = "=";
-            cnx_dest = file_from_perspective(color, dest_file_number);
+            cnx_dest = file_from_perspective(color, move.x);
         } else if (has_vertical_component && !has_horizontal_component) {
             // Up/down is from from player's perspective
-            var points_up = dest_rank_from_perspective - starting_rank_from_perspective;
+            var points_up = dest_y_from_perspective - starting_y_from_perspective;
             if (points_up > 0) {
                 // K4+# up relative # point(s)
                 direction = "+";
@@ -2643,12 +2642,12 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
             cnx_dest = Math.abs(points_up);
         } else {
             // A4+# diagonal to # file
-            if (dest_rank_from_perspective > starting_rank_from_perspective) {
+            if (dest_y_from_perspective > starting_y_from_perspective) {
                 direction = "+";
             } else {
                 direction = "-";
             }
-            cnx_dest = file_from_perspective(color, dest_file_number);
+            cnx_dest = file_from_perspective(color, move.x);
         }
 
         // TODO: may need to disambiguate rooks! with RR and FR
@@ -7292,7 +7291,7 @@ function xy2descriptive(color, xy)
     assert(x >= 1 && x <= GAME_STATE.files, "xy2descriptive(" + x + ", " + y + "): bad x: " + x);
     assert(y === "" || (y >= 1 && y <= GAME_STATE.ranks), "xy2descriptive(" + x + ", " + y + "): bad y: " + y);
 
-    return [null, "QR", "QN", "QB", "Q", "K", "KB", "KN", "KR"][x] + rank_from_perspective(color, y);
+    return [null, "QR", "QN", "QB", "Q", "K", "KB", "KN", "KR"][x] + y_from_perspective(color, y);
 }
 
 // Return name of square from color's perspective in "algebraic descriptive notation".
@@ -7315,12 +7314,11 @@ function xy2adescriptive(color, xy)
     assert(x >= 1 && x <= GAME_STATE.files, "xy2adescriptive(" + x + ", " + y + "): bad x: " + x);
     assert(y >= 1 && y <= GAME_STATE.ranks, "xy2adescriptive(" + x + ", " + y + "): bad y: " + y);
 
-    return x2file(x) + rank_from_perspective(color, y);
+    return x2file(x) + y_from_perspective(color, y);
 }
 
-// Return the rank given the y coordinate, from the player's perspective
-// White is natural, but black is mirrored
-function rank_from_perspective(color, y)
+// Get the y coordinate from the player's perspective
+function y_from_perspective(color, y)
 {
     return color === "white" ? y : (GAME_STATE.ranks + 1) - y;
 }
