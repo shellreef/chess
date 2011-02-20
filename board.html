@@ -319,6 +319,7 @@ var RULE_SETS = {
         ],
 
         PREFS:{
+            input_notation:"cnx",
             output_notation:"cnx"
         },
 
@@ -2651,7 +2652,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
 
         var cnx_piece_letter = PIECE_TYPES[piece.type].cnx_letter || piece_letter;
 
-        ps.cnx.push([piece, square, [cnx_piece_letter + starting_file_number.toString() + direction + cnx_dest              ], move]);
+        ps.cnx.push([piece, square,     [cnx_piece_letter + starting_file_number.toString() + direction + cnx_dest                                        ], move]);
 
         // Optional " xP" if capture
         var cnx_capture = "";
