@@ -2647,8 +2647,14 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
             }
             cnx_dest = dest_file_number.toString();
         }
-        // TODO: add " xP" if capture, etc., as optional
-        ps.cnx.push([piece, square, [piece_letter + starting_file_number.toString() + direction + cnx_dest], move]);
+
+        ps.cnx.push([piece, square, [piece_letter + starting_file_number.toString() + direction + cnx_dest              ], move]);
+
+        // Optional " xP" if capture
+        var cnx_capture = "";
+        if (captured_piece) {
+            ps.cnx.push([piece, square, [piece_letter + starting_file_number.toString() + direction + cnx_dest + " " + capture_x + captured_letter], move]);
+        } 
     });
 
     // TODO: check for cross-notation ambiguities. Inputs are tested in the order of
