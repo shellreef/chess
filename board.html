@@ -624,6 +624,7 @@ var PIECE_TYPES = {
     // parlett: movement of piece in extended Parlett notation
     // letter: uppercase character representing the piece in FEN
     // alg_letter: uppercase character for algebraic notation [defaults to FEN letter]
+    // cnx_letter: uppercase character for Chinese notation (as in David Li's books)
     // figurines: [white, black] Unicode strings for Figurine Algebraic Notation
     // hex: plane 1 (or higher) Unicode hex string, one character representing the piece
     //   U+#####. This is not a \u escape because that only accepts 4 hex digits!
@@ -823,7 +824,7 @@ var PIECE_TYPES = {
     /*1*/ soldier: {parlett: "1>", url:"http://en.wikipedia.org/wiki/Shogi", image:"shogipawn", aka:["shogipawn", "fu"]/*, promotion_rank:9*/, tags:"generals "}, // TODO: optional promotion
     chinesepawn: {parlett: "1>", url:"pc:pawn-xiangqi", aka:["chinesepawn", "fu"], 
 	// 1>, but when crosses "river", promotes and can move 1=
-	promote:["advancedsoldier"], promotion_rank:6, tags:"generals "}, 
+	promote:["advancedsoldier"], promotion_rank:6, tags:"generals ", cnx_letter:"P"}, 
     /*2*/ goose: {parlett: "o1X>", url:"akm", image:"goose", tags:"generals "},
     swan: {parlett: "1X>", image:"ferzf", tags:"generals "},
     /*3*/ drunk: {parlett: "1=", url:"akm", image:["drunk", "pawn90cw", "pawn90ccw"], tags:"generals "},
@@ -834,7 +835,7 @@ var PIECE_TYPES = {
     /*14*/ marine: {parlett: "1X<, 1>", url:"akm", aka:"wazirferzhunter", tags:"generals "}, 
     /*15*/ adjutant: {parlett: "1>, 1<", url:"akm", aka:["tsiu-yin", "chuuuin", "gobetween", "doublefootsoldier"], image:"general3", tags:"generals "}, 
     /*23*/ sidewinder: {parlett: "1X>, 1=", url:"akm", tags:"generals "}, 
-    /*24*/ ferz: {parlett: "1X", letter: "XF", image:["ferz", "ferz2", "1bishop", "1bishop2"], url:"pc:ferz", aka:["adviser", "firzin"], tags:"generals "}, // or ~1/1
+    /*24*/ ferz: {parlett: "1X", letter: "XF", image:["ferz", "ferz2", "1bishop", "1bishop2"], url:"pc:ferz", aka:["adviser", "firzin"], tags:"generals ", cnx_letter:"A"}, // or ~1/1
     /*25*/ //ferzwazirhunter: {parlett: "1<, 1X>", url:"akm", tags:"generals "}, // TODO: image
     /*34*/ drunkensailor: {parlett: "1=, 1X<", image:"shipinv", url:"akm", tags:"generals "}, 
     /*35*/ drunkenbackslider: {parlett: "1=, 1<", url:"akm", aka:["reversesoldier"], tags:"generals ", image:["drunkbackslider2", "drunkbackslider"]},
@@ -882,17 +883,17 @@ var PIECE_TYPES = {
     // Like knight, but can be blocked on orthogonal. 
     // Can almost do with this with n+.2\\45\\ or 1X(1+), but not quite (extra moves in intervening squares).
     // Would be really nice if could offset moves, blockable, in that way, though.
-    mao: {parlett: "[1,2;if_unblocked=0,1], [-1,2;if_unblocked=0,1], " +
+    horse: {parlett: "[1,2;if_unblocked=0,1], [-1,2;if_unblocked=0,1], " +
         "[2,1;if_unblocked=1,0], [2,-1;if_unblocked=1,0], " +
         "[1,-2;if_unblocked=0,-1], [-1,-2;if_unblocked=0,-1], " +
         "[-2,1;if_unblocked=-1,0], [-2,-1;if_unblocked=-1,0]",
-        image:["mao", "horse"], url:"pc:mao", letter:"H", tags:"diminished "},
+        image:["horse", "mao"], url:"pc:mao", letter:"H", aka:["ma"], tags:"diminished "},
     moa: {parlett: "[1,2;if_unblocked=1,1], [2,1;if_unblocked=1,1], " +
         "[2,-1;if_unblocked=1,-1], [1,-2;if_unblocked=1,-1], " +
         "[-1,-2;if_unblocked=-1,-1], [-2,-1;if_unblocked=-1,-1], " +
         "[-2,1;if_unblocked=-1,1], [-1,2;if_unblocked=-1,1]", tags:"diminished "
     },
-    moo: {parlett: "#mao, #moa", url:"http://chessvariants.wikidot.com/pcp-am:moo", tags:"diminished "}, 
+    moo: {parlett: "#horse, #moa", url:"http://chessvariants.wikidot.com/pcp-am:moo", tags:"diminished "}, 
 
     r4ferz: {parlett: "#r4, #ferz", tags:"diminished ", },
     n2r4: {parlett: "#r4, 2(~1/2)", tags:"diminished "},
@@ -1010,8 +1011,8 @@ var PIECE_TYPES = {
     crownedrook: {parlett: "#rook, #ferz"},
     crownedcamel: {parlett: "#camel, #ferz"},
     camelking: {parlett: "#camel, #king", image:["simplecamelking", "cbjcamelking", "tinyscamelking"]},
-    // TODO: telepotency - can attack opposing general on same open file
-    general: {parlett: "#wazir", royal: true, url:"pc:general", image:["general2", "general"], aka:["chineseking"]}, 
+    // TODO: telepotency - can attack opposing general on same open file. Like a capture but only for specific piece. New need syntax, maybe c(king)n+?
+    general: {parlett: "#wazir", royal: true, url:"pc:general", image:["general2", "general"], aka:["chineseking"], cnx_letter:"K"}, 
     // http://www.mayhematics.com/v/gm.htm has a different definition of wizard
     wizard: {parlett: "#camel, #ferz", image:"moon",  url:"pc:wizard", hex: "U+1F319"},
     fad: {parlett: "#ferz, #alfil, #warmachine", image:["elephantferzwarmachine"], url:"pc:fad"},
@@ -1035,7 +1036,7 @@ var PIECE_TYPES = {
 
     //murray_lion: {parlett: "~0/2, ~2/2, c1*", letter: "XM"}, // TODO: image
     lion: {parlett: "~n*", letter: "XL", url:"pc:lion"},
-    elephant: {parlett: "2X", letter: "E", image:["elephantmodern", "elephant1"], url:"pc:elephant", aka:["minister"], hex:"U+1F418"},  // Not a leaper, path can be blocked (unlike alfil, ~2X)
+    elephant: {parlett: "2X", letter: "E", image:["elephantmodern", "elephant1"], url:"pc:elephant", aka:["minister"], hex:"U+1F418", cnx_letter:"E"}, // Not a leaper, path can be blocked (unlike alfil, ~2X)
 
     // TODO: support ~0/0 for "null move" (---), but don't let drop to null, instead show a button
     //kraken: {parlett: "~n/m ~0/0"},     // any square, not realistic since always checkmates! TODO: image
@@ -1108,7 +1109,7 @@ var PIECE_TYPES = {
     // Hoppers
     //checker: {parlett: "cn(^2X)>, o1X>", url:"http://en.wikipedia.org/wiki/Fairy_chess_piece#Notations"}, // TODO: movement
     
-    //cannon: {parlett: "on+, cn+^^", aka:["pao"]}, // TODO: movement. Like rook, but hops.
+    //cannon: {parlett: "on+, cn+^^", aka:["pao"], cnx_letter:"C"}, // TODO: movement. Like rook, but hops.
     //vao: {parlett: "onX, cnX^^"}, // TODO: movement. Like bishop, but hops.
     //leo: {letter: "XO", parlett: "on*, c^&", url:"http://en.wikipedia.org/wiki/Fairy_chess_piece#Notable_examples"}, // TODO: locust movement, cn*^&?? cn*^^?. Like queen, but hops
     
@@ -1143,7 +1144,7 @@ var PIECE_TYPES = {
 
     
     // Pieces that probably won't be supported without significant coding
-    // TODO: "darters", blockable 'leapers' - 1//2, elban knight, like mao and moa
+    // TODO: "darters", blockable 'leapers' - 1//2, elban knight, like horse and moa
     //checker: {parlett: "cn(^2X>), o1X>", promote: "checker_kinged", letter:"XY"},  // no grouping
     //checker_kinged: {parlett: "cn(^2X), o1x", letter:"XZ"},
     //spy: {parlett: "2>, 2=, (1/1)>", letter:"XS"}  // no grouping
@@ -1186,9 +1187,9 @@ var SAVED_BOARDS = {
 // TODO: Minishogi, 5x5 board, http://en.wikipedia.org/wiki/Minishogi
 
 // Chinese Chess (Xiangqi),
-"Chinese Chess (Xiangqi) (w/o cannons)": "rx(mao)ex(ferz)x(general)x(ferz)ex(mao)r///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)///RX(mao)EX(ferz)X(general)X(ferz)EX(mao)R w - - rs=xiangqi",
+"Chinese Chess (Xiangqi) (w/o cannons)": "rhex(ferz)x(general)x(ferz)ehr///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)///RHEX(ferz)X(general)X(ferz)EHR w - - rs=xiangqi",
 
-"Chinese Chess (Xiangqi, Westernized) (w/o cannons)": "rx(mao)ex(ferz)x(general)x(ferz)ex(mao)r///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)///RX(mao)EX(ferz)X(general)X(ferz)EX(mao)R w - - rs=xiangqiw",
+"Chinese Chess (Xiangqi, Westernized) (w/o cannons)": "rhex(ferz)x(general)x(ferz)ehr///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)///RHEX(ferz)X(general)X(ferz)EHR w - - rs=xiangqiw",
 
 // Counting rules on http://en.wikipedia.org/wiki/Makruk are not implemented
 "Thai Chess (Makruk)": "rnx(silvergeneral)x(ferz)x(lord)x(silvergeneral)nr/8/x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)/8/8/X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)/8/RNX(silvergeneral)X(lord)X(ferz)X(silvergeneral)NR w - -",
@@ -1335,7 +1336,7 @@ var SAVED_BOARDS = {
 "Test Complex Riders": "1X(crookedbishop)/8/3X(dummy)/4X(griffon)/7X(panda)//5X(slipbishop) w - -",
 "Test Complex Riders I": "8/8/8/8/4X(crookedrook) w - -",
 "Test Hoppers": "///4X(grasshopper)kx(dummy)//4X(dummy) w - -",
-"Test Chinese Pieces": "8/8/8/3X(moa)X(moo)/3x(mao)X(mao)3/8/8/8 w - -",
+"Test Chinese Pieces": "8/8/8/3X(moa)X(moo)/3hH3/8/8/8 w - -",
 "Test Amphibians": "4k/8/8/slslslsl/8/8/FFFFFFFF/4K w - -",
 "Test Royalty": "x(royalrook)x(royalknight)x(royalbishop)xjkx(royalbishop)x(royalknight)x(royalrook)/pppppppp/8/8/8/8/PPPPPPPP/X(royalrook)X(royalknight)X(royalbishop)XJKX(royalbishop)X(royalknight)X(royalrook) w KQkq -",
 "Test Projectiles": "x(airplane)X(airplane)4x(airplane)/X(allseeingeye)/1x(bird)/2x(bird)x(bird)x(bird)1x(bird)/3x(bird)x(bird)/3X(archerzz3)x(bird)/4X(archerzz2)X(archer)/x(frog)1X(gun)3X(rocket) w - -",
@@ -2648,12 +2649,15 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
             cnx_dest = dest_file_number.toString();
         }
 
-        ps.cnx.push([piece, square, [piece_letter + starting_file_number.toString() + direction + cnx_dest              ], move]);
+        var cnx_piece_letter = PIECE_TYPES[piece.type].cnx_letter || piece_letter;
+
+        ps.cnx.push([piece, square, [cnx_piece_letter + starting_file_number.toString() + direction + cnx_dest              ], move]);
 
         // Optional " xP" if capture
         var cnx_capture = "";
         if (captured_piece) {
-            ps.cnx.push([piece, square, [piece_letter + starting_file_number.toString() + direction + cnx_dest + " " + capture_x + captured_letter], move]);
+            var cnx_captured_letter = PIECE_TYPES[captured_piece.type].cnx_letter || captured_letter;
+            ps.cnx.push([piece, square, [cnx_piece_letter + starting_file_number.toString() + direction + cnx_dest + " " + capture_x + cnx_captured_letter], move]);
         } 
     });
 
@@ -4107,7 +4111,7 @@ function decode_one_parlett(parlett)
 
         if (ch === "~") {
             movement = "leaper";
-            // TODO: "darters", blockable 'leapers' - 1//2, elban knight, mao (0,1 then 1,1), moa (1,1 then 0,1)
+            // TODO: "darters", blockable 'leapers' - 1//2, elban knight, horse (0,1 then 1,1), moa (1,1 then 0,1)
             // http://www.mayhematics.com/v/gm.htm
 
         // Flags, documented on http://en.wikipedia.org/wiki/Fairy_chess_piece#Additions_to_Parlett.27s
@@ -6410,7 +6414,7 @@ function load_starting_position(fen, replay)
             // Store location of castles on 1st rank, for return value
             if (y === 1 && PIECE_TYPES[piece.type].castle && piece.color === "white") {
                 back_castles.white.push(x);
-            }  else if (y === GAME_STATE.ranks && PIECE_TYPES[piece.type].castle && piece.color === "black") {
+            } else if (y === GAME_STATE.ranks && PIECE_TYPES[piece.type].castle && piece.color === "black") {
                 back_castles.black.push(x);
             }
 
@@ -6681,7 +6685,7 @@ function show_piece_inspector(piece)
 
     dojo.byId("inspector-image").innerHTML = image_htmls.join(" ");
     dojo.byId("inspector-movement").innerHTML = escape_html(type_info.parlett);
-    dojo.byId("inspector-tags").innerHTML = escape_html(type_info.tags.replace(piece.type, ""));
+    dojo.byId("inspector-tags").innerHTML = type_info.tags ? escape_html(type_info.tags.replace(piece.type, "")) : "";
 
     dojo.byId("inspector-diagram").innerHTML = movement_diagram(unfiltered_moves(type_info.parlett));
 
