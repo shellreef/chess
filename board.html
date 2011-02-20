@@ -2629,7 +2629,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
         if (has_horizontal_component && !has_vertical_component) {
             // K4=# lateral (sideways) to # file
             direction = "=";
-            cnx_dest = dest_file_number;
+            cnx_dest = file_from_perspective(color, dest_file_number);
         } else if (has_vertical_component && !has_horizontal_component) {
             // Up/down is from from player's perspective
             var points_up = dest_rank_from_perspective - starting_rank_from_perspective;
@@ -2648,18 +2648,19 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
             } else {
                 direction = "-";
             }
-            cnx_dest = dest_file_number.toString();
+            cnx_dest = file_from_perspective(color, dest_file_number);
         }
 
+        // TODO: may need to disambiguate rooks! with RR and FR
         var cnx_piece_letter = PIECE_TYPES[piece.type].cnx_letter || piece_letter;
 
-        ps.cnx.push([piece, square,     [cnx_piece_letter + starting_file_number.toString() + direction + cnx_dest                                        ], move]);
+        ps.cnx.push([piece, square,     [cnx_piece_letter + file_from_perspective(color, starting_file_number) + direction + cnx_dest                                        ], move]);
 
         // Optional " xP" if capture
         var cnx_capture = "";
         if (captured_piece) {
             var cnx_captured_letter = PIECE_TYPES[captured_piece.type].cnx_letter || captured_letter;
-            ps.cnx.push([piece, square, [cnx_piece_letter + starting_file_number.toString() + direction + cnx_dest + " " + capture_x + cnx_captured_letter], move]);
+            ps.cnx.push([piece, square, [cnx_piece_letter + file_from_perspective(color, starting_file_number) + direction + cnx_dest + " " + capture_x + cnx_captured_letter], move]);
         } 
     });
 
@@ -7324,6 +7325,12 @@ function rank_from_perspective(color, y)
     return color === "white" ? y : (GAME_STATE.ranks + 1) - y;
 }
 
+// Return the file given the x coordinate, from the player's perspective
+// -- as a numerical string. Used for Xiangqi.
+function file_from_perspective(color, x) 
+{   
+    return (color === "white" ? (GAME_STATE.files + 1) - x : x).toString();
+}
 
 // Shorten a file name, in descriptive notation, to a possibly-ambiguous name.
 // QR for queen's rook file is shortened to R, and so is KR for king's rook. 
