@@ -832,7 +832,7 @@ var PIECE_TYPES = {
     /*4*/ sailor: {parlett: "1X<", image:["ship", "ferzb"], url:"akm", tags:"generals "}, 
     /*5*/ backslider: {parlett: "1<", url:"akm", tags:"generals "}, 
     /*12*/ plasticgeneral: {parlett: "1>, 1X>", aka:"notcoppergeneral", url:"akm", tags:"generals "},     // akm says coppergeneral can't move backwards, but shogi disagrees, so I call it plasticgeneral
-    /*13*/ advancedsoldier: {parlett: "1>, 1=", url:"akm", aka:"drunkensoldier", tags:"generals "},  // for Xiangqi after passing the river
+    /*13*/ advancedsoldier: {parlett: "1>, 1=", url:"akm", aka:["drunkensoldier", "rivercrossedpawn"], cnx_letter:"P", tags:"generals "},  // for Xiangqi after passing the river
     /*14*/ marine: {parlett: "1X<, 1>", url:"akm", aka:"wazirferzhunter", tags:"generals "}, 
     /*15*/ adjutant: {parlett: "1>, 1<", url:"akm", aka:["tsiu-yin", "chuuuin", "gobetween", "doublefootsoldier"], image:"general3", tags:"generals "}, 
     /*23*/ sidewinder: {parlett: "1X>, 1=", url:"akm", tags:"generals "}, 
@@ -2388,8 +2388,8 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
         var dest_rank_from_perspective = rank_from_perspective(color, move.y);
         // starting_filerank (passed in as parameter)           // e2
         var starting_file = starting_filerank.substr(0, 1);     // e 
-        var starting_file_number = filerank2xy(starting_filerank)[0];                               // 5
-        var starting_rank_number = filerank2xy(starting_filerank)[1];                               // 2
+        var starting_file_number = filerank2xy(starting_filerank).x;                                // 5
+        var starting_rank_number = filerank2xy(starting_filerank).y;                                // 2
         var starting_rank = starting_filerank.substr(1, 1);                                         // 2
         var starting_rank_from_perspective = rank_from_perspective(color, starting_rank_number);    // 2
         var descriptive_origin = xy2descriptive(color, filerank2xy(starting_filerank));             // K2
@@ -2603,9 +2603,8 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
         ps.coord.push([piece, square, [starting_filerank.toUpperCase() + "-" + dest_filerank.toUpperCase() + promote_paren], move]);
 
         // ICCF numeric notation
-        var starting_xy = filerank2xy(starting_filerank);
-        var starting_x = starting_xy[0], starting_y = starting_xy[1];
-        ps.ICCF.push([piece, square, [starting_x + "" + starting_y + "" + move.x + "" + move.y + promote_iccf], move]);
+        var starting = filerank2xy(starting_filerank);
+        ps.ICCF.push([piece, square, [starting.x + "" + starting.y + "" + move.x + "" + move.y + promote_iccf], move]);
 
         // Smith notation, reversible, non-ambiguous: https://www.chessclub.com/chessviewer/smith.html
         var smith_capture_letter;
@@ -6939,8 +6938,8 @@ function pc(x, y, virtual)
 {
     if (x.charAt) {
         var xy = filerank2xy(x);
-        x = xy[0];
-        y = xy[1];
+        x = xy.x;
+        y = xy.y;
     }
 
     //assert(x >= 1 && x <= GAME_STATE.files, "pc(" + x + ", " + y + "): bad x: " + x);
@@ -7220,7 +7219,7 @@ function highlight_moves(piece, enable, skip_legal)
 
 //// SQUARE FUNCTIONS / FILE-RANK NOTATION
 
-// Convert filerank f8 to the x,y coordinate [8,6], etc. These coordinates
+// Convert filerank f8 to the x,y coordinate {x:8,y:6}, etc. These coordinates
 // are used internally, but filerank notation is useful for human consumption
 // (though I actually think better in descriptive notation, but maybe I'm in the minority there)
 // Note: does not accept piece name as initial character, yet.
@@ -7237,16 +7236,7 @@ function filerank2xy(code)
     //assert(x >= 1 && x <= GAME_STATE.files, "filerank2xy(" + code + "): bad x: " + x);
     //assert(y >= 1 && y <= GAME_STATE.ranks, "filerank2xy(" + code + "): bad y: " + y);
 
-    return [x, y];
-}
-
-// Return an object with x and y from a filerank
-// TODO: Replace filerank2xy with this
-function filerank2obj(code)
-{
-    var xy = filerank2xy(code);
-
-    return {x:xy[0], y:xy[1]};
+    return {x:x, y:y};
 }
 
 // Convert from x,y coordinates to filerank notation for human consumption. Can either pass
@@ -7362,8 +7352,8 @@ function sq(code, extra)
         xy = filerank2xy(code);
 
         // Note JavaScript 1.8 can do var [x,y] = ...
-        x = xy[0];
-        y = xy[1];
+        x = xy.x;
+        y = xy.y;
     } else {
         assert(false, "sq(" + code + ", " + extra + "): couldn't find out what I was given");
     }
