@@ -2381,18 +2381,17 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
         var square = VBOARD[move.x][move.y];
 
         // Building blocks
-        // TODO: remove these ugly and limited substr()s, use x2file and y2rank
-        var dest_filerank = xy2filerank(move);                  // e4
-        var dest_file = dest_filerank.substr(0, 1);             // e
-        var dest_rank = dest_filerank.substr(1, 1);             // 4
+        var dest_file = x2file(move.x);                         // e
+        var dest_rank = y2rank(move.y);                         // 4
+        var dest_filerank = dest_file + dest_rank;              // e4
         var dest_y_from_perspective = y_from_perspective(color, move.y);
         // starting_filerank (passed in as parameter)           // e2
         var starting = filerank2xy(starting_filerank);          // {x:5, y:2}
-        var starting_file = starting_filerank.substr(0, 1);     // e 
-        var starting_rank = starting_filerank.substr(1, 1);     // 2
+        var starting_file = x2file(starting.x);                 // e
+        var starting_rank = y2rank(starting.y);                 // 2
         var starting_y_from_perspective = y_from_perspective(color, starting.y);                    // 2
-        var descriptive_origin = xy2descriptive(color, filerank2xy(starting_filerank));             // K2
-        var adescriptive_origin = xy2adescriptive(color, filerank2xy(starting_filerank));           // e2
+        var descriptive_origin = xy2descriptive(color, starting);                                   // K2
+        var adescriptive_origin = xy2adescriptive(color, starting);                                 // e2
         var descriptive_dest = xy2descriptive(color, move);                                         // K4
         var adescriptive_dest = xy2adescriptive(color, move);                                       // e4
         var descriptive_dest_file = descriptive_dest &&
@@ -2405,6 +2404,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
             descriptive_dest.substr(descriptive_dest.length - 1);                                   //  4
         //var adescriptive_dest_file = adescriptive_dest.substr(0, 1);                              // e
         //var adescriptive_dest_rank = adescriptive_dest.substr(1, 1);                              //  4
+        // TODO: use proper decoding functions so adescriptive can handle large boards
         var adescriptive_origin_file = adescriptive_origin.substr(0, 1);                            // e
         var adescriptive_origin_rank = adescriptive_dest.substr(1, 1);                              //  4
 
@@ -7314,7 +7314,7 @@ function xy2adescriptive(color, xy)
     assert(x >= 1 && x <= GAME_STATE.files, "xy2adescriptive(" + x + ", " + y + "): bad x: " + x);
     assert(y >= 1 && y <= GAME_STATE.ranks, "xy2adescriptive(" + x + ", " + y + "): bad y: " + y);
 
-    return x2file(x) + y_from_perspective(color, y);
+    return x2file(x) + y_from_perspective(color, y).toString();
 }
 
 // Get the y coordinate from the player's perspective
