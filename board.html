@@ -2390,18 +2390,24 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
         var starting_file = x2file(starting.x);                 // e
         var starting_rank = y2rank(starting.y);                 // 2
         var starting_y_from_perspective = y_from_perspective(color, starting.y);                    // 2
-        var descriptive_origin = xy2descriptive(color, starting);                                   // K2
+
+        var descriptive_origin_file = x2descriptive(starting.x);                                    // K
+        var descriptive_origin_rank = y_from_perspective(starting.y).toString();                    // 2
+        var descriptive_origin = descriptive_origin_file + descriptive_origin_rank;                 // K2
+
+        var descriptive_dest_file = x2descriptive(move.x);                                          // K
+        var descriptive_dest_rank = y_from_perspective(move.y).toString();                          // 4
+        var descriptive_dest = descriptive_dest_file + descriptive_dest_rank;                       // K4
+
         var adescriptive_origin = xy2adescriptive(color, starting);                                 // e2
         var descriptive_dest = xy2descriptive(color, move);                                         // K4
         var adescriptive_dest = xy2adescriptive(color, move);                                       // e4
         var descriptive_dest_file = descriptive_dest &&
             descriptive_dest.substr(0, descriptive_dest.length - 1);                                // K
+
         var descriptive_dest_rank = descriptive_dest &&
             descriptive_dest.substr(descriptive_dest.length - 1);                                   //  4
-        var descriptive_origin_file = descriptive_origin &&
-            descriptive_origin.substr(0, descriptive_origin.length - 1);                            // K
-        var descriptive_origin_rank = descriptive_dest && 
-            descriptive_dest.substr(descriptive_dest.length - 1);                                   //  4
+
         //var adescriptive_dest_file = adescriptive_dest.substr(0, 1);                              // e
         //var adescriptive_dest_rank = adescriptive_dest.substr(1, 1);                              //  4
         // TODO: use proper decoding functions so adescriptive can handle large boards
@@ -7276,6 +7282,7 @@ function y2rank(y)
 // Only works for chess1, not any variants where the pieces are arranged differently.
 function xy2descriptive(color, xy)
 {
+    // TODO: remove all this junk and use x2descriptive only
     var x, y;
     if (dojo.isArray(xy)) {
         x = xy[0];
@@ -7291,7 +7298,12 @@ function xy2descriptive(color, xy)
     assert(x >= 1 && x <= GAME_STATE.files, "xy2descriptive(" + x + ", " + y + "): bad x: " + x);
     assert(y === "" || (y >= 1 && y <= GAME_STATE.ranks), "xy2descriptive(" + x + ", " + y + "): bad y: " + y);
 
-    return [null, "QR", "QN", "QB", "Q", "K", "KB", "KN", "KR"][x] + y_from_perspective(color, y);
+    return x2descriptive(x) + y_from_perspective(color, y);
+}
+function x2descriptive(x) 
+{
+    return [null, "QR", "QN", "QB", "Q", "K", "KB", "KN", "KR"][x];
+    
 }
 
 // Return name of square from color's perspective in "algebraic descriptive notation".
