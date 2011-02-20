@@ -1457,7 +1457,7 @@ var OPENINGS = {
 
 /* Global functions for jslint to recognize. TODO: move to objects? */
 
-/*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved unfiltered_moves filtered_moves relative_decode_direction parse_move_flags nested_flags decode_explicit_move decode_one_parlett without_dupes opposite_color set_turn set_check_message check_repetition load_notations capture_piece notation_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position init_board name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc image_path_for create_piece create_piece_by_letter highlight_moves unhighlight_all filerank2xy xy2filerank xy2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection make_move_by_menu populate_make_a_move_list realize_vboard*/
+/*global edit_pgn restore_edit save_pgn reload_pgn load_pgn parse_pgn output_pgn_dict load_ply set_next_back_accesskeys move_link decode_ply encode_ply mv should_promote promote in_check calculate_notations disambiguate_notations calculate_moves computer_move_if_applicable would_check piece_moved unfiltered_moves filtered_moves relative_decode_direction parse_move_flags nested_flags decode_explicit_move decode_one_parlett without_dupes opposite_color set_turn set_check_message check_repetition load_notations capture_piece notation_from_piece_square forwards_vector move_piece_to_square mark_repeated_moves move_dropped_piece save_fen load_fen clear_board load_starting_position init_board name_pieces algebraic_letter piece_letter2name full_piece_prefix algebraic_piece_prefix figurine_piece_prefix pc_or_offboard pc image_path_for create_piece create_piece_by_letter highlight_moves unhighlight_all filerank2xy xy2filerank x2descriptive xy2adescriptive short_descriptive sq randint ucfirst AssertException assert enable_document_selection make_move_by_menu populate_make_a_move_list realize_vboard*/
  
 function main() {
 // http://o.aolcdn.com/dojo/1.0.0/dojo/cookie.xd.js
@@ -5220,8 +5220,8 @@ function clear_board()
             square.color = (x + y % 2) % 2 ? "white" : "black";
 
             square.descriptive = {};
-            square.descriptive.white = xy2descriptive("white", [x, y]);
-            square.descriptive.black = xy2descriptive("black", [x, y]);
+            square.descriptive.white = x2descriptive(x) + y_from_perspective("white", y).toString();
+            square.descriptive.black = x2descriptive(x) + y_from_perspective("black", y).toString();
         }
     }
 }
@@ -6781,7 +6781,7 @@ function name_pieces()
 
     for (var file_number = 1; file_number <= GAME_STATE.files; file_number += 1) {
         // English descriptive notation (only really applicable to chess1)
-        var file = xy2descriptive("white", file_number);
+        var file = x2descriptive(file_number);
 
         // White's pieces and pawns
         piece = pc(file_number, 1); if (piece) { piece.descriptive_name = file; }
@@ -7277,30 +7277,10 @@ function y2rank(y)
 
 
 // Return name of square from color's perspective in English descriptive notation
-// Accepts an array of two numbers, for file and rank, or just a file
 // Only works for chess1, not any variants where the pieces are arranged differently.
-function xy2descriptive(color, xy)
-{
-    // TODO: remove all this junk and use x2descriptive only
-    var x, y;
-    if (dojo.isArray(xy)) {
-        x = xy[0];
-        y = xy[1];
-    } else if (xy.x && xy.y) {
-        x = xy.x;
-        y = xy.y;
-    } else {
-        x = xy;
-        y = "";
-    }
-
-    assert(x >= 1 && x <= GAME_STATE.files, "xy2descriptive(" + x + ", " + y + "): bad x: " + x);
-    assert(y === "" || (y >= 1 && y <= GAME_STATE.ranks), "xy2descriptive(" + x + ", " + y + "): bad y: " + y);
-
-    return x2descriptive(x) + y_from_perspective(color, y).toString();
-}
 function x2descriptive(x) 
 {
+    assert(x >= 1 && x <= GAME_STATE.files, "x2descriptive(" + x + "): bad x: " + x);
     return [null, "QR", "QN", "QB", "Q", "K", "KB", "KN", "KR"][x];
     
 }
