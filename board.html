@@ -6229,17 +6229,17 @@ function load_fen(fen, replay)
 
     castling = parts[2]; // parsed below, after know dimensions
 
-    if (parts[3] === "-") {
-        GAME_STATE.ep_target = null;
-    } else {
-        GAME_STATE.ep_target = filerank2xy(parts[3]);
-    }
-
     color = {w:"white", b:"black", "?":"ask"}[parts[1]];
     assert(color, "load_fen(" + fen + "): bad active color: " + parts[1]);
 
     if (!replay) {
         GAME_STATE = dojo.clone(GAME_STATE_DEFAULT);
+    }
+
+    if (parts[3] === "-") {
+        GAME_STATE.ep_target = null;
+    } else {
+        GAME_STATE.ep_target = filerank2xy(parts[3]);
     }
 
     if (!isNaN(parseInt(parts[4], 10))) {
