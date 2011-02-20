@@ -167,7 +167,8 @@ var PREFS = {
     revert_time: 350,               // ms to take to revert
     movement_animation_time: 100,   // ms to animate moving of pieces
 
-    input_notation: "SAN",
+    input_notation: "SAN",          // Move list menu
+    output_notation: "SAN",         // Move history
 
     image_root: "images/",
     //image_root: "http://camelpawn.appspot.com/images/",    // on Google App Engine (TODO: update)
@@ -1568,7 +1569,7 @@ function email_board(get_text)
     dots = ply_info.color ? (ply_info.color === "black" ? "... " : " ") : "";
 
     link = dojo.byId("copyable_link").href;
-    link_text = GAME_STATE.made_moves[ply] ? GAME_STATE.made_moves[ply].notations[form_value("output_notation")] : "*";
+    link_text = GAME_STATE.made_moves[ply] ? GAME_STATE.made_moves[ply].notations[PREFS.output_notation] : "*";
     // Note: IE ActiveXObject for Outlook: http://www.webdeveloper.com/forum/showthread.php?t=176548
     // Got an automation error when I tried it, but it could supposedly allow HTML bodies on Windows
     //body = ply_info.fmvn + ". " + dots + '<a href="' + link + '">' + link_text + '</a>';
@@ -2301,7 +2302,7 @@ function ask_to_promote(piece, tieback, is_immediate)
     for (var type in tieback) {
         if (tieback.hasOwnProperty(type)) {
             // The move the user selected that will be made
-            var notation = tieback[type].notations[form_value("output_notation")];
+            var notation = tieback[type].notations[PREFS.output_notation];
 
             //element = create_piece(GAME_STATE.active_color, type);
             element = dojo.create("img", {src:image_path_for(type, piece.color), piece_type:type, notation:notation});
@@ -4608,7 +4609,7 @@ function set_copyable_link(this_position)
         if (last_move) {
             // Store the previous move and the board state _before_ the move,
             // so it can be made.
-            last_move = ";m=" + last_move.notations[form_value("output_notation")];
+            last_move = ";m=" + last_move.notations[PREFS.output_notation];
             if (!prior) {
                 // No move has been made yet
                 dojo.byId("copyable_link").href = document.URL;
@@ -5563,7 +5564,7 @@ function all_notations_from_piece_square(piece, square, text_input)
 // user drags a piece to a square and we don't know what move it is.
 function notation_from_piece_square(piece, square, text_input, notation_type)
 {
-    notation_type = notation_type || form_value("output_notation");
+    notation_type = notation_type || PREFS.output_notation;
     var notations = VALID_MOVE_NOTATIONS[notation_type];
     var finds = {}, find_count = 0, one;
 
@@ -5912,7 +5913,7 @@ function show_move_history()
 
 
         if (move_info) {
-            move_text = move_info.notations[form_value("output_notation")];
+            move_text = move_info.notations[PREFS.output_notation];
         } else {
             // Ply 1 does not exist. Include the fmvn, but not the link,
             // so that the period can link to ply_0.
@@ -8284,7 +8285,7 @@ not to implement chess AI. But having automatic moves is useful for testing. -->
 <div id="show_skill" style="display: none"><p>Skill Level: 
 <input type="text" size="3" maxlength="3" id="skill_level" onchange="update_skill(this)"></div>
 
-<p><select accesskey="o" id="output_notation" name="output_notation" onchange="show_move_history()"></select>
+<p><select accesskey="o" id="output_notation" name="output_notation" onchange="PREFS.output_notation = form_value(this); show_move_history()"></select>
 
 <p><a href="#" onclick="edit_pgn()">import/edit PGN</a>
 
