@@ -5670,8 +5670,13 @@ function castles_come_from()
     ret.long_x = files[0];
     ret.short_x = files[1];
 
-    ret.long_file = x2file(files[0]);
-    ret.short_file = x2file(files[1]);
+    if (ret.long_x !== undefined) {
+        ret.long_file = x2file(ret.long_x);
+    }
+
+    if (ret.short_x !== undefined) {
+        ret.short_file = x2file(ret.short_x);
+    }
 
     return ret;
 }
