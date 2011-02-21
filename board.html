@@ -4932,7 +4932,7 @@ function create_board()
     for (var y = 0; y < GAME_STATE.ranks; y += 1) {
         var rank = PREFS.flipped ? y + 1 : GAME_STATE.ranks - y;
 
-        ctx.fillText(rank, DISPLAY.rank_labels_left, 
+        ctx.fillText(y2rank_cnx("white", rank), DISPLAY.rank_labels_left, 
                 DISPLAY.rank_labels_top + DISPLAY.square_height * (y + 1), DISPLAY.board_left);
     }
 
@@ -7266,11 +7266,11 @@ function number2roman(n)
     return {1:"ⅰ", 2:"ⅱ", 3:"ⅲ", 4:"ⅳ", 5:"ⅴ", 6:"ⅵ", 7:"ⅶ", 8:"ⅷ", 9:"ⅸ", 10:"ⅹ"}[n]; 
 }
 
-// Convert an (one-based) X coordinate to a Roman numeral file number from the player's perspective
+// Convert an (one-based) Y coordinate to a Roman numeral file number from the player's perspective
 // TODO: use this for labels!
-function x2file_cnx(color, x)
+function y2rank_cnx(color, y)
 {
-    return number2roman((color === "white" ? x + 1: (GAME_STATE.files + 1) - x));
+    return number2roman((color === "white" ? y: (GAME_STATE.files) - y));
 }
 
 // Convert a (one-based) Y coordinate to a human readable representation of a rank
