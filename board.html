@@ -4932,7 +4932,7 @@ function create_board()
     for (var y = 0; y < GAME_STATE.ranks; y += 1) {
         var rank = PREFS.flipped ? y + 1 : GAME_STATE.ranks - y;
 
-        ctx.fillText(y2rank_cnx("white", rank), DISPLAY.rank_labels_left, 
+        ctx.fillText(y2rank(rank), DISPLAY.rank_labels_left, 
                 DISPLAY.rank_labels_top + DISPLAY.square_height * (y + 1), DISPLAY.board_left);
     }
 
