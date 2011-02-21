@@ -4888,7 +4888,7 @@ function create_board()
     
     for (var x = 0; x < GAME_STATE.files; x += 1) {
         // File labels
-        var file = String.fromCharCode("a".charCodeAt(0) + (PREFS.flipped ? GAME_STATE.files - x - 1 : x));
+        var file = x2file((PREFS.flipped ? GAME_STATE.files - x : x + 1));
         ctx.fillStyle = DISPLAY.text_color;
         ctx.fillText(file, 
                 DISPLAY.board_left + DISPLAY.file_labels_left + x * DISPLAY.square_width,
@@ -5659,7 +5659,7 @@ function castles_come_from()
     var files = [], ret = {};
 
     for (var i = 0; i < GAME_STATE.files; i += 1) {
-        var file = String.fromCharCode("a".charCodeAt(0) + i);
+        var file = x2file(i + 1);
         var file_no = i + 1;
 
         if (cs[file] !== undefined) {
@@ -5670,8 +5670,8 @@ function castles_come_from()
     ret.long_x = files[0];
     ret.short_x = files[1];
 
-    ret.long_file = String.fromCharCode("a".charCodeAt(0) + files[0] - 1);
-    ret.short_file = String.fromCharCode("a".charCodeAt(0) + files[1] - 1);
+    ret.long_file = x2file(files[0]);
+    ret.short_file = x2file(files[1]);
 
     return ret;
 }
@@ -6297,10 +6297,10 @@ function load_fen(fen, replay)
         if (!GAME_STATE.shredder_castle) {
             if (file === "k") {
                 // "kingside", opposite from a-side (this is the h-side on an orthodox board)
-                file = String.fromCharCode("a".charCodeAt(0) - 1 + back_castles[castle_color][1]);
+                file = x2file(back_castles[castle_color][1]);
             } else if (file === "q") {
                 // "queenside", a-side
-                file = String.fromCharCode("a".charCodeAt(0) - 1 + back_castles[castle_color][0]);
+                file = x2file(back_castles[castle_color][0]);
             }
         }
 
@@ -7246,10 +7246,9 @@ function xy2filerank(obj)
 // Convert an X coordinate to a human readable representation of a file
 function x2file(x)
 {
-    //assert(x >= 1 && x <= GAME_STATE.files, "xy2file(" + x + "): bad x: " + x);
+    assert(x >= 1 && x <= GAME_STATE.files, "x2file(" + x + "): bad x: " + x);
 
     // TODO: after z, allow aa, ab, ...
-    // TODO: Chinese, digits (reflected!)
     return String.fromCharCode(x + "a".charCodeAt(0) - 1);
 }
 
@@ -7262,24 +7261,24 @@ function number2roman(n)
     return {1:"ⅰ", 2:"ⅱ", 3:"ⅲ", 4:"ⅳ", 5:"ⅴ", 6:"ⅵ", 7:"ⅶ", 8:"ⅷ", 9:"ⅸ", 10:"ⅹ"}[n]; 
 }
 
-// Convert an X coordinate to a Roman numeral file number from the player's perspective
+// Convert an (one-based) X coordinate to a Roman numeral file number from the player's perspective
 // TODO: use this for labels!
 function x2file_cnx(color, x)
 {
     return number2roman((color === "white" ? x + 1: (GAME_STATE.files + 1) - x));
 }
 
-// Convert a Y coordinate to a human readable representation of a rank
+// Convert a (one-based) Y coordinate to a human readable representation of a rank
 function y2rank(y) 
 {
     if (y === "") {
         return "";  // TODO: remove grossness
     }
 
-    //assert(y === "" || (y >= 1 && y <= GAME_STATE.ranks), "y2rank(" + y + "): bad y: " + y);
+    assert(y >= 1 && y <= GAME_STATE.ranks, "y2rank(" + y + "): bad y: " + y);
 
     // TODO: Chinese, lowercase Roman numerals 
-    return String.fromCharCode(y + "1".charCodeAt(0) - 1);
+    return y.toString();
 }
 
 
@@ -7514,8 +7513,8 @@ function generate_castling_eligibility(setup_string)
     setup_string = setup_string.replace("R", "-");
     rook2 = setup_string.indexOf("R");
 
-    file1 = String.fromCharCode("a".charCodeAt(0) + rook1);
-    file2 = String.fromCharCode("a".charCodeAt(0) + rook2);
+    file1 = x2file(rook1 + 1);
+    file2 = x2file(rook2 + 1);
 
     // AHha, for example
     castling = file1 + file2;
