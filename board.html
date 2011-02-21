@@ -186,7 +186,7 @@ var PREFS = {
 
     flipped: false,             // True if from black's perspective instead of white
     rank_label_style: "Arabic", // "Arabic" (1-8) or "Roman" (i-x) numerals
-    //TODO: file_label_style: "Latin",  // "Latin" (a-z) or "Arabic"
+    file_label_style: "Latin",  // "Latin" (a-z) or "Arabic"
     setup_mode: false,          // Setup pieces, instead of playing game
 
     saved_games_path: "games/",
@@ -320,10 +320,11 @@ var RULE_SETS = {
             {cross:true, over:true, color:"black", file:4, rank:3, width:2, height:2, shift_y:true, shift_x:true},
         ],
 
-        PREFS:{
+        PREFS:{ // TODO: need defaults for non-cnx prefs
             input_notation:"cnx",
             output_notation:"cnx",
-            rank_label_style:"Roman"
+            rank_label_style:"Roman",
+            file_label_style:"Arabic"
         },
 
         //TODO: player_colors:{"red", "green"},
@@ -4891,9 +4892,19 @@ function create_board()
     
     for (var x = 0; x < GAME_STATE.files; x += 1) {
         // File labels, on top for white
-        var file = x2file((PREFS.flipped ? GAME_STATE.files - x : x + 1));
+        var file = (PREFS.flipped ? GAME_STATE.files - x : x + 1);
+        var file_label;
+
+        if (PREFS.file_label_style === "Latin") {
+            file_label = x2file(file);
+        } else if (PREFS.file_label_style === "Arabic") {
+            file_label = file.toString();
+        } else {
+            assert(file, "invalid file_label_style: " + PREFS.file_label_style);
+        }
+
         ctx.fillStyle = DISPLAY.text_color;
-        ctx.fillText(file, 
+        ctx.fillText(file_label, 
                 DISPLAY.board_left + DISPLAY.file_labels_left + x * DISPLAY.square_width,
                 DISPLAY.file_labels_top);
         // TODO: Optional file labels on bottom for black
