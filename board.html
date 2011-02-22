@@ -158,7 +158,7 @@ var AVAILABLE_NOTATIONS = {
     smith:"Smith Notation",//                           b5c6n       e7e5
     descr:"English Descriptive Notation",// aka EDN     BxN         P-K4
     adesc:"Algebraic Descriptive Notation",//           BxN         P-e4
-    cnx:  "Chinese Chess (Xiangqi)"//                   TODO
+    wxf:  "World Xiangqi Federation)"//                   TODO
     // TODO: http://en.wikipedia.org/wiki/Xiangqi#Notational_system_1 and http://en.wikipedia.org/wiki/Xiangqi#Notational_system_3_.28unofficial.2C_for_players_of_Western_Chess.29
 };
 
@@ -320,9 +320,9 @@ var RULE_SETS = {
             {cross:true, over:true, color:"black", file:4, rank:3, width:2, height:2, shift_y:true, shift_x:true},
         ],
 
-        PREFS:{ // TODO: need defaults for non-cnx prefs
-            input_notation:"cnx",
-            output_notation:"cnx",
+        PREFS:{ // TODO: need defaults for non-wxf prefs
+            input_notation:"wxf",
+            output_notation:"wxf",
             rank_label_style:"Roman",
             file_label_style:"Arabic"
         },
@@ -629,7 +629,7 @@ var PIECE_TYPES = {
     // parlett: movement of piece in extended Parlett notation
     // letter: uppercase character representing the piece in FEN
     // alg_letter: uppercase character for algebraic notation [defaults to FEN letter]
-    // cnx_letter: uppercase character for Chinese notation (as in David Li's books)
+    // wxf_letter: uppercase character for Chinese notation (as in David Li's books)
     // figurines: [white, black] Unicode strings for Figurine Algebraic Notation
     // hex: plane 1 (or higher) Unicode hex string, one character representing the piece
     //   U+#####. This is not a \u escape because that only accepts 4 hex digits!
@@ -829,18 +829,18 @@ var PIECE_TYPES = {
     /*1*/ soldier: {parlett: "1>", url:"http://en.wikipedia.org/wiki/Shogi", image:"shogipawn", aka:["shogipawn", "fu"]/*, promotion_rank:9*/, tags:"generals "}, // TODO: optional promotion
     chinesepawn: {parlett: "1>", url:"pc:pawn-xiangqi", aka:["chinesepawn", "fu"], 
 	// 1>, but when crosses "river", promotes and can move 1=
-	promote:["advancedsoldier"], promotion_rank:6, tags:"generals ", cnx_letter:"P"}, 
+	promote:["advancedsoldier"], promotion_rank:6, tags:"generals ", wxf_letter:"P"}, 
     /*2*/ goose: {parlett: "o1X>", url:"akm", image:"goose", tags:"generals "},
     swan: {parlett: "1X>", image:"ferzf", tags:"generals "},
     /*3*/ drunk: {parlett: "1=", url:"akm", image:["drunk", "pawn90cw", "pawn90ccw"], tags:"generals "},
     /*4*/ sailor: {parlett: "1X<", image:["ship", "ferzb"], url:"akm", tags:"generals "}, 
     /*5*/ backslider: {parlett: "1<", url:"akm", tags:"generals "}, 
     /*12*/ plasticgeneral: {parlett: "1>, 1X>", aka:"notcoppergeneral", url:"akm", tags:"generals "},     // akm says coppergeneral can't move backwards, but shogi disagrees, so I call it plasticgeneral
-    /*13*/ advancedsoldier: {parlett: "1>, 1=", url:"akm", aka:["drunkensoldier", "rivercrossedpawn"], cnx_letter:"P", tags:"generals "},  // for Xiangqi after passing the river
+    /*13*/ advancedsoldier: {parlett: "1>, 1=", url:"akm", aka:["drunkensoldier", "rivercrossedpawn"], wxf_letter:"P", tags:"generals "},  // for Xiangqi after passing the river
     /*14*/ marine: {parlett: "1X<, 1>", url:"akm", aka:"wazirferzhunter", tags:"generals "}, 
     /*15*/ adjutant: {parlett: "1>, 1<", url:"akm", aka:["tsiu-yin", "chuuuin", "gobetween", "doublefootsoldier"], image:"general3", tags:"generals "}, 
     /*23*/ sidewinder: {parlett: "1X>, 1=", url:"akm", tags:"generals "}, 
-    /*24*/ ferz: {parlett: "1X", letter: "XF", image:["ferz", "ferz2", "1bishop", "1bishop2"], url:"pc:ferz", aka:["adviser", "firzin"], tags:"generals ", cnx_letter:"A"}, // or ~1/1
+    /*24*/ ferz: {parlett: "1X", letter: "XF", image:["ferz", "ferz2", "1bishop", "1bishop2"], url:"pc:ferz", aka:["adviser", "firzin"], tags:"generals ", wxf_letter:"A"}, // or ~1/1
     /*25*/ //ferzwazirhunter: {parlett: "1<, 1X>", url:"akm", tags:"generals "}, // TODO: image
     /*34*/ drunkensailor: {parlett: "1=, 1X<", image:"shipinv", url:"akm", tags:"generals "}, 
     /*35*/ drunkenbackslider: {parlett: "1=, 1<", url:"akm", aka:["reversesoldier"], tags:"generals ", image:["drunkbackslider2", "drunkbackslider"]},
@@ -1017,7 +1017,7 @@ var PIECE_TYPES = {
     crownedcamel: {parlett: "#camel, #ferz"},
     camelking: {parlett: "#camel, #king", image:["simplecamelking", "cbjcamelking", "tinyscamelking"]},
     // TODO: telepotency - can attack opposing general on same open file. Like a capture but only for specific piece. New need syntax, maybe c(king)n+?
-    general: {parlett: "#wazir", royal: true, url:"pc:general", image:["general2", "general"], aka:["chineseking"], cnx_letter:"K"}, 
+    general: {parlett: "#wazir", royal: true, url:"pc:general", image:["general2", "general"], aka:["chineseking"], wxf_letter:"K"}, 
     // http://www.mayhematics.com/v/gm.htm has a different definition of wizard
     wizard: {parlett: "#camel, #ferz", image:"moon",  url:"pc:wizard", hex: "U+1F319"},
     fad: {parlett: "#ferz, #alfil, #warmachine", image:["elephantferzwarmachine"], url:"pc:fad"},
@@ -1041,7 +1041,7 @@ var PIECE_TYPES = {
 
     //murray_lion: {parlett: "~0/2, ~2/2, c1*", letter: "XM"}, // TODO: image
     lion: {parlett: "~n*", letter: "XL", url:"pc:lion"},
-    elephant: {parlett: "2X", letter: "E", image:["elephantmodern", "elephant1"], url:"pc:elephant", aka:["minister"], hex:"U+1F418", cnx_letter:"E"}, // Not a leaper, path can be blocked (unlike alfil, ~2X)
+    elephant: {parlett: "2X", letter: "E", image:["elephantmodern", "elephant1"], url:"pc:elephant", aka:["minister"], hex:"U+1F418", wxf_letter:"E"}, // Not a leaper, path can be blocked (unlike alfil, ~2X)
 
     // TODO: support ~0/0 for "null move" (---), but don't let drop to null, instead show a button
     //kraken: {parlett: "~n/m ~0/0"},     // any square, not realistic since always checkmates! TODO: image
@@ -1114,7 +1114,7 @@ var PIECE_TYPES = {
     // Hoppers
     //checker: {parlett: "cn(^2X)>, o1X>", url:"http://en.wikipedia.org/wiki/Fairy_chess_piece#Notations"}, // TODO: movement
     
-    //cannon: {parlett: "on+, cn+^^", aka:["pao"], cnx_letter:"C"}, // TODO: movement. Like rook, but hops.
+    //cannon: {parlett: "on+, cn+^^", aka:["pao"], wxf_letter:"C"}, // TODO: movement. Like rook, but hops.
     //vao: {parlett: "onX, cnX^^"}, // TODO: movement. Like bishop, but hops.
     //leo: {letter: "XO", parlett: "on*, c^&", url:"http://en.wikipedia.org/wiki/Fairy_chess_piece#Notable_examples"}, // TODO: locust movement, cn*^&?? cn*^^?. Like queen, but hops
     
@@ -2626,11 +2626,11 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
         // Chinese Chess (Xiangqi), as used in _First Syllabus on Xiangqi: Chinese Chess 1_ by David H. Li
         var has_horizontal_component = starting.x !== move.x;
         var has_vertical_component = starting.y !== move.y;
-        var direction, cnx_dest;
+        var direction, wxf_dest;
         if (has_horizontal_component && !has_vertical_component) {
             // K4=# lateral (sideways) to # file
             direction = "=";
-            cnx_dest = file_from_perspective(color, move.x);
+            wxf_dest = file_from_perspective(color, move.x);
         } else if (has_vertical_component && !has_horizontal_component) {
             // Up/down is from from player's perspective
             var points_up = dest_y_from_perspective - starting_y_from_perspective;
@@ -2641,7 +2641,7 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
                 // K4-# down relative # point(s)
                 direction = "-";
             }
-            cnx_dest = Math.abs(points_up);
+            wxf_dest = Math.abs(points_up);
         } else {
             // A4+# diagonal to # file
             if (dest_y_from_perspective > starting_y_from_perspective) {
@@ -2649,19 +2649,19 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
             } else {
                 direction = "-";
             }
-            cnx_dest = file_from_perspective(color, move.x);
+            wxf_dest = file_from_perspective(color, move.x);
         }
 
         // TODO: may need to disambiguate rooks! with RR and FR
-        var cnx_piece_letter = PIECE_TYPES[piece.type].cnx_letter || piece_letter;
+        var wxf_piece_letter = PIECE_TYPES[piece.type].wxf_letter || piece_letter;
 
-        ps.cnx.push([piece, square,     [cnx_piece_letter + file_from_perspective(color, starting.x) + direction + cnx_dest                                        ], move]);
+        ps.wxf.push([piece, square,     [wxf_piece_letter + file_from_perspective(color, starting.x) + direction + wxf_dest                                        ], move]);
 
         // Optional " xP" if capture
-        var cnx_capture = "";
+        var wxf_capture = "";
         if (captured_piece) {
-            var cnx_captured_letter = PIECE_TYPES[captured_piece.type].cnx_letter || captured_letter;
-            ps.cnx.push([piece, square, [cnx_piece_letter + file_from_perspective(color, starting.x) + direction + cnx_dest + " " + capture_x + cnx_captured_letter], move]);
+            var wxf_captured_letter = PIECE_TYPES[captured_piece.type].wxf_letter || captured_letter;
+            ps.wxf.push([piece, square, [wxf_piece_letter + file_from_perspective(color, starting.x) + direction + wxf_dest + " " + capture_x + wxf_captured_letter], move]);
         } 
     });
 
@@ -4952,7 +4952,7 @@ function create_board()
         if (PREFS.rank_label_style === "Arabic") {
             rank_label = y2rank(rank);
         } else if (PREFS.rank_label_style === "Roman") {
-            rank_label = y2rank_cnx("white", rank);
+            rank_label = y2rank_wxf("white", rank);
         } else {
             assert(false, "invalid rank label style: " + PREFS.rank_label_style);
         }
@@ -7283,6 +7283,12 @@ function x2file(x)
     return String.fromCharCode(x + "a".charCodeAt(0) - 1);
 }
 
+// TODO: generic number-to-label converter
+// Latin: a-z (aa-..), for x2file
+// Arabic: 1-9 (10-..), simply .toString()
+// Roman: i-x
+// Chinese: 一 to 十 http://en.wikipedia.org/wiki/Chinese_numerals
+
 // Convert a number to a lowercase Roman numeral
 function number2roman(n)
 {
@@ -7294,7 +7300,7 @@ function number2roman(n)
 
 // Convert an (one-based) Y coordinate to a Roman numeral file number from the player's perspective
 // TODO: use this for labels!
-function y2rank_cnx(color, y)
+function y2rank_wxf(color, y)
 {
     return number2roman((color === "white" ? y: (GAME_STATE.files) - y));
 }
