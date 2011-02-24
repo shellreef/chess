@@ -980,8 +980,8 @@ var PIECE_TYPES = {
     //rhinocamelrider: {parlett: "#rhino, #camelrider"},
     //rhinozebra: {parlett: "#rhino, #zebra"},
     //rhinozebrarider: {parlett: "#rhino, #zebrarider"},
-    //scorpion: {parlett: "#man, #grasshopper"}, 
-    //scorpionpawn: {parlett: "#scorpion, #pawn"},
+    scorpion: {parlett: "#man, #grasshopper"}, 
+    scorpionpawn: {parlett: "#scorpion, #pawn"},
     queenalfilwarmachine: {parlett: "#queen, #alfil, #warmachine", image:"queenalfildabbaba3"},
     // TODO: herowarmachinewazir, lemurianwarmachinewazir, flexibleknight, linearchieftainjumpinggeneral, from http://chessvariants.wikidot.com/joe-s-strange-notation
     wazirwarmachinealfil: {parlett: "#wazir, #warmachine, #alfil", image:"wazirdababaalfil"},
@@ -1136,14 +1136,14 @@ var PIECE_TYPES = {
     //nightriderhopper: {parlett: "(~1/2&)^&", pc:"akm"}, // TODO: movement notation?
 
     // Chinese hoppers: move as rider, capture as line-hopper
-    //cannon: {parlett: "on+, cn+^&", aka:["pao"], wxf_letter:"C", cn_letter:"炮"}, // TODO: movement. Like rook, but capture move requires a "screen" to hop over immediately in front; line-hopper
+    cannon: {parlett: "on+, cn+^&", aka:["pao"], wxf_letter:"C", cn_letter:"炮"}, // TODO: movement. Like rook, but capture move requires a "screen" to hop over immediately in front; line-hopper
     //vao: {parlett: "onX, cnX^&"}, // like bishop
     //leo: {letter: "XO", parlett: "on*, cn*^&", url:"http://en.wikipedia.org/wiki/Fairy_chess_piece#Notable_examples"}, 
     
     // Fore-hoppers
-    //grasshopper: {parlett: "n*^", aka:"queenhopper", url:"http://en.wikipedia.org/wiki/Grasshopper_(chess)"}, // TODO: movement
-    //rookhopper: {parlett: "n+^", pc:"akm"},
-    //bishopper: {parlett: "nX^", pc:"akm"},
+    grasshopper: {parlett: "n*^", aka:"queenhopper", url:"http://en.wikipedia.org/wiki/Grasshopper_(chess)"}, // TODO: movement
+    rookhopper: {parlett: "n+^", pc:"akm"}, // TODO: image
+    bishopper: {parlett: "nX^", pc:"akm"}, // TODO: image
     //kangaroo: {parlett: "n*^^", pc:"akm"}, // TODO: movement, hops over *two* hurdles
 
     // TODO: locust movement (captures hurdle), cn*^&?? cn*^^?. 
@@ -1228,9 +1228,9 @@ var SAVED_BOARDS = {
 // TODO: Minishogi, 5x5 board, http://en.wikipedia.org/wiki/Minishogi
 
 // Chinese Chess (Xiangqi),
-"Chinese Chess (Xiangqi) (w/o cannons)": "rhex(ferz)x(general)x(ferz)ehr///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)///RHEX(ferz)X(general)X(ferz)EHR w - - rs=xiangqi",
+"Chinese Chess (Xiangqi)": "rhex(ferz)x(general)x(ferz)ehr//1x(cannon)5x(cannon)/x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)/1X(cannon)5X(cannon)//RHEX(ferz)X(general)X(ferz)EHR w - - rs=xiangqi",
 
-"Chinese Chess (Xiangqi, Westernized) (w/o cannons)": "rhex(ferz)x(general)x(ferz)ehr///x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)///RHEX(ferz)X(general)X(ferz)EHR w - - rs=xiangqiw",
+"Chinese Chess (Xiangqi, Westernized)": "rhex(ferz)x(general)x(ferz)ehr//1x(cannon)5x(cannon)/x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)//1X(cannon)5X(cannon)/RHEX(ferz)X(general)X(ferz)EHR w - - rs=xiangqiw",
 
 // TODO: http://www.chessvariants.org/xiangqivariants.dir/yangqi.htm
 
@@ -1378,7 +1378,7 @@ var SAVED_BOARDS = {
 "Test Riders": "B2R4/5X(barcrider)2/4Q3/4XN3/2X(alibabariderferz)3X(stone)1/3X(crabrider)1X(warmachinerider)X(squirrelrider)1/2X(alfilrider)X(camelrider)2X(zebrarider)1/4X(girafferider)3 w - - 0 1",
 "Test Complex Riders": "1X(crookedbishop)/8/3X(dummy)/4X(griffon)/7X(panda)//5X(slipbishop) w - -",
 "Test Complex Riders I": "8/8/8/8/4X(crookedrook) w - -",
-"Test Hoppers": "///4X(grasshopper)kx(dummy)//4X(dummy) w - -",
+"Test Fore-hoppers": "/2X(rookhopper)2x(dummy)/5X(bishopper)/4X(grasshopper)kx(dummy)//2x(dummy)1X(dummy) w - -",
 "Test Chinese Pieces": "8/8/8/3X(moa)X(moo)/3hH3/8/8/8 w - -",
 "Test Amphibians": "4k/8/8/slslslsl/8/8/FFFFFFFF/4K w - -",
 "Test Royalty": "x(royalrook)x(royalknight)x(royalbishop)xjkx(royalbishop)x(royalknight)x(royalrook)/pppppppp/8/8/8/8/PPPPPPPP/X(royalrook)X(royalknight)X(royalbishop)XJKX(royalbishop)X(royalknight)X(royalrook) w KQkq -",
