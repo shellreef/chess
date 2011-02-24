@@ -971,6 +971,7 @@ var PIECE_TYPES = {
     giraffeferz: {parlett: "#giraffe, #ferz"},
     giraffewazir: {parlett: "#giraffe, #wazir"},
     knightcamelzebra: {parlett: "#knight, #camel, #zebra"},
+    //lynx: {parlett: "#rook, #knight, #zebra", pc:"akm"},  // TODO: image
     rookwarmachine: {parlett: "#rook, #warmachine", image:"rookdabbaba"},
     rookelephantrider: {parlett: "#rook, #alfilrider"},
     narrowknightferz: {parlett: "#narrowknight, #ferz"},
@@ -1114,14 +1115,47 @@ var PIECE_TYPES = {
     //forfnifurlrurking: {parlett: "~1/2>, n=, n>, 1*", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/fhnfrlrk.html"}, // TODO: image
  
     // Hoppers
-    //checker: {parlett: "cn(^2X)>, o1X>", url:"http://en.wikipedia.org/wiki/Fairy_chess_piece#Notations"}, // TODO: movement
-    
-    //cannon: {parlett: "on+, cn+^^", aka:["pao"], wxf_letter:"C", cn_letter:"炮"}, // TODO: movement. Like rook, but capture move requires a "screen" to hop over immediately in front, then rook
-    //vao: {parlett: "onX, cnX^^"}, // TODO: movement. Like bishop, but hops.
-    //leo: {letter: "XO", parlett: "on*, c^&", url:"http://en.wikipedia.org/wiki/Fairy_chess_piece#Notable_examples"}, // TODO: locust movement, cn*^&?? cn*^^?. Like queen, but hops
-    
-    grasshopper: {parlett: "n*^", url:"http://en.wikipedia.org/wiki/Grasshopper_(chess)"}, // TODO: movement
+
+    // http://www.mayhematics.com/v/gm.htm
+    // Hoppers vary in how far the hurdle can be from the source and destination
+    // Jumping left to right, / is the piece start, = is the hurdle, ... is any number of squares, \ is where it lands:
+    //
+    //  ---->
+    //  _____
+    // /  =  \
+    // 
+    // /=\          step-hop
+    // /...=\       fore-hop    ^
+    // /=...\       contra-hop
+    // /...=...\    line-hop    ^&
    
+    // Line-hoppers
+    //rion: {parlett: "n+^&", aka:"rooklinehopper", pc:"akm"},
+    //bion: {parlett: "nX^&", aka:["bishlion", "bishoplinehopper"], pc:"akm"},
+    //lion: {parlett: "n*^&", aka:"queenlinehopper", pc:"akm"},  // TODO: reconcile with ~n* lion
+    //nightriderhopper: {parlett: "(~1/2&)^&", pc:"akm"}, // TODO: movement notation?
+
+    // Chinese hoppers: move as rider, capture as line-hopper
+    //cannon: {parlett: "on+, cn+^&", aka:["pao"], wxf_letter:"C", cn_letter:"炮"}, // TODO: movement. Like rook, but capture move requires a "screen" to hop over immediately in front; line-hopper
+    //vao: {parlett: "onX, cnX^&"}, // like bishop
+    //leo: {letter: "XO", parlett: "on*, cn*^&", url:"http://en.wikipedia.org/wiki/Fairy_chess_piece#Notable_examples"}, 
+    
+    // Fore-hoppers
+    //grasshopper: {parlett: "n*^", aka:"queenhopper", url:"http://en.wikipedia.org/wiki/Grasshopper_(chess)"}, // TODO: movement
+    //rookhopper: {parlett: "n+^", pc:"akm"},
+    //bishopper: {parlett: "nX^", pc:"akm"},
+    //kangaroo: {parlett: "n*^^", pc:"akm"}, // TODO: movement, hops over *two* hurdles
+
+    // TODO: locust movement (captures hurdle), cn*^&?? cn*^^?. 
+    //checker: {parlett: "cn(^2X)>, o1X>", url:"http://en.wikipedia.org/wiki/Fairy_chess_piece#Notations"}, // TODO: movement; difficult because it must hop to the end
+
+    // Bifurcating pieces, have a path that forks
+    //moose: {parlett: "n*\\45^"}, // TODO: movement, like grasshopper but turns 45 degrees over hurdle 
+    //eagle: {parlett: "n*\\90^", pc:"akm"}, // TODO: movement, like grasshopper but lands to left or right of hurdle 
+    //sparrow: {parlett: "n*\\135^", pc:"akm"}, // TODO: movement, like grasshopper but turns 135 degrees over hurdle
+    //jibber: {parlett: "n*\\180^", pc:"akm"}, // TODO: movement, like grasshopper but to cell in front of hurdle
+  
+
     // Complex riders
     
     griffon: {parlett: "[1,0](n+>), [1,0](n+<), [0,1](n+>>), [0,1](n+<<), [-1,0](n+<), [-1,0](n+>), [0,-1](n+<<), [0,-1](n+>>)", 
