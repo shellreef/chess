@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <!-- TODO <base href="http://xyzzy.freeshell.org/chess/"> -->
 <title>Chess by Jeff</title>
-<!-- Copyright (C) 2009-2010 Jeff Connelly -->
+<!-- Copyright (C) 2009-2011 Jeff Connelly -->
 <!-- Created:20090411 -->
 <style type="text/css">
 
@@ -161,6 +161,7 @@ var AVAILABLE_NOTATIONS = {
     wxf:  "World Xiangqi Federation Notation",//        C2=5        H8+7
     xq:   "Traditional Chinese Xiangqi"//               車二平五    馬8進7
     // TODO: http://en.wikipedia.org/wiki/Xiangqi#Notational_system_1 and http://en.wikipedia.org/wiki/Xiangqi#Notational_system_3_.28unofficial.2C_for_players_of_Western_Chess.29
+    // TODO: http://en.wikipedia.org/wiki/Taikyoku_shogi#Game_notation
 };
 
 // Preferences, not game state.
@@ -1130,7 +1131,7 @@ var PIECE_TYPES = {
     // /...=...\    line-hop    ^&
    
     // Line-hoppers
-    //rion: {parlett: "n+^&", aka:"rooklinehopper", pc:"akm"},
+    rion: {parlett: "n+^&", aka:"rooklinehopper", pc:"akm"},
     //bion: {parlett: "nX^&", aka:["bishlion", "bishoplinehopper"], pc:"akm"},
     //lion: {parlett: "n*^&", aka:"queenlinehopper", pc:"akm"},  // TODO: reconcile with ~n* lion
     //nightriderhopper: {parlett: "(~1/2&)^&", pc:"akm"}, // TODO: movement notation?
@@ -1142,7 +1143,7 @@ var PIECE_TYPES = {
     
     // Fore-hoppers
     grasshopper: {parlett: "n*^", aka:"queenhopper", url:"http://en.wikipedia.org/wiki/Grasshopper_(chess)"}, // TODO: movement
-    rookhopper: {parlett: "n+^", pc:"akm"}, // TODO: image
+    rookhopper: {parlett: "n+^", pc:"akm"},
     bishopper: {parlett: "nX^", pc:"akm"}, // TODO: image
     //kangaroo: {parlett: "n*^^", pc:"akm"}, // TODO: movement, hops over *two* hurdles
 
@@ -1378,7 +1379,9 @@ var SAVED_BOARDS = {
 "Test Riders": "B2R4/5X(barcrider)2/4Q3/4XN3/2X(alibabariderferz)3X(stone)1/3X(crabrider)1X(warmachinerider)X(squirrelrider)1/2X(alfilrider)X(camelrider)2X(zebrarider)1/4X(girafferider)3 w - - 0 1",
 "Test Complex Riders": "1X(crookedbishop)/8/3X(dummy)/4X(griffon)/7X(panda)//5X(slipbishop) w - -",
 "Test Complex Riders I": "8/8/8/8/4X(crookedrook) w - -",
-"Test Fore-hoppers": "/2X(rookhopper)2x(dummy)/5X(bishopper)/4X(grasshopper)kx(dummy)//2x(dummy)1X(dummy) w - -",
+"Test Fore-Hoppers": "/2X(rookhopper)2x(dummy)/5X(bishopper)/4X(grasshopper)kx(dummy)//2x(dummy)1X(dummy) w - -",
+"Test Line-Hoppers": "/2X(rion)2x(dummy)///2X(rion)/2x(dummy) w - -",
+//TODO: "Test Line-Hoppers": "x(cannon)"
 "Test Chinese Pieces": "8/8/8/3X(moa)X(moo)/3hH3/8/8/8 w - -",
 "Test Amphibians": "4k/8/8/slslslsl/8/8/FFFFFFFF/4K w - -",
 "Test Royalty": "x(royalrook)x(royalknight)x(royalbishop)xjkx(royalbishop)x(royalknight)x(royalrook)/pppppppp/8/8/8/8/PPPPPPPP/X(royalrook)X(royalknight)X(royalbishop)XJKX(royalbishop)X(royalknight)X(royalrook) w KQkq -",
@@ -1399,6 +1402,7 @@ var SAVED_BOARDS = {
 "Test Stalemate (half-win)":     "k7/2Q5/8/8/p7/1P6/8/8 w KQkq - fmvn=5 stalemate=halfwin",
 "Test Stalemate (loss)":     "k7/2Q5/8/8/p7/1P6/8/8 w KQkq - fmvn=5 stalemate=loss",
 "Test Remove Check by Capture":     "4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5",
+"Test Double-check": "4k/3N/2Q w - - -",
 "Test Promotion":     "K/1X(fiveriderpawn)1X(ccpawn)X(rrpawn)X(nnpawn)X(pkpawn)/8/PX(makrukpawn)/5X(makrukpawn).X(chinesepawn)/8/pppppppp/7k w - -",
 "Test Promotion to Rook": "8/k1P5/p7/P3K3/8/8/8/8 w - - 0 53", // from http://chessteacher.110mb.com/2008/10/22/minor-promotion/
 "Test Promotion to Bishop": "8/5P1k/5K1p/7P/8/8/8/8 w - - 0 51",
@@ -2377,7 +2381,7 @@ function ask_to_promote(piece, tieback, is_immediate)
 function in_check(victim_color, all_moves)
 {
     var royals;
-    var attacked = false;
+    var attacked = 0;
 
     // Pieces that can't be captured and need to move if attacked
     royals = [];
@@ -2405,7 +2409,7 @@ function in_check(victim_color, all_moves)
                     if (move.x === square.x && move.y === square.y) { 
                         // Being attacked!
                         //console.log("CHECKED BY",piece,filerank,xy2filerank(move));
-                        attacked = true;
+                        attacked += 1;  // number of times checked (check, double-check, triple-check, quadruple-check, etc.)
                     }
                 });
             });
@@ -4598,8 +4602,10 @@ function set_turn(color, historical)
     // Results. 
     if (checked && !no_moves) {
         set_check_message("Check!");
-        text_move = "+";
-        // TODO: detect double-check, allow ++ for descriptive/algebraic descriptive, but not algebraic
+        // Show + number of times piece is checked
+        // + check, ++ double-check, +++ triple-check, ++++ quadruple-check etc.
+        text_move = new Array(checked + 1).join("+")
+        // TODO: still use only "+" for algebraic (but keep ++ etc. for descriptive and others)
     } else if (!checked && no_moves) {
         if (GAME_STATE.stalemate === undefined) {
             // Usual rules: stalemate is a draw
