@@ -46,10 +46,15 @@ a.active_move { border-bottom: 1px dashed; background-color: #ff0; border: 1px s
 .draggable { position: absolute; cursor: move; }
 
 /* TODO: switch to divs, for flexibility, and use background-image.. or maybe not */
-img.piece
+div.piece
 { 
  border: none;
  margin: 0px;
+
+
+ /* Note: images might not actually all be 50px, but should be close */
+ width: 50px;
+ height: 50px;
 
  /* Make captured pieces (smaller) look better on IE7+. See
   * http://www.gabrielweinberg.com/blog/2009/06/things-about-web-images-i-just-learned.html
@@ -73,9 +78,9 @@ img.captured
  height: 25px;
 }
 
-img.black {}
-img.white {}
-img.neutral {}
+div.black {}
+div.white {}
+div.neutral {}
 
 .canvas-board
 {
@@ -1128,7 +1133,7 @@ var PIECE_TYPES = {
     // /=\          step-hop
     // /...=\       fore-hop    ^
     // /=...\       contra-hop
-    // /...=...\    line-hop    ^&
+    // /...=...\    line-hop    ^& (TODO)
    
     // Line-hoppers
     rion: {parlett: "n+^&", aka:"rooklinehopper", pc:"akm"},
@@ -1247,8 +1252,9 @@ var SAVED_BOARDS = {
 // Note that in this implementation, only 4-move castling is supported, but chessvariants.com describes how one, two, three, or four is supported.
 "Wildebeest Chess": "rnwwx(gnu)kqbbnr/ppppppppppp///////PPPPPPPPPPP/RNWWX(gnu)KQBBNR w AKak - files=11 ranks=10 stalemate=win rs=quad_castle shredder_castle",
 "Taikyoku Shogi": "/ w - - ranks=36 files=36",  // TODO
+//TODO: http://en.wikipedia.org/wiki/Tenjiku_shogi
 // TODO: Modern variants
-// Ultima
+// TODO: Ultima
 
     },
 
@@ -7214,8 +7220,9 @@ function create_piece(color, type)
     // Create the node
     // TODO Use a div with background-image instead, then can have arbitrary
     // characters, instead of just images, more flexible, maybe transition too.
-    piece = dojo.create("img", {src:filename, "class":classes.join(" "), 
-            className:classes.join(" ")});
+    //piece = dojo.create("img", {src:filename, "class":classes.join(" "), className:classes.join(" ")});
+    piece = dojo.create("div", {"class":classes.join(" "), className:classes.join(" "), style:"background-image: url(" + filename + ")"});
+    //dojo.create("img", {src:filename}, piece);
 
     // Property will tell name of piece. To tell what color, or if it is
     // a piece in the first place, check the class names.
