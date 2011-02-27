@@ -45,7 +45,7 @@ a.active_move { border-bottom: 1px dashed; background-color: #ff0; border: 1px s
 /* Element that can be dragged */
 .draggable { position: absolute; cursor: move; }
 
-/* TODO: switch to divs, for flexibility, and use background-image.. or maybe not */
+/* Piece object - for flexibility, this is a <div> with a CSS background-image, instead of an <img> */
 div.piece
 { 
  border: none;
@@ -74,6 +74,13 @@ div.piece
   * http://www.the-art-of-web.com/css/timing-function/ section 4, but
   * that is even worse. */
  /*-webkit-transition: background 1s linear;*/
+
+
+ /* For textContents overlaid on image */
+ /* TODO: get vertical-align working, see http://phrogz.net/css/vertical-align/index.html */
+ text-align: center;  
+ vertical-align: middle;
+ display: table-cell;
 }
 
 div.captured
