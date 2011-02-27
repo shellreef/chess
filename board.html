@@ -6581,7 +6581,11 @@ function show_library_images()
             var paths = image_path_for(type, "white", true);
 
             for (var i = 0; i < paths.length; i += 1) {
-                used_paths[paths[i]] = type + (i === 0 ? "" : " (alternate image)");
+                var path_split = paths[i].split("#", 2);
+                var path = path_split[0];
+                var text = path_split[1];
+
+                used_paths[path] = type + (i === 0 ? "" : " (alternate image)") + (text ? " (overlaid " + text + ")" : "");
                 count += 1;
             }
         }
