@@ -52,9 +52,13 @@ div.piece
  margin: 0px;
 
 
- /* Note: images might not actually all be 50px, but should be close */
- width: 50px;
- height: 50px;
+ /* Note: images might not actually all be this size, but should be close (TODO: resize them all!) */
+ width: 49px;
+ height: 49px;
+
+ /* Scale to fit.. important for miniature (captured) piece images, otherwise they'll be clipped */
+ /* Note this is a CSS3 property */
+ background-size: 100%;
 
  /* Make captured pieces (smaller) look better on IE7+. See
   * http://www.gabrielweinberg.com/blog/2009/06/things-about-web-images-i-just-learned.html
@@ -72,10 +76,11 @@ div.piece
  /*-webkit-transition: background 1s linear;*/
 }
 
-img.captured
+div.captured
 {
  width: 25px;
  height: 25px;
+ position: static;
 }
 
 div.black {}
@@ -5578,11 +5583,8 @@ function update_captured_piece_images(piece)
         // Currently you can't really, even in setup mode.
         // For Shogi (but captured pieces would need to change colors), where can drop
         // captured pieces back onto the board. create_piece() then add captured class.
-        html += '<img src="' + image_path_for(p.type, p.color) + '" class="captured"> ';
-
         var piece = create_piece(p.color, p.type);
         dojo.addClass(piece, "captured");
-        piece.style.position = "static";
 
         captured.appendChild(piece);
     }
@@ -5590,7 +5592,6 @@ function update_captured_piece_images(piece)
         var p = GAME_STATE.captured.black[i];
 
         var piece = create_piece(p.color, p.type);
-        piece.style.position = "static";
         dojo.addClass(piece, "captured");
 
         captured.appendChild(piece);
