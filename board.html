@@ -78,6 +78,7 @@ div.piece
 
  /* For optional textContents overlaid on image */
  text-align: center;  
+ font-weight: bold;
  line-height: 49px;     /* center, by matching to div height */
 }
 
@@ -6581,6 +6582,7 @@ function show_library_images()
             var paths = image_path_for(type, "white", true);
 
             for (var i = 0; i < paths.length; i += 1) {
+                // Get base image, and optional overlay text
                 var path_split = paths[i].split("#", 2);
                 var path = path_split[0];
                 var text = path_split[1];
@@ -6588,6 +6590,7 @@ function show_library_images()
                 if (!used_paths[path]) {
                     used_paths[path] = "";
                 } else {
+                    // Same base image for multiple pieces
                     used_paths[path] += "<br>";
                 }
 
@@ -6804,13 +6807,18 @@ function show_piece_inspector(piece)
     dojo.byId("inspector-type").innerHTML = piece.type + alt_names_string;
 
     // Show all the images, in order of preference.
-    image_htmls = [];
-    paths = image_path_for(piece.type, piece.color, true);
-    for (var i = 0; i < paths.length; i += 1) {
-        image_htmls.push("<img src=\"" + paths[i] + "\">");
+    var images = dojo.byId("inspector-image");
+    images.innerHTML = "";
+    var images_count = image_path_for(piece.type, piece.color, true).length;    // TODO: stop being ugly
+    for (var i = 0; i < images_count; i += 1) {
+        var piece_image = create_piece(piece.color, piece.type, true, true, i);
+        piece_image.style.float = "left";
+        images.appendChild(piece_image);
     }
+    dojo.create("br", {clear:"all"}, images);
+    
 
-    dojo.byId("inspector-image").innerHTML = image_htmls.join(" ");
+
     dojo.byId("inspector-movement").innerHTML = escape_html(type_info.parlett);
     dojo.byId("inspector-tags").innerHTML = type_info.tags ? escape_html(type_info.tags.replace(piece.type, "")) : "";
 
@@ -7231,14 +7239,20 @@ function out_piece(piece, event)
 
 // Create a new piece by color and type (full name).
 // If faux, then piece cannot be moved (its not on the game board, it might be in a promotion selector etc.)
+// If no_inspector, you can't inspect this piece (only useful if this piece *is* inside the inspector)
+// If image_override is given, it is taken as an index to an alternate image
 // TODO: make this a constructor so you can do new Piece().
-function create_piece(color, type, faux)
+function create_piece(color, type,   faux, no_inspector, image_override)
 {
     var filename, piece, classes;
 
     assert(type, "create_piece(" + type+ "): unrecognized piece type: " + type);
 
-    filename = image_path_for(type, color);
+    filename = image_path_for(type, color, image_override !== undefined);
+
+    if (image_override !== undefined) {
+        filename = filename[image_override];
+    }
 
     // CSS classes, can use with dojo.query and also shown in toString (useful 
     // for debugging), however, note that code should not use this, because
@@ -7280,8 +7294,10 @@ function create_piece(color, type, faux)
 
     // Highlight/unhighlight legal moves on mouse over, like Chess with Friends.
     // Yahoo Games does this too, but uses a yellow outline.
-    piece.onmouseover = function(event) { over_piece(piece, event); };
-    piece.onmouseout = function(event) { out_piece(piece, event); };
+    if (!no_inspector) {
+        piece.onmouseover = function(event) { over_piece(piece, event); };
+        piece.onmouseout = function(event) { out_piece(piece, event); };
+    }
 
     // If has text overlay, set it
     // TODO: this needs to be done elsewhere too, since image_path_for() is used 
