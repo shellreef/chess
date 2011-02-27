@@ -846,7 +846,7 @@ var PIECE_TYPES = {
     //   3 * 3    1=      1=
     //   4 5 4   1X<  1<  1X<
     /*1*/ soldier: {parlett: "1>", url:"http://en.wikipedia.org/wiki/Shogi", image:"shogipawn", aka:["shogipawn", "fu"]/*, promotion_rank:9*/, tags:"generals "}, // TODO: optional promotion
-    chinesepawn: {parlett: "1>", url:"pc:pawn-xiangqi", aka:["chinesepawn", "fu"], 
+    chinesepawn: {image:["circle#兵"], parlett: "1>", url:"pc:pawn-xiangqi", aka:["chinesepawn", "fu"], 
 	// 1>, but when crosses "river", promotes and can move 1=
 	promote:["advancedsoldier"], promotion_rank:6, tags:"generals ", wxf_letter:"P", cn_letter:["兵", "卒"]}, 
     /*2*/ goose: {parlett: "o1X>", url:"akm", image:"goose", tags:"generals "},
@@ -6585,7 +6585,13 @@ function show_library_images()
                 var path = path_split[0];
                 var text = path_split[1];
 
-                used_paths[path] = type + (i === 0 ? "" : " (alternate image)") + (text ? " (overlaid " + text + ")" : "");
+                if (!used_paths[path]) {
+                    used_paths[path] = "";
+                } else {
+                    used_paths[path] += "<br>";
+                }
+
+                used_paths[path] += type + (i === 0 ? "" : " (alternate image)") + (text ? " (overlaid " + text + ")" : "");
                 count += 1;
             }
         }
