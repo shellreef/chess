@@ -1147,13 +1147,13 @@ var PIECE_TYPES = {
     // /...=...\    line-hop    ^& (TODO)
    
     // Line-hoppers
-    rion: {parlett: "n+^&", aka:"rooklinehopper", pc:"akm"},
+    //rion: {parlett: "n+^&", aka:"rooklinehopper", pc:"akm"}, // TODO: movement
     //bion: {parlett: "nX^&", aka:["bishlion", "bishoplinehopper"], pc:"akm"},
     //lion: {parlett: "n*^&", aka:"queenlinehopper", pc:"akm"},  // TODO: reconcile with ~n* lion
     //nightriderhopper: {parlett: "(~1/2&)^&", pc:"akm"}, // TODO: movement notation?
 
     // Chinese hoppers: move as rider, capture as line-hopper
-    cannon: {/*TODO: image:[["circle", "炮"]], */parlett: "on+, cn+^&", aka:["pao"], wxf_letter:"C", cn_letter:"炮"}, // TODO: movement. Like rook, but capture move requires a "screen" to hop over immediately in front; line-hopper
+    cannon: {image:["circle#炮"], parlett: "on+, cn+^&", aka:["pao"], wxf_letter:"C", cn_letter:"炮"}, // TODO: movement. Like rook, but capture move requires a "screen" to hop over immediately in front; line-hopper
     //vao: {parlett: "onX, cnX^&"}, // like bishop
     //leo: {letter: "XO", parlett: "on*, cn*^&", url:"http://en.wikipedia.org/wiki/Fairy_chess_piece#Notable_examples"}, 
     
@@ -7097,15 +7097,11 @@ function image_path_for(type, color, all)
     for (var i = 0; i < bases.length; i += 1) {
         var basename, text;
 
-        if (typeof bases[i] === "string") {
-            // Normally image is given as a string only
-            basename = bases[i];
-            text = null;
-        } else {
-            // ...but it can be given as a 2-element array, of the base image *and* text to overlay it
-            basename = bases[i][0];
-            text = bases[i][1];
-        } 
+        // Normally image is given with filename only, but may also have optional
+        // text after hash, to overlay on the image
+        var ary = bases[i].split("#", 2);
+        basename = ary[0];
+        text = ary[1];
 
         var path = [PREFS.image_root, PREFS.image_set, "/", PREFS.image_prefixes[color], basename, PREFS.image_extension].join("");
         if (text) {
