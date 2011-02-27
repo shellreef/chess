@@ -2337,7 +2337,7 @@ function would_promote(piece, move)
 function promote(piece, square, type, notation, is_immediate)
 {
     // TODO: Puff out, or fade in from new to old piece. Is there an
-    // effect that can fade from one image to another? LikE IE page transitions.
+    // effect that can fade from one image to another? Like IE page transitions.
     // http://sachiniscool.blogspot.com/2006/01/implementing-page-transitions-in.html
     // ... except when changing images. Safari has CSS animations.
     // or try CSS transitions, see CSS at the top of this document.
@@ -2375,8 +2375,13 @@ function ask_to_promote(piece, tieback, is_immediate)
             // The move the user selected that will be made
             var notation = tieback[type].notations[PREFS.output_notation];
 
-            //element = create_piece(GAME_STATE.active_color, type);
-            element = dojo.create("img", {src:image_path_for(type, piece.color), piece_type:type, notation:notation});
+            // Create a faux piece to click on
+            element = create_piece(piece.color, type, true);
+
+            // TODO: pass this via the closure instead of through the DOM
+            dojo.attr(element, "piece_type", type);
+            dojo.attr(element, "notation", notation);
+
             element.onclick = function() {
                 // Finishes up the move
                 promote(piece, tieback[type].square, dojo.attr(this, "piece_type"), dojo.attr(this, "notation"), is_immediate);
@@ -7219,8 +7224,9 @@ function out_piece(piece, event)
 
 
 // Create a new piece by color and type (full name).
+// If faux, then piece cannot be moved (its not on the game board, it might be in a promotion selector etc.)
 // TODO: make this a constructor so you can do new Piece().
-function create_piece(color, type)
+function create_piece(color, type, faux)
 {
     var filename, piece, classes;
 
@@ -7235,12 +7241,24 @@ function create_piece(color, type)
     // and dojo's hasClass uses indexOf so its faster, but it still involves
     // parsing, and it is ugly. Probably a design flaw, oh well.
     // Use .type and .piece (set below) instead of classes for speed.
-    classes = ["draggable", "piece", color, type];
+    classes = ["piece", color, type];
 
     // Royal class is very important.
     if (PIECE_TYPES[type].royal) {
         classes.push("royal");
     }
+
+    if (!faux) {
+        // Make all new pieces draggable. I tried only making the active color's
+        // pieces draggable, but then in Safari they can still be selected like text,
+        // even with enable_document_selection(false), maybe I need to enable it on the
+        // images too, but it wasn't appealing. In Firefox, the images can be dragged
+        // as ghosts, which is cool, but instead: now pieces can only be dropped anywhere
+        // if they are the active colors move. The player can drag the opponent's pieces
+        // around but not drop anywhere.
+        classes.push("draggable");
+    }
+
 
     // Create the node
     // TODO Use a div with background-image instead, then can have arbitrary
@@ -7259,16 +7277,8 @@ function create_piece(color, type)
     piece.onmouseover = function(event) { over_piece(piece, event); };
     piece.onmouseout = function(event) { out_piece(piece, event); };
 
-    // Make all new pieces draggable. I tried only making the active color's
-    // pieces draggable, but then in Safari they can still be selected like text,
-    // even with enable_document_selection(false), maybe I need to enable it on the
-    // images too, but it wasn't appealing. In Firefox, the images can be dragged
-    // as ghosts, which is cool, but instead: now pieces can only be dropped anywhere
-    // if they are the active colors move. The player can drag the opponent's pieces
-    // around but not drop anywhere.
-
     // If has text overlay, set it
-    // TODO: this needs to be done elsewhere too, since image_for_path() is used 
+    // TODO: this needs to be done elsewhere too, since image_path_for() is used 
     // in many places, for example in the piece browser and inspector, and it won't show up there! XXX
     if (filename.indexOf("#") != -1) {
         var text = filename.split("#")[1];
