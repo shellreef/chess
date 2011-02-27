@@ -7059,7 +7059,7 @@ function pc(x, y, virtual)
 }
 
 // Return the path to an image for the piece of that color.
-// The path strings are URLs to images, but also with an optional .textContents property for overlaying
+// The path may optionally have # appended by the overlay text
 // If all, then returns an array of all images including alternates,
 // otherwise returns preferred.
 function image_path_for(type, color, all)
@@ -7103,8 +7103,9 @@ function image_path_for(type, color, all)
         } 
 
         var path = [PREFS.image_root, PREFS.image_set, "/", PREFS.image_prefixes[color], basename, PREFS.image_extension].join("");
-
-        path.textContents = text;
+        if (text) {
+            path += "#" + text;
+        }
 
         paths.push(path);
     }
@@ -7266,11 +7267,13 @@ function create_piece(color, type)
     // if they are the active colors move. The player can drag the opponent's pieces
     // around but not drop anywhere.
 
-    //XYZ
+    // If has text overlay, set it
+    // TODO: this needs to be done elsewhere too, since image_for_path() is used 
+    // in many places, for example in the piece browser and inspector, and it won't show up there! XXX
+    if (filename.indexOf("#") != -1) {
+        var text = filename.split("#")[1];
 
-    console.log(filename.textContents);
-    if (filename.textContents) {
-        piece.textContents = filename.textContents;
+        piece.textContent = text;
     }
 
     return piece;
