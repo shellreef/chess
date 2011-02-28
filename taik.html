@@ -536,7 +536,7 @@ for (var name in pieces) {
         continue;
     }
     if (promoted_from[goes_to]) {
-        console.log("Warning: " + name + "," + promoted_from[goes_to] + " -> " + goes_to);
+        //console.log("Warning: " + name + "," + promoted_from[goes_to] + " -> " + goes_to);
     } else {
         promoted_from[goes_to] = [];
     }
@@ -546,15 +546,41 @@ for (var name in pieces) {
 for (var name in pieces) {
     var info = pieces[name]; 
     var letter;
+    var line = "    //" + name + ": {parlett: \"\"";
+
+    info.image = "circle#" + info.kanji;     // TODO: wedge
+    delete info.kanji;
+
+    for (var key in info) {
+        if (key === "parlett") { continue; }
+        line += ", " + key + ": \"" + info[key] + "\"";
+    }
+
     if (letters[name]) {
         letter = letters[name].letter;
     } else {
-        var came_from = promoted_from[name][0];     // TODO: which should it be?
+        var came_froms = promoted_from[name];
+        if (came_froms.length !== 1) {
+            //console.log(came_froms);
+        }
+        // Choose the _first_ that promotes to us for our canonical letter representation
+        // For example: 
+        // YA - Yaksha 
+        // BD - Buddhist Devil 
+        // GU - Guardian of the Gods
+        // WR - Wrestler
+        // all promote to Heavenly Tetrarch. Notation allows +YA, +BD, +GU, +WR to all
+        // represent the Heavenly Tetrarch, but there is no functional difference, so choose +YA.
+        var came_from = came_froms[0];
         if (letters[came_from]) {
             letter = "+" + letters[came_from].letter;
         } else {
-            console.log("No letter for " + name + " or " + came_from);
+            throw "No letter for " + name + " or " + came_from;
         }
     }
+
+    line += ", letter: \"" + letter + "\"},";
+
+    console.log(line);
 }
 </script>

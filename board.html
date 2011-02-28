@@ -1177,308 +1177,310 @@ var PIECE_TYPES = {
     //sparrow: {parlett: "n*\\135^", pc:"akm"}, // TODO: movement, like grasshopper but turns 135 degrees over hurdle
     //jibber: {parlett: "n*\\180^", pc:"akm"}, // TODO: movement, like grasshopper but to cell in front of hurdle
 
-    // Taikyoku Shogi pieces http://en.wikipedia.org/wiki/Taikyoku_shogi#Game_equipment
-    //pbpaste|perl -F'\t' -ane'{chomp $F[3];$F[3]=~tr/ /_/;if($F[3]eq"—"){$p=""}else{$p=qq(, promote:"$F[3]")}; $F[0]=~tr/*//d;$F[0]=~tr/ /_/;$F[0]=lc$F[0]; print qq(//$F[0]: {parlett: "", kanji:"$F[1]", romanji:"$F[2]"$p}\n)}'  
-
-    //king: {parlett: "", kanji:"玉将", romanji:"gyokushō"}
-    //crown_prince: {parlett: "", kanji:"太子", romanji:"taishi", promote:"king"}
-    //gold_general: {parlett: "", kanji:"金将", romanji:"kinshō", promote:"rook"}
-    //right_general: {parlett: "", kanji:"右将", romanji:"ushō", promote:"right_army"}
-    //right_army: {parlett: "", kanji:"右軍", romanji:"ugun"}
-    //left_general: {parlett: "", kanji:"左将", romanji:"sashō", promote:"left_army"}
-    //left_army: {parlett: "", kanji:"左軍", romanji:"sagun"}
-    //rear_standard: {parlett: "", kanji:"後旗", romanji:"kōki", promote:"center_standard"}
-    //free_king: {parlett: "", kanji:"奔王", romanji:"honnō", promote:"great_general"}
-    //free_dream-eater: {parlett: "", kanji:"奔獏", romanji:"honbaku", promote:"free_king"}
-    //wooden_dove: {parlett: "", kanji:"鳩槃", romanji:"kyūhan"}
-    //ceramic_dove: {parlett: "", kanji:"鳩盤", romanji:"kyūban"}
-    //earth_dragon: {parlett: "", kanji:"地龍", romanji:"chiryū", promote:"rain_dragon"}
-    //free_demon: {parlett: "", kanji:"奔鬼", romanji:"honki", promote:"free_king"}
-    //running_horse: {parlett: "", kanji:"走馬", romanji:"sōma, sōba", promote:"free_demon"}
-    //beast_cadet: {parlett: "", kanji:"獣曹", romanji:"jūsō", promote:"beast_officer"}
-    //long-nosed_goblin: {parlett: "", kanji:"天狗", romanji:"tengu"}
-    //mountain_eagle_(left_and_right): {parlett: "", kanji:"山鷲", romanji:"sanshū", promote:"soaring_eagle"}
-    //fire_demon: {parlett: "", kanji:"火鬼", romanji:"kaki", promote:"free_fire"}
-    //free_fire: {parlett: "", kanji:"奔火", romanji:"honka"}
-    //whale: {parlett: "", kanji:"鯨鯢", romanji:"keigei", promote:"great_whale"}
-    //great_whale: {parlett: "", kanji:"大鯨", romanji:"daigei"}
-    //running_rabbit: {parlett: "", kanji:"走兎", romanji:"sōto", promote:"treacherous_fox"}
-    //white_tiger: {parlett: "", kanji:"白虎", romanji:"byakko", promote:"divine_tiger"}
-    //divine_tiger: {parlett: "", kanji:"神虎", romanji:"shinko"}
-    //turtle-snake: {parlett: "", kanji:"玄武", romanji:"genbu", promote:"divine_turtle"}
-    //divine_turtle: {parlett: "", kanji:"神亀", romanji:"shinki"}
-    //lance: {parlett: "", kanji:"香車", romanji:"kyōsha", promote:"white_horse"}
-    //reverse_chariot: {parlett: "", kanji:"反車", romanji:"hensha", promote:"whale"}
-    //fragrant_elephant: {parlett: "", kanji:"香象", romanji:"kōzō", promote:"elephant_king"}
-    //elephant_king: {parlett: "", kanji:"象王", romanji:"zōō"}
-    //white_elephant: {parlett: "", kanji:"白象", romanji:"hakuzō", promote:"elephant_king"}
-    //mountain_dove: {parlett: "", kanji:"山鳩", romanji:"sankyū", promote:"great_dove"}
-    //flying_swallow: {parlett: "", kanji:"飛燕", romanji:"hien", promote:"rook"}
-    //captive_officer: {parlett: "", kanji:"禽吏", romanji:"kinri", promote:"captive_bird"}
-    //captive_bird: {parlett: "", kanji:"禽鳥", romanji:"kinchō"}
-    //rain_dragon: {parlett: "", kanji:"雨龍", romanji:"uryū", promote:"great_dragon"}
-    //forest_demon: {parlett: "", kanji:"森鬼", romanji:"shinki", promote:"thunder_runner"}
-    //thunder_runner: {parlett: "", kanji:"雷走", romanji:"raisō"}
-    //mountain_stag: {parlett: "", kanji:"山鹿", romanji:"sanroku", promote:"great_stag"}
-    //running_pup: {parlett: "", kanji:"走狗", romanji:"sōku", promote:"free_leopard"}
-    //free_leopard: {parlett: "", kanji:"奔豹", romanji:"honpyō"}
-    //running_serpent: {parlett: "", kanji:"走蛇", romanji:"sōja", promote:"Free_serpent"}
-    //free_serpent: {parlett: "", kanji:"奔蛇", romanji:"honja"}
-    //side_serpent: {parlett: "", kanji:"横蛇", romanji:"ōja", promote:"great_shark"}
-    //great_shark: {parlett: "", kanji:"大鱗", romanji:"dairin"}
-    //great_dove: {parlett: "", kanji:"大鳩", romanji:"daikyū", promote:"wooden_dove"}
-    //running_tiger: {parlett: "", kanji:"走虎", romanji:"sōko", promote:"free_tiger"}
-    //free_tiger: {parlett: "", kanji:"奔虎", romanji:"honko"}
-    //running_bear: {parlett: "", kanji:"走熊", romanji:"sōyū", promote:"free_bear"}
-    //free_bear: {parlett: "", kanji:"奔熊", romanji:"hon’yū"}
-    //yaksha: {parlett: "", kanji:"夜叉", romanji:"yasha", promote:"Heavenly_Tetrarch"}
-    //heavenly_tetrarch: {parlett: "", kanji:"四天", romanji:"shiten"}
-    //buddhist_devil: {parlett: "", kanji:"羅刹", romanji:"rasetsu", promote:"Heavenly_Tetrarch"}
-    //guardian_of_the_gods: {parlett: "", kanji:"金剛", romanji:"kongō", promote:"Heavenly_Tetrarch"}
-    //wrestler: {parlett: "", kanji:"力士", romanji:"rikishi", promote:"Heavenly_Tetrarch"}
-    //silver_general: {parlett: "", kanji:"銀将", romanji:"ginshō", promote:"vertical_mover"}
-    //drunken_elephant: {parlett: "", kanji:"酔象", romanji:"suizō", promote:"crown_prince"}
-    //neighboring_king: {parlett: "", kanji:"近王", romanji:"kinnō", promote:"front_standard"}
-    //gold_chariot: {parlett: "", kanji:"金車", romanji:"kinsha", promote:"playful_cockatoo"}
-    //playful_cockatoo: {parlett: "", kanji:"遊母", romanji:"yūmo"}
-    //side_dragon: {parlett: "", kanji:"横龍", romanji:"ōryū", promote:"running_dragon"}
-    //running_dragon: {parlett: "", kanji:"走龍", romanji:"sōryū"}
-    //running_stag: {parlett: "", kanji:"走鹿", romanji:"sōroku", promote:"free_stag"}
-    //free_stag: {parlett: "", kanji:"奔鹿", romanji:"honroku"}
-    //running_wolf: {parlett: "", kanji:"走狼", romanji:"sōrō", promote:"free_wolf"}
-    //free_wolf: {parlett: "", kanji:"奔狼", romanji:"honrō"}
-    //bishop_general: {parlett: "", kanji:"角将", romanji:"kakushō", promote:"rain_demon"}
-    //rain_demon: {parlett: "", kanji:"霖鬼", romanji:"rinki"}
-    //rook_general: {parlett: "", kanji:"飛将", romanji:"hishō", promote:"flying_crocodile"}
-    //flying_crocodile: {parlett: "", kanji:"飛鰐", romanji:"higaku"}
-    //right_tiger: {parlett: "", kanji:"右虎", romanji:"uko", promote:"white_tiger"}
-    //left_tiger: {parlett: "", kanji:"左虎", romanji:"sako", promote:"turtle-snake"}
-    //right_dragon: {parlett: "", kanji:"右龍", romanji:"uryū", promote:"Blue_dragon"}
-    //left_dragon: {parlett: "", kanji:"左龍", romanji:"saryū", promote:"vermillion_sparrow"}
-    //beast_officer: {parlett: "", kanji:"獣吏", romanji:"jūri", promote:"beast_bird"}
-    //beast_bird: {parlett: "", kanji:"獣鳥", romanji:"jūchō"}
-    //wind_dragon: {parlett: "", kanji:"風龍", romanji:"fūryū", promote:"free_dragon"}
-    //free_dragon: {parlett: "", kanji:"奔龍", romanji:"honryū"}
-    //free_pup: {parlett: "", kanji:"奔狗", romanji:"honku", promote:"free_dog"}
-    //free_dog: {parlett: "", kanji:"奔犬", romanji:"honken"}
-    //rushing_bird: {parlett: "", kanji:"行鳥", romanji:"gyōchō", promote:"free_demon"}
-    //old_kite: {parlett: "", kanji:"古鵄", romanji:"kotetsu", promote:"long-nosed_goblin"}
-    //peacock: {parlett: "", kanji:"孔雀", romanji:"kujaku", promote:"long-nosed_goblin"}
-    //water_dragon: {parlett: "", kanji:"水龍", romanji:"suiryū", promote:"phoenix_master"}
-    //fire_dragon: {parlett: "", kanji:"火龍", romanji:"karyū", promote:"kirin_master"}
-    //copper_general: {parlett: "", kanji:"銅将", romanji:"dōshō", promote:"side_mover"}
-    //phoenix_master: {parlett: "", kanji:"鳳師", romanji:"hōshi"}
-    //kirin_master: {parlett: "", kanji:"麟師", romanji:"rinshi"}
-    //silver_chariot: {parlett: "", kanji:"銀車", romanji:"ginsha", promote:"goose_wing"}
-    //goose_wing: {parlett: "", kanji:"鴻翼", romanji:"kōyoko"}
-    //vertical_bear: {parlett: "", kanji:"竪熊", romanji:"shuyū", promote:"free_bear"}
-    //knight: {parlett: "", kanji:"桂馬", romanji:"keima", promote:"side_soldier"}
-    //pig_general: {parlett: "", kanji:"豚将", romanji:"tonshō", promote:"free_pig"}
-    //free_pig: {parlett: "", kanji:"奔豚", romanji:"honton"}
-    //chicken_general: {parlett: "", kanji:"鶏将", romanji:"keishō", promote:"free_chicken"}
-    //free_chicken: {parlett: "", kanji:"奔鶏", romanji:"honkei"}
-    //pup_general: {parlett: "", kanji:"狗将", romanji:"kushō", promote:"free_pup"}
-    //horse_general: {parlett: "", kanji:"馬将", romanji:"bashō", promote:"free_horse"}
-    //free_horse: {parlett: "", kanji:"奔馬", romanji:"honba"}
-    //ox_general: {parlett: "", kanji:"牛将", romanji:"gyūshō", promote:"free_ox"}
-    //free_ox: {parlett: "", kanji:"奔牛", romanji:"hongyū"}
-    //center_standard: {parlett: "", kanji:"中旗", romanji:"chūki", promote:"front_standard"}
-    //side_boar: {parlett: "", kanji:"横猪", romanji:"ōcho", promote:"free_boar"}
-    //free_boar: {parlett: "", kanji:"奔猪", romanji:"honcho"}
-    //silver_rabbit: {parlett: "", kanji:"銀兎", romanji:"ginto", promote:"whale"}
-    //golden_deer: {parlett: "", kanji:"金鹿", romanji:"konroku", promote:"white_horse"}
-    //lion: {parlett: "", kanji:"獅子", romanji:"shishi", promote:"furious_fiend"}
-    //furious_fiend: {parlett: "", kanji:"奮迅", romanji:"funjin"}
-    //captive_cadet: {parlett: "", kanji:"禽曹", romanji:"kinsō", promote:"captive_officer"}
-    //great_stag: {parlett: "", kanji:"大鹿", romanji:"dairoku", promote:"free_stag"}
-    //violent_dragon: {parlett: "", kanji:"猛龍", romanji:"mōryū", promote:"great_dragon"}
-    //woodland_demon: {parlett: "", kanji:"林鬼", romanji:"rinki", promote:"right_phoenix"}
-    //right_phoenix: {parlett: "", kanji:"右鵰", romanji:"ushū"}
-    //vice_general: {parlett: "", kanji:"副将", romanji:"fukushō", promote:"great_general"}
-    //great_general: {parlett: "", kanji:"大将", romanji:"taishō"}
-    //stone_chariot: {parlett: "", kanji:"石車", romanji:"sekisha", promote:"walking_heron"}
-    //walking_heron: {parlett: "", kanji:"歩振", romanji:"fushin"}
-    //cloud_eagle: {parlett: "", kanji:"雲鷲", romanji:"unjū", promote:"strong_eagle"}
-    //strong_eagle: {parlett: "", kanji:"勁鷲", romanji:"keijū"}
-    //bishop: {parlett: "", kanji:"角行", romanji:"kakugyō", promote:"dragon_horse"}
-    //rook: {parlett: "", kanji:"飛車", romanji:"hisha", promote:"dragon_king"}
-    //side_wolf: {parlett: "", kanji:"横狼", romanji:"ōrō", promote:"free_wolf"}
-    //flying_cat: {parlett: "", kanji:"飛猫", romanji:"hibyō", promote:"rook"}
-    //mountain_falcon: {parlett: "", kanji:"山鷹", romanji:"san’ō", promote:"horned_falcon"}
-    //vertical_tiger: {parlett: "", kanji:"竪虎", romanji:"shuko", promote:"free_tiger"}
-    //soldier: {parlett: "", kanji:"兵士", romanji:"heishi", promote:"cavalier"}
-    //cavalier: {parlett: "", kanji:"騎士", romanji:"kishi"}
-    //little_standard: {parlett: "", kanji:"小旗", romanji:"shōki", promote:"rear_standard"}
-    //cloud_dragon: {parlett: "", kanji:"雲龍", romanji:"unryū", promote:"great_dragon"}
-    //copper_chariot: {parlett: "", kanji:"銅車", romanji:"dōsha", promote:"copper_elephant"}
-    //copper_elephant: {parlett: "", kanji:"銅象", romanji:"dōzō"}
-    //running_chariot: {parlett: "", kanji:"走車", romanji:"sōsha", promote:"burning_chariot"}
-    //burning_chariot: {parlett: "", kanji:"炮車", romanji:"hōsha"}
-    //ram’s-head_soldier: {parlett: "", kanji:"羊兵", romanji:"yōhei", promote:"tiger_soldier"}
-    //tiger_soldier: {parlett: "", kanji:"虎兵", romanji:"kohei"}
-    //violent_ox: {parlett: "", kanji:"猛牛", romanji:"mōgyū", promote:"flying_ox"}
-    //great_dragon: {parlett: "", kanji:"大龍", romanji:"dairyū", promote:"ancient_dragon"}
-    //ancient_dragon: {parlett: "", kanji:"元龍", romanji:"genryū, ganryū"}
-    //golden_bird: {parlett: "", kanji:"金翅", romanji:"kinshi", promote:"free_bird"}
-    //free_bird: {parlett: "", kanji:"奔翅", romanji:"honshi"}
-    //dark_spirit: {parlett: "", kanji:"無明", romanji:"mumyō", promote:"Buddhist_spirit"}
-    //buddhist_spirit: {parlett: "", kanji:"法性", romanji:"hōsei"}
-    //deva: {parlett: "", kanji:"提婆", romanji:"daiba", promote:"teaching_king"}
-    //teaching_king: {parlett: "", kanji:"教王", romanji:"kyōō"}
-    //wood_chariot: {parlett: "", kanji:"木車", romanji:"mokusha", promote:"wind_snapping_turtle"}
-    //wind_snapping_turtle: {parlett: "", kanji:"風鼈", romanji:"fūbetsu"}
-    //white_horse: {parlett: "", kanji:"白駒", romanji:"hakku", promote:"great_horse"}
-    //great_horse: {parlett: "", kanji:"大駒", romanji:"daiku"}
-    //howling_dog_(left_and_right): {parlett: "", kanji:"口奇犬", romanji:"kiken", promote:"left_dog,_right_dog"}
-    //right_dog: {parlett: "", kanji:"右犬", romanji:"uken"}
-    //left_dog: {parlett: "", kanji:"左犬", romanji:"saken"}
-    //side_mover: {parlett: "", kanji:"横行", romanji:"ōgyō", promote:"free_boar"}
-    //prancing_stag: {parlett: "", kanji:"踊鹿", romanji:"yōroku", promote:"square_mover"}
-    //water_buffalo: {parlett: "", kanji:"水牛", romanji:"suigyū", promote:"great_dream-eater"}
-    //great_dream-eater: {parlett: "", kanji:"大獏", romanji:"daibaku"}
-    //ferocious_leopard: {parlett: "", kanji:"猛豹", romanji:"mōhyō", promote:"bishop"}
-    //fierce_eagle: {parlett: "", kanji:"猛鷲", romanji:"mōjū", promote:"soaring_eagle"}
-    //flying_dragon: {parlett: "", kanji:"飛龍", romanji:"hiryū", promote:"dragon_king"}
-    //poisonous_snake: {parlett: "", kanji:"毒蛇", romanji:"dokuja", promote:"hook_mover"}
-    //flying_goose: {parlett: "", kanji:"鳫飛", romanji:"ganhi", promote:"swallow’s_wings"}
-    //strutting_crow: {parlett: "", kanji:"烏行", romanji:"ukō", promote:"flying_falcon"}
-    //flying_falcon: {parlett: "", kanji:"飛鷹", romanji:"hiyō"}
-    //blind_dog: {parlett: "", kanji:"盲犬", romanji:"mōken", promote:"violent_stag"}
-    //water_general: {parlett: "", kanji:"水将", romanji:"suishō", promote:"vice_general"}
-    //fire_general: {parlett: "", kanji:"火将", romanji:"kashō", promote:"great_general"}
-    //phoenix: {parlett: "", kanji:"鳳凰", romanji:"hōō", promote:"golden_bird"}
-    //kirin: {parlett: "", kanji:"麒麟", romanji:"kirin", promote:"golden_bird"}
-    //hook_mover: {parlett: "", kanji:"鉤行", romanji:"kōgyō"}
-    //little_turtle: {parlett: "", kanji:"小亀", romanji:"shōki", promote:"treasure_turtle"}
-    //treasure_turtle: {parlett: "", kanji:"宝亀", romanji:"hōki"}
-    //great_turtle: {parlett: "", kanji:"大亀", romanji:"daiki", promote:"spirit_turtle"}
-    //spirit_turtle: {parlett: "", kanji:"霊亀", romanji:"reiki"}
-    //capricorn: {parlett: "", kanji:"摩羯", romanji:"makatsu", promote:"hook_mover"}
-    //tile_chariot: {parlett: "", kanji:"瓦車", romanji:"gasha", promote:"running_tile"}
-    //running_tile: {parlett: "", kanji:"走瓦", romanji:"sōga"}
-    //vertical_wolf: {parlett: "", kanji:"竪狼", romanji:"shurō", promote:"running_wolf"}
-    //side_ox: {parlett: "", kanji:"横牛", romanji:"ōgyū", promote:"flying_ox"}
-    //donkey: {parlett: "", kanji:"驢馬", romanji:"roba", promote:"ceramic_dove"}
-    //flying_horse: {parlett: "", kanji:"馬麟", romanji:"barin", promote:"free_king"}
-    //violent_bear: {parlett: "", kanji:"猛熊", romanji:"mōyū", promote:"great_bear"}
-    //great_bear: {parlett: "", kanji:"大熊", romanji:"daiyū"}
-    //angry_boar: {parlett: "", kanji:"嗔猪", romanji:"shincho", promote:"free_boar"}
-    //evil_wolf: {parlett: "", kanji:"悪狼", romanji:"akurō", promote:"venomous_wolf"}
-    //venomous_wolf: {parlett: "", kanji:"毒狼", romanji:"dokurō"}
-    //liberated_horse: {parlett: "", kanji:"風馬", romanji:"fūma", promote:"heavenly_horse"}
-    //heavenly_horse: {parlett: "", kanji:"天馬", romanji:"temma"}
-    //flying_cock: {parlett: "", kanji:"鶏飛", romanji:"keihi", promote:"raiding_falcon"}
-    //raiding_falcon: {parlett: "", kanji:"延鷹", romanji:"en’yō"}
-    //old_monkey: {parlett: "", kanji:"古猿", romanji:"koen", promote:"mountain_witch"}
-    //mountain_witch: {parlett: "", kanji:"山母", romanji:"sanbo"}
-    //chinese_cock: {parlett: "", kanji:"淮鶏", romanji:"waikei", promote:"wizard_stork"}
-    //wizard_stork: {parlett: "", kanji:"仙鷦", romanji:"senkaku"}
-    //northern_barbarian: {parlett: "", kanji:"北狄", romanji:"hokuteki", promote:"wooden_dove"}
-    //southern_barbarian: {parlett: "", kanji:"南蛮", romanji:"nanban", promote:"golden_bird"}
-    //western_barbarian: {parlett: "", kanji:"西戎", romanji:"seijū", promote:"lion_dog"}
-    //eastern_barbarian: {parlett: "", kanji:"東夷", romanji:"tōi", promote:"lion"}
-    //violent_stag: {parlett: "", kanji:"猛鹿", romanji:"mōroku", promote:"rushing_boar"}
-    //rushing_boar: {parlett: "", kanji:"行猪", romanji:"gyōcho"}
-    //violent_wolf: {parlett: "", kanji:"猛狼", romanji:"mōrō", promote:"bear’s_eyes"}
-    //bear’s_eyes: {parlett: "", kanji:"熊眼", romanji:"yūgan"}
-    //treacherous_fox: {parlett: "", kanji:"隠狐", romanji:"inko, onko", promote:"mountain_crane"}
-    //mountain_crane: {parlett: "", kanji:"山鶻", romanji:"sankotsu"}
-    //center_master: {parlett: "", kanji:"中師", romanji:"chūshi"}
-    //roc_master: {parlett: "", kanji:"鵬師", romanji:"hōshi"}
-    //earth_chariot: {parlett: "", kanji:"土車", romanji:"dosha", promote:"young_bird"}
-    //young_bird: {parlett: "", kanji:"*尺鳥", romanji:"shakuchō"}
-    //vermillion_sparrow: {parlett: "", kanji:"朱雀", romanji:"suzaku", promote:"divine_sparrow"}
-    //divine_sparrow: {parlett: "", kanji:"神雀", romanji:"shinjaku"}
-    //blue_dragon: {parlett: "", kanji:"青龍", romanji:"seiryū", promote:"divine_dragon"}
-    //divine_dragon: {parlett: "", kanji:"神龍", romanji:"shinryū"}
-    //enchanted_badger: {parlett: "", kanji:"変狸", romanji:"henri", promote:"ceramic_dove"}
-    //horseman: {parlett: "", kanji:"騎兵", romanji:"kihei", promote:"cavalier"}
-    //swooping_owl: {parlett: "", kanji:"鴟行", romanji:"shigyō", promote:"cloud_eagle"}
-    //climbing_monkey: {parlett: "", kanji:"登猿", romanji:"tōen", promote:"violent_stag"}
-    //cat_sword: {parlett: "", kanji:"猫刄", romanji:"myōjin", promote:"dragon_horse"}
-    //swallow’s_wings: {parlett: "", kanji:"燕羽", romanji:"en’u", promote:"gliding_swallow"}
-    //gliding_swallow: {parlett: "", kanji:"燕行", romanji:"engyō"}
-    //blind_monkey: {parlett: "", kanji:"盲猿", romanji:"mōen", promote:"flying_stag"}
-    //flying_stag: {parlett: "", kanji:"飛鹿", romanji:"hiroku"}
-    //blind_tiger: {parlett: "", kanji:"盲虎", romanji:"mōko", promote:"flying_stag"}
-    //oxcart: {parlett: "", kanji:"牛車", romanji:"gissha", promote:"plodding_ox"}
-    //plodding_ox: {parlett: "", kanji:"歬牛", romanji:"sengyū"}
-    //side_flier: {parlett: "", kanji:"横飛", romanji:"ōhi", promote:"side_dragon"}
-    //blind_bear: {parlett: "", kanji:"盲熊", romanji:"mōyū", promote:"flying_stag"}
-    //old_rat: {parlett: "", kanji:"老鼠", romanji:"rōso", promote:"bird_of_paradise"}
-    //bird_of_paradise: {parlett: "", kanji:"", romanji:"jichō"}
-    //square_mover: {parlett: "", kanji:"方行", romanji:"hōgyō", promote:"strong_chariot"}
-    //strong_chariot: {parlett: "", kanji:"強車", romanji:"kyōsha"}
-    //coiled_serpent: {parlett: "", kanji:"蟠蛇", romanji:"banja", promote:"coiled_dragon"}
-    //coiled_dragon: {parlett: "", kanji:"蟠龍", romanji:"banryū"}
-    //reclining_dragon: {parlett: "", kanji:"臥龍", romanji:"garyū", promote:"great_dragon"}
-    //free_eagle: {parlett: "", kanji:"奔鷲", romanji:"honjū"}
-    //lion_hawk: {parlett: "", kanji:"獅鷹", romanji:"shiō"}
-    //chariot_soldier: {parlett: "", kanji:"車兵", romanji:"shahei", promote:"Heavenly_Tetrarch_king"}
-    //heavenly_tetrarch_king: {parlett: "", kanji:"四天王", romanji:"shitennō"}
-    //side_soldier: {parlett: "", kanji:"横兵", romanji:"ōhei", promote:"water_buffalo"}
-    //vertical_soldier: {parlett: "", kanji:"竪兵", romanji:"shuhei", promote:"chariot_soldier"}
-    //wind_general: {parlett: "", kanji:"風将", romanji:"fūshō", promote:"violent_wind"}
-    //violent_wind: {parlett: "", kanji:"暴風", romanji:"bōfū"}
-    //river_general: {parlett: "", kanji:"川将", romanji:"senshō", promote:"Chinese_river"}
-    //chinese_river: {parlett: "", kanji:"淮川", romanji:"waisen"}
-    //mountain_general: {parlett: "", kanji:"山将", romanji:"sanshō", promote:"peaceful_mountain"}
-    //peaceful_mountain: {parlett: "", kanji:"泰山", romanji:"taizan"}
-    //front_standard: {parlett: "", kanji:"前旗", romanji:"zenki", promote:"great_standard"}
-    //horse_soldier: {parlett: "", kanji:"馬兵", romanji:"bahei", promote:"running_horse"}
-    //wood_general: {parlett: "", kanji:"木将", romanji:"mokushō", promote:"white_elephant"}
-    //ox_soldier: {parlett: "", kanji:"牛兵", romanji:"gyūhei", promote:"running_ox"}
-    //running_ox: {parlett: "", kanji:"走牛", romanji:"sōgyū"}
-    //earth_general: {parlett: "", kanji:"土将", romanji:"doshō", promote:"white_elephant"}
-    //boar_soldier: {parlett: "", kanji:"猪兵", romanji:"chohei", promote:"running_boar"}
-    //running_boar: {parlett: "", kanji:"走猪", romanji:"sōcho"}
-    //stone_general: {parlett: "", kanji:"石将", romanji:"sekishō", promote:"white_elephant"}
-    //leopard_soldier: {parlett: "", kanji:"豹兵", romanji:"hyōhei", promote:"running_leopard"}
-    //running_leopard: {parlett: "", kanji:"走豹", romanji:"sōhyō"}
-    //tile_general: {parlett: "", kanji:"瓦将", romanji:"gashō", promote:"white_elephant"}
-    //bear_soldier: {parlett: "", kanji:"熊兵", romanji:"yūhei", promote:"strong_bear"}
-    //strong_bear: {parlett: "", kanji:"強熊", romanji:"kyōyū"}
-    //iron_general: {parlett: "", kanji:"鉄将", romanji:"tesshō", promote:"white_elephant"}
-    //great_standard: {parlett: "", kanji:"大旗", romanji:"daiki"}
-    //great_master: {parlett: "", kanji:"大師", romanji:"daishi"}
-    //right_chariot: {parlett: "", kanji:"右車", romanji:"usha", promote:"right_iron_chariot"}
-    //right_iron_chariot: {parlett: "", kanji:"右鉄車", romanji:"utessha"}
-    //left_chariot: {parlett: "", kanji:"左車", romanji:"sasha", promote:"left_iron_chariot"}
-    //left_iron_chariot: {parlett: "", kanji:"左鉄車", romanji:"satessha"}
-    //side_monkey: {parlett: "", kanji:"横猿", romanji:"ōen", promote:"side_soldier"}
-    //vertical_mover: {parlett: "", kanji:"竪行", romanji:"shugyō", promote:"flying_ox"}
-    //flying_ox: {parlett: "", kanji:"飛牛", romanji:"higyū", promote:"fire_ox"}
-    //fire_ox: {parlett: "", kanji:"火牛", romanji:"kagyū"}
-    //longbow_soldier: {parlett: "", kanji:"弩兵", romanji:"dohei", promote:"longbow_general"}
-    //longbow_general: {parlett: "", kanji:"弩将", romanji:"doshō"}
-    //vertical_pup: {parlett: "", kanji:"竪狗", romanji:"shuku", promote:"leopard_king"}
-    //leopard_king: {parlett: "", kanji:"豹王", romanji:"hyōō"}
-    //vertical_horse: {parlett: "", kanji:"竪馬", romanji:"shuba", promote:"dragon_horse"}
-    //burning_soldier: {parlett: "", kanji:"炮兵", romanji:"hōhei", promote:"burning_general"}
-    //burning_general: {parlett: "", kanji:"炮将", romanji:"hōshō"}
-    //dragon_horse: {parlett: "", kanji:"龍馬", romanji:"ryūme", promote:"horned_falcon"}
-    //dragon_king: {parlett: "", kanji:"龍王", romanji:"ryūō", promote:"soaring_eagle"}
-    //sword_soldier: {parlett: "", kanji:"刀兵", romanji:"tōhei", promote:"sword_general"}
-    //sword_general: {parlett: "", kanji:"刀将", romanji:"tōshō"}
-    //horned_falcon: {parlett: "", kanji:"角鷹", romanji:"kakuō", promote:"great_falcon"}
-    //great_falcon: {parlett: "", kanji:"大鷹", romanji:"daiō"}
-    //soaring_eagle: {parlett: "", kanji:"飛鷲", romanji:"hijū", promote:"great_eagle"}
-    //great_eagle: {parlett: "", kanji:"大鷲", romanji:"daijū"}
-    //spear_soldier: {parlett: "", kanji:"鎗兵", romanji:"sōhei", promote:"spear_general"}
-    //spear_general: {parlett: "", kanji:"鎗将", romanji:"sōshō"}
-    //vertical_leopard: {parlett: "", kanji:"竪豹", romanji:"shuhyō", promote:"great_leopard"}
-    //great_leopard: {parlett: "", kanji:"大豹", romanji:"daihyō"}
-    //savage_tiger: {parlett: "", kanji:"猛虎", romanji:"mōko", promote:"great_tiger"}
-    //great_tiger: {parlett: "", kanji:"大虎", romanji:"daiko"}
-    //cross-bow_soldier: {parlett: "", kanji:"弓兵", romanji:"kyūhei", promote:"cross-bow_general"}
-    //cross-bow_general: {parlett: "", kanji:"弓将", romanji:"kyūshō"}
-    //roaring_dog: {parlett: "", kanji:"吼犬", romanji:"kōken", promote:"lion_dog"}
-    //lion_dog: {parlett: "", kanji:"狛犬", romanji:"komainu", promote:"great_elephant"}
-    //great_elephant: {parlett: "", kanji:"大象", romanji:"taizō"}
-    //dog: {parlett: "", kanji:"犬", romanji:"inu", promote:"multi_general"}
-    //multi_general: {parlett: "", kanji:"雜将", romanji:"suishō"}
-    //go_between: {parlett: "", kanji:"仲人", romanji:"chūnin", promote:"drunken_elephant"}
-    //pawn: {parlett: "", kanji:"歩兵", romanji:"fuhyō", promote:"gold_general"}
+    // Taikyoku Shogi pieces http://en.wikipedia.org/wiki/Taikyoku_shogi
+    //TAIK
+    //king: {parlett: "", romanji: "gyokushō", image: "circle#玉将", letter: "K"},
+    //crown_prince: {parlett: "", romanji: "taishi", promote: "king", image: "circle#太子", letter: "CP"},
+    //gold_general: {parlett: "", romanji: "kinshō", promote: "rook", image: "circle#金将", letter: "G"},
+    //right_general: {parlett: "", romanji: "ushō", promote: "right_army", image: "circle#右将", letter: "RG"},
+    //right_army: {parlett: "", romanji: "ugun", image: "circle#右軍", letter: "+RG"},
+    //left_general: {parlett: "", romanji: "sashō", promote: "left_army", image: "circle#左将", letter: "LG"},
+    //left_army: {parlett: "", romanji: "sagun", image: "circle#左軍", letter: "+LG"},
+    //rear_standard: {parlett: "", romanji: "kōki", promote: "center_standard", image: "circle#後旗", letter: "RS"},
+    //free_king: {parlett: "", romanji: "honnō", promote: "great_general", image: "circle#奔王", letter: "FK"},
+    //free_dreameater: {parlett: "", romanji: "honbaku", promote: "free_king", image: "circle#奔獏", letter: "FT"},
+    //wooden_dove: {parlett: "", romanji: "kyūhan", image: "circle#鳩槃", letter: "WO"},
+    //ceramic_dove: {parlett: "", romanji: "kyūban", image: "circle#鳩盤", letter: "CD"},
+    //earth_dragon: {parlett: "", romanji: "chiryū", promote: "rain_dragon", image: "circle#地龍", letter: "ED"},
+    //free_demon: {parlett: "", romanji: "honki", promote: "free_king", image: "circle#奔鬼", letter: "FR"},
+    //running_horse: {parlett: "", romanji: "sōma, sōba", promote: "free_demon", image: "circle#走馬", letter: "HR"},
+    //beast_cadet: {parlett: "", romanji: "jūsō", promote: "beast_officer", image: "circle#獣曹", letter: "BC"},
+    //longnosed_goblin: {parlett: "", romanji: "tengu", image: "circle#天狗", letter: "LO"},
+    //mountain_eagle_left: {parlett: "", romanji: "sanshū", promote: "soaring_eagle", image: "circle#山鷲", letter: "ME"},
+    //mountain_eagle_right: {parlett: "", romanji: "sanshū", promote: "soaring_eagle", image: "circle#山鷲", letter: "MR"},
+    //fire_demon: {parlett: "", romanji: "kaki", promote: "free_fire", image: "circle#火鬼", letter: "DM"},
+    //free_fire: {parlett: "", romanji: "honka", image: "circle#奔火", letter: "+DM"},
+    //whale: {parlett: "", romanji: "keigei", promote: "great_whale", image: "circle#鯨鯢", letter: "W"},
+    //great_whale: {parlett: "", romanji: "daigei", image: "circle#大鯨", letter: "+W"},
+    //running_rabbit: {parlett: "", romanji: "sōto", promote: "treacherous_fox", image: "circle#走兎", letter: "RR"},
+    //white_tiger: {parlett: "", romanji: "byakko", promote: "divine_tiger", image: "circle#白虎", letter: "WT"},
+    //divine_tiger: {parlett: "", romanji: "shinko", image: "circle#神虎", letter: "+WT"},
+    //turtle_snake: {parlett: "", romanji: "genbu", promote: "divine_turtle", image: "circle#玄武", letter: "TS"},
+    //divine_turtle: {parlett: "", romanji: "shinki", image: "circle#神亀", letter: "+TS"},
+    //lance: {parlett: "", romanji: "kyōsha", promote: "white_horse", image: "circle#香車", letter: "L"},
+    //reverse_chariot: {parlett: "", romanji: "hensha", promote: "whale", image: "circle#反車", letter: "RV"},
+    //fragrant_elephant: {parlett: "", romanji: "kōzō", promote: "elephant_king", image: "circle#香象", letter: "FG"},
+    //elephant_king: {parlett: "", romanji: "zōō", image: "circle#象王", letter: "+FG"},
+    //white_elephant: {parlett: "", romanji: "hakuzō", promote: "elephant_king", image: "circle#白象", letter: "WE"},
+    //mountain_dove: {parlett: "", romanji: "sankyū", promote: "great_dove", image: "circle#山鳩", letter: "MD"},
+    //flying_swallow: {parlett: "", romanji: "hien", promote: "rook", image: "circle#飛燕", letter: "FS"},
+    //captive_officer: {parlett: "", romanji: "kinri", promote: "captive_bird", image: "circle#禽吏", letter: "CO"},
+    //captive_bird: {parlett: "", romanji: "kinchō", image: "circle#禽鳥", letter: "+CO"},
+    //rain_dragon: {parlett: "", romanji: "uryū", promote: "great_dragon", image: "circle#雨龍", letter: "RA"},
+    //forest_demon: {parlett: "", romanji: "shinki", promote: "thunder_runner", image: "circle#森鬼", letter: "FO"},
+    //thunder_runner: {parlett: "", romanji: "raisō", image: "circle#雷走", letter: "+FO"},
+    //mountain_stag: {parlett: "", romanji: "sanroku", promote: "great_stag", image: "circle#山鹿", letter: "MS"},
+    //running_pup: {parlett: "", romanji: "sōku", promote: "free_leopard", image: "circle#走狗", letter: "RP"},
+    //free_leopard: {parlett: "", romanji: "honpyō", image: "circle#奔豹", letter: "+RP"},
+    //running_serpent: {parlett: "", romanji: "sōja", promote: "free_serpent", image: "circle#走蛇", letter: "RU"},
+    //free_serpent: {parlett: "", romanji: "honja", image: "circle#奔蛇", letter: "+RU"},
+    //side_serpent: {parlett: "", romanji: "ōja", promote: "great_shark", image: "circle#横蛇", letter: "SS"},
+    //great_shark: {parlett: "", romanji: "dairin", image: "circle#大鱗", letter: "+SS"},
+    //great_dove: {parlett: "", romanji: "daikyū", promote: "wooden_dove", image: "circle#大鳩", letter: "GR"},
+    //running_tiger: {parlett: "", romanji: "sōko", promote: "free_tiger", image: "circle#走虎", letter: "RT"},
+    //free_tiger: {parlett: "", romanji: "honko", image: "circle#奔虎", letter: "+RT"},
+    //running_bear: {parlett: "", romanji: "sōyū", promote: "free_bear", image: "circle#走熊", letter: "BA"},
+    //free_bear: {parlett: "", romanji: "hon’yū", image: "circle#奔熊", letter: "+BA"},
+    //yaksha: {parlett: "", romanji: "yasha", promote: "heavenly_tetrarch", image: "circle#夜叉", letter: "YA"},
+    //heavenly_tetrarch: {parlett: "", romanji: "shiten", image: "circle#四天", letter: "+YA"},
+    //buddhist_devil: {parlett: "", romanji: "rasetsu", promote: "heavenly_tetrarch", image: "circle#羅刹", letter: "BD"},
+    //guardian_of_the_gods: {parlett: "", romanji: "kongō", promote: "heavenly_tetrarch", image: "circle#金剛", letter: "GU"},
+    //wrestler: {parlett: "", romanji: "rikishi", promote: "heavenly_tetrarch", image: "circle#力士", letter: "WR"},
+    //silver_general: {parlett: "", romanji: "ginshō", promote: "vertical_mover", image: "circle#銀将", letter: "S"},
+    //drunken_elephant: {parlett: "", romanji: "suizō", promote: "crown_prince", image: "circle#酔象", letter: "DE"},
+    //neighboring_king: {parlett: "", romanji: "kinnō", promote: "front_standard", image: "circle#近王", letter: "NK"},
+    //gold_chariot: {parlett: "", romanji: "kinsha", promote: "playful_cockatoo", image: "circle#金車", letter: "GC"},
+    //playful_cockatoo: {parlett: "", romanji: "yūmo", image: "circle#遊母", letter: "+GC"},
+    //side_dragon: {parlett: "", romanji: "ōryū", promote: "running_dragon", image: "circle#横龍", letter: "SI"},
+    //running_dragon: {parlett: "", romanji: "sōryū", image: "circle#走龍", letter: "+SI"},
+    //running_stag: {parlett: "", romanji: "sōroku", promote: "free_stag", image: "circle#走鹿", letter: "RN"},
+    //free_stag: {parlett: "", romanji: "honroku", image: "circle#奔鹿", letter: "+RN"},
+    //running_wolf: {parlett: "", romanji: "sōrō", promote: "free_wolf", image: "circle#走狼", letter: "RW"},
+    //free_wolf: {parlett: "", romanji: "honrō", image: "circle#奔狼", letter: "+RW"},
+    //bishop_general: {parlett: "", romanji: "kakushō", promote: "rain_demon", image: "circle#角将", letter: "BG"},
+    //rain_demon: {parlett: "", romanji: "rinki", image: "circle#霖鬼", letter: "+BG"},
+    //rook_general: {parlett: "", romanji: "hishō", promote: "flying_crocodile", image: "circle#飛将", letter: "RO"},
+    //flying_crocodile: {parlett: "", romanji: "higaku", image: "circle#飛鰐", letter: "+RO"},
+    //right_tiger: {parlett: "", romanji: "uko", promote: "white_tiger", image: "circle#右虎", letter: "TT"},
+    //left_tiger: {parlett: "", romanji: "sako", promote: "turtle_snake", image: "circle#左虎", letter: "LT"},
+    //right_dragon: {parlett: "", romanji: "uryū", promote: "blue_dragon", image: "circle#右龍", letter: "RI"},
+    //left_dragon: {parlett: "", romanji: "saryū", promote: "vermillion_sparrow", image: "circle#左龍", letter: "LE"},
+    //beast_officer: {parlett: "", romanji: "jūri", promote: "beast_bird", image: "circle#獣吏", letter: "BO"},
+    //beast_bird: {parlett: "", romanji: "jūchō", image: "circle#獣鳥", letter: "+BO"},
+    //wind_dragon: {parlett: "", romanji: "fūryū", promote: "free_dragon", image: "circle#風龍", letter: "WD"},
+    //free_dragon: {parlett: "", romanji: "honryū", image: "circle#奔龍", letter: "+WD"},
+    //free_pup: {parlett: "", romanji: "honku", promote: "free_dog", image: "circle#奔狗", letter: "FP"},
+    //free_dog: {parlett: "", romanji: "honken", image: "circle#奔犬", letter: "+FP"},
+    //rushing_bird: {parlett: "", romanji: "gyōchō", promote: "free_demon", image: "circle#行鳥", letter: "RB"},
+    //old_kite: {parlett: "", romanji: "kotetsu", promote: "longnosed_goblin", image: "circle#古鵄", letter: "OK"},
+    //peacock: {parlett: "", romanji: "kujaku", promote: "longnosed_goblin", image: "circle#孔雀", letter: "PC"},
+    //water_dragon: {parlett: "", romanji: "suiryū", promote: "phoenix_master", image: "circle#水龍", letter: "WA"},
+    //fire_dragon: {parlett: "", romanji: "karyū", promote: "kirin_master", image: "circle#火龍", letter: "FI"},
+    //copper_general: {parlett: "", romanji: "dōshō", promote: "side_mover", image: "circle#銅将", letter: "C"},
+    //phoenix_master: {parlett: "", romanji: "hōshi", image: "circle#鳳師", letter: "PM"},
+    //kirin_master: {parlett: "", romanji: "rinshi", image: "circle#麟師", letter: "KM"},
+    //silver_chariot: {parlett: "", romanji: "ginsha", promote: "goose_wing", image: "circle#銀車", letter: "SV"},
+    //goose_wing: {parlett: "", romanji: "kōyoko", image: "circle#鴻翼", letter: "+SV"},
+    //vertical_bear: {parlett: "", romanji: "shuyū", promote: "free_bear", image: "circle#竪熊", letter: "VE"},
+    //knight: {parlett: "", romanji: "keima", promote: "side_soldier", image: "circle#桂馬", letter: "N"},
+    //pig_general: {parlett: "", romanji: "tonshō", promote: "free_pig", image: "circle#豚将", letter: "PI"},
+    //free_pig: {parlett: "", romanji: "honton", image: "circle#奔豚", letter: "+PI"},
+    //chicken_general: {parlett: "", romanji: "keishō", promote: "free_chicken", image: "circle#鶏将", letter: "CG"},
+    //free_chicken: {parlett: "", romanji: "honkei", image: "circle#奔鶏", letter: "+CG"},
+    //pup_general: {parlett: "", romanji: "kushō", promote: "free_pup", image: "circle#狗将", letter: "PG"},
+    //horse_general: {parlett: "", romanji: "bashō", promote: "free_horse", image: "circle#馬将", letter: "H"},
+    //free_horse: {parlett: "", romanji: "honba", image: "circle#奔馬", letter: "+H"},
+    //ox_general: {parlett: "", romanji: "gyūshō", promote: "free_ox", image: "circle#牛将", letter: "O"},
+    //free_ox: {parlett: "", romanji: "hongyū", image: "circle#奔牛", letter: "+O"},
+    //center_standard: {parlett: "", romanji: "chūki", promote: "front_standard", image: "circle#中旗", letter: "CN"},
+    //side_boar: {parlett: "", romanji: "ōcho", promote: "free_boar", image: "circle#横猪", letter: "SA"},
+    //free_boar: {parlett: "", romanji: "honcho", image: "circle#奔猪", letter: "+SA"},
+    //silver_rabbit: {parlett: "", romanji: "ginto", promote: "whale", image: "circle#銀兎", letter: "SR"},
+    //golden_deer: {parlett: "", romanji: "konroku", promote: "white_horse", image: "circle#金鹿", letter: "GL"},
+    //lion: {parlett: "", romanji: "shishi", promote: "furious_fiend", image: "circle#獅子", letter: "LN"},
+    //furious_fiend: {parlett: "", romanji: "funjin", image: "circle#奮迅", letter: "+LN"},
+    //captive_cadet: {parlett: "", romanji: "kinsō", promote: "captive_officer", image: "circle#禽曹", letter: "CT"},
+    //great_stag: {parlett: "", romanji: "dairoku", promote: "free_stag", image: "circle#大鹿", letter: "GS"},
+    //violent_dragon: {parlett: "", romanji: "mōryū", promote: "great_dragon", image: "circle#猛龍", letter: "VD"},
+    //woodland_demon: {parlett: "", romanji: "rinki", promote: "right_phoenix", image: "circle#林鬼", letter: "WL"},
+    //right_phoenix: {parlett: "", romanji: "ushū", image: "circle#右鵰", letter: "+WL"},
+    //vice_general: {parlett: "", romanji: "fukushō", promote: "great_general", image: "circle#副将", letter: "VG"},
+    //great_general: {parlett: "", romanji: "taishō", image: "circle#大将", letter: "GG"},
+    //stone_chariot: {parlett: "", romanji: "sekisha", promote: "walking_heron", image: "circle#石車", letter: "CI"},
+    //walking_heron: {parlett: "", romanji: "fushin", image: "circle#歩振", letter: "+CI"},
+    //cloud_eagle: {parlett: "", romanji: "unjū", promote: "strong_eagle", image: "circle#雲鷲", letter: "CE"},
+    //strong_eagle: {parlett: "", romanji: "keijū", image: "circle#勁鷲", letter: "+CE"},
+    //bishop: {parlett: "", romanji: "kakugyō", promote: "dragon_horse", image: "circle#角行", letter: "B"},
+    //rook: {parlett: "", romanji: "hisha", promote: "dragon_king", image: "circle#飛車", letter: "R"},
+    //side_wolf: {parlett: "", romanji: "ōrō", promote: "free_wolf", image: "circle#横狼", letter: "WF"},
+    //flying_cat: {parlett: "", romanji: "hibyō", promote: "rook", image: "circle#飛猫", letter: "FC"},
+    //mountain_falcon: {parlett: "", romanji: "san’ō", promote: "horned_falcon", image: "circle#山鷹", letter: "MF"},
+    //vertical_tiger: {parlett: "", romanji: "shuko", promote: "free_tiger", image: "circle#竪虎", letter: "VT"},
+    //soldier: {parlett: "", romanji: "heishi", promote: "cavalier", image: "circle#兵士", letter: "SO"},
+    //cavalier: {parlett: "", romanji: "kishi", image: "circle#騎士", letter: "+SO"},
+    //little_standard: {parlett: "", romanji: "shōki", promote: "rear_standard", image: "circle#小旗", letter: "LS"},
+    //cloud_dragon: {parlett: "", romanji: "unryū", promote: "great_dragon", image: "circle#雲龍", letter: "CL"},
+    //copper_chariot: {parlett: "", romanji: "dōsha", promote: "copper_elephant", image: "circle#銅車", letter: "CR"},
+    //copper_elephant: {parlett: "", romanji: "dōzō", image: "circle#銅象", letter: "+CR"},
+    //running_chariot: {parlett: "", romanji: "sōsha", promote: "burning_chariot", image: "circle#走車", letter: "RH"},
+    //burning_chariot: {parlett: "", romanji: "hōsha", image: "circle#炮車", letter: "+RH"},
+    //ramshead_soldier: {parlett: "", romanji: "yōhei", promote: "tiger_soldier", image: "circle#羊兵", letter: "HE"},
+    //tiger_soldier: {parlett: "", romanji: "kohei", image: "circle#虎兵", letter: "+HE"},
+    //violent_ox: {parlett: "", romanji: "mōgyū", promote: "flying_ox", image: "circle#猛牛", letter: "VO"},
+    //great_dragon: {parlett: "", romanji: "dairyū", promote: "ancient_dragon", image: "circle#大龍", letter: "GD"},
+    //ancient_dragon: {parlett: "", romanji: "genryū, ganryū", image: "circle#元龍", letter: "+GD"},
+    //golden_bird: {parlett: "", romanji: "kinshi", promote: "free_bird", image: "circle#金翅", letter: "GO"},
+    //free_bird: {parlett: "", romanji: "honshi", image: "circle#奔翅", letter: "+GO"},
+    //dark_spirit: {parlett: "", romanji: "mumyō", promote: "buddhist_spirit", image: "circle#無明", letter: "DS"},
+    //buddhist_spirit: {parlett: "", romanji: "hōsei", image: "circle#法性", letter: "+DS"},
+    //deva: {parlett: "", romanji: "daiba", promote: "teaching_king", image: "circle#提婆", letter: "DV"},
+    //teaching_king: {parlett: "", romanji: "kyōō", image: "circle#教王", letter: "+DV"},
+    //wood_chariot: {parlett: "", romanji: "mokusha", promote: "wind_snapping_turtle", image: "circle#木車", letter: "WC"},
+    //wind_snapping_turtle: {parlett: "", romanji: "fūbetsu", image: "circle#風鼈", letter: "+WC"},
+    //white_horse: {parlett: "", romanji: "hakku", promote: "great_horse", image: "circle#白駒", letter: "WH"},
+    //great_horse: {parlett: "", romanji: "daiku", image: "circle#大駒", letter: "+WH"},
+    //howling_dog_left: {parlett: "", romanji: "kiken", promote: "left_dog", image: "circle#口奇犬", letter: "HL"},
+    //howling_dog_right: {parlett: "", romanji: "kiken", promote: "right_dog", image: "circle#口奇犬", letter: "HD"},
+    //right_dog: {parlett: "", romanji: "uken", image: "circle#右犬", letter: "+HD"},
+    //left_dog: {parlett: "", romanji: "saken", image: "circle#左犬", letter: "+HL"},
+    //side_mover: {parlett: "", romanji: "ōgyō", promote: "free_boar", image: "circle#横行", letter: "SM"},
+    //prancing_stag: {parlett: "", romanji: "yōroku", promote: "square_mover", image: "circle#踊鹿", letter: "PR"},
+    //water_buffalo: {parlett: "", romanji: "suigyū", promote: "great_dreameater", image: "circle#水牛", letter: "WB"},
+    //great_dreameater: {parlett: "", romanji: "daibaku", image: "circle#大獏", letter: "+WB"},
+    //ferocious_leopard: {parlett: "", romanji: "mōhyō", promote: "bishop", image: "circle#猛豹", letter: "FL"},
+    //fierce_eagle: {parlett: "", romanji: "mōjū", promote: "soaring_eagle", image: "circle#猛鷲", letter: "EG"},
+    //flying_dragon: {parlett: "", romanji: "hiryū", promote: "dragon_king", image: "circle#飛龍", letter: "FD"},
+    //poisonous_snake: {parlett: "", romanji: "dokuja", promote: "hook_mover", image: "circle#毒蛇", letter: "PS"},
+    //flying_goose: {parlett: "", romanji: "ganhi", promote: "swallow’s_wings", image: "circle#鳫飛", letter: "FY"},
+    //strutting_crow: {parlett: "", romanji: "ukō", promote: "flying_falcon", image: "circle#烏行", letter: "ST"},
+    //flying_falcon: {parlett: "", romanji: "hiyō", image: "circle#飛鷹", letter: "+ST"},
+    //blind_dog: {parlett: "", romanji: "mōken", promote: "violent_stag", image: "circle#盲犬", letter: "BI"},
+    //water_general: {parlett: "", romanji: "suishō", promote: "vice_general", image: "circle#水将", letter: "WG"},
+    //fire_general: {parlett: "", romanji: "kashō", promote: "great_general", image: "circle#火将", letter: "F"},
+    //phoenix: {parlett: "", romanji: "hōō", promote: "golden_bird", image: "circle#鳳凰", letter: "PH"},
+    //kirin: {parlett: "", romanji: "kirin", promote: "golden_bird", image: "circle#麒麟", letter: "KR"},
+    //hook_mover: {parlett: "", romanji: "kōgyō", image: "circle#鉤行", letter: "HM"},
+    //little_turtle: {parlett: "", romanji: "shōki", promote: "treasure_turtle", image: "circle#小亀", letter: "LL"},
+    //treasure_turtle: {parlett: "", romanji: "hōki", image: "circle#宝亀", letter: "+LL"},
+    //great_turtle: {parlett: "", romanji: "daiki", promote: "spirit_turtle", image: "circle#大亀", letter: "GT"},
+    //spirit_turtle: {parlett: "", romanji: "reiki", image: "circle#霊亀", letter: "+GT"},
+    //capricorn: {parlett: "", romanji: "makatsu", promote: "hook_mover", image: "circle#摩羯", letter: "CA"},
+    //tile_chariot: {parlett: "", romanji: "gasha", promote: "running_tile", image: "circle#瓦車", letter: "TC"},
+    //running_tile: {parlett: "", romanji: "sōga", image: "circle#走瓦", letter: "+TC"},
+    //vertical_wolf: {parlett: "", romanji: "shurō", promote: "running_wolf", image: "circle#竪狼", letter: "VW"},
+    //side_ox: {parlett: "", romanji: "ōgyū", promote: "flying_ox", image: "circle#横牛", letter: "SX"},
+    //donkey: {parlett: "", romanji: "roba", promote: "ceramic_dove", image: "circle#驢馬", letter: "DO"},
+    //flying_horse: {parlett: "", romanji: "barin", promote: "free_king", image: "circle#馬麟", letter: "FH"},
+    //violent_bear: {parlett: "", romanji: "mōyū", promote: "great_bear", image: "circle#猛熊", letter: "VB"},
+    //great_bear: {parlett: "", romanji: "daiyū", image: "circle#大熊", letter: "+VB"},
+    //angry_boar: {parlett: "", romanji: "shincho", promote: "free_boar", image: "circle#嗔猪", letter: "AB"},
+    //evil_wolf: {parlett: "", romanji: "akurō", promote: "venomous_wolf", image: "circle#悪狼", letter: "EW"},
+    //venomous_wolf: {parlett: "", romanji: "dokurō", image: "circle#毒狼", letter: "+EW"},
+    //liberated_horse: {parlett: "", romanji: "fūma", promote: "heavenly_horse", image: "circle#風馬", letter: "LH"},
+    //heavenly_horse: {parlett: "", romanji: "temma", image: "circle#天馬", letter: "+LH"},
+    //flying_cock: {parlett: "", romanji: "keihi", promote: "raiding_falcon", image: "circle#鶏飛", letter: "CK"},
+    //raiding_falcon: {parlett: "", romanji: "en’yō", image: "circle#延鷹", letter: "+CK"},
+    //old_monkey: {parlett: "", romanji: "koen", promote: "mountain_witch", image: "circle#古猿", letter: "OM"},
+    //mountain_witch: {parlett: "", romanji: "sanbo", image: "circle#山母", letter: "+OM"},
+    //chinese_cock: {parlett: "", romanji: "waikei", promote: "wizard_stork", image: "circle#淮鶏", letter: "CC"},
+    //wizard_stork: {parlett: "", romanji: "senkaku", image: "circle#仙鷦", letter: "+CC"},
+    //northern_barbarian: {parlett: "", romanji: "hokuteki", promote: "wooden_dove", image: "circle#北狄", letter: "NB"},
+    //southern_barbarian: {parlett: "", romanji: "nanban", promote: "golden_bird", image: "circle#南蛮", letter: "SU"},
+    //western_barbarian: {parlett: "", romanji: "seijū", promote: "lion_dog", image: "circle#西戎", letter: "WS"},
+    //eastern_barbarian: {parlett: "", romanji: "tōi", promote: "lion", image: "circle#東夷", letter: "ES"},
+    //violent_stag: {parlett: "", romanji: "mōroku", promote: "rushing_boar", image: "circle#猛鹿", letter: "VS"},
+    //rushing_boar: {parlett: "", romanji: "gyōcho", image: "circle#行猪", letter: "+VS"},
+    //violent_wolf: {parlett: "", romanji: "mōrō", promote: "bears_eyes", image: "circle#猛狼", letter: "NT"},
+    //bears_eyes: {parlett: "", romanji: "yūgan", image: "circle#熊眼", letter: "+NT"},
+    //treacherous_fox: {parlett: "", romanji: "inko, onko", promote: "mountain_crane", image: "circle#隠狐", letter: "TF"},
+    //mountain_crane: {parlett: "", romanji: "sankotsu", image: "circle#山鶻", letter: "+TF"},
+    //center_master: {parlett: "", romanji: "chūshi", image: "circle#中師", letter: "MT"},
+    //roc_master: {parlett: "", romanji: "hōshi", image: "circle#鵬師", letter: "RM"},
+    //earth_chariot: {parlett: "", romanji: "dosha", promote: "young_bird", image: "circle#土車", letter: "EC"},
+    //young_bird: {parlett: "", romanji: "shakuchō", image: "circle#*尺鳥", letter: "+EC"},
+    //vermillion_sparrow: {parlett: "", romanji: "suzaku", promote: "divine_sparrow", image: "circle#朱雀", letter: "VI"},
+    //divine_sparrow: {parlett: "", romanji: "shinjaku", image: "circle#神雀", letter: "+VI"},
+    //blue_dragon: {parlett: "", romanji: "seiryū", promote: "divine_dragon", image: "circle#青龍", letter: "BL"},
+    //divine_dragon: {parlett: "", romanji: "shinryū", image: "circle#神龍", letter: "+BL"},
+    //enchanted_badger: {parlett: "", romanji: "henri", promote: "ceramic_dove", image: "circle#変狸", letter: "EB"},
+    //horseman: {parlett: "", romanji: "kihei", promote: "cavalier", image: "circle#騎兵", letter: "HO"},
+    //swooping_owl: {parlett: "", romanji: "shigyō", promote: "cloud_eagle", image: "circle#鴟行", letter: "OW"},
+    //climbing_monkey: {parlett: "", romanji: "tōen", promote: "violent_stag", image: "circle#登猿", letter: "CM"},
+    //cat_sword: {parlett: "", romanji: "myōjin", promote: "dragon_horse", image: "circle#猫刄", letter: "CS"},
+    //swallows_wings: {parlett: "", romanji: "en’u", promote: "gliding_swallow", image: "circle#燕羽", letter: "SW"},
+    //gliding_swallow: {parlett: "", romanji: "engyō", image: "circle#燕行", letter: "+SW"},
+    //blind_monkey: {parlett: "", romanji: "mōen", promote: "flying_stag", image: "circle#盲猿", letter: "BM"},
+    //flying_stag: {parlett: "", romanji: "hiroku", image: "circle#飛鹿", letter: "+BM"},
+    //blind_tiger: {parlett: "", romanji: "mōko", promote: "flying_stag", image: "circle#盲虎", letter: "BT"},
+    //oxcart: {parlett: "", romanji: "gissha", promote: "plodding_ox", image: "circle#牛車", letter: "OC"},
+    //plodding_ox: {parlett: "", romanji: "sengyū", image: "circle#歬牛", letter: "+OC"},
+    //side_flier: {parlett: "", romanji: "ōhi", promote: "side_dragon", image: "circle#横飛", letter: "SF"},
+    //blind_bear: {parlett: "", romanji: "mōyū", promote: "flying_stag", image: "circle#盲熊", letter: "BB"},
+    //old_rat: {parlett: "", romanji: "rōso", promote: "bird_of_paradise", image: "circle#老鼠", letter: "OR"},
+    //bird_of_paradise: {parlett: "", romanji: "jichō", image: "circle#", letter: "+OR"},
+    //square_mover: {parlett: "", romanji: "hōgyō", promote: "strong_chariot", image: "circle#方行", letter: "SQ"},
+    //strong_chariot: {parlett: "", romanji: "kyōsha", image: "circle#強車", letter: "+SQ"},
+    //coiled_serpent: {parlett: "", romanji: "banja", promote: "coiled_dragon", image: "circle#蟠蛇", letter: "SN"},
+    //coiled_dragon: {parlett: "", romanji: "banryū", image: "circle#蟠龍", letter: "+SN"},
+    //reclining_dragon: {parlett: "", romanji: "garyū", promote: "great_dragon", image: "circle#臥龍", letter: "RD"},
+    //free_eagle: {parlett: "", romanji: "honjū", image: "circle#奔鷲", letter: "FE"},
+    //lion_hawk: {parlett: "", romanji: "shiō", image: "circle#獅鷹", letter: "LI"},
+    //chariot_soldier: {parlett: "", romanji: "shahei", promote: "heavenly_tetrarch_king", image: "circle#車兵", letter: "CH"},
+    //heavenly_tetrarch_king: {parlett: "", romanji: "shitennō", image: "circle#四天王", letter: "+CH"},
+    //side_soldier: {parlett: "", romanji: "ōhei", promote: "water_buffalo", image: "circle#横兵", letter: "SL"},
+    //vertical_soldier: {parlett: "", romanji: "shuhei", promote: "chariot_soldier", image: "circle#竪兵", letter: "VR"},
+    //wind_general: {parlett: "", romanji: "fūshō", promote: "violent_wind", image: "circle#風将", letter: "WN"},
+    //violent_wind: {parlett: "", romanji: "bōfū", image: "circle#暴風", letter: "+WN"},
+    //river_general: {parlett: "", romanji: "senshō", promote: "chinese_river", image: "circle#川将", letter: "RE"},
+    //chinese_river: {parlett: "", romanji: "waisen", image: "circle#淮川", letter: "+RE"},
+    //mountain_general: {parlett: "", romanji: "sanshō", promote: "peaceful_mountain", image: "circle#山将", letter: "M"},
+    //peaceful_mountain: {parlett: "", romanji: "taizan", image: "circle#泰山", letter: "+M"},
+    //front_standard: {parlett: "", romanji: "zenki", promote: "great_standard", image: "circle#前旗", letter: "SD"},
+    //horse_soldier: {parlett: "", romanji: "bahei", promote: "running_horse", image: "circle#馬兵", letter: "HS"},
+    //wood_general: {parlett: "", romanji: "mokushō", promote: "white_elephant", image: "circle#木将", letter: "GN"},
+    //ox_soldier: {parlett: "", romanji: "gyūhei", promote: "running_ox", image: "circle#牛兵", letter: "OS"},
+    //running_ox: {parlett: "", romanji: "sōgyū", image: "circle#走牛", letter: "+OS"},
+    //earth_general: {parlett: "", romanji: "doshō", promote: "white_elephant", image: "circle#土将", letter: "EA"},
+    //boar_soldier: {parlett: "", romanji: "chohei", promote: "running_boar", image: "circle#猪兵", letter: "BS"},
+    //running_boar: {parlett: "", romanji: "sōcho", image: "circle#走猪", letter: "+BS"},
+    //stone_general: {parlett: "", romanji: "sekishō", promote: "white_elephant", image: "circle#石将", letter: "SG"},
+    //leopard_soldier: {parlett: "", romanji: "hyōhei", promote: "running_leopard", image: "circle#豹兵", letter: "LP"},
+    //running_leopard: {parlett: "", romanji: "sōhyō", image: "circle#走豹", letter: "+LP"},
+    //tile_general: {parlett: "", romanji: "gashō", promote: "white_elephant", image: "circle#瓦将", letter: "T"},
+    //bear_soldier: {parlett: "", romanji: "yūhei", promote: "strong_bear", image: "circle#熊兵", letter: "BE"},
+    //strong_bear: {parlett: "", romanji: "kyōyū", image: "circle#強熊", letter: "+BE"},
+    //iron_general: {parlett: "", romanji: "tesshō", promote: "white_elephant", image: "circle#鉄将", letter: "I"},
+    //great_standard: {parlett: "", romanji: "daiki", image: "circle#大旗", letter: "GE"},
+    //great_master: {parlett: "", romanji: "daishi", image: "circle#大師", letter: "GM"},
+    //right_chariot: {parlett: "", romanji: "usha", promote: "right_iron_chariot", image: "circle#右車", letter: "RC"},
+    //right_iron_chariot: {parlett: "", romanji: "utessha", image: "circle#右鉄車", letter: "+RC"},
+    //left_chariot: {parlett: "", romanji: "sasha", promote: "left_iron_chariot", image: "circle#左車", letter: "LC"},
+    //left_iron_chariot: {parlett: "", romanji: "satessha", image: "circle#左鉄車", letter: "+LC"},
+    //side_monkey: {parlett: "", romanji: "ōen", promote: "side_soldier", image: "circle#横猿", letter: "MK"},
+    //vertical_mover: {parlett: "", romanji: "shugyō", promote: "flying_ox", image: "circle#竪行", letter: "VM"},
+    //flying_ox: {parlett: "", romanji: "higyū", promote: "fire_ox", image: "circle#飛牛", letter: "OX"},
+    //fire_ox: {parlett: "", romanji: "kagyū", image: "circle#火牛", letter: "+OX"},
+    //longbow_soldier: {parlett: "", romanji: "dohei", promote: "longbow_general", image: "circle#弩兵", letter: "LB"},
+    //longbow_general: {parlett: "", romanji: "doshō", image: "circle#弩将", letter: "+LB"},
+    //vertical_pup: {parlett: "", romanji: "shuku", promote: "leopard_king", image: "circle#竪狗", letter: "VP"},
+    //leopard_king: {parlett: "", romanji: "hyōō", image: "circle#豹王", letter: "+VP"},
+    //vertical_horse: {parlett: "", romanji: "shuba", promote: "dragon_horse", image: "circle#竪馬", letter: "VH"},
+    //burning_soldier: {parlett: "", romanji: "hōhei", promote: "burning_general", image: "circle#炮兵", letter: "BN"},
+    //burning_general: {parlett: "", romanji: "hōshō", image: "circle#炮将", letter: "+BN"},
+    //dragon_horse: {parlett: "", romanji: "ryūme", promote: "horned_falcon", image: "circle#龍馬", letter: "DH"},
+    //dragon_king: {parlett: "", romanji: "ryūō", promote: "soaring_eagle", image: "circle#龍王", letter: "DK"},
+    //sword_soldier: {parlett: "", romanji: "tōhei", promote: "sword_general", image: "circle#刀兵", letter: "SE"},
+    //sword_general: {parlett: "", romanji: "tōshō", image: "circle#刀将", letter: "+SE"},
+    //horned_falcon: {parlett: "", romanji: "kakuō", promote: "great_falcon", image: "circle#角鷹", letter: "HF"},
+    //great_falcon: {parlett: "", romanji: "daiō", image: "circle#大鷹", letter: "+HF"},
+    //soaring_eagle: {parlett: "", romanji: "hijū", promote: "great_eagle", image: "circle#飛鷲", letter: "EL"},
+    //great_eagle: {parlett: "", romanji: "daijū", image: "circle#大鷲", letter: "+EL"},
+    //spear_soldier: {parlett: "", romanji: "sōhei", promote: "spear_general", image: "circle#鎗兵", letter: "SP"},
+    //spear_general: {parlett: "", romanji: "sōshō", image: "circle#鎗将", letter: "+SP"},
+    //vertical_leopard: {parlett: "", romanji: "shuhyō", promote: "great_leopard", image: "circle#竪豹", letter: "VL"},
+    //great_leopard: {parlett: "", romanji: "daihyō", image: "circle#大豹", letter: "+VL"},
+    //savage_tiger: {parlett: "", romanji: "mōko", promote: "great_tiger", image: "circle#猛虎", letter: "TG"},
+    //great_tiger: {parlett: "", romanji: "daiko", image: "circle#大虎", letter: "+TG"},
+    //crossbow_soldier: {parlett: "", romanji: "kyūhei", promote: "crossbow_general", image: "circle#弓兵", letter: "SB"},
+    //crossbow_general: {parlett: "", romanji: "kyūshō", image: "circle#弓将", letter: "+SB"},
+    //roaring_dog: {parlett: "", romanji: "kōken", promote: "lion_dog", image: "circle#吼犬", letter: "DG"},
+    //lion_dog: {parlett: "", romanji: "komainu", promote: "great_elephant", image: "circle#狛犬", letter: "LD"},
+    //great_elephant: {parlett: "", romanji: "taizō", image: "circle#大象", letter: "+LD"},
+    //dog: {parlett: "", romanji: "inu", promote: "multi_general", image: "circle#犬", letter: "D"},
+    //multi_general: {parlett: "", romanji: "suishō", image: "circle#雜将", letter: "+D"},
+    //go_between: {parlett: "", romanji: "chūnin", promote: "drunken_elephant", image: "circle#仲人", letter: "GB"},
+    //pawn: {parlett: "", romanji: "fuhyō", promote: "gold_general", image: "circle#歩兵", letter: "P"},
+    // whew!
 
     // Complex riders
     griffon: {parlett: "[1,0](n+>), [1,0](n+<), [0,1](n+>>), [0,1](n+<<), [-1,0](n+<), [-1,0](n+>), [0,-1](n+<<), [0,-1](n+>>)", 
