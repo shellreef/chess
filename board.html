@@ -1177,6 +1177,7 @@ var PIECE_TYPES = {
     //sparrow: {parlett: "n*\\135^", pc:"akm"}, // TODO: movement, like grasshopper but turns 135 degrees over hurdle
     //jibber: {parlett: "n*\\180^", pc:"akm"}, // TODO: movement, like grasshopper but to cell in front of hurdle
 
+
     // Taikyoku Shogi pieces http://en.wikipedia.org/wiki/Taikyoku_shogi
     // TODO: wedge piece instead of circle
     // TODO: "The [royal pieces] may move into check (not recommended)."
@@ -1193,34 +1194,46 @@ var PIECE_TYPES = {
     //TODO: reconcile with goldgeneral gold_general: {parlett: "1+, 1X>", romanji: "kinshō", promote: ["rook"], image: "circle#金将", letter: "G", tags:"taikyoku "},
     violent_wolf: {parlett: "1+, 1X>", romanji: "mōrō", promote: ["bears_eyes"], image: "circle#猛狼", letter: "NT", tags:"taikyoku "},
 
-    //right_army: {parlett: "", romanji: "ugun", image: "circle#右軍", letter: "+RG", tags:"taikyoku "},
-    //left_army: {parlett: "", romanji: "sagun", image: "circle#左軍", letter: "+LG", tags:"taikyoku "},
-    //rear_standard: {parlett: "", romanji: "kōki", promote: ["center_standard"], image: "circle#後旗", letter: "RS", tags:"taikyoku "},
-    //free_king: {parlett: "", romanji: "honnō", promote: ["great_general"], image: "circle#奔王", letter: "FK", tags:"taikyoku "},
-    //free_dreameater: {parlett: "", romanji: "honbaku", promote: ["free_king"], image: "circle#奔獏", letter: "FT", tags:"taikyoku "},
-    //wooden_dove: {parlett: "", romanji: "kyūhan", image: "circle#鳩槃", letter: "WO", tags:"taikyoku "},
-    //ceramic_dove: {parlett: "", romanji: "kyūban", image: "circle#鳩盤", letter: "CD", tags:"taikyoku "},
-    //earth_dragon: {parlett: "", romanji: "chiryū", promote: ["rain_dragon"], image: "circle#地龍", letter: "ED", tags:"taikyoku "},
-    //free_demon: {parlett: "", romanji: "honki", promote: ["free_king"], image: "circle#奔鬼", letter: "FR", tags:"taikyoku "},
-    //running_horse: {parlett: "", romanji: "sōma, sōba", promote: ["free_demon"], image: "circle#走馬", letter: "HR", tags:"taikyoku "},
-    //beast_cadet: {parlett: "", romanji: "jūsō", promote: ["beast_officer"], image: "circle#獣曹", letter: "BC", tags:"taikyoku "},
-    //longnosed_goblin: {parlett: "", romanji: "tengu", image: "circle#天狗", letter: "LO", tags:"taikyoku "},
-    //mountain_eagle_left: {parlett: "", romanji: "sanshū", promote: ["soaring_eagle"], image: "circle#山鷲", letter: "ME", tags:"taikyoku "},
-    //mountain_eagle_right: {parlett: "", romanji: "sanshū", promote: ["soaring_eagle"], image: "circle#山鷲", letter: "MR", tags:"taikyoku "},
-    //fire_demon: {parlett: "", romanji: "kaki", promote: ["free_fire"], image: "circle#火鬼", letter: "DM", tags:"taikyoku "},
+    rear_standard: {parlett: "1X, 2X, n+", romanji: "kōki", promote: ["center_standard"], image: "circle#後旗", letter: "RS", tags:"taikyoku "},
+
+    free_king: {parlett: "n*", romanji: "honnō", promote: ["great_general"], image: "circle#奔王", letter: "FK", tags:"taikyoku "},
+
+    free_dreameater: {parlett: "nX, n<, n>, n=.5", romanji: "honbaku", promote: ["free_king"], image: "circle#奔獏", letter: "FT", tags:"taikyoku "},
+
+    //wooden_dove: {parlett: "n+.2, ~nX", romanji: "kyūhan", image: "circle#鳩槃", letter: "WO", tags:"taikyoku "}, // TODO: movement
+
+    earth_dragon: {parlett: "1>, 1<X, n+.2, n<X", romanji: "chiryū", promote: ["rain_dragon"], image: "circle#地龍", letter: "ED", tags:"taikyoku "},
+    free_demon: {parlett: "n<X.5, n+, n→", romanji: "honki", promote: ["free_king"], image: "circle#奔鬼", letter: "FR", tags:"taikyoku "},
+
+    //running_horse: {parlett: "1<, n+, n>X", romanji: "sōma, sōba", promote: ["free_demon"], image: "circle#走馬", letter: "HR", tags:"taikyoku "},
+    beast_cadet: {parlett: "n>.2, n=.2, nX.2", romanji: "jūsō", promote: ["beast_officer"], image: "circle#獣曹", letter: "BC", tags:"taikyoku "},
+    //longnosed_goblin: {parlett: "", romanji: "tengu", image: "circle#天狗", letter: "LO", tags:"taikyoku "}, // TODO: hook move
+
+    //mountain_eagle_left: {parlett: "n↙.2", romanji: "sanshū", promote: ["soaring_eagle"], image: "circle#山鷲", letter: "ME", tags:"taikyoku "},
+    //mountain_eagle_right: {parlett: "n↘.2", romanji: "sanshū", promote: ["soaring_eagle"], image: "circle#山鷲", letter: "MR", tags:"taikyoku "},
+    fire_demon: {parlett: "n>.2, n<.2, n=, nX", romanji: "kaki", promote: ["free_fire"], image: "circle#火鬼", letter: "DM", tags:"taikyoku "},
+
     //free_fire: {parlett: "", romanji: "honka", image: "circle#奔火", letter: "+DM", tags:"taikyoku "},
-    //whale: {parlett: "", romanji: "keigei", promote: ["great_whale"], image: "circle#鯨鯢", letter: "W", tags:"taikyoku "},
+
+    whale: {parlett: "n<, n>, n<X", romanji: "keigei", promote: ["great_whale"], image: "circle#鯨鯢", letter: "W", tags:"taikyoku "},
     //great_whale: {parlett: "", romanji: "daigei", image: "circle#大鯨", letter: "+W", tags:"taikyoku "},
-    //running_rabbit: {parlett: "", romanji: "sōto", promote: ["treacherous_fox"], image: "circle#走兎", letter: "RR", tags:"taikyoku "},
-    //white_tiger: {parlett: "", romanji: "byakko", promote: ["divine_tiger"], image: "circle#白虎", letter: "WT", tags:"taikyoku "},
+    running_rabbit: {parlett: "1+, 1<X, n+, n>X", romanji: "sōto", promote: ["treacherous_fox"], image: "circle#走兎", letter: "RR", tags:"taikyoku "},
+    white_tiger: {parlett: "n=, n↖, n>.2, n<.2", romanji: "byakko", promote: ["divine_tiger"], image: "circle#白虎", letter: "WT", tags:"taikyoku "},
     //divine_tiger: {parlett: "", romanji: "shinko", image: "circle#神虎", letter: "+WT", tags:"taikyoku "},
-    //turtle_snake: {parlett: "", romanji: "genbu", promote: ["divine_turtle"], image: "circle#玄武", letter: "TS", tags:"taikyoku "},
+    turtle_snake: {parlett: "n↗, n↙, 1*", romanji: "genbu", promote: ["divine_turtle"], image: "circle#玄武", letter: "TS", tags:"taikyoku "},
+
+    ceramic_dove: {parlett: "n+.2, nX", romanji: "kyūban", image: "circle#鳩盤", letter: "CD", tags:"taikyoku "},
+
     //divine_turtle: {parlett: "", romanji: "shinki", image: "circle#神亀", letter: "+TS", tags:"taikyoku "},
-    //lance: {parlett: "", romanji: "kyōsha", promote: ["white_horse"], image: "circle#香車", letter: "L", tags:"taikyoku "},
-    //reverse_chariot: {parlett: "", romanji: "hensha", promote: ["whale"], image: "circle#反車", letter: "RV", tags:"taikyoku "},
-    //mountain_dove: {parlett: "", romanji: "sankyū", promote: ["great_dove"], image: "circle#山鳩", letter: "MD", tags:"taikyoku "},
+
+    //TODO: reconcile with lance: lance: {parlett: "", romanji: "kyōsha", promote: ["white_horse"], image: "circle#香車", letter: "L", tags:"taikyoku "},
+    oxcart: {parlett: "n>", romanji: "gissha", promote: ["plodding_ox"], image: "circle#牛車", letter: "OC", tags:"taikyoku "},
+    savage_tiger: {parlett: "n>", romanji: "mōko", promote: ["great_tiger"], image: "circle#猛虎", letter: "TG", tags:"taikyoku "},
+
+    reverse_chariot: {parlett: "n<, n>", romanji: "hensha", promote: ["whale"], image: "circle#反車", letter: "RV", tags:"taikyoku "},
+    mountain_dove: {parlett: "1<, 1=, n>X.5", romanji: "sankyū", promote: ["great_dove"], image: "circle#山鳩", letter: "MD", tags:"taikyoku "},
     //elephant_king: {parlett: "", romanji: "zōō", image: "circle#象王", letter: "+FG", tags:"taikyoku "},
-    //flying_swallow: {parlett: "", romanji: "hien", promote: ["rook"], image: "circle#飛燕", letter: "FS", tags:"taikyoku "},
+    flying_swallow: {parlett: "1<, n>X", romanji: "hien", promote: ["rook"], image: "circle#飛燕", letter: "FS", tags:"taikyoku "},
     //captive_officer: {parlett: "", romanji: "kinri", promote: ["captive_bird"], image: "circle#禽吏", letter: "CO", tags:"taikyoku "},
     //captive_bird: {parlett: "", romanji: "kinchō", image: "circle#禽鳥", letter: "+CO", tags:"taikyoku "},
     //rain_dragon: {parlett: "", romanji: "uryū", promote: ["great_dragon"], image: "circle#雨龍", letter: "RA", tags:"taikyoku "},
@@ -1248,6 +1261,9 @@ var PIECE_TYPES = {
     //neighboring_king: {parlett: "", romanji: "kinnō", promote: ["front_standard"], image: "circle#近王", letter: "NK", tags:"taikyoku "},
     //gold_chariot: {parlett: "", romanji: "kinsha", promote: ["playful_cockatoo"], image: "circle#金車", letter: "GC", tags:"taikyoku "},
     //playful_cockatoo: {parlett: "", romanji: "yūmo", image: "circle#遊母", letter: "+GC", tags:"taikyoku "},
+    //right_army: {parlett: "", romanji: "ugun", image: "circle#右軍", letter: "+RG", tags:"taikyoku "},
+    //left_army: {parlett: "", romanji: "sagun", image: "circle#左軍", letter: "+LG", tags:"taikyoku "},
+
     //side_dragon: {parlett: "", romanji: "ōryū", promote: ["running_dragon"], image: "circle#横龍", letter: "SI", tags:"taikyoku "},
     //running_dragon: {parlett: "", romanji: "sōryū", image: "circle#走龍", letter: "+SI", tags:"taikyoku "},
     //running_stag: {parlett: "", romanji: "sōroku", promote: ["free_stag"], image: "circle#走鹿", letter: "RN", tags:"taikyoku "},
@@ -1408,7 +1424,6 @@ var PIECE_TYPES = {
     //blind_monkey: {parlett: "", romanji: "mōen", promote: ["flying_stag"], image: "circle#盲猿", letter: "BM", tags:"taikyoku "},
     //flying_stag: {parlett: "", romanji: "hiroku", image: "circle#飛鹿", letter: "+BM", tags:"taikyoku "},
     //blind_tiger: {parlett: "", romanji: "mōko", promote: ["flying_stag"], image: "circle#盲虎", letter: "BT", tags:"taikyoku "},
-    //oxcart: {parlett: "", romanji: "gissha", promote: ["plodding_ox"], image: "circle#牛車", letter: "OC", tags:"taikyoku "},
     //plodding_ox: {parlett: "", romanji: "sengyū", image: "circle#歬牛", letter: "+OC", tags:"taikyoku "},
     //side_flier: {parlett: "", romanji: "ōhi", promote: ["side_dragon"], image: "circle#横飛", letter: "SF", tags:"taikyoku "},
     //blind_bear: {parlett: "", romanji: "mōyū", promote: ["flying_stag"], image: "circle#盲熊", letter: "BB", tags:"taikyoku "},
@@ -1475,7 +1490,6 @@ var PIECE_TYPES = {
     //spear_general: {parlett: "", romanji: "sōshō", image: "circle#鎗将", letter: "+SP", tags:"taikyoku "},
     //vertical_leopard: {parlett: "", romanji: "shuhyō", promote: ["great_leopard"], image: "circle#竪豹", letter: "VL", tags:"taikyoku "},
     //great_leopard: {parlett: "", romanji: "daihyō", image: "circle#大豹", letter: "+VL", tags:"taikyoku "},
-    //savage_tiger: {parlett: "", romanji: "mōko", promote: ["great_tiger"], image: "circle#猛虎", letter: "TG", tags:"taikyoku "},
     //great_tiger: {parlett: "", romanji: "daiko", image: "circle#大虎", letter: "+TG", tags:"taikyoku "},
     //crossbow_soldier: {parlett: "", romanji: "kyūhei", promote: ["crossbow_general"], image: "circle#弓兵", letter: "SB", tags:"taikyoku "},
     //crossbow_general: {parlett: "", romanji: "kyūshō", image: "circle#弓将", letter: "+SB", tags:"taikyoku "},
@@ -4376,7 +4390,12 @@ function relative_decode_direction(ch, ch2)
     } else if (ch === "↙") {
         // ↙ diagonally left down (Extended Parlett)
         vectors = [[-1, -1]];
-
+    } else if (ch === "←") {
+        // ← left
+        vectors = [[-1, 0]];
+    } else if (ch === "→") {
+        // → right
+        vectors = [[1, 0]];
     } else if (ch === "*") {    
         // orthogonally or diagonally (eight possible directions)
         vectors = relative_decode_direction("+", undefined).vectors.concat(relative_decode_direction("X", undefined).vectors);
