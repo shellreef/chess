@@ -529,6 +529,13 @@ yaksha: {letter: "YA"},
 // http://en.wikipedia.org/wiki/Taikyoku_shogi#Game_notation says "Promoted pieces have a + added in front of the letter. (e.g., +CC for a wizard stork (promoted Chinese cock). "
 var promoted_from = {};
 for (var name in pieces) {
+    var goes_to = pieces[name].promote;
+    if (!goes_to) {
+        continue;
+    }
+    if (promoted_from[goes_to]) {
+        console.log("Warning: " + name + "," + promoted_from[goes_to] + " -> " + goes_to);
+    }
     promoted_from[pieces[name].promote] = name;
 }
 
