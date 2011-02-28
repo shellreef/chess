@@ -394,7 +394,8 @@ great_stag: {letter: "GS"},
 great_turtle: {letter: "GT"},
 guardian_of_the_gods: {letter: "GU"},
 horse_general: {letter: "H"},
-howling_dog: {letter: "HD"},
+howling_dog_left: {letter: "HL"},
+howling_dog_right: {letter: "HD"},
 ramshead_soldier: {letter: "HE"},
 horned_falcon: {letter: "HF"},
 hook_mover: {letter: "HM"},
@@ -421,7 +422,8 @@ little_standard: {letter: "LS"},
 left_tiger: {letter: "LT"},
 mountain_general: {letter: "M"},
 mountain_dove: {letter: "MD"},
-mountain_eagle: {letter: "ME"},
+mountain_eagle_left: {letter: "ME"},
+mountain_eagle_right: {letter: "MR"},
 mountain_falcon: {letter: "MF"},
 side_monkey: {letter: "MK"},
 mountain_stag: {letter: "MS"},
@@ -535,8 +537,10 @@ for (var name in pieces) {
     }
     if (promoted_from[goes_to]) {
         console.log("Warning: " + name + "," + promoted_from[goes_to] + " -> " + goes_to);
+    } else {
+        promoted_from[goes_to] = [];
     }
-    promoted_from[pieces[name].promote] = name;
+    promoted_from[goes_to].push(name);
 }
 
 for (var name in pieces) {
@@ -545,7 +549,7 @@ for (var name in pieces) {
     if (letters[name]) {
         letter = letters[name].letter;
     } else {
-        var came_from = promoted_from[name];
+        var came_from = promoted_from[name][0];     // TODO: which should it be?
         if (letters[came_from]) {
             letter = "+" + letters[came_from].letter;
         } else {
