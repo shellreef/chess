@@ -1203,7 +1203,7 @@ var PIECE_TYPES = {
     //wooden_dove: {parlett: "n+.2, ~nX", romanji: "kyūhan", image: "circle#鳩槃", letter: "WO", tags:"taikyoku "}, // TODO: movement
 
     earth_dragon: {parlett: "1>, 1<X, n+.2, n<X", romanji: "chiryū", promote: ["rain_dragon"], image: "circle#地龍", letter: "ED", tags:"taikyoku "},
-    free_demon: {parlett: "n<X.5, n+, n→", romanji: "honki", promote: ["free_king"], image: "circle#奔鬼", letter: "FR", tags:"taikyoku "},
+    free_demon: {parlett: "n<X.5, n+, n>>", romanji: "honki", promote: ["free_king"], image: "circle#奔鬼", letter: "FR", tags:"taikyoku "},
 
     //running_horse: {parlett: "1<, n+, n>X", romanji: "sōma, sōba", promote: ["free_demon"], image: "circle#走馬", letter: "HR", tags:"taikyoku "},
     beast_cadet: {parlett: "n>.2, n=.2, nX.2", romanji: "jūsō", promote: ["beast_officer"], image: "circle#獣曹", letter: "BC", tags:"taikyoku "},
@@ -4390,12 +4390,6 @@ function relative_decode_direction(ch, ch2)
     } else if (ch === "↙") {
         // ↙ diagonally left down (Extended Parlett)
         vectors = [[-1, -1]];
-    } else if (ch === "←") {
-        // ← left
-        vectors = [[-1, 0]];
-    } else if (ch === "→") {
-        // → right
-        vectors = [[1, 0]];
     } else if (ch === "*") {    
         // orthogonally or diagonally (eight possible directions)
         vectors = relative_decode_direction("+", undefined).vectors.concat(relative_decode_direction("X", undefined).vectors);
