@@ -1343,6 +1343,7 @@ var PIECE_TYPES = {
     howling_dog_right: {parlett: "#howling_dog_left", romanji: "kiken", promote: ["right_dog"], image: "circle#口奇犬", letter: "HD", tags:"taikyoku "},
     //right_dog: {parlett: "", romanji: "uken", image: "circle#右犬", letter: "+HD", tags:"taikyoku "},
     //left_dog: {parlett: "", romanji: "saken", image: "circle#左犬", letter: "+HL", tags:"taikyoku "},
+    // TODO: up dog
     side_mover: {parlett: "n=, 1>, 1<", romanji: "ōgyō", promote: ["free_boar"], image: "circle#横行", letter: "SM", tags:"taikyoku "},
     prancing_stag: {parlett: "n=.2, 1>, 1<, 1X>", romanji: "yōroku", promote: ["square_mover"], image: "circle#踊鹿", letter: "PR", tags:"taikyoku "},
     water_buffalo: {parlett: "nX, n=, n>.2, n<.2", romanji: "suigyū", promote: ["great_dreameater"], image: "circle#水牛", letter: "WB", tags:"taikyoku "},
@@ -1575,31 +1576,31 @@ var SAVED_BOARDS = {
 // Note that in this implementation, only 4-move castling is supported, but chessvariants.com describes how one, two, three, or four is supported.
 "Wildebeest Chess": "rnwwx(gnu)kqbbnr/ppppppppppp///////PPPPPPPPPPP/RNWWX(gnu)KQBBNR w AKak - files=11 ranks=10 stalemate=win rs=quad_castle shredder_castle",
 "Taikyoku Shogi": 
-    "(l)(ts)(rr)(w)(dm)(me)(lo)(bc)(hr)(fr)(ed)(cd)(ft)(fk)(rs)(lg)(g)(k)(cp)(g)(rg)(rs)(fk)(ft)(wo)(ed)(fr)(hr)(bc)(lo)(me)(dm)(w)(rr)(wt)(l)/" + 
-    "(rv)(we)(md)(fs)(co)(ra)(fo)(ms)(rp)(ru)(ss)(gr)(rt)(ba)(bd)(wr)(s)(nk)(de)(s)(gu)(ya)(ba)(rt)(gr)(ss)(ru)(rp)(ms)(fo)(ra)(co)(fs)(md)(fg)(rv)/" + 
-    "(gc)(si)(rn)(rw)(bg)(ro)(lt)(le)(bo)(wd)(fp)(rb)(ok)(pc)(wa)(fi)(c)(km)(pm)(c)(fi)(wa)(pc)(ok)(rb)(fp)(wd)(bo)(ri)(tt)(ro)(bg)(rw)(rn)(si)(gc)/" + 
-    "(sv)(ve)(n)(pi)(cg)(pg)(h)(o)(cn)(sa)(sr)(gl)(ln)(ct)(gs)(vd)(wl)(gg)(vg)(wl)(vd)(gs)(ct)(ln)(gl)(sr)(sa)(cn)(o)(h)(pg)(cg)(pi)(n)(ve)(sv)/" + 
-    "(ci)(ce)(b)(r)(wf)(fc)(mf)(vt)(so)(ls)(cl)(cr)(rh)(he)(vo)(gd)(go)(dv)(ds)(go)(gd)(vo)(he)(rh)(cr)(cl)(ls)(so)(vt)(mf)(fc)(wf)(r)(b)(ce)(ci)/" + 
-    "(wc)(wh)(hd)(sm)(pr)(wb)(fl)(eg)(fd)(ps)(fy)(st)(bi)(wg)(f)(kr)(ca)(gt)(ll)(hm)(ph)(f)(wg)(bi)(st)(fy)(ps)(fd)(eg)(fl)(wb)(pr)(sm)(hd)(wh)(wc)/" + 
-    "(tc)(vw)(sx)(do)(fh)(vb)(ab)(ew)(lh)(ck)(om)(cc)(ws)(es)(vs)(nt)(tf)(rm)(mt)(tf)(nt)(vs)(su)(nb)(cc)(om)(ck)(lh)(ew)(ab)(vb)(fh)(do)(sx)(vw)(tc)/" + 
-    "(ec)(bl)(eb)(ho)(ow)(cm)(cs)(sw)(bm)(bt)(oc)(sf)(bb)(or)(sq)(sn)(rd)(li)(fe)(rd)(sn)(sq)(or)(bb)(sf)(oc)(bt)(bm)(sw)(cs)(cm)(ow)(ho)(eb)(vi)(ec)/" + 
-    "(ch)(sl)(vr)(wn)(re)(m)(sd)(hs)(gn)(os)(ea)(bs)(sg)(lp)(t)(be)(i)(gm)(ge)(i)(be)(t)(lp)(sg)(bs)(ea)(os)(gn)(hs)(sd)(m)(re)(wn)(vr)(sl)(ch)/" + 
-    "(lc)(mk)(vm)(ox)(lb)(vp)(vh)(bn)(dh)(dk)(se)(hf)(el)(sp)(vl)(tg)(sb)(ld)(dg)(sb)(tg)(vl)(sp)(el)(hf)(se)(dk)(dh)(bn)(vh)(vp)(lb)(ox)(vm)(mk)(rc)/" + 
-    "(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)(p)/" + 
-    "5(d)5(gb)3(d)6(d)3(gb)4(d)/" +
+    "[l][ts][rr][w][dm][me][lo][bc][hr][fr][ed][cd][ft][fk][rs][lg][g][k][cp][g][rg][rs][fk][ft][wo][ed][fr][hr][bc][lo][me][dm][w][rr][wt][l]/" + 
+    "[rv][we][md][fs][co][ra][fo][ms][rp][ru][ss][gr][rt][ba][bd][wr][s][nk][de][s][gu][ya][ba][rt][gr][ss][ru][rp][ms][fo][ra][co][fs][md][fg][rv]/" + 
+    "[gc][si][rn][rw][bg][ro][lt][le][bo][wd][fp][rb][ok][pc][wa][fi][c][km][pm][c][fi][wa][pc][ok][rb][fp][wd][bo][ri][tt][ro][bg][rw][rn][si][gc]/" + 
+    "[sv][ve][n][pi][cg][pg][h][o][cn][sa][sr][gl][ln][ct][gs][vd][wl][gg][vg][wl][vd][gs][ct][ln][gl][sr][sa][cn][o][h][pg][cg][pi][n][ve][sv]/" + 
+    "[ci][ce][b][r][wf][fc][mf][vt][so][ls][cl][cr][rh][he][vo][gd][go][dv][ds][go][gd][vo][he][rh][cr][cl][ls][so][vt][mf][fc][wf][r][b][ce][ci]/" + 
+    "[wc][wh][hd][sm][pr][wb][fl][eg][fd][ps][fy][st][bi][wg][f][kr][ca][gt][ll][hm][ph][f][wg][bi][st][fy][ps][fd][eg][fl][wb][pr][sm][hd][wh][wc]/" + 
+    "[tc][vw][sx][do][fh][vb][ab][ew][lh][ck][om][cc][ws][es][vs][nt][tf][rm][mt][tf][nt][vs][su][nb][cc][om][ck][lh][ew][ab][vb][fh][do][sx][vw][tc]/" + 
+    "[ec][bl][eb][ho][ow][cm][cs][sw][bm][bt][oc][sf][bb][or][sq][sn][rd][li][fe][rd][sn][sq][or][bb][sf][oc][bt][bm][sw][cs][cm][ow][ho][eb][vi][ec]/" + 
+    "[ch][sl][vr][wn][re][m][sd][hs][gn][os][ea][bs][sg][lp][t][be][i][gm][ge][i][be][t][lp][sg][bs][ea][os][gn][hs][sd][m][re][wn][vr][sl][ch]/" + 
+    "[lc][mk][vm][ox][lb][vp][vh][bn][dh][dk][se][hf][el][sp][vl][tg][sb][ld][dg][sb][tg][vl][sp][el][hf][se][dk][dh][bn][vh][vp][lb][ox][vm][mk][rc]/" + 
+    "[p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p]/" + 
+    "5[d]5[gb]3[d]6[d]3[gb]4[d]/" +
     "////////////" + 
-    "5(D)5(GB)3(D)6(D)3(GB)4(D)/" + 
-    "(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)(P)/" + 
-    "(LC)(MK)(VM)(OX)(LB)(VP)(VH)(BN)(DH)(DK)(SE)(HF)(EL)(SP)(VL)(TG)(SB)(LD)(DG)(SB)(TG)(VL)(SP)(EL)(HF)(SE)(DK)(DH)(BN)(VH)(VP)(LB)(OX)(VM)(MK)(RC)/" + 
-    "(CH)(SL)(VR)(WN)(RE)(M)(SD)(HS)(GN)(OS)(EA)(BS)(SG)(LP)(T)(BE)(I)(GM)(GE)(I)(BE)(T)(LP)(SG)(BS)(EA)(OS)(GN)(HS)(SD)(M)(RE)(WN)(VR)(SL)(CH)/" + 
-    "(EC)(BL)(EB)(HO)(OW)(CM)(CS)(SW)(BM)(BT)(OC)(SF)(BB)(OR)(SQ)(SN)(RD)(LI)(FE)(RD)(SN)(SQ)(OR)(BB)(SF)(OC)(BT)(BM)(SW)(CS)(CM)(OW)(HO)(EB)(VI)(EC)/" + 
-    "(TC)(VW)(SX)(DO)(FH)(VB)(AB)(EW)(LH)(CK)(OM)(CC)(WS)(ES)(VS)(NT)(TF)(RM)(MT)(TF)(NT)(VS)(SU)(NB)(CC)(OM)(CK)(LH)(EW)(AB)(VB)(FH)(DO)(SX)(VW)(TC)/" + 
-    "(WC)(WH)(HD)(SM)(PR)(WB)(FL)(EG)(FD)(PS)(FY)(ST)(BI)(WG)(F)(KR)(CA)(GT)(LL)(HM)(PH)(F)(WG)(BI)(ST)(FY)(PS)(FD)(EG)(FL)(WB)(PR)(SM)(HD)(WH)(WC)/" + 
-    "(CI)(CE)(B)(R)(WF)(FC)(MF)(VT)(SO)(LS)(CL)(CR)(RH)(HE)(VO)(GD)(GO)(DV)(DS)(GO)(GD)(VO)(HE)(RH)(CR)(CL)(LS)(SO)(VT)(MF)(FC)(WF)(R)(B)(CE)(CI)/" + 
-    "(SV)(VE)(N)(PI)(CG)(PG)(H)(O)(CN)(SA)(SR)(GL)(LN)(CT)(GS)(VD)(WL)(GG)(VG)(WL)(VD)(GS)(CT)(LN)(GL)(SR)(SA)(CN)(O)(H)(PG)(CG)(PI)(N)(VE)(SV)/" + 
-    "(GC)(SI)(RN)(RW)(BG)(RO)(LT)(LE)(BO)(WD)(FP)(RB)(OK)(PC)(WA)(FI)(C)(KM)(PM)(C)(FI)(WA)(PC)(OK)(RB)(FP)(WD)(BO)(RI)(TT)(RO)(BG)(RW)(RN)(SI)(GC)/" + 
-    "(RV)(WE)(MD)(FS)(CO)(RA)(FO)(MS)(RP)(RU)(SS)(GR)(RT)(BA)(BD)(WR)(S)(NK)(DE)(S)(GU)(YA)(BA)(RT)(GR)(SS)(RU)(RP)(MS)(FO)(RA)(CO)(FS)(MD)(FG)(RV)/" + 
-    "(L)(TS)(RR)(W)(DM)(ME)(LO)(BC)(HR)(FR)(ED)(CD)(FT)(FK)(RS)(LG)(G)(K)(CP)(G)(RG)(RS)(FK)(FT)(WO)(ED)(FR)(HR)(BC)(LO)(ME)(DM)(W)(RR)(WT)(L)/" + 
+    "5[D]5[GB]3[D]6[D]3[GB]4[D]/" + 
+    "[P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P]/" + 
+    "[LC][MK][VM][OX][LB][VP][VH][BN][DH][DK][SE][HF][EL][SP][VL][TG][SB][LD][DG][SB][TG][VL][SP][EL][HF][SE][DK][DH][BN][VH][VP][LB][OX][VM][MK][RC]/" + 
+    "[CH][SL][VR][WN][RE][M][SD][HS][GN][OS][EA][BS][SG][LP][T][BE][I][GM][GE][I][BE][T][LP][SG][BS][EA][OS][GN][HS][SD][M][RE][WN][VR][SL][CH]/" + 
+    "[EC][BL][EB][HO][OW][CM][CS][SW][BM][BT][OC][SF][BB][OR][SQ][SN][RD][LI][FE][RD][SN][SQ][OR][BB][SF][OC][BT][BM][SW][CS][CM][OW][HO][EB][VI][EC]/" + 
+    "[TC][VW][SX][DO][FH][VB][AB][EW][LH][CK][OM][CC][WS][ES][VS][NT][TF][RM][MT][TF][NT][VS][SU][NB][CC][OM][CK][LH][EW][AB][VB][FH][DO][SX][VW][TC]/" + 
+    "[WC][WH][HD][SM][PR][WB][FL][EG][FD][PS][FY][ST][BI][WG][F][KR][CA][GT][LL][HM][PH][F][WG][BI][ST][FY][PS][FD][EG][FL][WB][PR][SM][HD][WH][WC]/" + 
+    "[CI][CE][B][R][WF][FC][MF][VT][SO][LS][CL][CR][RH][HE][VO][GD][GO][DV][DS][GO][GD][VO][HE][RH][CR][CL][LS][SO][VT][MF][FC][WF][R][B][CE][CI]/" + 
+    "[SV][VE][N][PI][CG][PG][H][O][CN][SA][SR][GL][LN][CT][GS][VD][WL][GG][VG][WL][VD][GS][CT][LN][GL][SR][SA][CN][O][H][PG][CG][PI][N][VE][SV]/" + 
+    "[GC][SI][RN][RW][BG][RO][LT][LE][BO][WD][FP][RB][OK][PC][WA][FI][C][KM][PM][C][FI][WA][PC][OK][RB][FP][WD][BO][RI][TT][RO][BG][RW][RN][SI][GC]/" + 
+    "[RV][WE][MD][FS][CO][RA][FO][MS][RP][RU][SS][GR][RT][BA][BD][WR][S][NK][DE][S][GU][YA][BA][RT][GR][SS][RU][RP][MS][FO][RA][CO][FS][MD][FG][RV]/" + 
+    "[L][TS][RR][W][DM][ME][LO][BC][HR][FR][ED][CD][FT][FK][RS][LG][G][K][CP][G][RG][RS][FK][FT][WO][ED][FR][HR][BC][LO][ME][DM][W][RR][WT][L]/" + 
     " w - - ranks=36 files=36",  // TODO
 //TODO: http://en.wikipedia.org/wiki/Tenjiku_shogi
 // TODO: Modern variants
@@ -6851,7 +6852,7 @@ function load_starting_position(fen, replay)
     for (i = 0; i < fen.length; i += 1) {
         code = fen.charAt(i);
 
-        if (/[a-zA-Z\(]/.test(code)) {
+        if (/[a-zA-Z\(\[]/.test(code)) {
             // Read possibly multi-letter piece code
             var length = piece_code_length(fen.substr(i));
             var letter = fen.substr(i, length);
@@ -7497,17 +7498,17 @@ function piece_code_length(code)
             // Two-letter codes beginning with X (XR, etc.) TODO: deprecate?
             i = 2; 
         }
-    } else if (code.charAt(0) === "(") {
+    } else if (code.charAt(0) === "[") {
         i = 1;
         // (letters)
         // Multiple-letter code (but not fullname); for Taikyoku Shogi
 
-        // Read until closing paren
+        // Read until closing bracket
         var ch;
         i += 1;
         while(i < code.length) {
             ch = code.charAt(i);
-            if (ch === ")") { break; }
+            if (ch === "]") { break; }
             i += 1;
         }
         i += 1;
@@ -7526,9 +7527,9 @@ function decode_piece_letter(name)
 {
     var color, type;
 
-    if (name.indexOf("(") === 0) {
-        // Parenthesized (letters)
-        name = name.substring(1).replace(")", "");
+    if (name.indexOf("[") === 0) {
+        // Parenthesized [multi-letter code]
+        name = name.substring(1).replace("]", "");
     }
 
     // In FEN, uppercase=white, lower=black
