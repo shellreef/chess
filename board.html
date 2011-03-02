@@ -876,7 +876,7 @@ var PIECE_TYPES = {
     /*135*/ wazir: {parlett: "1+", letter: "I", aka:"drunkenadjuant", url:"pc:wazir", image:["wazir", "1rook2"], tags:"generals "},    // or ~0/1
     /*145*/ //gorilla: {parlett: "1=, 1X<, 1<", aka:"guerilla", url:"akm", tags:"generals "}, // TODO: image
     /*234*/ diabolo: {parlett: "1X, 1=", url:"akm", aka:"drunkenferz", tags:"generals ", image:"daemon"},
-    /*235*/ coppergeneral: {parlett: "1X>, 1=, 1<", image:["coppergeneral", "yen"], aka:["yen", "dou-sho", "drunkenyale"], url:"http://filer.case.edu/org/cwrums/games/chu-pieces.html#dou", tags:"generals "},
+    /*235*/ copper_general: {parlett: "1X>, 1=, 1<", image:["coppergeneral", "yen"], aka:["yen", "dou-sho", "drunkenyale"], url:"http://filer.case.edu/org/cwrums/games/chu-pieces.html#dou", tags:"generals "},
     /*245*/ invertedsilver: {parlett: "1X+, 1<", aka:"backwardelephant", url:"akm", image:"backwardssilvergeneral", tags:"generals "},
     /*345*/ //drunkendeserter: {parlett: "1=, 1X<, 1<", url:"akm", tags:"generals "}, // TODO: image
     /*1234*/ drunkenelephant: {parlett: "1X, 1>, 1=", url:"akm", aka:"siu-zo", image:["drunkelephant", "drunkelephant2"], aka:["suizo"], tags:"generals "},
@@ -1532,6 +1532,9 @@ var PIECE_TYPES = {
 
 var DEFAULT_BOARD_GROUP = "Recognized";
 var DEFAULT_BOARD_NAME = "FIDE Chess";
+
+
+// TODO: replace x(foo) with (foo) and X(foo) with (Foo), then remove deprecated
 
 // Saved board setups in FEN
 var SAVED_BOARDS = {
@@ -7433,7 +7436,8 @@ function image_path_for(type, color, all)
         // Choose first from array if is an array
         bases = dojo.isArray(image_list) ? image_list : [image_list];
     } else {
-        bases = [type];
+        // If no image: key given, default to piece name except without underscores
+        bases = [type.replace("_", "")];
     }
 
     // TODO: Use .style.webkitTransform="rotate(45deg)" etc. to get rotated pieces,
