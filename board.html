@@ -7473,6 +7473,8 @@ function image_path_for(type, color, all)
 //
 // Examples: 
 // piece_code_length("RNBQKBNR") === 1 (for "R")
+// piece_code_length("(bede)RRR") === 6 (for "(bede)")
+// piece_code_length("[MR]foo") === 4 (for "[MR]")
 // piece_code_length("XRPPXA") === 2 (for "XR")
 // piece_code_length("X(bede)RRR") === 7 (for "X(bede)")
 function piece_code_length(code)
@@ -7483,6 +7485,7 @@ function piece_code_length(code)
         i = 1;
 
         // Expanded FEN codes
+        // TODO: deprecate and remove in preference of (fullname) or [letters] notation
         if (code.substr(0, 2) === "X(" || code.substr(0, 2) === "x(") {
             // x(fullname) or X(fullname)
             // Read until closing paren
@@ -7498,10 +7501,10 @@ function piece_code_length(code)
             // Two-letter codes beginning with X (XR, etc.) TODO: deprecate?
             i = 2; 
         }
+
+    // [letters]: multiple-letter code; useful for Taikyoku Shogi
     } else if (code.charAt(0) === "[") {
         i = 1;
-        // (letters)
-        // Multiple-letter code (but not fullname); for Taikyoku Shogi
 
         // Read until closing bracket
         var ch;
@@ -7509,6 +7512,20 @@ function piece_code_length(code)
         while(i < code.length) {
             ch = code.charAt(i);
             if (ch === "]") { break; }
+            i += 1;
+        }
+        i += 1;
+
+    // (fullname): actual name of piece given, instead of a letter code
+    } else if (code.charAt(0) === "(") {
+        i = 1;
+
+        // Read until closing paren
+        var ch;
+        i += 1;
+        while(i < code.length) {
+            ch = code.charAt(i);
+            if (ch === ")") { break; }
             i += 1;
         }
         i += 1;
@@ -7525,7 +7542,7 @@ function piece_code_length(code)
 // To encode, use color_piece_prefix().
 function decode_piece_letter(name)
 {
-    var color, type;
+    var color, type, color_letter;
 
     if (name.indexOf("[") === 0) {
         // Parenthesized [multi-letter code]
@@ -7533,20 +7550,32 @@ function decode_piece_letter(name)
     }
 
     // In FEN, uppercase=white, lower=black
-    if (/^[A-Z]/.test(name)) {
+    if (name.indexOf("(") === 0) {
+        color_letter = name.substring(1);   // first character of (Foo)
+    } else {
+        color_letter = name;
+    }
+
+    if (/^[A-Z]/.test(color_letter)) {
         color = "white";
-    } else if (/^[a-z]/.test(name)) {
+    } else if (/^[a-z]/.test(color_letter)) {
         color = "black";
     } else {
-        assert(false, "create_piece_by_letter(" + name + "): not a letter");
+        assert(false, "create_piece_by_letter(" + name + "): not a letter: " + color_letter);
     }
     name = name.toLowerCase();
 
+    if (name.substring(0, 1) === "(") {
+        // Full name parenthesized
+        type = name.substring(1).replace(")", "");
+
+    // TODO: deprecate/remove x(...) and X(...) in favor of (...)
     // x(name) or X(name) is explicit name, otherwise, is a letter
-    if (/\(/.test(name)) {
+    } else if (/\(/.test(name)) {
         var ary = /^[xX]\(([^)]+)/.exec(name);
         type = ary[1];
     } else {
+        // Just letter(s)
         type = piece_letter2name(name);
     }
 
