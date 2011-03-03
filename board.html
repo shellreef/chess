@@ -186,7 +186,8 @@ var AVAILABLE_NOTATIONS = {
 };
 
 // Preferences, not game state.
-var PREFS = {
+var USER_PREFS = {};
+var PREFS_DEFAULT = {
     revert_time: 350,               // ms to take to revert
     movement_animation_time: 100,   // ms to animate moving of pieces
 
@@ -216,8 +217,12 @@ var PREFS = {
 
     show_castling_impediments:false,    // Highlight squares preventing castling
     variant_generator:null              // Setup function for randomized games
-
 };
+
+// Get preference: global default, overriden by game default, or overriden by user selection
+function pref(name) { return USER_PREFS[name] || GAME_STATE.PREFS[name] || PREFS_DEFAULT[name]; }
+function set_pref(name, value) { USER_PREFS[name] = value; }
+
 
 // Board display and drawing settings
 var DISPLAY = {
@@ -430,7 +435,8 @@ var GAME_STATE_DEFAULT = {
     shift: false,               // Whether shift key is pressed
     update_custom: false,       // Whether custom movement field is focused and being typed in
     update_piece_query: false,  // Whether piece library query field is focused & being typed in
-    alert_assert: true          // Whether to alert assertion errors
+    alert_assert: true,         // Whether to alert assertion errors
+    PREFS: {}                   // Override preference defaults for game
 }; 
 
 var SESSION = {
@@ -1980,7 +1986,7 @@ function email_board(get_text)
     dots = ply_info.color ? (ply_info.color === "black" ? "... " : " ") : "";
 
     link = dojo.byId("copyable_link").href;
-    link_text = GAME_STATE.made_moves[ply] ? GAME_STATE.made_moves[ply].notations[PREFS.output_notation] : "*";
+    link_text = GAME_STATE.made_moves[ply] ? GAME_STATE.made_moves[ply].notations[pref("output_notation")] : "*";
     // Note: IE ActiveXObject for Outlook: http://www.webdeveloper.com/forum/showthread.php?t=176548
     // Got an automation error when I tried it, but it could supposedly allow HTML bodies on Windows
     //body = ply_info.fmvn + ". " + dots + '<a href="' + link + '">' + link_text + '</a>';
@@ -2540,7 +2546,7 @@ function mv(alg_move, is_not_immediate)
 
     if (!alg_move) {
         assert(VALID_MOVE_NOTATIONS, "mv(" + alg_move + "): called with VALID_MOVE_NOTATIONS false");
-        return own_properties(VALID_MOVE_NOTATIONS[PREFS.input_notation]);
+        return own_properties(VALID_MOVE_NOTATIONS[pref("input_notation")]);
     }
 
     // Find move in precalculated notations. 
@@ -2714,7 +2720,7 @@ function ask_to_promote(piece, tieback, is_immediate)
     for (var type in tieback) {
         if (tieback.hasOwnProperty(type)) {
             // The move the user selected that will be made
-            var notation = tieback[type].notations[PREFS.output_notation];
+            var notation = tieback[type].notations[pref("output_notation")];
 
             // Create a faux piece to click on
             element = create_piece(piece.color, type, true);
@@ -3319,13 +3325,13 @@ function own_properties(obj)
 // by selection instead of moving a piece with your mouse.
 function populate_make_a_move_list()
 {
-    var active_name = AVAILABLE_NOTATIONS[PREFS.input_notation];
+    var active_name = AVAILABLE_NOTATIONS[pref("input_notation")];
     var move_group, change_group, count, menu;
 
     menu = dojo.byId("make_move_menu");
     menu.innerHTML = "";
 
-    count = own_property_count(VALID_MOVE_NOTATIONS[PREFS.input_notation]);
+    count = own_property_count(VALID_MOVE_NOTATIONS[pref("input_notation")]);
     if (count === 0) {
         // TODO: This fails, _35e. Fix.
         menu.appendChild(dojo.create("option", {value:"", innerHTML:"No legal moves"}));
@@ -3339,8 +3345,8 @@ function populate_make_a_move_list()
     move_group = dojo.create("optgroup", {label:active_name});
     menu.appendChild(move_group);
 
-    for (var notation in VALID_MOVE_NOTATIONS[PREFS.input_notation]) {
-        if (VALID_MOVE_NOTATIONS[PREFS.input_notation].hasOwnProperty(notation)) {
+    for (var notation in VALID_MOVE_NOTATIONS[pref("input_notation")]) {
+        if (VALID_MOVE_NOTATIONS[pref("input_notation")].hasOwnProperty(notation)) {
             move_group.appendChild(dojo.create("option", 
                         {value: notation, innerHTML:notation}));
         }
@@ -3351,7 +3357,7 @@ function populate_make_a_move_list()
     menu.appendChild(change_group);
 
     for (var n in AVAILABLE_NOTATIONS) {
-        if (AVAILABLE_NOTATIONS.hasOwnProperty(n) && n !== PREFS.input_notation) {
+        if (AVAILABLE_NOTATIONS.hasOwnProperty(n) && n !== pref("input_notation")) {
             var name = AVAILABLE_NOTATIONS[n];
             change_group.appendChild(dojo.create("option", 
                         {value: "change_" + n, innerHTML:name}));
@@ -3501,7 +3507,7 @@ function make_move_by_menu(menu)
     if (choice.indexOf("change_") === 0) {
         var new_notation = choice.substring("change_".length);
    
-        PREFS.input_notation = new_notation;
+        set_pref("input_notation", new_notation);
         populate_make_a_move_list();
         return;
     }
@@ -3517,7 +3523,7 @@ function computer_move_if_applicable(clicked)
 {
     if (clicked) {
         if (form_value("black_computer") || form_value("white_computer")) {
-            dojo.byId("skill_level").value = PREFS.skill;
+            dojo.byId("skill_level").value = pref("skill");
             dojo.byId("show_skill").style.display = "";
         } else {
             dojo.byId("show_skill").style.display = "none";
@@ -3537,10 +3543,10 @@ function computer_move_if_applicable(clicked)
 
     unhighlight_all();
 
-    if (PREFS.skill === 0) {
+    if (pref("skill") === 0) {
         setTimeout(random_move, 1);
     } else {
-        schedule_engine_move(PREFS.skill);
+        schedule_engine_move(pref("skill"));
     }
 }
 
@@ -3558,7 +3564,7 @@ function update_skill(element)
 
     element.value = skill;
 
-    PREFS.skill = skill;
+    pref("skill") = skill;
 }
 
 // Make a random move with equal probability. No intelligence.
@@ -3586,7 +3592,7 @@ function schedule_engine_move(skill)
     query = "?skill=" + skill + ";fen=" + encodeURIComponent(active_fen());
 
     dojo.xhrGet({
-        url: PREFS.engine + query,
+        url: pref("engine") + query,
         handleAs: "json",
         load: got_engine_move,
         error: got_engine_error
@@ -3617,8 +3623,8 @@ function got_engine_error(response)
 // Disable the external chess engine usage and make a random move in its place.
 function disable_engine(why)
 {
-    PREFS.skill = 0;
-    dojo.byId("skill_level").value = PREFS.skill;
+    pref("skill") = 0;
+    dojo.byId("skill_level").value = pref("skill");
     dojo.byId("skill_level").title = "Reset because of: " + why;
     window.status = "Skill level reset because: " + why;
 
@@ -3673,7 +3679,7 @@ function running_locally()
 // Clear the session
 function logout()
 {
-    dojo.xhr("DELETE", {url:PREFS.server + "session",
+    dojo.xhr("DELETE", {url:pref("server") + "session",
             load:function(response, args) {
                 console.log("Logout successful");
                 update_session();
@@ -3691,11 +3697,11 @@ function login()
     // TODO: allow logging in without leaving the page and losing state!
     /* 
     dojo.byId("login_iframe").style.display = "";
-    dojo.byId("login_iframe").src = PREFS.server + "session/new";
+    dojo.byId("login_iframe").src = pref("server") + "session/new";
     */
 
     
-    location = PREFS.server + "session/new";
+    location = pref("server") + "session/new";
     // redirected back here
 }
 
@@ -3703,9 +3709,9 @@ function login()
 function update_session()
 {
     // So we were served off of localhost
-    PREFS.server = location.protocol + "//" + location.hostname + ":" + location.port + "/";
+    set_pref("server", location.protocol + "//" + location.hostname + ":" + location.port + "/");
 
-    dojo.xhr("GET", {url:PREFS.server + "session.json", handleAs: "json",
+    dojo.xhr("GET", {url:pref("server") + "session.json", handleAs: "json",
             load:function(response, args) {
                 if (response.player) {
                     console.log("Logged in");
@@ -3752,7 +3758,7 @@ function send_remote_move(color, move_text, fen, ply)
 
     // Send move to server
     console.log("Send remote:"+color+" "+move_text);
-    dojo.xhrPut({url:PREFS.server + "games/" + active_remote_game(), content:{color:color, move:move_text, fen:fen, ply:ply},
+    dojo.xhrPut({url:pref("server") + "games/" + active_remote_game(), content:{color:color, move:move_text, fen:fen, ply:ply},
             load:function(response) {
                 //console.log("load xhrPut",response);
             },
@@ -3787,7 +3793,7 @@ function active_remote_game()
 // Load a remote game from the server
 function load_remote_game(id)
 {
-    dojo.xhrGet({url:PREFS.server + "games/" + id + ".pgn",
+    dojo.xhrGet({url:pref("server") + "games/" + id + ".pgn",
             load:function(response) {
                 console.log("load_remote_game(" + id + "): got response", response);
                 load_pgn(response);
@@ -3801,7 +3807,7 @@ function load_remote_game(id)
 function new_remote_game()
 {
     // TODO: white, black remote players
-    dojo.xhrPost({url:PREFS.server + "game", content:{color:color, move:move_text},  //authenticity_token:SESSION.auth_token},
+    dojo.xhrPost({url:pref("server") + "game", content:{color:color, move:move_text},  //authenticity_token:SESSION.auth_token},
             load:function(response) {
                 console.log("load xhrPost",response);
             },
@@ -4180,7 +4186,7 @@ function filtered_moves(piece, color, is_hypothetical)
                 if (piece_between && 
                         piece_between.unique_id !== piece.unique_id &&          // king can be in the way
                         piece_between.unique_id !== castle_piece.unique_id) {   // this rook only " " "
-                    if (PREFS.show_castling_impediments) {
+                    if (pref("show_castling_impediments")) {
                         push_highlight(sq(x,1),"orange");
                     }
                     return false;
@@ -4198,7 +4204,7 @@ function filtered_moves(piece, color, is_hypothetical)
                 if (piece_between && 
                         piece_between.unique_id !== piece.unique_id &&          // king can be in the way
                         piece_between.unique_id !== castle_piece.unique_id) {   // castling rook only " " "
-                    if (PREFS.show_castling_impediments) {
+                    if (pref("show_castling_impediments")) {
                         push_highlight(sq(x,1),"darkorange");
                     }
                     return false;
@@ -5045,7 +5051,7 @@ function set_copyable_link(this_position)
     if (this_position) {
         fen = save_fen();
         captured = export_captured();
-        perspective = PREFS.flipped;
+        perspective = pref("flipped");
     } else {
         last = GAME_STATE.position_after.slice(-1)[0];
         prior = GAME_STATE.position_after.slice(-2)[0];
@@ -5056,7 +5062,7 @@ function set_copyable_link(this_position)
         if (last_move) {
             // Store the previous move and the board state _before_ the move,
             // so it can be made.
-            last_move = ";m=" + last_move.notations[PREFS.output_notation];
+            last_move = ";m=" + last_move.notations[pref("output_notation")];
             if (!prior) {
                 // No move has been made yet
                 dojo.byId("copyable_link").href = document.URL;
@@ -5217,7 +5223,7 @@ function make_game_browser()
     load_css("http://o.aolcdn.com/dojo/1.3.1/dojox/grid/resources/Grid.css");
 
     dojo.addOnLoad(function() {
-        dojo.xhrGet({url: PREFS.saved_games_path + "index",
+        dojo.xhrGet({url: pref("saved_games_path") + "index",
             handleAs: "json",
             load: function(games) {
                 var browser = dojo.byId("game-browser");
@@ -5245,7 +5251,7 @@ function make_game_browser()
 
                 dojo.connect(grid, "onRowClick", function(event) {
                         var item = grid.getItem(event.rowIndex);
-                        load_pgn_from_url(PREFS.saved_games_path + item.Filename[0], item.Offset[0]);
+                        load_pgn_from_url(pref("saved_games_path") + item.Filename[0], item.Offset[0]);
                     });
 
                 grid.columnReordering = true;
@@ -5324,15 +5330,15 @@ function create_board()
     
     for (var x = 0; x < GAME_STATE.files; x += 1) {
         // File labels, on top for white
-        var file = (PREFS.flipped ? GAME_STATE.files - x : x + 1);
+        var file = (pref("flipped") ? GAME_STATE.files - x : x + 1);
         var file_label;
 
-        if (PREFS.file_label_style === "Latin") {
+        if (pref("file_label_style") === "Latin") {
             file_label = x2file(file);
-        } else if (PREFS.file_label_style === "Arabic") {
+        } else if (pref("file_label_style") === "Arabic") {
             file_label = file.toString();
         } else {
-            assert(file, "invalid file_label_style: " + PREFS.file_label_style);
+            assert(file, "invalid file_label_style: " + pref("file_label_style"));
         }
 
         ctx.fillStyle = DISPLAY.text_color;
@@ -5378,15 +5384,15 @@ function create_board()
     ctx.fillStyle = DISPLAY.text_color;
     ctx.textAlign = "center";
     for (var y = 0; y < GAME_STATE.ranks; y += 1) {
-        var rank = PREFS.flipped ? y + 1 : GAME_STATE.ranks - y;
+        var rank = pref("flipped") ? y + 1 : GAME_STATE.ranks - y;
         var rank_label;
 
-        if (PREFS.rank_label_style === "Arabic") {
+        if (pref("rank_label_style") === "Arabic") {
             rank_label = y2rank(rank);
-        } else if (PREFS.rank_label_style === "Roman") {
+        } else if (pref("rank_label_style") === "Roman") {
             rank_label = y2rank_wxf("white", rank);
         } else {
-            assert(false, "invalid rank label style: " + PREFS.rank_label_style);
+            assert(false, "invalid rank label style: " + pref("rank_label_style"));
         }
 
         ctx.fillText(rank_label, DISPLAY.rank_labels_left, 
@@ -5505,13 +5511,13 @@ function unhighlight_all()
 // Get the upper-left x coordinate of a square given file
 function get_square_x(file)
 {
-    return DISPLAY.board_left + DISPLAY.board_border/2 + (PREFS.flipped ? GAME_STATE.files - file : file - 1) * DISPLAY.square_width;
+    return DISPLAY.board_left + DISPLAY.board_border/2 + (pref("flipped") ? GAME_STATE.files - file : file - 1) * DISPLAY.square_width;
 }
 
 // Get the upper-left y coordinate of a square given rank
 function get_square_y(rank)
 {
-    return DISPLAY.board_top + DISPLAY.board_border/2 + (PREFS.flipped ? rank - 1 : GAME_STATE.ranks - rank) * DISPLAY.square_height;
+    return DISPLAY.board_top + DISPLAY.board_border/2 + (pref("flipped") ? rank - 1 : GAME_STATE.ranks - rank) * DISPLAY.square_height;
 }
 
 // Highlight a square with a given color, or unhighlight it if color is false
@@ -5643,8 +5649,8 @@ function realize_vboard()
 // Toggle perspective of board
 function flip()
 {
-    PREFS.flipped = !PREFS.flipped;
-    dojo.byId("enable_flip").checked = PREFS.flipped;
+    set_pref("flipped", pref("flipped"));
+    dojo.byId("enable_flip").checked = pref("flipped");
 
     create_board();
     load_fen(save_fen(), true);
@@ -5842,8 +5848,8 @@ function load_from_query_string()
     // Flip/unflip board as needed. Avoid doing this unless
     // there is a change in the flip state, as it is expensive.
     // Needs to be done before loading.
-    if (!!query.f !== !!PREFS.flipped) {
-        PREFS.flipped = !!query.f;
+    if (!!query.f !== !!pref("flipped")) {
+        set_pref("flipped", !!query.f);
     }
 
 
@@ -6029,7 +6035,7 @@ function all_notations_from_piece_square(piece, square, text_input)
 // user drags a piece to a square and we don't know what move it is.
 function notation_from_piece_square(piece, square, text_input, notation_type)
 {
-    notation_type = notation_type || PREFS.output_notation;
+    notation_type = notation_type || pref("output_notation");
     var notations = VALID_MOVE_NOTATIONS[notation_type];
     var finds = {}, find_count = 0, one;
 
@@ -6245,7 +6251,7 @@ function execute_move(promote_to, choices, is_hypothetical, is_immediate)
             // Animate the movement
             var from_image = dojo.byId("piece-at-" + from_square.filerank);
             dojo.anim(from_image, {left:get_square_x(square.x) + 4,
-                    top:get_square_y(square.y) + 3}, PREFS.movement_animation_time, null, function() {
+                    top:get_square_y(square.y) + 3}, pref("movement_animation_time"), null, function() {
                         highlight_recent_move(from_square, square);
                         continue_execute_move(piece, square, move, 
                             is_hypothetical, choices, promote_to, is_immediate);
@@ -6383,7 +6389,7 @@ function show_move_history()
 
 
         if (move_info) {
-            move_text = move_info.notations[PREFS.output_notation];
+            move_text = move_info.notations[pref("output_notation")];
         } else {
             // Ply 1 does not exist. Include the fmvn, but not the link,
             // so that the period can link to ply_0.
@@ -6499,7 +6505,7 @@ function mark_repeated_moves(reps)
 // Handle graphically moving of a piece, dropping it to its new location
 function move_dropped_piece(piece, square, event)
 {
-    if (PREFS.setup_mode) {
+    if (pref("setup_mode")) {
         var from_square = piece.square;
 
         if (piece.unique_id === undefined) {
@@ -6717,12 +6723,14 @@ function load_fen(fen, replay)
         // Game "rule set"
         dojo.mixin(GAME_STATE, RULE_SETS[GAME_STATE.rs]);
 
+        /* XXX: remove with pref()
         if (RULE_SETS[GAME_STATE.rs].PREFS) {
             // Default preferences for this rule set
             delete GAME_STATE.PREFS;
             dojo.mixin(PREFS, RULE_SETS[GAME_STATE.rs].PREFS);
             dojo.byId("output_notation").value = PREFS.output_notation; // TODO: cleaner
-        }
+        }*/
+        dojo.byId("output_notation").value = pref("output_notation"); // TODO: cleaner
     }
 
     // Captured pieces (if no EPD tag present, initializes to empty)
@@ -6910,7 +6918,7 @@ function load_starting_position(fen, replay)
 // Show all available images, even those without movement
 function show_library_images()
 {
-    var root = PREFS.image_root + PREFS.image_set + "/";
+    var root = pref("image_root") + pref("image_set") + "/";
     var used_paths = {}, count;
 
     count = 0;
@@ -6947,9 +6955,9 @@ function show_library_images()
         document.write("<h1>All piece images</h1>");
         document.write("<h2>" + count + " of " + images.length + " (" + 
             Math.round(count / images.length * 100) + "%) defined" + "</h2>");
-        document.write("<p>This is a list of all blue and white piece images available in the <b>" + PREFS.image_set + "</b> image set, including those that are not assigned to a piece. See also: <ul>");
-        document.write("<li><a href=\"" + PREFS.image_root + PREFS.image_set + "\">Directory listing</a>");
-        document.write("<li><a href=\"" + PREFS.image_root + PREFS.image_set + "/README.html\">README</a>");
+        document.write("<p>This is a list of all blue and white piece images available in the <b>" + pref("image_set") + "</b> image set, including those that are not assigned to a piece. See also: <ul>");
+        document.write("<li><a href=\"" + pref("image_root") + pref("image_set") + "\">Directory listing</a>");
+        document.write("<li><a href=\"" + pref("image_root") + pref("image_set") + "/README.html\">README</a>");
         document.write("</ul>");
 
         document.write("<table>");
@@ -6960,8 +6968,8 @@ function show_library_images()
                 continue;
             }
 
-            var wpath = root + "w" + image + PREFS.image_extension;
-            var bpath = root + "b" + image + PREFS.image_extension;
+            var wpath = root + "w" + image + pref("image_extension");
+            var bpath = root + "b" + image + pref("image_extension");
 
             document.write('<tr>');
             document.write('<td>' + i + '.</td>');
@@ -6980,7 +6988,7 @@ function set_setup_mode(on)
 {
     // Set setup mode as opening/closing piece library, since that is what it is for
     dojo.byId("enable_setup_mode").checked = on;
-    PREFS.setup_mode = on;
+    set_pref("setup_mode", on);
 
     if (!on) {
         // Exited setup mode, so calculate moves with new setup
@@ -7461,7 +7469,7 @@ function image_path_for(type, color, all)
         basename = ary[0];
         text = ary[1];
 
-        var path = [PREFS.image_root, PREFS.image_set, "/", PREFS.image_prefixes[color], basename, PREFS.image_extension].join("");
+        var path = [pref("image_root"), pref("image_set"), "/", pref("image_prefixes")[color], basename, pref("image_extension")].join("");
         if (text) {
             path += "#" + text;
         }
@@ -7956,13 +7964,13 @@ function set_variant_code(code, generator)
 
     assert(generator, "set_variant_code(" + code + ", " + generator + "): requires generator");
 
-    PREFS.variant_generator = generator;
+    set_pref("variant_generator", generator);
 }
 
 // Load a new game when a new variant code is entered.
 function update_variant_code(code) 
 {
-    assert(PREFS.variant_generator, "update_variant_code(" + code + "): called before set_variant_code, missing variant_generator");
+    assert(pref("variant_generator"), "update_variant_code(" + code + "): called before set_variant_code, missing variant_generator");
 
     if (code.indexOf && code.indexOf("0x") === 0) {
         code = parseInt(code, 16);
@@ -7974,7 +7982,7 @@ function update_variant_code(code)
         code = undefined;
     }
 
-    load_fen(PREFS.variant_generator(code));
+    load_fen(pref("variant_generator")(code));
 }
 
 // Decode the Chess960 S# (Scharnagl) code to a piece array
@@ -8279,7 +8287,7 @@ function mousedown(event)
         open_piece_url(target);
     }
 
-    if (target.className.indexOf("tear-off") !== -1 || (event.altKey && PREFS.setup_mode)) {
+    if (target.className.indexOf("tear-off") !== -1 || (event.altKey && pref("setup_mode"))) {
         // This is from the piece library -- or being option-dragged from
         // the board to be cloned -- so allow a new copy
         // of the piece to be torn off.
@@ -8416,7 +8424,7 @@ function dragging_over(element, left, top)
         }
 
         // Highlight droppable square
-        var flipped = PREFS.flipped;
+        var flipped = pref("flipped");
         if (!VBOARD[flipped ? (GAME_STATE.files + 1) - cell_x : cell_x]) {
             DROP.square = null;
             return;
@@ -8505,7 +8513,7 @@ function accepts(piece, square)
     }
 
     // Can drop anywhere
-    if (PREFS.setup_mode) {
+    if (pref("setup_mode")) {
         return true;
     }
 
@@ -8534,11 +8542,11 @@ function drop_or_revert()
     square = DROP.square;
 
     // Dragging offboard: delete in setup mode
-    if (DROP.offboard && PREFS.setup_mode) {
+    if (DROP.offboard && pref("setup_mode")) {
         var new_top = dojo.style(piece, "top") + dojo.style(piece, "height") / 2;
         var new_left = dojo.style(piece, "left") + dojo.style(piece, "width") / 2;
         // Shrink off into the distance
-        dojo.anim(piece, {width:0, height:0, top:new_top, left:new_left}, PREFS.revert_time, undefined, function() {
+        dojo.anim(piece, {width:0, height:0, top:new_top, left:new_left}, pref("revert_time"), undefined, function() {
                 // It was on board, move piece over itself to kill it
                 if (piece.square) {
                     do_virtual_move(piece, {x:piece.square.x, y:piece.square.y});
@@ -8568,12 +8576,12 @@ function drop_or_revert()
             // Use webkit transforms if available; faster
             // Feature detection from http://iui.googlecode.com/svn/trunk/test/features.html
             // (detects for css transforms, hopefully close enough)
-            piece.style.webkitTransition = "left " + PREFS.revert_time + "ms linear, " + 
-                "top " + PREFS.revert_time + "ms linear";
+            piece.style.webkitTransition = "left " + pref("revert_time") + "ms linear, " + 
+                "top " + pref("revert_time") + "ms linear";
             piece.style.left = DRAG.initial_left + "px";
             piece.style.top  = DRAG.initial_top + "px";
         } else {
-            dojo.anim(piece, { left: DRAG.initial_left, top: DRAG.initial_top }, PREFS.revert_time);
+            dojo.anim(piece, { left: DRAG.initial_left, top: DRAG.initial_top }, pref("revert_time"));
         }
         return;
     }
@@ -8878,7 +8886,7 @@ not to implement chess AI. But having automatic moves is useful for testing. -->
 <div id="show_skill" style="display: none"><p>Skill Level: 
 <input type="text" size="3" maxlength="3" id="skill_level" onchange="update_skill(this)"></div>
 
-<p><select accesskey="o" id="output_notation" name="output_notation" onchange="PREFS.output_notation = form_value(this); show_move_history()"></select>
+<p><select accesskey="o" id="output_notation" name="output_notation" onchange="set_pref('output_notation', form_value(this)); show_move_history()"></select>
 
 <p><a href="#" onclick="edit_pgn()">import/edit PGN</a>
 
