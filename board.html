@@ -79,6 +79,7 @@ div.piece
  /* For optional textContents overlaid on image */
  text-align: center;  
  font-weight: bold;
+ font-size: 24px;       /* TODO: smaller for multiple letters */
  line-height: 49px;     /* center, by matching to div height */
 }
 
@@ -339,7 +340,7 @@ var RULE_SETS = {
       
         // piece movement restrictions
         bounds1:"river,1,1,10,5,elephant", 
-        bounds2:"palace,4,1,6,3,general,ferz",
+        bounds2:"palace,4,1,6,3,general,advisor",
 
         // Graphical board features to show piece movement restrictions
         features:[
@@ -372,7 +373,7 @@ var RULE_SETS = {
       
         // piece movement restrictions
         bounds1:"river,1,1,10,5,elephant", 
-        bounds2:"palace,4,1,6,3,general,ferz",
+        bounds2:"palace,4,1,6,3,general,advisor",
 
         // Graphical board features to show piece movement restrictions
         features:[
@@ -686,7 +687,7 @@ var PIECE_TYPES = {
           royal: true, letter: "K", figurines: ["\u2654", "\u265a"],
           castles_with: "rook", url:"pc:king", tags:"fide "},
     queen: {parlett: "n*", letter: "Q", figurines: ["\u2655", "\u265b"], iccf_number: 1, url:"pc:queen", tags:"fide ", tags:"dame"},
-    rook: {parlett: "n+", letter: "R", castle: true, figurines: ["\u2656", "\u265c"], iccf_number: 2, url:"pc:rook", aka:["chariot", "car"], tags:"fide ", cn_letter:"車"},
+    rook: {parlett: "n+", image:{w:"rook", kw:"circle#車", kb:"circle#俥"}, letter: "R", castle: true, figurines: ["\u2656", "\u265c"], iccf_number: 2, url:"pc:rook", aka:["chariot", "car"], tags:"fide ", cn_letter:"車"},
     bishop: {parlett: "nX", letter: "B", figurines: ["\u2657", "\u265d"], iccf_number: 3, url:"pc:bishop", aka:["courier", "alfieri"], tags:"fide "},
     knight: {parlett: "~1/2", letter: "N", figurines: ["\u2658", "\u265e"], iccf_number: 4, url:"pc:knight", tags:"fide ", aka:"cavalier"},
 
@@ -717,8 +718,8 @@ var PIECE_TYPES = {
 
     weakpawn: {parlett: "o1>, c1X>"},   // No double move, no promotion
     losalamospawn: {parlett: "o1>, c1X>", promote: ["queen", "rook", "knight"]},
-    shatranjpawn: {parlett: "#weakpawn", promote:["ferz"], url:"http://en.wikipedia.org/wiki/Shatranj#Rules"},
-    makrukpawn: {parlett: "#weakpawn", promote:["ferz"], promotion_rank:6, url:"http://en.wikipedia.org/wiki/Makruk#Pieces"},
+    shatranjpawn: {parlett: "#weakpawn", promote:["advisor"], url:"http://en.wikipedia.org/wiki/Shatranj#Rules"},
+    makrukpawn: {parlett: "#weakpawn", promote:["advisor"], promotion_rank:6, url:"http://en.wikipedia.org/wiki/Makruk#Pieces"},
     superpawn: {parlett: "on>, cnX>", letter: "XP", image:"quickpawn"},
     berolinapawn: {parlett: "o1X>, c1>, io2X>", letter: "XB", resets_50move: true, url:"pc:berolina"},
     leftberolinapawn: {parlett: "o1↖, c1>, io2↖", letter: "XB", resets_50move: true},
@@ -755,7 +756,7 @@ var PIECE_TYPES = {
     fieldmouse: {parlett: "~0/5"},
     mouse: {parlett: "~0/6"},
     rat: {parlett: "~0/7"},
-    // See also: ~1/1 is ferz; ~1/2 is knight
+    // See also: ~1/1 is advisor; ~1/2 is knight
     camel: {parlett: "~1/3", letter: "W", image:["camel", "camel2", "camelrev2"], url:"pc:camel", hex:"U+1F42A"/*dromedary*/},  // TODO: Timur's game
     giraffe: {parlett: "~1/4", letter: "XG", url:"pc:giraffe"},
     blowfish: {parlett: "~1/5"},
@@ -785,14 +786,14 @@ var PIECE_TYPES = {
 
     // Amphibians (combined leapers)
     // "31 Basic Pieces" from http://chessvariants.wikidot.com/31-basic-pieces
-    // dababa,knight,alfil,wazir,ferz
+    // dababa,knight,alfil,wazir,advisor
     //    1     2     3     4     5
     /*12345*/
-    /*    5*/ // see ferz
+    /*    5*/ // see advisor
     /*    4*/ // see wazir 
     /*   45*/ // see guard
     /*  3  */ // see alfil
-    /*  3 5*/ //alfilferz:{parlett:"#alfil, #ferz", url:"http://chessvariants.wikidot.com/31-basic-pieces"},  // TODO: image
+    /*  3 5*/ //alfilferz:{parlett:"#alfil, #advisor", url:"http://chessvariants.wikidot.com/31-basic-pieces"},  // TODO: image
     /*  34 */ waffle: {parlett: "#wazir, #alfil", image:"elephantwazir", aka:"phoenix", url:"pc:waffle", aka:["WA"]},
     /*  345*/ //guardalfil:{parlett: "#man, #alfil", url:"http://chessvariants.wikidot.com/31-basic-pieces"},  // TODO: image
     /* 2   */ // see knight
@@ -800,30 +801,30 @@ var PIECE_TYPES = {
     /* 2 4 */ knightwazir: {parlett: "#knight, #wazir", url:"http://chessvariants.wikidot.com/31-basic-pieces"},
     /* 2 45*/ centaur: {parlett: "#knight, #man", aka:"crownedknight", url:"pc:centaur"},         // not royal, so not an equesrex  (also, ~0/1, ~1/1, ~1/2. K+N)
     /* 23  */ kangaroo: {parlett: "#knight, #alfil", aka:["newton", "knightalfil"], url:"pc:cangaroo"},  // Newton kangaroo, different than pc:kangaroo
-    /* 23 5*/ highpriestness: {parlett: "#knight, #alfil, #ferz", image:["highpriestess2", "highpriestess"], url:"http://chessvariants.wikidot.com/31-basic-pieces"},
+    /* 23 5*/ highpriestness: {parlett: "#knight, #alfil, #advisor", image:["highpriestess2", "highpriestess"], url:"http://chessvariants.wikidot.com/31-basic-pieces"},
     /* 234 */ //alfilknightwazir: {"#alfil, #knight, #wazir", url:"http://chessvariants.wikidot.com/31-basic-pieces"}, // TODO: image
     /* 2345*/ //crownedknightalfil: {"#alfil, #knight, #man"}, // TODO: image
     /*1    */ // see dababba
-    /*1   5*/ //ferzwarmachine: {"#ferz, #warmachine"}, // TODO: image
+    /*1   5*/ //ferzwarmachine: {"#advisor, #warmachine"}, // TODO: image
     /*1  4 */ woodyrook: {parlett: "#warmachine, #wazir", image:"warmachinewazir", url:"http://www.chessvariants.com/d.betza/chessvar/dan/rookies.html", aka:["WD"]},
     /*1  45*/ //guardwarmachine: {"#man, #warmachine"}, // TODO: image
     /*1   5*/ alibaba: {parlett: "~2*", letter: "L", image:"elephantwarmachine", url:"pc:alibaba", aka:"deacon"},   // or: #alfil, #warmachine = ~0/2, ~2/2
-    /*1 3 5*/ //alibabaferz: {parlett: "#alibaba, #ferz", url:"http://chessvariants.wikidot.com/31-basic-pieces"}, // TODO: image
+    /*1 3 5*/ //alibabaferz: {parlett: "#alibaba, #advisor", url:"http://chessvariants.wikidot.com/31-basic-pieces"}, // TODO: image
     /*1 34 */ //alibabawazir: {parlett: "#alibaba, #wazir", url:"http://chessvariants.wikidot.com/31-basic-pieces"}, // TODO: image
     /*1 345*/ jumpinggeneral: {parlett: "#warmachine, #alfil, #man", url:"http://chessvariants.wikidot.com/31-basic-pieces", image:["jumpinggeneral2", "jumpinggeneral"]}, // this is a leaper, versus "mastodon" which is a rider
     /*12   */ carpenter: {parlett: "#knight, #warmachine", image:["knightwarmachine2", "knightwarmachine"], aka:"knightwarmachine", url:"pc:carpentr"},
-    /*12  5*/ knightwarmachineferz: {parlett: "#knight, #warmachine, #ferz", image:"knightdababaferz"},
+    /*12  5*/ knightwarmachineferz: {parlett: "#knight, #warmachine, #advisor", image:"knightdababaferz"},
     /*12 4 */ minister: {parlett: "#knight, #warmachine, #wazir", image:["minister", "knightwarmachinewazir2", "knightwarmachinewazir", "knightwazirwarmachine"], url:"http://chessvariants.wikidot.com/31-basic-pieces"}, // http://chessvariants.wikidot.com/31-basic-pieces calls "minister", but conflicts with http://chessvariants.wikidot.com/pcp-am:minister
     /*12 45*/ //ministerferz: {parlett: "TODO"}, // TODO: image and movement
     /*123  */ squirrel: {parlett: "~0/2, ~1/2, ~2/2", aka:["centurion", "castle"], letter: "S", url:"pc:squirrel"},
-    /*123 5*/ //squirrelferz: {parlett: "#squirrel, #ferz", url:"http://chessvariants.wikidot.com/31-basic-pieces"}, // TODO: image
+    /*123 5*/ //squirrelferz: {parlett: "#squirrel, #advisor", url:"http://chessvariants.wikidot.com/31-basic-pieces"}, // TODO: image
     /*1234 */ //squirrelwazir: {parlett: "#squirrel, #wazir", url:"http://chessvariants.wikidot.com/31-basic-pieces"}, // TODO: image
     /*12345*/ squire: {parlett: "#man, #squirrel"},       // haha.. man + squirrel. Actually defined as 2 squares, any direction. http://chessvariants.wikidot.com/31-basic-pieces calls this a "lion" but that piece is too overloaded
 
     dolphin: {parlett: "~7/7, ~0/7, ~0/6, ~6/6"},
     bat: {parlett: "~1/8, ~7/4", url:"http://www.quadibloc.com/chess/ch0201.htm"},
     frog: {parlett: "~1/1, ~0/3", letter: "F", hex:"U+1F438"},     
-    duke: {parlett: "~0/2, ~1/1", url:"akm"},      // #ferz, #warmachine
+    duke: {parlett: "~0/2, ~1/1", url:"akm"},      // #advisor, #warmachine
     bison: {parlett: "~1/3, ~2/3", url:"pc:bison"},
     gnu: {parlett: "~1/2, ~1/3", image:"knightcamel", url:"pc:gnus", aka:["wildebeest"]},
     rootfiftyleaper: {parlett: "~5/5, ~7/1", url:"pc:root50"},
@@ -860,7 +861,7 @@ var PIECE_TYPES = {
     //   3 * 3    1=      1=
     //   4 5 4   1X<  1<  1X<
     /*1*/ soldier: {parlett: "1>", url:"http://en.wikipedia.org/wiki/Shogi", image:"shogipawn", aka:["shogipawn", "fu"]/*, promotion_rank:9*/, tags:"generals "}, // TODO: optional promotion
-    chinesepawn: {image:{w:"chinesepawn", k:"circle#兵"}, parlett: "1>", url:"pc:pawn-xiangqi", aka:["chinesepawn", "fu"], 
+    chinesepawn: {image:{w:"chinesepawn", kw:"circle#卒", kb:"circle#兵"}, parlett: "1>", url:"pc:pawn-xiangqi", aka:["chinesepawn", "fu"], 
 	// 1>, but when crosses "river", promotes and can move 1=
 	promote:["advancedsoldier"], promotion_rank:6, tags:"generals ", wxf_letter:"P", cn_letter:["兵", "卒"]}, 
     /*2*/ goose: {parlett: "o1X>", url:"akm", image:"goose", tags:"generals "},
@@ -873,7 +874,7 @@ var PIECE_TYPES = {
     /*14*/ marine: {parlett: "1X<, 1>", url:"akm", aka:"wazirferzhunter", tags:"generals "}, 
     /*15*/ adjutant: {parlett: "1>, 1<", url:"akm", aka:["tsiu-yin", "chuuuin", "gobetween", "doublefootsoldier"], image:"general3", tags:"generals "}, 
     /*23*/ sidewinder: {parlett: "1X>, 1=", url:"akm", tags:"generals "}, 
-    /*24*/ ferz: {parlett: "1X", letter: "XF", image:["ferz", "ferz2", "1bishop", "1bishop2"], url:"pc:ferz", aka:["adviser", "firzin"], tags:"generals ", wxf_letter:"A", cn_letter:"士"}, // or ~1/1
+    /*24*/ advisor: {parlett: "1X", letter: "XF", image:{w:["ferz", "ferz2", "1bishop", "1bishop2"], kw:"circle#士", kb:"circle#仕"}, url:"pc:ferz", aka:["adviser", "firzin"], tags:"generals ", wxf_letter:"A", cn_letter:"士"}, // or ~1/1
     /*25*/ //ferzwazirhunter: {parlett: "1<, 1X>", url:"akm", tags:"generals "}, // TODO: image
     /*34*/ drunkensailor: {parlett: "1=, 1X<", image:"shipinv", url:"akm", tags:"generals "}, 
     /*35*/ drunkenbackslider: {parlett: "1=, 1<", url:"akm", aka:["reversesoldier"], tags:"generals ", image:["drunkbackslider2", "drunkbackslider"]},
@@ -925,7 +926,7 @@ var PIECE_TYPES = {
         "[2,1;if_unblocked=1,0], [2,-1;if_unblocked=1,0], " +
         "[1,-2;if_unblocked=0,-1], [-1,-2;if_unblocked=0,-1], " +
         "[-2,1;if_unblocked=-1,0], [-2,-1;if_unblocked=-1,0]",
-        image:["horse", "mao"], url:"pc:mao", letter:"H", aka:["ma", "mare"], tags:"diminished ", cn_letter:"馬"},
+        image:{w:["horse", "mao"], kw:"circle#馬", kb:"circle#傌"}, url:"pc:mao", letter:"H", aka:["ma", "mare"], tags:"diminished ", cn_letter:"馬"},
     moa: {parlett: "[1,2;if_unblocked=1,1], [2,1;if_unblocked=1,1], " +
         "[2,-1;if_unblocked=1,-1], [1,-2;if_unblocked=1,-1], " +
         "[-1,-2;if_unblocked=-1,-1], [-2,-1;if_unblocked=-1,-1], " +
@@ -933,7 +934,7 @@ var PIECE_TYPES = {
     },
     moo: {parlett: "#horse, #moa", url:"http://chessvariants.wikidot.com/pcp-am:moo", tags:"diminished "}, 
 
-    r4ferz: {parlett: "#r4, #ferz", tags:"diminished ", },
+    r4ferz: {parlett: "#r4, #advisor", tags:"diminished ", },
     n2r4: {parlett: "#r4, 2(~1/2)", tags:"diminished "},
     rookish: {parlett: "#alfil, #r4", tags:"diminished ", image:["alfilr4", "onediamondrook"], url:"http://chessvariants.wikidot.com/8x8-variants"},
     mastodon: {parlett: "n*.2", url:"http://www.quadibloc.com/chess/ch0502.htm", tags:"diminished "},
@@ -954,9 +955,9 @@ var PIECE_TYPES = {
     chancellorwazir: {parlett: "#chancellor, #wazir"},
     archbishop: {parlett: "#bishop, #knight", letter: "A", image: ["cardinal", "cardinal1", "cardinal2", "princess", "bishopknight2"], url:"pc:bishop-knight", aka:["cardinal", "princess", "janus", "NB"], hex:"U+1F478"}, // B+N
     archbishoprider: {parlett: "#archbishop, #nightrider", image:"cardinalrider"},
-    cardinalferz: {parlett: "#archbishop, #ferz"},
+    cardinalferz: {parlett: "#archbishop, #advisor"},
     dragonhorse: {parlett: "#bishop, #wazir", image: "promotedbishop", url:"pc:dragonhorse"},
-    //berse: {parlett: "#rook, #ferz", image: "promtoedrook", aka:["dragonking"]},    // TODO: image
+    //berse: {parlett: "#rook, #advisor", image: "promtoedrook", aka:["dragonking"]},    // TODO: image
     caliph: {parlett: "#camel, #bishop", image: "camelbishop", url:"pc:caliph"},
     pope: {parlett: "#king, #bishop", image:"kingbishop"},  // http://www.chessvariants.com/difftaking.dir/thunder.html 
     dragonking: {parlett: "#king, #rook", royal: true, url:"pc:dragonking", image:"turtle"},
@@ -968,14 +969,14 @@ var PIECE_TYPES = {
     elephantwarmachinewazir: {parlett: "#elephant, #warmachine, #wazir"},
     elephantwarmachinewizard: {parlett: "#elephant, #warmachine, #wizard", image:"elephantwarmachinezzmoon"},
     dayrider: {parlett: "#alfilrider, #warmachinerider", image:"elephantwarmachinerider", aka:["alibabarider", "skipqueen"]},
-    duck: {parlett: "#ferz, #warmachinerider"}, 
+    duck: {parlett: "#advisor, #warmachinerider"}, 
     rookpawn: {parlett: "#rook, #pawn"},
     knightwizard: {parlett: "#knight, #wizard", image:"horsezzmoon"},
     horsewazir: {parlett: "#honorablehorse, #wazir"},  
     guardknight: {parlett: "#knight, #man", image:["guardknight2", "guardknight"], hex:"U+1F482"}, 
     elephantwazir: {parlett: "#elephant, #wazir"},
-    elephantferzwarmachine: {parlett: "#elephant, #ferz, #warmachine"},
-    camelferz: {parlett: "#camel, #ferz", image:["camelferz", "camel2ferz"]},
+    elephantferzwarmachine: {parlett: "#elephant, #advisor, #warmachine"},
+    camelferz: {parlett: "#camel, #advisor", image:["camelferz", "camel2ferz"]},
     camelqueen: {parlett: "#camel, #queen"},
     camelwarmachine: {parlett: "#camel, #warmachine"},
     camelwazir: {parlett: "#camel, #wazir", image:["camelwazir", "camel2wazir"]},
@@ -986,26 +987,26 @@ var PIECE_TYPES = {
     camelopard: {parlett: "#camelrider, #fiveleaper", url:"akm"}, // TODO: is this supposed to be "cameleopard"?
     crabalfil: {parlett: "#crab, #alfil"},
     crabwarmachine: {parlett: "#crab, #warmachine", image:"crabdabbaba"},
-    crabferz: {parlett: "#crab, #ferz"},
+    crabferz: {parlett: "#crab, #advisor"},
     crabwazir: {parlett: "#crab, #wazir"},
     crabshortrook: {parlett: "#crab, #r4"},
     elephantcamel: {parlett: "#elephant, #camel", hex:"U+1F42B"/*bactrian*/},
     elephantcamelrider: {parlett: "#elephant, #camelrider"},
-    elephantferz: {parlett: "#elephant, #ferz", image:["elephantferz", "elephant2ferz"]},
-    elephantferzrook: {parlett: "#elephant, #ferz, #rook"},
+    elephantferz: {parlett: "#elephant, #advisor", image:["elephantferz", "elephant2ferz"]},
+    elephantferzrook: {parlett: "#elephant, #advisor, #rook"},
     elephantknight: {parlett: "#elephant, #knight"},
     elephantknightrider: {parlett: "#elephant, #nightrider"},
     elephantknightwazir: {parlett: "#elephant, #knight, #wazir"},
     elephantwizard: {parlett: "#elephant, #wizard", image:"elephantzzmoon"},
     //fibnifrook: {parlett: "#fibnif, #rook"}, // TODO: image
     genscher: {parlett: "#panda, #knight"},
-    giraffeferz: {parlett: "#giraffe, #ferz"},
+    giraffeferz: {parlett: "#giraffe, #advisor"},
     giraffewazir: {parlett: "#giraffe, #wazir"},
     knightcamelzebra: {parlett: "#knight, #camel, #zebra"},
     //lynx: {parlett: "#rook, #knight, #zebra", pc:"akm"},  // TODO: image
     rookwarmachine: {parlett: "#rook, #warmachine", image:"rookdabbaba"},
     rookelephantrider: {parlett: "#rook, #alfilrider"},
-    narrowknightferz: {parlett: "#narrowknight, #ferz"},
+    narrowknightferz: {parlett: "#narrowknight, #advisor"},
     narrowknightwazir: {parlett: "#narrowknight, #wazir"},
     //rhinocamel: {parlett: "#rhino, #camel"},
     //rhinocamelrider: {parlett: "#rhino, #camelrider"},
@@ -1017,16 +1018,16 @@ var PIECE_TYPES = {
     // TODO: herowarmachinewazir, lemurianwarmachinewazir, flexibleknight, linearchieftainjumpinggeneral, from http://chessvariants.wikidot.com/joe-s-strange-notation
     wazirwarmachinealfil: {parlett: "#wazir, #warmachine, #alfil", image:"wazirdababaalfil"},
     warmachineriderwazir: {parlett: "#warmachinerider, #wazir"},
-    warmachineferz: {parlett: "#warmachine, #ferz"},
-    warmachineferzrider: {parlett: "#warmachinerider, #ferz"},
-    warmachineriderferz: {parlett: "#warmachinerider, #ferz", image:"dababbahriderferz", aka:["dabbabahriderferz"]},
+    warmachineferz: {parlett: "#warmachine, #advisor"},
+    warmachineferzrider: {parlett: "#warmachinerider, #advisor"},
+    warmachineriderferz: {parlett: "#warmachinerider, #advisor", image:"dababbahriderferz", aka:["dabbabahriderferz"]},
     warmachineriderwazir: {parlett: "#warmachinerider, #wazir", image:"dababbahriderwazir2", aka:["dababbahriderwazir"]},
     warmachinewizard: {parlett: "#warmachine, #wizard", image:"warmachinezzmoon"},
-    wizardrider: {parlett: "#camelrider, #ferz", image:"moonrider"},
+    wizardrider: {parlett: "#camelrider, #advisor", image:"moonrider"},
     witch: {parlett: "#rook, #bishop, #nightrider, #camelrider, #zebrarider"},
     zebracamel: {parlett: "#zebra, #camel"},
     zebracamelrider: {parlett: "#zebra, #camelrider"},
-    zebraferz: {parlett: "#zebra, #ferz"},
+    zebraferz: {parlett: "#zebra, #advisor"},
     zebrawazir: {parlett: "#zebra, #wazir"},
     zebrawizard: {parlett: "#zebra, #wizard", image:"zebrazzmoon"},
 
@@ -1047,14 +1048,14 @@ var PIECE_TYPES = {
     bede: {parlett: "#warmachine, #bishop", image:"bishopwarmachine", url:"pc:bd"},
     canvasser: {parlett: "#camel, #rook", image:"camelrook", url:"pc:canvassr"}, // yes, url is canvassr (no e)
     champion: {parlett: "#wazir, #alfil, #warmachine", url:"pc:champion"},
-    crownedrook: {parlett: "#rook, #ferz"},
-    crownedcamel: {parlett: "#camel, #ferz"},
+    crownedrook: {parlett: "#rook, #advisor"},
+    crownedcamel: {parlett: "#camel, #advisor"},
     camelking: {parlett: "#camel, #king", image:["simplecamelking", "cbjcamelking", "tinyscamelking"]},
     // TODO: telepotency - can attack opposing general on same open file. Like a capture but only for specific piece. New need syntax, maybe c(king)n+?
     general: {image:{w:["general2", "general"], kw:"circle#將", kb:"circle#帥"}, parlett: "#wazir", royal: true, url:"pc:general", aka:["chineseking"], wxf_letter:"K", cn_letter:["帥", "將"]}, 
     // http://www.mayhematics.com/v/gm.htm has a different definition of wizard
-    wizard: {parlett: "#camel, #ferz", image:"moon",  url:"pc:wizard", hex: "U+1F319"},
-    fad: {parlett: "#ferz, #alfil, #warmachine", image:["elephantferzwarmachine"], url:"pc:fad"},
+    wizard: {parlett: "#camel, #advisor", image:"moon",  url:"pc:wizard", hex: "U+1F319"},
+    fad: {parlett: "#advisor, #alfil, #warmachine", image:["elephantferzwarmachine"], url:"pc:fad"},
     bede: {parlett: "#bishop, #warmachine", image:"bishopwarmachine"},
     //zurafa: {parlett: "i#giraffe, #rook"}, // TODO: image, and no rook move on initial
 
@@ -1075,7 +1076,7 @@ var PIECE_TYPES = {
 
     //murray_lion: {parlett: "~0/2, ~2/2, c1*", letter: "XM"}, // TODO: image
     lion: {parlett: "~n*", letter: "XL", url:"pc:lion"},
-    elephant: {parlett: "2X", letter: "E", image:["elephantmodern", "elephant1"], url:"pc:elephant", aka:["minister"], hex:"U+1F418", wxf_letter:"E", cn_letter:["相","象"]}, // Not a leaper, path can be blocked (unlike alfil, ~2X)
+    elephant: {parlett: "2X", letter: "E", image:{w:["elephantmodern", "elephant1"], kw:"circle#象", kb:"circle#相"}, url:"pc:elephant", aka:["minister"], hex:"U+1F418", wxf_letter:"E", cn_letter:["相","象"]}, // Not a leaper, path can be blocked (unlike alfil, ~2X)
 
     // TODO: support ~0/0 for "null move" (---), but don't let drop to null, instead show a button
     //kraken: {parlett: "~n/m ~0/0"},     // any square, not realistic since always checkmates! TODO: image
@@ -1138,7 +1139,7 @@ var PIECE_TYPES = {
 
     // Ralph Betza's crazy pieces
     chargingrook: {parlett: "n+>=, 1<, 1X<", image:"frookbprince", url:"http://www.chessvariants.com/unequal.dir/cwda.html", castle:true},
-    fibnif: {parlett: "#ferz, [1,2], [-1,2], [1,-2], [-1,-2]", url:"pc:fibnif", image:"narrowknightferz"},
+    fibnif: {parlett: "#advisor, [1,2], [-1,2], [1,-2], [-1,-2]", url:"pc:fibnif", image:"narrowknightferz"},
     chargingknight: {parlett: "~1/2>, 1<, 1=", image:"fknightbprince", url:"http://www.chessvariants.com/unequal.dir/cwda.html"},
     colonel: {parlett: "n>, n=, ~1/2>, 1*", letter: "XC", url:"http://www.chessvariants.com/unequal.dir/cwda.html", image:"forwardchancellorprince"},
     furlrurlbakking: {parlett: "n=, n>, 1<, 1<X", url:"http://www.chessvariants.com/d.betza/chessvar/pieces/frlrrlbk.html"}, 
@@ -1167,7 +1168,7 @@ var PIECE_TYPES = {
     //nightriderhopper: {parlett: "(~1/2&)^&", pc:"akm"}, // TODO: movement notation?
 
     // Chinese hoppers: move as rider, capture as line-hopper
-    cannon: {image:{w:"cannon", k:"circle#炮"}, parlett: "on+, cn+^&", aka:["pao"], wxf_letter:"C", cn_letter:"炮"}, // TODO: movement. Like rook, but capture move requires a "screen" to hop over immediately in front; line-hopper
+    cannon: {image:{w:"cannon", kw:"circle#砲", kb:"circle#炮"}, parlett: "on+, cn+^&", aka:["pao"], wxf_letter:"C", cn_letter:"炮"}, // TODO: movement. Like rook, but capture move requires a "screen" to hop over immediately in front; line-hopper
     //vao: {parlett: "onX, cnX^&"}, // like bishop
     //leo: {letter: "XO", parlett: "on*, cn*^&", url:"http://en.wikipedia.org/wiki/Fairy_chess_piece#Notable_examples"}, 
     
@@ -1295,7 +1296,7 @@ var PIECE_TYPES = {
     chicken_general: {parlett: "1X<, n>.4", romanji: "keishō", promote: ["free_chicken"], image: "circle#鶏将", letter: "CG", tags:"taikyoku "},
     pup_general: {parlett: "#chicken_general", romanji: "kushō", promote: ["free_pup"], image: "circle#狗将", letter: "PG", tags:"taikyoku "},
     //free_chicken: {parlett: "", romanji: "honkei", image: "circle#奔鶏", letter: "+CG", tags:"taikyoku "},
-    horse_general: {parlett: "1<, 1X>, n>.3", romanji: "bashō", promote: ["free_horse"], image: "circle#馬将", letter: "H", tags:"taikyoku "},
+    //horse_general: {parlett: "1<, 1X>, n>.3", romanji: "bashō", promote: ["free_horse"], image: "circle#馬将", letter: "H", tags:"taikyoku "},    // TODO: reconcile letter
     ox_general: {parlett: "#ox_general", romanji: "gyūshō", promote: ["free_ox"], image: "circle#牛将", letter: "O", tags:"taikyoku "},
     //free_horse: {parlett: "", romanji: "honba", image: "circle#奔馬", letter: "+H", tags:"taikyoku "},
     //free_ox: {parlett: "", romanji: "hongyū", image: "circle#奔牛", letter: "+O", tags:"taikyoku "},
@@ -1416,7 +1417,7 @@ var PIECE_TYPES = {
     swooping_owl: {parlett: "1>, 1X<", romanji: "shigyō", promote: ["cloud_eagle"], image: "circle#鴟行", letter: "OW", tags:"taikyoku generals"}, // TODO: reconcile w/ generals
     old_rat: {parlett: "#swooping_owl", romanji: "rōso", promote: ["bird_of_paradise"], image: "circle#老鼠", letter: "OR", tags:"taikyoku "},
     climbing_monkey: {parlett: "1>, 1<, 1X>", romanji: "tōen", promote: ["violent_stag"], image: "circle#登猿", letter: "CM", tags:"taikyoku generals"}, // TODO: reconcile w/ generals
-    cat_sword: {parlett: "#ferz", romanji: "myōjin", promote: ["dragon_horse"], image: "circle#猫刄", letter: "CS", tags:"taikyoku "},
+    cat_sword: {parlett: "#advisor", romanji: "myōjin", promote: ["dragon_horse"], image: "circle#猫刄", letter: "CS", tags:"taikyoku "},
     swallows_wings: {parlett: "1>, 1<, n=", romanji: "en’u", promote: ["gliding_swallow"], image: "circle#燕羽", letter: "SW", tags:"taikyoku "},
     //gliding_swallow: {parlett: "", romanji: "engyō", image: "circle#燕行", letter: "+SW", tags:"taikyoku "},
     blind_monkey: {parlett: "1X, 1=", romanji: "mōen", promote: ["flying_stag"], image: "circle#盲猿", letter: "BM", tags:"taikyoku generals"}, // TODO: reconcile w/ generals
@@ -1520,7 +1521,7 @@ var PIECE_TYPES = {
     mushroom: {parlett: "[-1,2], [1,2], [3,1], [-3,1], [1,-1], [1,-2], [-1,-1], [-1,-2]", url:"pc:mushroom", hex: "U+1F344"},
     sausage: {parlett: "1X, 1=, ~0/3<>, [1,2], [-1,2], [1,-2], [-1,-2]", url:"http://www.chessvariants.org/unequal.dir/pizza-kings.html", castle:true},
     pepperoni: {parlett: "2=, 1X, 1<, 1>, ~2/2>"},
-    meatball: {parlett: "#ferz, #wazir, #alfil, #warmachine, [1,2], [-1,2]", url:"http://www.chessvariants.org/unequal.dir/pizza-kings.html"},
+    meatball: {parlett: "#advisor, #wazir, #alfil, #warmachine, [1,2], [-1,2]", url:"http://www.chessvariants.org/unequal.dir/pizza-kings.html"},
 
     
     // Pieces that probably won't be supported without significant coding
@@ -1570,14 +1571,14 @@ var SAVED_BOARDS = {
 // TODO: Minishogi, 5x5 board, http://en.wikipedia.org/wiki/Minishogi
 
 // Chinese Chess (Xiangqi),
-"Chinese Chess (Xiangqi)": "rhex(ferz)x(general)x(ferz)ehr//1x(cannon)5x(cannon)/x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)/1X(cannon)5X(cannon)//RHEX(ferz)X(general)X(ferz)EHR w - - rs=xiangqi",
+"Chinese Chess (Xiangqi)": "rhex(advisor)x(general)x(advisor)ehr//1x(cannon)5x(cannon)/x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)/1X(cannon)5X(cannon)//RHEX(advisor)X(general)X(advisor)EHR w - - rs=xiangqi",
 
-"Chinese Chess (Xiangqi, Westernized)": "rhex(ferz)x(general)x(ferz)ehr//1x(cannon)5x(cannon)/x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)//1X(cannon)5X(cannon)/RHEX(ferz)X(general)X(ferz)EHR w - - rs=xiangqiw",
+"Chinese Chess (Xiangqi, Westernized)": "rhex(advisor)x(general)x(advisor)ehr//1x(cannon)5x(cannon)/x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)//1X(cannon)5X(cannon)/RHEX(advisor)X(general)X(advisor)EHR w - - rs=xiangqiw",
 
 // TODO: http://www.chessvariants.org/xiangqivariants.dir/yangqi.htm
 
 // Counting rules on http://en.wikipedia.org/wiki/Makruk are not implemented
-"Thai Chess (Makruk)": "rnx(silvergeneral)x(ferz)x(lord)x(silvergeneral)nr/8/x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)/8/8/X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)/8/RNX(silvergeneral)X(lord)X(ferz)X(silvergeneral)NR w - -",
+"Thai Chess (Makruk)": "rnx(silvergeneral)x(advisor)x(lord)x(silvergeneral)nr/8/x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)/8/8/X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)/8/RNX(silvergeneral)X(lord)X(advisor)X(silvergeneral)NR w - -",
 "FIDE Chess": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -",
 "Chess960": setup_chess960,
 // TODO: pawns promote to rook,knight,queen, no double-move
@@ -1641,7 +1642,7 @@ var SAVED_BOARDS = {
 "Milener's Chess-3 (non-random)": "rnbqkvjt/pppppppp/8/8/8/8/PPPPPPPP/RNBQKVJT w KQkq -",
 "Nightrider Chess I": "r1bx(nightrider)kb1r/pppppppp/8/8/8/8/PPPPPPPP/R1BX(nightrider)KB1R w KQkq -",
 "Nightrider Chess II": "rx(nightrider)bqkbx(nightrider)r/pppppppp/8/8/8/8/PPPPPPPP/RX(nightrider)BQKBX(nightrider)R w KQkq -",
-"Fox and Geese": "8/8/8/4x(ferz)/5X(goose)/2X(goose)1X(goose)/3X(goose) w - -", // geese win by stalemating fox, solution at http://www.mayhematics.com/v/gm.htm
+"Fox and Geese": "8/8/8/4x(advisor)/5X(goose)/2X(goose)1X(goose)/3X(goose) w - -", // geese win by stalemating fox, solution at http://www.mayhematics.com/v/gm.htm
 // http://hem.passagen.se/melki9/royalpawn.htm
 "Royal Pawn Chess": "rnbqmbnr/ppppx(royalpawn)ppp/8/8/8/8/PPPPX(royalpawn)PPP/RNBQMBNR w - -",
 "Sniper Chess": "x(rookni)x(kniroo)x(bishkni)qkx(ensign)x(knibis)x(roobis)/pppppppp/8/8/8/8/PPPPPPPP/X(rookni)X(kniroo)X(bishkni)QKX(ensign)X(knibis)X(roobis) w KQkq -",
