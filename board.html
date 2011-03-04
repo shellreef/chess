@@ -197,11 +197,13 @@ var PREFS_DEFAULT = {
     image_root: "images/",
     //image_root: "http://camelpawn.appspot.com/images/",    // on Google App Engine (TODO: update)
     // What piece images to use
-    image_set: "alfaerieomega", image_extension: ".gif",   // most comprehensive
-    //image_set: "ariel", image_extension: ".gif",         // based on Ariel Unicode MS
+    image_set: "alfaerieomega", image_extension: ".gif",     // most comprehensive
+    //image_set: "ariel", image_extension: ".gif",           // based on Ariel Unicode MS
     //image_set: "chessos", image_extension: ".gif",
     //image_set: "classic", image_extension: ".png",
     image_prefixes: {white:"w", black:"b", neutral:"e"},
+
+    image_style: "w",                                        // preferred image style (w=Western, k=Kanji)
     
     server: "http://chess.heroku.com/",           // Remote backend game server (note: actually overwritten from document.location!)
 
@@ -216,7 +218,7 @@ var PREFS_DEFAULT = {
     saved_games_path: "games/",
 
     show_castling_impediments:false,    // Highlight squares preventing castling
-    variant_generator:null              // Setup function for randomized games
+    variant_generator:null,             // Setup function for randomized games
 };
 
 // Get preference: global default, overriden by game default, or overriden by user selection
@@ -352,7 +354,8 @@ var RULE_SETS = {
             input_notation:"wxf",
             output_notation:"wxf",
             rank_label_style:"Roman",
-            file_label_style:"Arabic"
+            file_label_style:"Arabic",
+            image_style:"k"
         },
 
         //TODO: player_colors:{"red", "green"},
@@ -857,7 +860,7 @@ var PIECE_TYPES = {
     //   3 * 3    1=      1=
     //   4 5 4   1X<  1<  1X<
     /*1*/ soldier: {parlett: "1>", url:"http://en.wikipedia.org/wiki/Shogi", image:"shogipawn", aka:["shogipawn", "fu"]/*, promotion_rank:9*/, tags:"generals "}, // TODO: optional promotion
-    chinesepawn: {image:["circle#兵"], parlett: "1>", url:"pc:pawn-xiangqi", aka:["chinesepawn", "fu"], 
+    chinesepawn: {image:{w:"chinesepawn", k:"circle#兵"}, parlett: "1>", url:"pc:pawn-xiangqi", aka:["chinesepawn", "fu"], 
 	// 1>, but when crosses "river", promotes and can move 1=
 	promote:["advancedsoldier"], promotion_rank:6, tags:"generals ", wxf_letter:"P", cn_letter:["兵", "卒"]}, 
     /*2*/ goose: {parlett: "o1X>", url:"akm", image:"goose", tags:"generals "},
@@ -1048,7 +1051,7 @@ var PIECE_TYPES = {
     crownedcamel: {parlett: "#camel, #ferz"},
     camelking: {parlett: "#camel, #king", image:["simplecamelking", "cbjcamelking", "tinyscamelking"]},
     // TODO: telepotency - can attack opposing general on same open file. Like a capture but only for specific piece. New need syntax, maybe c(king)n+?
-    general: {parlett: "#wazir", royal: true, url:"pc:general", image:["general2", "general"], aka:["chineseking"], wxf_letter:"K", cn_letter:["帥", "將"]}, 
+    general: {image:{w:["general2", "general"], kw:"circle#將", kb:"circle#帥"}, parlett: "#wazir", royal: true, url:"pc:general", aka:["chineseking"], wxf_letter:"K", cn_letter:["帥", "將"]}, 
     // http://www.mayhematics.com/v/gm.htm has a different definition of wizard
     wizard: {parlett: "#camel, #ferz", image:"moon",  url:"pc:wizard", hex: "U+1F319"},
     fad: {parlett: "#ferz, #alfil, #warmachine", image:["elephantferzwarmachine"], url:"pc:fad"},
@@ -1164,7 +1167,7 @@ var PIECE_TYPES = {
     //nightriderhopper: {parlett: "(~1/2&)^&", pc:"akm"}, // TODO: movement notation?
 
     // Chinese hoppers: move as rider, capture as line-hopper
-    cannon: {image:["circle#炮"], parlett: "on+, cn+^&", aka:["pao"], wxf_letter:"C", cn_letter:"炮"}, // TODO: movement. Like rook, but capture move requires a "screen" to hop over immediately in front; line-hopper
+    cannon: {image:{w:"cannon", k:"circle#炮"}, parlett: "on+, cn+^&", aka:["pao"], wxf_letter:"C", cn_letter:"炮"}, // TODO: movement. Like rook, but capture move requires a "screen" to hop over immediately in front; line-hopper
     //vao: {parlett: "onX, cnX^&"}, // like bishop
     //leo: {letter: "XO", parlett: "on*, cn*^&", url:"http://en.wikipedia.org/wiki/Fairy_chess_piece#Notable_examples"}, 
     
@@ -7434,7 +7437,9 @@ function pc(x, y, virtual)
 // otherwise returns preferred.
 function image_path_for(type, color, all)
 {
-    var bases, image_list, paths;
+    var bases, image_list, paths, color_prefix;
+
+    color_prefix = pref("image_prefixes")[color];       // w, b, etc.
 
     assert(PIECE_TYPES[type], "image_path_for(" + type + ", " + color + "): no such piece type");
 
@@ -7446,6 +7451,30 @@ function image_path_for(type, color, all)
     } else {
         // If no image: key given, default to piece name except without underscores
         bases = [type.replace("_", "")];
+    }
+
+    // Quite ugly code to expand the data structure to all images, if requested
+    if (all) {
+        var new_bases = [];
+        for (var i = 0; i < bases.length; i += 1) {
+            if (dojo.isString(bases[i])) {
+                new_bases.push(bases[i]);
+            } else {
+                for (var base in bases[i]) {
+                    if (bases[i].hasOwnProperty(base)) {
+                        // TODO: annotate for what style the image is? w, kb, kw, etc.
+                        if (dojo.isArray(bases[i][base])) {
+                            for (var j = 0; j < bases[i][base].length; j += 1) {
+                                new_bases.push(bases[i][base][j]);
+                            }
+                        } else {
+                            new_bases.push(bases[i][base]);
+                        }
+                    }
+                }
+            }
+        }
+        bases = new_bases;
     }
 
     // TODO: Use .style.webkitTransform="rotate(45deg)" etc. to get rotated pieces,
@@ -7461,15 +7490,27 @@ function image_path_for(type, color, all)
     
     paths = [];
     for (var i = 0; i < bases.length; i += 1) {
+        var image_spec;
+
+        if (dojo.isString(bases[i])) {
+            image_spec = bases[i];
+        } else {
+            image_spec = bases[i][pref("image_style") + color_prefix] || bases[i][pref("image_style")] || bases[i].w;
+
+            if (dojo.isArray(image_spec)) {
+                image_spec = image_spec[0];
+            }
+        }
+
         var basename, text;
 
         // Normally image is given with filename only, but may also have optional
         // text after hash, to overlay on the image
-        var ary = bases[i].split("#", 2);
+        var ary = image_spec.split("#", 2);
         basename = ary[0];
         text = ary[1];
 
-        var path = [pref("image_root"), pref("image_set"), "/", pref("image_prefixes")[color], basename, pref("image_extension")].join("");
+        var path = [pref("image_root"), pref("image_set"), "/", color_prefix, basename, pref("image_extension")].join("");
         if (text) {
             path += "#" + text;
         }
@@ -7591,7 +7632,7 @@ function decode_piece_letter(name)
         type = piece_letter2name(name);
     }
 
-    console.log(name,color,type);
+    //console.log(name,color,type);
     // XXX temporary hack to get pieces I don't have to load TODO: remove this, its just for show
     if (type === undefined) {
         type = "cannon"; 
