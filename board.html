@@ -1163,7 +1163,7 @@ var PIECE_TYPES = {
     // /...=...\    line-hop    ^& (TODO)
    
     // Line-hoppers
-    //rion: {parlett: "n+^&", aka:"rooklinehopper", pc:"akm"}, // TODO: movement
+    rion: {parlett: "n+^&", image:"rook#LH", aka:"rooklinehopper", pc:"akm"}, // TODO: movement
     //bion: {parlett: "nX^&", aka:["bishlion", "bishoplinehopper"], pc:"akm"},
     //lion: {parlett: "n*^&", aka:"queenlinehopper", pc:"akm"},  // TODO: reconcile with ~n* lion
     //nightriderhopper: {parlett: "(~1/2&)^&", pc:"akm"}, // TODO: movement notation?
@@ -4534,7 +4534,7 @@ function decode_explicit_move(text_move, existing_flags)
 function decode_one_parlett(parlett)
 {
     var distances, directions, flags, movement, rel_moves, limit, inner_moves, rotates;
-    var hippogonal = false, hopper = false;
+    var hippogonal = false, hopper = false, line_hopper = false;
 
     flags = {};
     distances = [];
@@ -4545,7 +4545,9 @@ function decode_one_parlett(parlett)
     // Hippogonal riders, like the nightrider, can be specified as 
     // either ~1/2& or n(~1/2). The first notation, due to David Parlett's
     // _The Oxford History of Board Games_, is less flexible but more compact.
-    if (parlett.substr(parlett.length - 1) === "&") {
+    if (parlett.substr(parlett.length - 1) === "&"         // foo& = n(foo)
+        && parlett.substr(parlett.length - 2, 1) !== "^"   // exception: ^& is line-hopper
+        ) {
         parlett = "n(" + parlett.substr(0, parlett.length - 1) + ")";
     }
 
@@ -4574,7 +4576,13 @@ function decode_one_parlett(parlett)
         
         // Hopping rider
         } else if (ch === "^") {
-            hopper = true;
+            // fore-hopper
+            hopper = 1;        // TODO: support ^^ etc. for multiple-hurdle hoppers (overhoppers)
+
+            if (i + 1 < parlett.length && parlett.substr(i + 1, 1) === "&") {
+                hopper = -1;   // line-hopper
+                i += 1;
+            }
 
         // Grouping
         } else if (ch === "(") {
@@ -4839,7 +4847,7 @@ function expand_directions(directions, distances, limit, flags, movement, rel_mo
             }
 
  
-           // Directions - these were either specified by direction vector code
+            // Directions - these were either specified by direction vector code
             // as in n* or hippogonally using ~1/2& (both these expand to >1 direction)
             rel_x += dir[0];
             rel_y += dir[1];
@@ -4850,7 +4858,7 @@ function expand_directions(directions, distances, limit, flags, movement, rel_mo
                     these_flags.if_blocked_dx = prev_rel_x;
                     these_flags.if_blocked_dy = prev_rel_y;
 
-                    // TODO: only allow hopping over one piece (not an overhopper)
+                    // TODO: only allow hopping over one piece (not an overhopper), should allow ^^ etc. for multiple-hurdle hoppers
                     //these_flags.if_blocked_skip = max - count - 1;
                 }  else {
                     // This is one square away from the moving piece.
