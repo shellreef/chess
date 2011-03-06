@@ -1747,7 +1747,7 @@ var SAVED_BOARDS = {
 "Test Pawns": "8/x(rookpawn)x(dragon)x(bishoppawn)x(superpawn)x(weakpawn)x(berolinapawn)x(pawnattackrook)//2x(steward)4X(optingpawn)/4X(sergeant)1X(liapawn)/8/X(rookpawn)X(dragon)X(bishoppawn)X(superpawn)X(weakpawn)X(berolinapawn)X(pawnattackrook)P w - -",
 "Test Leapers": "K/2E1Y1H1/3M/1XT1W1XG1Z/8/3Z1N/4oo/5k w - -", // TODO: antelope, flamingo
 "Test Riders": "B2R4/5X(barcrider)2/4Q3/4XN3/2X(alibabariderferz)3X(stone)1/3X(crabrider)1X(warmachinerider)X(squirrelrider)1/2X(alfilrider)X(camelrider)2X(zebrarider)1/4X(girafferider)3 w - - 0 1",
-"Test Rider 1": "////2x(dummy)x(dummy)2R w - - 0 1",
+"Test Rider 1": "////3(dummy)2X(rion) w - - 0 1",
 "Test Complex Riders": "1X(crookedbishop)/8/3X(dummy)/4X(griffon)/7X(panda)//5X(slipbishop) w - -",
 "Test Complex Riders II": "8/8/8/8/4X(crookedrook) w - -",
 "Test Griffon": "8//3(dummy)/4X(griffon) w - -",
@@ -4012,24 +4012,6 @@ function filtered_moves(piece, color, is_hypothetical)
         var dest_square = VBOARD[x][y];
         var capture_piece = dest_square.piece;
 
-        // Maintain state of this ray - for riders
-        var this_state = null;
-        if (flags.ray_number !== undefined) {
-            this_state = ray_state[flags.ray_number];
-            //console.log(i,"ray " + flags.ray_number,this_state, xy2filerank({x:x,y:y})  ,JSON.stringify(ray_state));
-
-            var action = flags.ray_action[this_state];
-            if (action === "skip") {
-                continue;
-            //} else if (action === "end") {    // not quite useful since ends all moves not just this ray
-            //    break;
-            } else if (action === "allow") {
-                ;
-            } else {
-                assert(false, "unknown ray_action: " + action + " for state " + this_state);
-            }
-        }
-
 
         // If there is any piece there, it may block other moves
         if (capture_piece) {
@@ -4041,8 +4023,8 @@ function filtered_moves(piece, color, is_hypothetical)
 
                 new_state = flags.ray_state_transition[this_state];
                 ray_state[flags.ray_number] = new_state;
-                //console.log("transition(" + flags.ray_number + ")",this_state,"->",new_state);
-                //console.log("rs",JSON.stringify(ray_state));
+                console.log("transition(" + flags.ray_number + ")",this_state,"->",new_state);
+                console.log("rs",JSON.stringify(ray_state));
             }
         
             // Can't move to self-occupied square
@@ -4072,6 +4054,26 @@ function filtered_moves(piece, color, is_hypothetical)
             // For move notations
             abs_move.capture = capture_piece;
         } 
+
+        // Maintain state of this ray - for riders
+        var this_state = null;
+        if (flags.ray_number !== undefined) {
+            this_state = ray_state[flags.ray_number];
+            console.log(i,"ray " + flags.ray_number,this_state, xy2filerank({x:x,y:y})  ,JSON.stringify(ray_state));
+
+            var action = flags.ray_action[this_state];
+            if (action === "skip") {
+                continue;
+            //} else if (action === "end") {    // not quite useful since ends all moves not just this ray
+            //    break;
+            } else if (action === "allow") {
+                ;
+            } else {
+                assert(false, "unknown ray_action: " + action + " for state " + this_state);
+            }
+        }
+
+
 
         // Must be a capture
         if (flags.capture_only && !capture_piece) {
