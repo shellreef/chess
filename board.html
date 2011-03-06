@@ -4047,8 +4047,11 @@ function filtered_moves(piece, color, is_hypothetical)
                 // Record blocked moves where we are guarding our own pieces
                 // Castling moves can never guard, since the destination must be unoccupied
                 if (!flags.no_capture && !flags.if_can_castle) {
-                    // to indicate we are guarding this piece
-                    blocked_moves.push(abs_move);
+                    if (flags.ray_action && flags.ray_action[this_state] !== "skip") {  // don't let through
+
+                        // to indicate we are guarding this piece
+                        blocked_moves.push(abs_move);
+                    }
                 }
 
                 if (flags.if_can_castle) {
