@@ -1749,7 +1749,7 @@ var SAVED_BOARDS = {
 "Test Riders": "B2R4/5X(barcrider)2/4Q3/4XN3/2X(alibabariderferz)3X(stone)1/3X(crabrider)1X(warmachinerider)X(squirrelrider)1/2X(alfilrider)X(camelrider)2X(zebrarider)1/4X(girafferider)3 w - - 0 1",
 "Test Rider 1": "////2x(dummy)x(dummy)2R w - - 0 1",
 "Test Complex Riders": "1X(crookedbishop)/8/3X(dummy)/4X(griffon)/7X(panda)//5X(slipbishop) w - -",
-"Test Griffon": "8/3//4X(griffon) w - -",
+"Test Griffon": "8//3(dummy)/4X(griffon) w - -",
 "Test Complex Riders I": "8/8/8/8/4X(crookedrook) w - -",
 "Test Fore-Hoppers": "/2X(rookhopper)2x(dummy)/5X(bishopper)/4X(grasshopper)kx(dummy)//2x(dummy)1X(dummy) w - -",
 "Test Line-Hoppers": "/2X(rion)2x(dummy)///2X(rion)/2x(dummy) w - -",
@@ -4012,12 +4012,14 @@ function filtered_moves(piece, color, is_hypothetical)
         var dest_square = VBOARD[x][y];
         var capture_piece = dest_square.piece;
 
+var USE_NEW = 1;
 
+if (USE_NEW) {
         // Maintain state of this ray
         var this_state = null;
         if (flags.ray_number !== undefined) {
             this_state = ray_state[flags.ray_number];
-            console.log(i,"ray " + flags.ray_number,this_state,JSON.stringify(ray_state));
+            console.log(i,"ray " + flags.ray_number,this_state,rel_x,rel_y,JSON.stringify(ray_state));
 
             var action = flags.ray_action[this_state];
             if (action === "skip") {
@@ -4030,12 +4032,14 @@ function filtered_moves(piece, color, is_hypothetical)
                 assert(false, "unknown ray_action: " + action + " for state " + this_state);
             }
         }
+}
 
 
         // If there is any piece there, it may block other moves
         if (capture_piece) {
             blocked[rel_x + "," + rel_y] = true;
 
+if (USE_NEW) {
             // There is a piece in the way, it might cause a state transition
             if (flags.ray_number !== undefined) {
                 var new_state;
@@ -4045,12 +4049,14 @@ function filtered_moves(piece, color, is_hypothetical)
                 console.log("transition(" + flags.ray_number + ")",this_state,"->",new_state);
                 console.log("rs",JSON.stringify(ray_state));
             }
+}
 
-
-/* XXX REMOVE
+/* XXX REMOVE */
+if (!USE_NEW) {
             if (flags.if_blocked_skip) {
                 i += flags.if_blocked_skip;
-            }*/
+            }
+}
         
             // Can't move to self-occupied square
             if (capture_piece.color === color) {
@@ -4827,6 +4833,18 @@ function decode_one_parlett(parlett)
     return rel_moves;
 }
 
+// Return an incrementing number unique for the running of the program
+function serial_id()
+{
+    if (serial_id.count === undefined) {
+        serial_id.count = 0;
+    }
+
+    serial_id.count += 1;
+
+    return serial_id.count;
+}
+
 // Expand a piece in the given directions, distances, up to
 // an optional limit, pushing the moves to rel_moves.
 // directions: array of direction vectors
@@ -4838,6 +4856,8 @@ function decode_one_parlett(parlett)
 // hopper: whether a intervening piece (hurdle) is required in the direction to be able to move
 function expand_directions(directions, distances, limit, flags, movement, rel_moves, rotates, hopper)
 {
+    var ray_begin_id = serial_id(); // cannot merely use 'i' below to distinguish since may be combined with other moves
+    
     for (i = 0; i < directions.length; i += 1) {
         var dir = directions[i];
 
@@ -4870,7 +4890,7 @@ function expand_directions(directions, distances, limit, flags, movement, rel_mo
             }
 
             // Ray number of expanded directions, for grouping moves in same "ray" together
-            these_flags.ray_number = i + 1;
+            these_flags.ray_number = ray_begin_id + i;
             if (hopper < 0) {
                 // Line-hoppers first can't move, then can after they hit their first piece (the screen),
                 // and then are blocked once they hit their second piece 
