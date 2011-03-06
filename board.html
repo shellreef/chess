@@ -1749,9 +1749,8 @@ var SAVED_BOARDS = {
 "Test Riders": "B2R4/5X(barcrider)2/4Q3/4XN3/2X(alibabariderferz)3X(stone)1/3X(crabrider)1X(warmachinerider)X(squirrelrider)1/2X(alfilrider)X(camelrider)2X(zebrarider)1/4X(girafferider)3 w - - 0 1",
 "Test Rider 1": "////2x(dummy)x(dummy)2R w - - 0 1",
 "Test Complex Riders": "1X(crookedbishop)/8/3X(dummy)/4X(griffon)/7X(panda)//5X(slipbishop) w - -",
+"Test Complex Riders II": "8/8/8/8/4X(crookedrook) w - -",
 "Test Griffon": "8//3(dummy)/4X(griffon) w - -",
-//"Test Griffon": "8///4X(griffon) w - -",
-"Test Complex Riders I": "8/8/8/8/4X(crookedrook) w - -",
 "Test Fore-Hoppers": "/2X(rookhopper)2x(dummy)/5X(bishopper)/4X(grasshopper)kx(dummy)//2x(dummy)1X(dummy) w - -",
 "Test Line-Hoppers": "/2X(rion)2x(dummy)///2X(rion)/2x(dummy) w - -",
 //TODO: "Test Line-Hoppers": "x(cannon)"
@@ -3850,7 +3849,7 @@ function movement_diagram(moves)
         }
 
         // Basic movement - leaper or rider
-        if (move[2].if_blocked_skip) {
+        if (move[2].ray_number) {
             // might block (rider)
             ch = "x";
         } else {
@@ -4013,14 +4012,11 @@ function filtered_moves(piece, color, is_hypothetical)
         var dest_square = VBOARD[x][y];
         var capture_piece = dest_square.piece;
 
-var USE_NEW = 1;
-
-if (USE_NEW) {
-        // Maintain state of this ray
+        // Maintain state of this ray - for riders
         var this_state = null;
         if (flags.ray_number !== undefined) {
             this_state = ray_state[flags.ray_number];
-            console.log(i,"ray " + flags.ray_number,this_state, xy2filerank({x:x,y:y})  ,JSON.stringify(ray_state));
+            //console.log(i,"ray " + flags.ray_number,this_state, xy2filerank({x:x,y:y})  ,JSON.stringify(ray_state));
 
             var action = flags.ray_action[this_state];
             if (action === "skip") {
@@ -4033,31 +4029,21 @@ if (USE_NEW) {
                 assert(false, "unknown ray_action: " + action + " for state " + this_state);
             }
         }
-}
 
 
         // If there is any piece there, it may block other moves
         if (capture_piece) {
             blocked[rel_x + "," + rel_y] = true;
 
-if (USE_NEW) {
             // There is a piece in the way, it might cause a state transition
             if (flags.ray_number !== undefined) {
                 var new_state;
 
                 new_state = flags.ray_state_transition[this_state];
                 ray_state[flags.ray_number] = new_state;
-                console.log("transition(" + flags.ray_number + ")",this_state,"->",new_state);
-                console.log("rs",JSON.stringify(ray_state));
+                //console.log("transition(" + flags.ray_number + ")",this_state,"->",new_state);
+                //console.log("rs",JSON.stringify(ray_state));
             }
-}
-
-/* XXX REMOVE */
-if (!USE_NEW) {
-            if (flags.if_blocked_skip) {
-                i += flags.if_blocked_skip;
-            }
-}
         
             // Can't move to self-occupied square
             if (capture_piece.color === color) {
@@ -4944,7 +4930,6 @@ function expand_directions(directions, distances, limit, flags, movement, rel_mo
                     these_flags.if_blocked_dy = prev_rel_y;
 
                     // TODO: only allow hopping over one piece (not an overhopper), should allow ^^ etc. for multiple-hurdle hoppers
-                    //these_flags.if_blocked_skip = max - count - 1;
                 }  else {
                     // This is one square away from the moving piece.
                     // Skip this move, since no hurdle can fit within in here.
@@ -4958,11 +4943,6 @@ function expand_directions(directions, distances, limit, flags, movement, rel_mo
 
 
             dojo.mixin(these_flags, flags);
-
-            // Blocked by a square which you CAN move to - riders w/ no limits except board dimensions
-            if (distance === Infinity && movement === "rider" && !hopper) {
-                these_flags.if_blocked_skip = max - count - 1;
-            }
 
             if (distance === Infinity || j === distance) {
                 rel_moves.push([rel_x, rel_y, these_flags]);
