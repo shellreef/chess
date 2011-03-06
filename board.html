@@ -871,7 +871,7 @@ var PIECE_TYPES = {
     /*4*/ sailor: {parlett: "1X<", image:["ship", "ferzb"], url:"akm", tags:"generals "}, 
     /*5*/ backslider: {parlett: "1<", url:"akm", tags:"generals "}, 
     /*12*/ plasticgeneral: {parlett: "1>, 1X>", aka:"notcoppergeneral", url:"akm", tags:"generals "},     // akm says coppergeneral can't move backwards, but shogi disagrees, so I call it plasticgeneral
-    /*13*/ advancedsoldier: {parlett: "1>, 1=", url:"akm", aka:["drunkensoldier", "rivercrossedpawn"], wxf_letter:"P", cn_letter:["兵", "卒"], tags:"generals "},  // for Xiangqi after passing the river
+    /*13*/ advancedsoldier: {parlett: "1>, 1=", image:{w:"advancedsoldier", xw:"circle#卒", xb:"circle#兵"}, url:"akm", aka:["drunkensoldier", "rivercrossedpawn"], wxf_letter:"P", cn_letter:["兵", "卒"], tags:"generals "},  // for Xiangqi after passing the river, note has same Xiangqi image
     /*14*/ marine: {parlett: "1X<, 1>", url:"akm", aka:"wazirferzhunter", tags:"generals "}, 
     /*15*/ adjutant: {parlett: "1>, 1<", url:"akm", aka:["tsiu-yin", "chuuuin", "gobetween", "doublefootsoldier"], image:"general3", tags:"generals "}, 
     /*23*/ sidewinder: {parlett: "1X>, 1=", url:"akm", tags:"generals "}, 
@@ -1052,7 +1052,7 @@ var PIECE_TYPES = {
     crownedrook: {parlett: "#rook, #advisor"},
     crownedcamel: {parlett: "#camel, #advisor"},
     camelking: {parlett: "#camel, #king", image:["simplecamelking", "cbjcamelking", "tinyscamelking"]},
-    // TODO: telepotency - can attack opposing general on same open file. Like a capture but only for specific piece. New need syntax, maybe c(king)n+?
+    // TODO: telepotency - can attack opposing general on same open file. Like a capture but only for specific piece. New need syntax, maybe c(king)n+? also needs to escape palace
     general: {image:{w:["general2", "general"], xw:"circle#將", xb:"circle#帥"}, parlett: "#wazir", royal: true, url:"pc:general", aka:["chineseking"], wxf_letter:"K", cn_letter:["帥", "將"]}, 
     // http://www.mayhematics.com/v/gm.htm has a different definition of wizard
     wizard: {parlett: "#camel, #advisor", image:"moon",  url:"pc:wizard", hex: "U+1F319"},
@@ -1575,7 +1575,7 @@ var SAVED_BOARDS = {
 // Chinese Chess (Xiangqi),
 "Chinese Chess (Xiangqi)": "rhex(advisor)x(general)x(advisor)ehr//1x(cannon)5x(cannon)/x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)/1X(cannon)5X(cannon)//RHEX(advisor)X(general)X(advisor)EHR w - - rs=xiangqi",
 
-"Chinese Chess (Xiangqi, Westernized)": "rhex(advisor)x(general)x(advisor)ehr//1x(cannon)5x(cannon)/x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)//1X(cannon)5X(cannon)/RHEX(advisor)X(general)X(advisor)EHR w - - rs=xiangqiw",
+"Chinese Chess (Xiangqi, Westernized)": "rhex(advisor)x(general)x(advisor)ehr//1x(cannon)5x(cannon)/x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)1x(chinesepawn)///X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)1X(chinesepawn)/1X(cannon)5X(cannon)//RHEX(advisor)X(general)X(advisor)EHR w - - rs=xiangqiw",
 
 // TODO: http://www.chessvariants.org/xiangqivariants.dir/yangqi.htm
 
