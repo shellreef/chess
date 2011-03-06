@@ -1747,6 +1747,7 @@ var SAVED_BOARDS = {
 "Test Pawns": "8/x(rookpawn)x(dragon)x(bishoppawn)x(superpawn)x(weakpawn)x(berolinapawn)x(pawnattackrook)//2x(steward)4X(optingpawn)/4X(sergeant)1X(liapawn)/8/X(rookpawn)X(dragon)X(bishoppawn)X(superpawn)X(weakpawn)X(berolinapawn)X(pawnattackrook)P w - -",
 "Test Leapers": "K/2E1Y1H1/3M/1XT1W1XG1Z/8/3Z1N/4oo/5k w - -", // TODO: antelope, flamingo
 "Test Riders": "B2R4/5X(barcrider)2/4Q3/4XN3/2X(alibabariderferz)3X(stone)1/3X(crabrider)1X(warmachinerider)X(squirrelrider)1/2X(alfilrider)X(camelrider)2X(zebrarider)1/4X(girafferider)3 w - - 0 1",
+"Test Rider 1": "////2x(dummy)2R w - - 0 1",
 "Test Complex Riders": "1X(crookedbishop)/8/3X(dummy)/4X(griffon)/7X(panda)//5X(slipbishop) w - -",
 "Test Complex Riders I": "8/8/8/8/4X(crookedrook) w - -",
 "Test Fore-Hoppers": "/2X(rookhopper)2x(dummy)/5X(bishopper)/4X(grasshopper)kx(dummy)//2x(dummy)1X(dummy) w - -",
@@ -3950,14 +3951,17 @@ function filtered_moves(piece, color, is_hypothetical)
 
     // Absolutize and find what is allowed
     moves = [];
-    blocked_moves = [];
-    blocked = {};
+    blocked_moves = [];     // moves blocked by our own piece, hence we are guarding it (saved for showing as red on Shift)
+    blocked = {};           // coordinates cannot move to, which may block other moves consequentially (as with riders)
+    ray_state = {};         // number of pieces along the way of a ray
     for (var i = 0; i < rel_moves.length; i += 1) {
         var rel_x, rel_y, flags, abs_move, x, y;
        
         rel_x = rel_moves[i][0];
         rel_y = rel_moves[i][1]; 
         flags = rel_moves[i][2];
+
+        console.log(rel_x,rel_y,JSON.stringify(flags));
 
         // Local copies of relative coords, so don't modify original.
         var if_unblocked_dx = flags.if_unblocked_dx, if_unblocked_dy = flags.if_unblocked_dy;
@@ -3987,6 +3991,7 @@ function filtered_moves(piece, color, is_hypothetical)
 
         // Default to limiting movement based on board dimensions, but
         // allow boards to also limit based on a river or palace
+        // TODO: allow overriding for Xiangqi king telepotency
         var x1 = 1, y1 = 1, x2 = GAME_STATE.files, y2 = GAME_STATE.ranks;
         if (GAME_STATE.boundaries[piece.type]) {
             var boundary = GAME_STATE.boundaries[piece.type][color];
@@ -4006,9 +4011,32 @@ function filtered_moves(piece, color, is_hypothetical)
         var dest_square = VBOARD[x][y];
         var capture_piece = dest_square.piece;
 
+
+
+
         // If there is any piece there, it may block other moves
         if (capture_piece) {
             blocked[rel_x + "," + rel_y] = true;
+
+            // Maintain state of this ray
+            if (flags.ray_number !== undefined) {
+                var old_state, new_state;
+                
+                old_state = ray_state[flags.ray_number];
+                if (flags.ray_state_action !== undefined) {
+                    var action = flags.ray_state_action[old_state];
+                    if (action === "skip") {
+                        continue;
+                    } else {
+                        assert(false, "unknown ray_state_action: " + action);
+                    }
+                }
+
+                new_state = flags.ray_state_transition[old_state];
+                ray_state[flags.ray_number] = new_state;
+                console.log(piece.type,JSON.stringify(ray_state));
+            }
+
 
             if (flags.if_blocked_skip) {
                 i += flags.if_blocked_skip;
@@ -4095,6 +4123,9 @@ function filtered_moves(piece, color, is_hypothetical)
                 continue;
             }
         }
+
+
+
 
         // Snap back after moving - for guns
         if (flags.snapback !== undefined) {
@@ -4534,7 +4565,7 @@ function decode_explicit_move(text_move, existing_flags)
 function decode_one_parlett(parlett)
 {
     var distances, directions, flags, movement, rel_moves, limit, inner_moves, rotates;
-    var hippogonal = false, hopper = false, line_hopper = false;
+    var hippogonal = false, hopper = false;
 
     flags = {};
     distances = [];
@@ -4794,7 +4825,7 @@ function decode_one_parlett(parlett)
 // flags: move flags to add
 // movement: "rider" or "leaper"
 // rotates: array of degrees to rotate moves after each step
-// TODO: hopper: whether a intervening piece (hurdle) is required in the direction to be able to move
+// hopper: whether a intervening piece (hurdle) is required in the direction to be able to move
 function expand_directions(directions, distances, limit, flags, movement, rel_moves, rotates, hopper)
 {
     for (i = 0; i < directions.length; i += 1) {
@@ -4826,6 +4857,20 @@ function expand_directions(directions, distances, limit, flags, movement, rel_mo
 
             if (rotates) {
                 dir = rotate_direction(dir, rotates[j % rotates.length]);
+            }
+
+            // Ray number of expanded directions, for grouping moves in same "ray" together
+            these_flags.ray_number = i;
+            if (hopper < 0) {
+                // Line-hoppers first can't move, then can after they hit their first piece (the screen),
+                // and then are blocked once they hit their second piece 
+                these_flags.ray_state_transition = {undefined:"screened", screened:"blocked"};
+            } else if (hopper > 0) {
+                // TODO: support fore-hoppers, like line but can only land right after the screen
+                assert(false, "sorry, forehoppers not yet supported");
+            } else {
+                // Riders ride until they are blocked
+                these_flags.ray_state_transition = {undefined:"blocked"};
             }
 
             // Riders get blocked. Note that you can have a non-hippogonal leaper.
