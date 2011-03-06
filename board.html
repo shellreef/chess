@@ -1545,6 +1545,7 @@ var DEFAULT_BOARD_GROUP = "Recognized";
 var DEFAULT_BOARD_NAME = "FIDE Chess";
 
 
+// TODO: support more from http://play.chessvariants.org/pbm/devguide.html
 // TODO: replace x(foo) with (foo) and X(foo) with (Foo), then remove deprecated
 
 // Saved board setups in FEN
@@ -4025,6 +4026,16 @@ function filtered_moves(piece, color, is_hypothetical)
                 ray_state[flags.ray_number] = new_state;
                 console.log("transition(" + flags.ray_number + ")",this_state,"->",new_state);
                 console.log("rs",JSON.stringify(ray_state));
+
+                // Can optionally specify to disallow capturing hurdle
+                var trans_action = flags.ray_action[this_state + "->" + new_state];
+                if (trans_action === undefined) {
+                    ;
+                } else if (trans_action === "skip") {
+                    continue;
+                } else {
+                    assert(false, "invalid transition ray action: " + trans_action);
+                }
             }
         
             // Can't move to self-occupied square
@@ -4064,8 +4075,6 @@ function filtered_moves(piece, color, is_hypothetical)
             var action = flags.ray_action[this_state];
             if (action === "skip") {
                 continue;
-            //} else if (action === "end") {    // not quite useful since ends all moves not just this ray
-            //    break;
             } else if (action === "allow") {
                 ;
             } else {
@@ -4891,7 +4900,12 @@ function expand_directions(directions, distances, limit, flags, movement, rel_mo
                 // Line-hoppers first can't move, then can after they hit their first piece (the screen),
                 // and then are blocked once they hit their second piece 
                 these_flags.ray_state_transition = {undefined:"screened", screened:"blocked", blocked:"blocked"};
-                these_flags.ray_action = {undefined:"skip", screened:"allow", blocked:"skip"};
+                these_flags.ray_action = {
+                    undefined:"skip",               // can't move before the screen
+                    screened:"allow",               // but once after, can move freely
+                    blocked:"skip",                 // until blocked by another piece
+                    "undefined->screened":"skip"    // can't capture screen
+                    };
             } else if (hopper > 0) {
                 // TODO: support fore-hoppers, like line but can only land right after the screen
                 assert(false, "sorry, forehoppers not yet supported");
@@ -4925,6 +4939,7 @@ function expand_directions(directions, distances, limit, flags, movement, rel_mo
             rel_x += dir[0];
             rel_y += dir[1];
 
+/* TODO: adapt to ray states for forehoppers (grasshopper)
             if (hopper) {
                 // Hoppers require a blocking piece (hurdle)
                 if (prev_rel_x !== null) {
@@ -4942,7 +4957,7 @@ function expand_directions(directions, distances, limit, flags, movement, rel_mo
                     continue;
                 }
             }
-
+*/
 
             dojo.mixin(these_flags, flags);
 
