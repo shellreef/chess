@@ -3871,8 +3871,11 @@ function movement_diagram(moves)
             ch = "u";   // unblocked
         }
         if (move[2].if_blocked_dx !== undefined) {
-            ch = "^";   // probably a hopper
+            ch = "b";   // blocked
         }
+
+        // If given a letter explicitly, override it
+        ch = move[2].move_diagram_char || ch;
 
         // Flip directions
         board[-move[1]][move[0]] = ch;
@@ -4912,6 +4915,7 @@ function expand_directions(directions, distances, limit, flags, movement, rel_mo
                     blocked:"skip",                 // until blocked by another piece
                     "undefined->screened":"skip"    // can't capture screen
                     };
+                these_flags.move_diagram_char = "^";
             } else if (hopper > 0) {
                 // TODO: support fore-hoppers, like line but can only land right after the screen
                 assert(false, "sorry, forehoppers not yet supported");
@@ -4919,6 +4923,7 @@ function expand_directions(directions, distances, limit, flags, movement, rel_mo
                 // Riders ride until they are blocked
                 these_flags.ray_state_transition = {undefined:"blocked", blocked:"blocked"};
                 these_flags.ray_action = {undefined:"allow", blocked:"skip"};
+                these_flags.move_diagram_char = "x";
             }
 
             // Riders get blocked. Note that you can have a non-hippogonal leaper.
