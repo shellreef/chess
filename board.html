@@ -4044,8 +4044,9 @@ function filtered_moves(piece, color, is_hypothetical)
         
             // Can't move to self-occupied square
             if (capture_piece.color === color) {
+                // Record blocked moves where we are guarding our own pieces
                 // Castling moves can never guard, since the destination must be unoccupied
-                if (!flags.if_can_castle) {
+                if (!flags.no_capture && !flags.if_can_castle) {
                     // to indicate we are guarding this piece
                     blocked_moves.push(abs_move);
                 }
