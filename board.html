@@ -1750,6 +1750,7 @@ var SAVED_BOARDS = {
 "Test Rider 1": "////2x(dummy)x(dummy)2R w - - 0 1",
 "Test Complex Riders": "1X(crookedbishop)/8/3X(dummy)/4X(griffon)/7X(panda)//5X(slipbishop) w - -",
 "Test Griffon": "8//3(dummy)/4X(griffon) w - -",
+//"Test Griffon": "8///4X(griffon) w - -",
 "Test Complex Riders I": "8/8/8/8/4X(crookedrook) w - -",
 "Test Fore-Hoppers": "/2X(rookhopper)2x(dummy)/5X(bishopper)/4X(grasshopper)kx(dummy)//2x(dummy)1X(dummy) w - -",
 "Test Line-Hoppers": "/2X(rion)2x(dummy)///2X(rion)/2x(dummy) w - -",
@@ -4019,7 +4020,7 @@ if (USE_NEW) {
         var this_state = null;
         if (flags.ray_number !== undefined) {
             this_state = ray_state[flags.ray_number];
-            console.log(i,"ray " + flags.ray_number,this_state,rel_x,rel_y,JSON.stringify(ray_state));
+            console.log(i,"ray " + flags.ray_number,this_state, xy2filerank({x:x,y:y})  ,JSON.stringify(ray_state));
 
             var action = flags.ray_action[this_state];
             if (action === "skip") {
@@ -4824,6 +4825,13 @@ function decode_one_parlett(parlett)
                 var flags = {};
                 dojo.mixin(flags, inner[2]);
                 dojo.mixin(flags, outer[2]);
+               
+                if (inner[2].ray_number !== undefined) {
+                    // The ray number is supposed to uniquely identify it for blocking purposes, but 
+                    // since we're mixing the inner and outer moves we need to disambiguate the rays,
+                    // especially for the griffon
+                    inner[2].ray_number += "-" + i;
+                }
 
                 rel_moves.push([outer[0] + inner[0], outer[1] + inner[1], flags]);
             }
@@ -4890,7 +4898,7 @@ function expand_directions(directions, distances, limit, flags, movement, rel_mo
             }
 
             // Ray number of expanded directions, for grouping moves in same "ray" together
-            these_flags.ray_number = ray_begin_id + i;
+            these_flags.ray_number = ray_begin_id + "-" + i;
             if (hopper < 0) {
                 // Line-hoppers first can't move, then can after they hit their first piece (the screen),
                 // and then are blocked once they hit their second piece 
