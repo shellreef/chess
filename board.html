@@ -4012,35 +4012,44 @@ function filtered_moves(piece, color, is_hypothetical)
         var capture_piece = dest_square.piece;
 
 
+        // Maintain state of this ray
+        var this_state = undefined;
+        if (flags.ray_number !== undefined) {
+            this_state = ray_state[flags.ray_number];
+
+            if (flags.ray_action !== undefined) {
+                var action = flags.ray_action[this_state];
+                if (action === "skip") {
+                    continue;
+                } else if (action === "end") {
+                    break;
+                } else if (action === "allow") {
+                    ;
+                } else {
+                    assert(false, "unknown ray_action: " + action + " for state " + this_state);
+                }
+            }
+        }
 
 
         // If there is any piece there, it may block other moves
         if (capture_piece) {
             blocked[rel_x + "," + rel_y] = true;
 
-            // Maintain state of this ray
+            // There is a piece in the way, it might cause a state transition
             if (flags.ray_number !== undefined) {
-                var old_state, new_state;
-                
-                old_state = ray_state[flags.ray_number];
-                if (flags.ray_state_action !== undefined) {
-                    var action = flags.ray_state_action[old_state];
-                    if (action === "skip") {
-                        continue;
-                    } else {
-                        assert(false, "unknown ray_state_action: " + action);
-                    }
-                }
+                var new_state;
 
-                new_state = flags.ray_state_transition[old_state];
+                new_state = flags.ray_state_transition[this_state];
                 ray_state[flags.ray_number] = new_state;
-                console.log(piece.type,JSON.stringify(ray_state));
+                console.log("transition(" + flags.ray_number + ")",this_state,"->",new_state);
             }
 
 
+/* XXX REMOVE
             if (flags.if_blocked_skip) {
                 i += flags.if_blocked_skip;
-            }
+            }*/
         
             // Can't move to self-occupied square
             if (capture_piece.color === color) {
@@ -4860,17 +4869,19 @@ function expand_directions(directions, distances, limit, flags, movement, rel_mo
             }
 
             // Ray number of expanded directions, for grouping moves in same "ray" together
-            these_flags.ray_number = i;
+            these_flags.ray_number = i + 1;
             if (hopper < 0) {
                 // Line-hoppers first can't move, then can after they hit their first piece (the screen),
                 // and then are blocked once they hit their second piece 
                 these_flags.ray_state_transition = {undefined:"screened", screened:"blocked"};
+                these_flags.ray_action = {undefined:"skip", screened:"allow", blocked:"end"};
             } else if (hopper > 0) {
                 // TODO: support fore-hoppers, like line but can only land right after the screen
                 assert(false, "sorry, forehoppers not yet supported");
             } else {
                 // Riders ride until they are blocked
                 these_flags.ray_state_transition = {undefined:"blocked"};
+                these_flags.ray_action = {undefined:"allow", blocked:"end"};
             }
 
             // Riders get blocked. Note that you can have a non-hippogonal leaper.
