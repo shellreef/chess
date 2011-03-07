@@ -198,8 +198,9 @@ var PREFS_DEFAULT = {
     input_notation: "SAN",          // Move list menu
     output_notation: "SAN",         // Move history
 
-    image_root: "images/",
-    //image_root: "http://camelpawn.appspot.com/images/",    // on Google App Engine (TODO: update)
+    // TODO: embed base64 data URIs so don't have to slowly load external files
+    //image_root: "images/",
+    image_root: "http://camelpawn.appspot.com/images/",    // on Google App Engine (TODO: update)
     // What piece images to use
     image_set: "alfaerieomega", image_extension: ".gif",     // most comprehensive
     //image_set: "ariel", image_extension: ".gif",           // based on Ariel Unicode MS
