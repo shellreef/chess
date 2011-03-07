@@ -1016,7 +1016,7 @@ var PIECE_TYPES = {
     //rhinocamelrider: {parlett: "#rhino, #camelrider"},
     //rhinozebra: {parlett: "#rhino, #zebra"},
     //rhinozebrarider: {parlett: "#rhino, #zebrarider"},
-    scorpion: {parlett: "#man, #grasshopper"}, 
+    //scorpion: {parlett: "#man, #grasshopper"},  
     scorpionpawn: {parlett: "#scorpion, #pawn"},
     queenalfilwarmachine: {parlett: "#queen, #alfil, #warmachine", image:"queenalfildabbaba3"},
     // TODO: herowarmachinewazir, lemurianwarmachinewazir, flexibleknight, linearchieftainjumpinggeneral, from http://chessvariants.wikidot.com/joe-s-strange-notation
@@ -1166,20 +1166,20 @@ var PIECE_TYPES = {
     // /...=...\    line-hop    ^& (TODO)
    
     // Line-hoppers
-    rion: {parlett: "n+^&", image:"rook#LH", aka:"rooklinehopper", pc:"akm"}, // TODO: movement
-    //bion: {parlett: "nX^&", aka:["bishlion", "bishoplinehopper"], pc:"akm"},
-    //lion: {parlett: "n*^&", aka:"queenlinehopper", pc:"akm"},  // TODO: reconcile with ~n* lion
+    rion: {parlett: "n+^&", image:"rook#^", aka:"rooklinehopper", pc:"akm"}, // TODO: image
+    bion: {parlett: "nX^&", image:"bishop#^", aka:["bishlion", "bishoplinehopper"], pc:"akm"},  // TODO: image
+    qion: {parlett: "n*^&", image:"queen#^", aka:["queenlinehopper", "akmlion"], pc:"akm"},  // Note: I call qion to disambiguate from ~n* lion // TODO: image
     //nightriderhopper: {parlett: "(~1/2&)^&", pc:"akm"}, // TODO: movement notation?
 
     // Chinese hoppers: move as rider, capture as line-hopper
-    cannon: {image:{w:"cannon", xw:"circle#砲", xb:"circle#炮"}, parlett: "on+, cn+^&", aka:["pao"], wxf_letter:"C", cn_letter:"炮"}, // TODO: movement. Like rook, but capture move requires a "screen" to hop over immediately in front; line-hopper
-    //vao: {parlett: "onX, cnX^&"}, // like bishop
-    //leo: {letter: "XO", parlett: "on*, cn*^&", url:"http://en.wikipedia.org/wiki/Fairy_chess_piece#Notable_examples"}, 
+    cannon: {parlett: "on+, cn+^&", image:{w:"cannon", xw:"circle#砲", xb:"circle#炮"}, aka:["pao"], wxf_letter:"C", cn_letter:"炮"}, // TODO: movement. Like rook, but capture move requires a "screen" to hop over immediately in front; line-hopper
+    vao: {parlett: "onX, cnX^&", image:"cannon#/", url:"http://en.wikipedia.org/wiki/Fairy_chess_piece#Chinese_pieces"}, // like bishop // TODO: image
+    leo: {parlett: "on*, cn*^&", image:"cannon#*", url:"http://en.wikipedia.org/wiki/Fairy_chess_piece#Notable_examples"}, // TODO: image
     
-    // Fore-hoppers
-    grasshopper: {parlett: "n*^", aka:"queenhopper", url:"http://en.wikipedia.org/wiki/Grasshopper_(chess)"}, // TODO: movement
-    rookhopper: {parlett: "n+^", pc:"akm"},
-    bishopper: {parlett: "nX^", pc:"akm"}, // TODO: image
+    // Fore-hoppers (TODO)
+    //grasshopper: {parlett: "n*^", aka:"queenhopper", url:"http://en.wikipedia.org/wiki/Grasshopper_(chess)"}, // TODO: movement
+    //rookhopper: {parlett: "n+^", pc:"akm"}, TODO: movement
+    //bishopper: {parlett: "nX^", pc:"akm"}, // TODO: movement // TODO: image
     //kangaroo: {parlett: "n*^^", pc:"akm"}, // TODO: movement, hops over *two* hurdles
 
     // TODO: locust movement (captures hurdle), cn*^&?? cn*^^?. 
@@ -1755,9 +1755,9 @@ var SAVED_BOARDS = {
 "Test Complex Riders": "1X(crookedbishop)/8/3X(dummy)/4X(griffon)/7X(panda)//5X(slipbishop) w - -",
 "Test Complex Riders II": "8/8/8/8/4X(crookedrook) w - -",
 "Test Griffon": "8//3(dummy)/4X(griffon) w - -",
-"Test Fore-Hoppers": "/2X(rookhopper)2x(dummy)/5X(bishopper)/4X(grasshopper)kx(dummy)//2x(dummy)1X(dummy) w - -",
-"Test Line-Hoppers": "/2X(rion)2x(dummy)///2X(rion)/2x(dummy) w - -",
-//TODO: "Test Line-Hoppers": "x(cannon)"
+//"Test Fore-Hoppers": "/2X(rookhopper)2x(dummy)/5X(bishopper)/4X(grasshopper)kx(dummy)//2x(dummy)1X(dummy) w - -",
+"Test Line-Hoppers": "/2(Rion)2x(dummy)///2(Rion)2(Qion)/2(dummy)3(Bion) w - -",
+"Test Chinese Hoppers": "5(dummy)(dummy)/2(Cannon)2(dummy)/3(dummy)//(dummy)1(Cannon)2(Leo)/2(dummy)3(Vao) w - -",
 "Test Chinese Pieces": "8/8/8/3X(moa)X(moo)/3hH3/8/8/8 w - -",
 "Test Amphibians": "4k/8/8/slslslsl/8/8/FFFFFFFF/4K w - -",
 "Test Royalty": "x(royalrook)x(royalknight)x(royalbishop)xjkx(royalbishop)x(royalknight)x(royalrook)/pppppppp/8/8/8/8/PPPPPPPP/X(royalrook)X(royalknight)X(royalbishop)XJKX(royalbishop)X(royalknight)X(royalrook) w KQkq -",
