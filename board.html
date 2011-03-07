@@ -1056,7 +1056,7 @@ var PIECE_TYPES = {
     crownedcamel: {parlett: "#camel, #advisor"},
     camelking: {parlett: "#camel, #king", image:["simplecamelking", "cbjcamelking", "tinyscamelking"]},
     // TODO: telepotency - can attack opposing general on same open file. Like a capture but only for specific piece. New need syntax, maybe c(king)n+? also needs to escape palace
-    general: {image:{w:["general2", "general"], xw:"circle#將", xb:"circle#帥"}, parlett: "#wazir", royal: true, url:"pc:general", aka:["chineseking"], wxf_letter:"K", cn_letter:["帥", "將"]}, 
+    general: {image:{w:["general2", "general"], xw:"circle#將", xb:"circle#帥"}, parlett: "#wazir, {c(general)n+;telepotent}", royal: true, url:"pc:general", aka:["chineseking"], wxf_letter:"K", cn_letter:["帥", "將"]}, 
     // http://www.mayhematics.com/v/gm.htm has a different definition of wizard
     wizard: {parlett: "#camel, #advisor", image:"moon",  url:"pc:wizard", hex: "U+1F319"},
     fad: {parlett: "#advisor, #alfil, #warmachine", image:["elephantferzwarmachine"], url:"pc:fad"},
@@ -3417,7 +3417,7 @@ function do_virtual_move(piece, move)
     }
 
     if (move.snapback) {
-        // Projectile attack, withdrawals back to where it came from
+        // Projectile attack, withdrawals back to where it came from (aka "igui")
         did.to_square = did.from_square;    // this is key
         did.piece_moved_over = did.captured;
         return did;
@@ -3999,9 +3999,9 @@ function filtered_moves(piece, color, is_hypothetical)
 
         // Default to limiting movement based on board dimensions, but
         // allow boards to also limit based on a river or palace
-        // TODO: allow overriding for Xiangqi king telepotency
         var x1 = 1, y1 = 1, x2 = GAME_STATE.files, y2 = GAME_STATE.ranks;
-        if (GAME_STATE.boundaries[piece.type]) {
+        if (GAME_STATE.boundaries[piece.type]
+            && !flags.telepotent) {     // Xiangqi king has telepotency, meaning it can attack beyond its palace
             var boundary = GAME_STATE.boundaries[piece.type][color];
 
             x1 = boundary[0];
@@ -4047,7 +4047,12 @@ function filtered_moves(piece, color, is_hypothetical)
                     assert(false, "invalid transition ray action: " + trans_action);
                 }
             }
-        
+
+            // Can only capture specific piece types
+            if (flags.capture_types && flags.capture_types.indexOf(capture_piece.type) === -1) {
+                continue;
+            }
+
             // Can't move to self-occupied square
             if (capture_piece.color === color) {
                 // Record blocked moves where we are guarding our own pieces
@@ -4076,6 +4081,7 @@ function filtered_moves(piece, color, is_hypothetical)
                 continue;
             }
 
+
             // For move notations
             abs_move.capture = capture_piece;
         } 
@@ -4094,8 +4100,6 @@ function filtered_moves(piece, color, is_hypothetical)
             }
         }
 
-
-
         // Must be a capture
         if (flags.capture_only && !capture_piece) {
             continue;
@@ -4106,7 +4110,7 @@ function filtered_moves(piece, color, is_hypothetical)
             continue;
         }
 
-        // TODO: Does piece_moved() need to be virtualized?
+        // Must not have moved from initial position
         if (flags.initial_only && piece_moved(piece)) {
             continue;
         }
@@ -4625,6 +4629,19 @@ function decode_one_parlett(parlett)
             // Capture only: may only be used if destination is occupied by enemy piece
             // (pawn's diagnal capture)
             flags.capture_only = true;
+
+            // Optional c(...) capture only-piece-type(s) specifier
+            if (i + 1 < parlett.length && parlett.substr(i + 1, 1) === "(") {
+                var capture_types = "";
+                i += 1;
+                while(i < parlett.length) {
+                    i += 1;
+                    ch = parlett.charAt(i);
+                    if (ch === ")") { break; }
+                    capture_types += ch;
+                }
+                flags.capture_types = capture_types.split(",");
+            }
         } else if (ch === "o") {
             // Can not capture: destination square must be unoccupied; since by default, piece
             // can move to enemy square in order to capture it
