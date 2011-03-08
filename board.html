@@ -727,8 +727,8 @@ var PIECE_TYPES = {
     makrukpawn: {parlett: "#weakpawn", promote:["advisor"], promotion_rank:6, url:"http://en.wikipedia.org/wiki/Makruk#Pieces"},
     superpawn: {parlett: "on>, cnX>", letter: "XP", image:"quickpawn"},
     berolinapawn: {parlett: "o1X>, c1>, io2X>", letter: "XB", resets_50move: true, url:"pc:berolina"},
-    leftberolinapawn: {parlett: "o1↖, c1>, io2↖", letter: "XB", resets_50move: true},
-    rightberolinapawn: {parlett: "o1↗, c1>, io2↗", letter: "XB", resets_50move: true},
+    leftberolinapawn: {parlett: "o1↖, c1>, io2↖", resets_50move: true},
+    rightberolinapawn: {parlett: "o1↗, c1>, io2↗", resets_50move: true},
     berolinapluspawn: {parlett: "#berolinapawn, c1=", url:"pc:berolina-plus"}, 
     
     dragon: {parlett: "#pawn, #knight", image: ["dragon", "dragon2", "knightpawn", "pawnknight"], url:"pc:dragon", hex:"U+1F409"},   
@@ -1219,7 +1219,7 @@ var PIECE_TYPES = {
     //mountain_eagle_right: {parlett: "n↘.2", romanji: "sanshū", promote: ["soaring_eagle"], image: "circle#山鷲", letter: "MR", tags:"taikyoku "},
     fire_demon: {parlett: "n>.2, n<.2, n=, nX", romanji: "kaki", promote: ["free_fire"], image: "circle#火鬼", letter: "DM", tags:"taikyoku "}, // Note: no burning
     //free_fire: {parlett: "", romanji: "honka", image: "circle#奔火", letter: "+DM", tags:"taikyoku "},
-    whale: {parlett: "n<, n>, nX<", romanji: "keigei", promote: ["great_whale"], image: "circle#鯨鯢", letter: "W", tags:"taikyoku "},
+    whale: {parlett: "n<, n>, nX<", romanji: "keigei", promote: ["great_whale"], image: "circle#鯨鯢", letter: "WW", tags:"taikyoku "},
     //great_whale: {parlett: "", romanji: "daigei", image: "circle#大鯨", letter: "+W", tags:"taikyoku "},
     running_rabbit: {parlett: "1+, 1<X, n+, n>X", romanji: "sōto", promote: ["treacherous_fox"], image: "circle#走兎", letter: "RR", tags:"taikyoku "},
     white_tiger: {parlett: "n=, n↖, n>.2, n<.2", romanji: "byakko", promote: ["divine_tiger"], image: "circle#白虎", letter: "WT", tags:"taikyoku "},
@@ -1373,7 +1373,7 @@ var PIECE_TYPES = {
     blind_dog: {parlett: "1<, 1=, 1X>", romanji: "mōken", promote: ["violent_stag"], image: "circle#盲犬", letter: "BI", tags:"taikyoku generals"}, // TODO: reconcile w/ generals
     chinese_cock: {parlett: "#blind_dog", romanji: "waikei", promote: ["wizard_stork"], image: "circle#淮鶏", letter: "CC", tags:"taikyoku "},
     water_general: {parlett: "1>, 1<, nX.3", romanji: "suishō", promote: ["vice_general"], image: "circle#水将", letter: "WG", tags:"taikyoku "},
-    mountain_general: {parlett: "#water_general", romanji: "sanshō", promote: ["peaceful_mountain"], image: "circle#山将", letter: "M", tags:"taikyoku "},
+    mountain_general: {parlett: "#water_general", romanji: "sanshō", promote: ["peaceful_mountain"], image: "circle#山将", letter: "MG", tags:"taikyoku "},
     fire_general: {parlett: "1X>, n>.3, n<.3", romanji: "kashō", promote: ["great_general"], image: "circle#火将", letter: "F", tags:"taikyoku "},
     phoenix: {parlett: "1=, ~2X", romanji: "hōō", promote: ["golden_bird"], image: "circle#鳳凰", letter: "PH", tags:"taikyoku "},
     kirin: {parlett: "1>, 1X, ~2X", romanji: "kirin", promote: ["golden_bird"], image: "circle#麒麟", letter: "KR", tags:"taikyoku "},
@@ -1462,7 +1462,7 @@ var PIECE_TYPES = {
     tile_general: {parlett: "1X>, 1<", romanji: "gashō", promote: ["white_elephant"], image: "circle#瓦将", letter: "T", tags:"taikyoku generals"}, // TODO: reconcile w/ generals
     sword_general: {parlett: "#tile_general", romanji: "tōshō", image: "circle#刀将", letter: "+SE", tags:"taikyoku "},
     //strong_bear: {parlett: "", romanji: "kyōyū", image: "circle#強熊", letter: "+BE", tags:"taikyoku "},
-    iron_general: {parlett: "1>, 1X>", romanji: "tesshō", promote: ["white_elephant"], image: "circle#鉄将", letter: "I", tags:"taikyoku generals"}, // TODO: reconcile w/ generals
+    iron_general: {parlett: "1>, 1X>", romanji: "tesshō", promote: ["white_elephant"], image: "circle#鉄将", letter: "IG", tags:"taikyoku generals"}, // TODO: reconcile w/ generals
     dog: {parlett: "#iron_general", romanji: "inu", promote: ["multi_general"], image: "circle#犬", letter: "D", tags:"taikyoku "}, // TODO: rename other dog
     great_standard: {parlett: "nX<.3, nX>, n+", romanji: "daiki", image: "circle#大旗", letter: "GE", tags:"taikyoku "},
     //great_master: {parlett: "n=.5, nX<.5", romanji: "daishi", image: "circle#大師", letter: "GM", tags:"taikyoku "}, // TODO: jump
@@ -1568,7 +1568,7 @@ var SAVED_BOARDS = {
 // Note that K v. K will result in a "draw by insufficient material" anyway, and
 // bareing the king will often result in a win eventually.
 // aka Iranian Chess, http://www.garagegames.com/community/blogs/view/17595
-"Iranian Chess (Shatranj)":     "rnyx(lord)xfynr/x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)x(shatranjpawn)/8/8/8/8/X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)X(shatranjpawn)/RNYX(lord)XFYNR w - - rs=shatranj",
+"Iranian Chess (Shatranj)":     "rny(lord)xfynr/(shatranjpawn)(shatranjpawn)(shatranjpawn)(shatranjpawn)(shatranjpawn)(shatranjpawn)(shatranjpawn)(shatranjpawn)/8/8/8/8/(Shatranjpawn)(Shatranjpawn)(Shatranjpawn)(Shatranjpawn)(Shatranjpawn)(Shatranjpawn)(Shatranjpawn)(Shatranjpawn)/RNY(Lord)XFYNR w - - rs=shatranj",
 
 // TODO: Tamerlane Chess, Timur's game, http://en.wikipedia.org/wiki/Tamerlane_Chess and http://www.pathguy.com/chess/Tamerlan.htm http://filer.case.edu/org/cwrums/games/tamerlane.html
 // TODO: Korean Chess (Changgi)
@@ -1579,23 +1579,23 @@ var SAVED_BOARDS = {
 // Chinese Chess (Xiangqi),
 "Chinese Chess (Xiangqi)": "rhe(advisor)(general)(advisor)ehr//1(cannon)5(cannon)/(chinesepawn)1(chinesepawn)1(chinesepawn)1(chinesepawn)1(chinesepawn)///(Chinesepawn)1(Chinesepawn)1(Chinesepawn)1(Chinesepawn)1(Chinesepawn)/1(Cannon)5(Cannon)//RHE(Advisor)(General)(Advisor)EHR w - - rs=xiangqi",
 
-"Chinese Chess (Xiangqi, Westernized)": "rhe(advisor)(general)(advisor)ehr//1(cannon)5(cannon)/(chinesepawn)1(chinesepawn)1(chinesepawn)1(chinesepawn)1(chinesepawn)///(Chinesepawn)1(Chinesepawn)1(Chinesepawn)1(Chinesepawn)1(Chinesepawn)/1(Cannon)5(Cannon)//RHE(Advisor)(General)(Advisor)EHR w - - rs=xiangqiw",
+"Chinese Chess (Xiangqi, Westernized/Crockford)": "rhe(advisor)(general)(advisor)ehr//1(cannon)5(cannon)/(chinesepawn)1(chinesepawn)1(chinesepawn)1(chinesepawn)1(chinesepawn)///(Chinesepawn)1(Chinesepawn)1(Chinesepawn)1(Chinesepawn)1(Chinesepawn)/1(Cannon)5(Cannon)//RHE(Advisor)(General)(Advisor)EHR w - - rs=xiangqiw",
 
 // TODO: http://www.chessvariants.org/xiangqivariants.dir/yangqi.htm
 
 // Counting rules on http://en.wikipedia.org/wiki/Makruk are not implemented
-"Thai Chess (Makruk)": "rnx(silvergeneral)x(advisor)x(lord)x(silvergeneral)nr/8/x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)x(makrukpawn)/8/8/X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)X(makrukpawn)/8/RNX(silvergeneral)X(lord)X(advisor)X(silvergeneral)NR w - -",
+"Thai Chess (Makruk)": "rn(silvergeneral)(advisor)(lord)(silvergeneral)nr/8/(makrukpawn)(makrukpawn)(makrukpawn)(makrukpawn)(makrukpawn)(makrukpawn)(makrukpawn)(makrukpawn)/8/8/(Makrukpawn)(Makrukpawn)(Makrukpawn)(Makrukpawn)(Makrukpawn)(Makrukpawn)(Makrukpawn)(Makrukpawn)/8/RN(Silvergeneral)(Lord)(Advisor)(Silvergeneral)NR w - -",
 "FIDE Chess": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -",
 "Chess960": setup_chess960,
 // TODO: pawns promote to rook,knight,queen, no double-move
-"Los Alamos Chess": "rnqknr/x(losalamospawn)x(losalamospawn)x(losalamospawn)x(losalamospawn)x(losalamospawn)x(losalamospawn)/6/6/X(losalamospawn)X(losalamospawn)X(losalamospawn)X(losalamospawn)X(losalamospawn)X(losalamospawn)/RNQKNR w - - ranks=6 files=6",
+"Los Alamos Chess": "rnqknr/(losalamospawn)(losalamospawn)(losalamospawn)(losalamospawn)(losalamospawn)(losalamospawn)/6/6/(Losalamospawn)(Losalamospawn)(Losalamospawn)(Losalamospawn)(Losalamospawn)(Losalamospawn)/RNQKNR w - - ranks=6 files=6",
 "Capablanca Chess": "rnabqkbcnr/pppppppppp/8/8/8/8/PPPPPPPPPP/RNABQKBCNR w AJaj - files=10 stalemate=win rs=triple_castle",
 "Berolina Chess": "rnbqkbnr/xbxbxbxbxbxbxbxb/8/8/8/8/XBXBXBXBXBXBXBXB/RNBQKBNR w KQkq -",
-"Courier Chess": "rnybmkxfibynr/x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)x(weakpawn)/////X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)X(weakpawn)/RNYBMKXFIBYNR w - - files=12 ranks=8",
+"Courier Chess": "rnybmkxfibynr/(weakpawn)(weakpawn)(weakpawn)(weakpawn)(weakpawn)(weakpawn)(weakpawn)(weakpawn)(weakpawn)(weakpawn)(weakpawn)(weakpawn)/////(Weakpawn)(Weakpawn)(Weakpawn)(Weakpawn)(Weakpawn)(Weakpawn)(Weakpawn)(Weakpawn)(Weakpawn)(Weakpawn)(Weakpawn)(Weakpawn)/RNYBMKXFIBYNR w - - files=12 ranks=8",
 // Note that in this implementation, only 4-move castling is supported, but chessvariants.com describes how one, two, three, or four is supported.
-"Wildebeest Chess": "rnwwx(gnu)kqbbnr/ppppppppppp///////PPPPPPPPPPP/RNWWX(gnu)KQBBNR w AKak - files=11 ranks=10 stalemate=win rs=quad_castle shredder_castle",
+"Wildebeest Chess": "rnww(gnu)kqbbnr/ppppppppppp///////PPPPPPPPPPP/RNWW(Gnu)KQBBNR w AKak - files=11 ranks=10 stalemate=win rs=quad_castle shredder_castle",
 "Taikyoku Shogi": 
-    "[l][ts][rr][w][dm][me][lo][bc][hr][fr][ed][cd][ft][fk][rs][lg][g][k][cp][g][rg][rs][fk][ft][wo][ed][fr][hr][bc][lo][me][dm][w][rr][wt][l]/" + 
+    "[l][ts][rr][ww][dm][me][lo][bc][hr][fr][ed][cd][ft][fk][rs][lg][g][k][cp][g][rg][rs][fk][ft][wo][ed][fr][hr][bc][lo][me][dm][ww][rr][wt][l]/" + 
     "[rv][we][md][fs][co][ra][fo][ms][rp][ru][ss][gr][rt][ba][bd][wr][s][nk][de][s][gu][ya][ba][rt][gr][ss][ru][rp][ms][fo][ra][co][fs][md][fg][rv]/" + 
     "[gc][si][rn][rw][bg][ro][lt][le][bo][wd][fp][rb][ok][pc][wa][fi][c][km][pm][c][fi][wa][pc][ok][rb][fp][wd][bo][ri][tt][ro][bg][rw][rn][si][gc]/" + 
     "[sv][ve][n][pi][cg][pg][h][o][cn][sa][sr][gl][ln][ct][gs][vd][wl][gg][vg][wl][vd][gs][ct][ln][gl][sr][sa][cn][o][h][pg][cg][pi][n][ve][sv]/" + 
@@ -1603,7 +1603,7 @@ var SAVED_BOARDS = {
     "[wc][wh][hd][sm][pr][wb][fl][eg][fd][ps][fy][st][bi][wg][f][kr][ca][gt][ll][hm][ph][f][wg][bi][st][fy][ps][fd][eg][fl][wb][pr][sm][hd][wh][wc]/" + 
     "[tc][vw][sx][do][fh][vb][ab][ew][lh][ck][om][cc][ws][es][vs][nt][tf][rm][mt][tf][nt][vs][su][nb][cc][om][ck][lh][ew][ab][vb][fh][do][sx][vw][tc]/" + 
     "[ec][bl][eb][ho][ow][cm][cs][sw][bm][bt][oc][sf][bb][or][sq][sn][rd][li][fe][rd][sn][sq][or][bb][sf][oc][bt][bm][sw][cs][cm][ow][ho][eb][vi][ec]/" + 
-    "[ch][sl][vr][wn][re][m][sd][hs][gn][os][ea][bs][sg][lp][t][be][i][gm][ge][i][be][t][lp][sg][bs][ea][os][gn][hs][sd][m][re][wn][vr][sl][ch]/" + 
+    "[ch][sl][vr][wn][re][mg][sd][hs][gn][os][ea][bs][sg][lp][t][be][ig][gm][ge][ig][be][t][lp][sg][bs][ea][os][gn][hs][sd][mg][re][wn][vr][sl][ch]/" + 
     "[lc][mk][vm][ox][lb][vp][vh][bn][dh][dk][se][hf][el][sp][vl][tg][sb][ld][dg][sb][tg][vl][sp][el][hf][se][dk][dh][bn][vh][vp][lb][ox][vm][mk][rc]/" + 
     "[p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p][p]/" + 
     "5[d]5[gb]3[d]6[d]3[gb]4[d]/" +
@@ -1611,7 +1611,7 @@ var SAVED_BOARDS = {
     "5[D]5[GB]3[D]6[D]3[GB]4[D]/" + 
     "[P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P][P]/" + 
     "[LC][MK][VM][OX][LB][VP][VH][BN][DH][DK][SE][HF][EL][SP][VL][TG][SB][LD][DG][SB][TG][VL][SP][EL][HF][SE][DK][DH][BN][VH][VP][LB][OX][VM][MK][RC]/" + 
-    "[CH][SL][VR][WN][RE][M][SD][HS][GN][OS][EA][BS][SG][LP][T][BE][I][GM][GE][I][BE][T][LP][SG][BS][EA][OS][GN][HS][SD][M][RE][WN][VR][SL][CH]/" + 
+    "[CH][SL][VR][WN][RE][MG][SD][HS][GN][OS][EA][BS][SG][LP][T][BE][IG][GM][GE][IG][BE][T][LP][SG][BS][EA][OS][GN][HS][SD][MG][RE][WN][VR][SL][CH]/" + 
     "[EC][BL][EB][HO][OW][CM][CS][SW][BM][BT][OC][SF][BB][OR][SQ][SN][RD][LI][FE][RD][SN][SQ][OR][BB][SF][OC][BT][BM][SW][CS][CM][OW][HO][EB][VI][EC]/" + 
     "[TC][VW][SX][DO][FH][VB][AB][EW][LH][CK][OM][CC][WS][ES][VS][NT][TF][RM][MT][TF][NT][VS][SU][NB][CC][OM][CK][LH][EW][AB][VB][FH][DO][SX][VW][TC]/" + 
     "[WC][WH][HD][SM][PR][WB][FL][EG][FD][PS][FY][ST][BI][WG][F][KR][CA][GT][LL][HM][PH][F][WG][BI][ST][FY][PS][FD][EG][FL][WB][PR][SM][HD][WH][WC]/" + 
@@ -1619,7 +1619,7 @@ var SAVED_BOARDS = {
     "[SV][VE][N][PI][CG][PG][H][O][CN][SA][SR][GL][LN][CT][GS][VD][WL][GG][VG][WL][VD][GS][CT][LN][GL][SR][SA][CN][O][H][PG][CG][PI][N][VE][SV]/" + 
     "[GC][SI][RN][RW][BG][RO][LT][LE][BO][WD][FP][RB][OK][PC][WA][FI][C][KM][PM][C][FI][WA][PC][OK][RB][FP][WD][BO][RI][TT][RO][BG][RW][RN][SI][GC]/" + 
     "[RV][WE][MD][FS][CO][RA][FO][MS][RP][RU][SS][GR][RT][BA][BD][WR][S][NK][DE][S][GU][YA][BA][RT][GR][SS][RU][RP][MS][FO][RA][CO][FS][MD][FG][RV]/" + 
-    "[L][TS][RR][W][DM][ME][LO][BC][HR][FR][ED][CD][FT][FK][RS][LG][G][K][CP][G][RG][RS][FK][FT][WO][ED][FR][HR][BC][LO][ME][DM][W][RR][WT][L]/" + 
+    "[L][TS][RR][WW][DM][ME][LO][BC][HR][FR][ED][CD][FT][FK][RS][LG][G][K][CP][G][RG][RS][FK][FT][WO][ED][FR][HR][BC][LO][ME][DM][WW][RR][WT][L]/" + 
     " w - - ranks=36 files=36",  // TODO
 //TODO: http://en.wikipedia.org/wiki/Tenjiku_shogi
 // TODO: Modern variants
@@ -1637,7 +1637,7 @@ var SAVED_BOARDS = {
 "Amazon Chess":         "rnbxvkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBXVKBNR w KQkq -",
 // http://en.wikipedia.org/wiki/Breakthrough_(board_game)
 // TODO: Win if promote.. have a universal leaper, but there is nothing to checkmate.
-"Breakthrough": "x(breakthru)x(breakthru)x(breakthru)x(breakthru)x(breakthru)x(breakthru)x(breakthru)x(breakthru)/x(breakthru)x(breakthru)x(breakthru)x(breakthru)x(breakthru)x(breakthru)x(breakthru)x(breakthru)/8/8/8/8/X(breakthru)X(breakthru)X(breakthru)X(breakthru)X(breakthru)X(breakthru)X(breakthru)X(breakthru)/X(breakthru)X(breakthru)X(breakthru)X(breakthru)X(breakthru)X(breakthru)X(breakthru)X(breakthru) w - - uncheckered",
+"Breakthrough": "(breakthru)(breakthru)(breakthru)(breakthru)(breakthru)(breakthru)(breakthru)(breakthru)/(breakthru)(breakthru)(breakthru)(breakthru)(breakthru)(breakthru)(breakthru)(breakthru)/8/8/8/8/(Breakthru)(Breakthru)(Breakthru)(Breakthru)(Breakthru)(Breakthru)(Breakthru)(Breakthru)/(Breakthru)(Breakthru)(Breakthru)(Breakthru)(Breakthru)(Breakthru)(Breakthru)(Breakthru) w - - uncheckered",
 "Commoner Chess":     "rnbqmbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQMBNR w KQkq -",
 "Knightmate Chess":    "rmbqxrbmr/pppppppp/8/8/8/8/PPPPPPPP/RMBQXRBMR w KQkq -",
 // A winning line of play for the roaylty pieces, from _The Oxford History of Board Games_ by David Parlett, pg. 192, regardless of the moves for the maharajah:
@@ -1646,26 +1646,26 @@ var SAVED_BOARDS = {
 // TODO: No black pawn promotion
 "Maharajah and the Sepoys (white)":     "rnbqkbnr/pppppppp/8/8/8/8/8/4XJ3 w kq -",
 "Milener's Chess-3 (non-random)": "rnbqkvjt/pppppppp/8/8/8/8/PPPPPPPP/RNBQKVJT w KQkq -",
-"Nightrider Chess I": "r1bx(nightrider)kb1r/pppppppp/8/8/8/8/PPPPPPPP/R1BX(nightrider)KB1R w KQkq -",
-"Nightrider Chess II": "rx(nightrider)bqkbx(nightrider)r/pppppppp/8/8/8/8/PPPPPPPP/RX(nightrider)BQKBX(nightrider)R w KQkq -",
-"Fox and Geese": "8/8/8/4x(advisor)/5X(goose)/2X(goose)1X(goose)/3X(goose) w - -", // geese win by stalemating fox, solution at http://www.mayhematics.com/v/gm.htm
+"Nightrider Chess I": "r1b(nightrider)kb1r/pppppppp/8/8/8/8/PPPPPPPP/R1B(Nightrider)KB1R w KQkq -",
+"Nightrider Chess II": "r(nightrider)bqkb(nightrider)r/pppppppp/8/8/8/8/PPPPPPPP/R(Nightrider)BQKB(Nightrider)R w KQkq -",
+"Fox and Geese": "8/8/8/4(advisor)/5(Goose)/2(Goose)1(Goose)/3(Goose) w - -", // geese win by stalemating fox, solution at http://www.mayhematics.com/v/gm.htm
 // http://hem.passagen.se/melki9/royalpawn.htm
-"Royal Pawn Chess": "rnbqmbnr/ppppx(royalpawn)ppp/8/8/8/8/PPPPX(royalpawn)PPP/RNBQMBNR w - -",
-"Sniper Chess": "x(rookni)x(kniroo)x(bishkni)qkx(ensign)x(knibis)x(roobis)/pppppppp/8/8/8/8/PPPPPPPP/X(rookni)X(kniroo)X(bishkni)QKX(ensign)X(knibis)X(roobis) w KQkq -",
+"Royal Pawn Chess": "rnbqmbnr/pppp(royalpawn)ppp/8/8/8/8/PPPP(Royalpawn)PPP/RNBQMBNR w - -",
+"Sniper Chess": "(rookni)(kniroo)(bishkni)qk(ensign)(knibis)(roobis)/pppppppp/8/8/8/8/PPPPPPPP/(Rookni)(Kniroo)(Bishkni)QK(Ensign)(Knibis)(Roobis) w KQkq -",
 
     //"Chess with Different Armies": {
 // Chess with Different Armies http://www.chessvariants.com/unequal.dir/cwda.html
 // TODO: Choose each? Colorbound Clobberers vs. Remarkable Rookies, randomized, etc.
 // TODO: new pawns to promote to pieces on each board
-"Colorbound Clobberers": "x(bede)x(waffle)x(fad)x(archbishop)kx(fad)x(waffle)x(bede)/x(ccpawn)x(ccpawn)x(ccpawn)x(ccpawn)x(ccpawn)x(ccpawn)x(ccpawn)x(ccpawn)/8/8/8/8/X(ccpawn)X(ccpawn)X(ccpawn)X(ccpawn)X(ccpawn)X(ccpawn)X(ccpawn)X(ccpawn)/X(bede)X(waffle)X(fad)X(archbishop)KX(fad)X(waffle)X(bede) w KQkq -",
-"Remarkable Rookies": "x(r4)x(woodyrook)x(halfduck)ckx(halfduck)x(woodyrook)x(r4)/x(rrpawn)x(rrpawn)x(rrpawn)x(rrpawn)x(rrpawn)x(rrpawn)x(rrpawn)x(rrpawn)/8/8/8/8/X(rrpawn)X(rrpawn)X(rrpawn)X(rrpawn)X(rrpawn)X(rrpawn)X(rrpawn)X(rrpawn)/X(r4)X(woodyrook)X(halfduck)CKX(halfduck)X(woodyrook)X(r4) w KQkq -",
-"Nutty Knights": "x(chargingrook)x(fibnif)x(chargingknight)x(colonel)kx(chargingknight)x(fibnif)x(chargingrook)/x(nnpawn)x(nnpawn)x(nnpawn)x(nnpawn)x(nnpawn)x(nnpawn)x(nnpawn)x(nnpawn)/8/8/8/8/X(nnpawn)X(nnpawn)X(nnpawn)X(nnpawn)X(nnpawn)X(nnpawn)X(nnpawn)X(nnpawn)/X(chargingrook)X(fibnif)X(chargingknight)X(colonel)KX(chargingknight)X(fibnif)X(chargingrook) w KQkq -",
+"Colorbound Clobberers": "(bede)(waffle)(fad)(archbishop)k(fad)(waffle)(bede)/(ccpawn)(ccpawn)(ccpawn)(ccpawn)(ccpawn)(ccpawn)(ccpawn)(ccpawn)/8/8/8/8/(Ccpawn)(Ccpawn)(Ccpawn)(Ccpawn)(Ccpawn)(Ccpawn)(Ccpawn)(Ccpawn)/(Bede)(Waffle)(Fad)(Archbishop)K(Fad)(Waffle)(Bede) w KQkq -",
+"Remarkable Rookies": "(r4)(woodyrook)(halfduck)ck(halfduck)(woodyrook)(r4)/(rrpawn)(rrpawn)(rrpawn)(rrpawn)(rrpawn)(rrpawn)(rrpawn)(rrpawn)/8/8/8/8/(Rrpawn)(Rrpawn)(Rrpawn)(Rrpawn)(Rrpawn)(Rrpawn)(Rrpawn)(Rrpawn)/(R4)(Woodyrook)(Halfduck)CK(Halfduck)(Woodyrook)(R4) w KQkq -",
+"Nutty Knights": "(chargingrook)(fibnif)(chargingknight)(colonel)k(chargingknight)(fibnif)(chargingrook)/(nnpawn)(nnpawn)(nnpawn)(nnpawn)(nnpawn)(nnpawn)(nnpawn)(nnpawn)/8/8/8/8/(Nnpawn)(Nnpawn)(Nnpawn)(Nnpawn)(Nnpawn)(Nnpawn)(Nnpawn)(Nnpawn)/(Chargingrook)(Fibnif)(Chargingknight)(Colonel)K(Chargingknight)(Fibnif)(Chargingrook) w KQkq -",
 
-"Amazon Army": "x(r4)nbxvkbnx(r4)/pppppppp/8/8/8/8/PPPPPPPP/X(r4)NBXVKBNX(r4) w KQkq -",
+"Amazon Army": "(r4)nbxvkbn(r4)/pppppppp/8/8/8/8/PPPPPPPP/(R4)NBXVKBN(R4) w KQkq -",
 /// TODO: Cylindrical Cinders, fighting fizzes, etc.
 /// http://en.wikipedia.org/wiki/Chess_with_different_armies#cite_note-2
 // http://www.chessvariants.org/unequal.dir/pizza-kings.html
-"Pizza Kings": "x(sausage)x(mushroom)x(pepperoni)x(meatball)kx(pepperoni)x(mushroom)x(sausage)/x(pkpawn)x(pkpawn)x(pkpawn)x(pkpawn)x(pkpawn)x(pkpawn)x(pkpawn)x(pkpawn)/8/8/8/8/X(pkpawn)X(pkpawn)X(pkpawn)X(pkpawn)X(pkpawn)X(pkpawn)X(pkpawn)X(pkpawn)/X(sausage)X(mushroom)X(pepperoni)X(meatball)KX(pepperoni)X(mushroom)X(sausage) w KQkq -"
+"Pizza Kings": "(sausage)(mushroom)(pepperoni)(meatball)k(pepperoni)(mushroom)(sausage)/(pkpawn)(pkpawn)(pkpawn)(pkpawn)(pkpawn)(pkpawn)(pkpawn)(pkpawn)/8/8/8/8/(Pkpawn)(Pkpawn)(Pkpawn)(Pkpawn)(Pkpawn)(Pkpawn)(Pkpawn)(Pkpawn)/(Sausage)(Mushroom)(Pepperoni)(Meatball)K(Pepperoni)(Mushroom)(Sausage) w KQkq -"
 
     },
 
@@ -1749,27 +1749,27 @@ var SAVED_BOARDS = {
     },
 
     "Test Pieces": {
-"Test Pawns": "8/x(rookpawn)x(dragon)x(bishoppawn)x(superpawn)x(weakpawn)x(berolinapawn)x(pawnattackrook)//2x(steward)4X(optingpawn)/4X(sergeant)1X(liapawn)/8/X(rookpawn)X(dragon)X(bishoppawn)X(superpawn)X(weakpawn)X(berolinapawn)X(pawnattackrook)P w - -",
+"Test Pawns": "8/(rookpawn)(dragon)(bishoppawn)(superpawn)(weakpawn)(berolinapawn)(pawnattackrook)//2(steward)4(Optingpawn)/4(Sergeant)1(Liapawn)/8/(Rookpawn)(Dragon)(Bishoppawn)(Superpawn)(Weakpawn)(Berolinapawn)(Pawnattackrook)P w - -",
 "Test Leapers": "K/2E1Y1H1/3M/1XT1W1XG1Z/8/3Z1N/4oo/5k w - -", // TODO: antelope, flamingo
-"Test Riders": "B2R4/5X(barcrider)2/4Q3/4XN3/2X(alibabariderferz)3X(stone)1/3X(crabrider)1X(warmachinerider)X(squirrelrider)1/2X(alfilrider)X(camelrider)2X(zebrarider)1/4X(girafferider)3 w - - 0 1",
-"Test Rider 1": "////1(dummy)2(dummy)2X(rion) w - - 0 1",
-"Test Complex Riders": "1X(crookedbishop)/8/3X(dummy)/4X(griffon)/7X(panda)//5X(slipbishop) w - -",
-"Test Complex Riders II": "8/8/8/8/4X(crookedrook) w - -",
-"Test Griffon": "8//3(dummy)/4X(griffon) w - -",
-//"Test Fore-Hoppers": "/2X(rookhopper)2x(dummy)/5X(bishopper)/4X(grasshopper)kx(dummy)//2x(dummy)1X(dummy) w - -",
-"Test Line-Hoppers": "/2(Rion)2x(dummy)///2(Rion)2(Qion)/2(dummy)3(Bion) w - -",
+"Test Riders": "B2R4/5(Barcrider)2/4Q3/4XN3/2(Alibabariderferz)3(Stone)1/3(Crabrider)1(Warmachinerider)(Squirrelrider)1/2(Alfilrider)(Camelrider)2(Zebrarider)1/4(Girafferider)3 w - - 0 1",
+"Test Rider 1": "////1(dummy)2(dummy)2(Rion) w - - 0 1",
+"Test Complex Riders": "1(Crookedbishop)/8/3(Dummy)/4(Griffon)/7(Panda)//5(Slipbishop) w - -",
+"Test Complex Riders II": "8/8/8/8/4(Crookedrook) w - -",
+"Test Griffon": "8//3(dummy)/4(Griffon) w - -",
+//"Test Fore-Hoppers": "/2(Rookhopper)2(dummy)/5(Bishopper)/4(Grasshopper)k(dummy)//2(dummy)1(Dummy) w - -",
+"Test Line-Hoppers": "/2(Rion)2(dummy)///2(Rion)2(Qion)/2(dummy)3(Bion) w - -",
 "Test Chinese Hoppers": "5(dummy)(dummy)/2(Cannon)2(dummy)/3(dummy)//(dummy)1(Cannon)2(Leo)/2(dummy)3(Vao) w - -",
-"Test Chinese Pieces": "8/8/8/3X(moa)X(moo)/3hH3/8/8/8 w - -",
+"Test Chinese Pieces": "8/8/8/3(Moa)(Moo)/3hH3/8/8/8 w - -",
 "Test Amphibians": "4k/8/8/slslslsl/8/8/FFFFFFFF/4K w - -",
-"Test Royalty": "x(royalrook)x(royalknight)x(royalbishop)xjkx(royalbishop)x(royalknight)x(royalrook)/pppppppp/8/8/8/8/PPPPPPPP/X(royalrook)X(royalknight)X(royalbishop)XJKX(royalbishop)X(royalknight)X(royalrook) w KQkq -",
-"Test Projectiles": "x(airplane)X(airplane)4x(airplane)/X(allseeingeye)/1x(bird)/2x(bird)x(bird)x(bird)1x(bird)/3x(bird)x(bird)/3X(archerzz3)x(bird)/4X(archerzz2)X(archer)/x(frog)1X(gun)3X(rocket) w - -",
-"Test Invincibles": "3x(dummy)x(dummy)/7x(nwall)/x(dummy)3x(block)1X(fortress)/4K3/5x(stone)X(fort)/8/1kX(block)1X(stone)/1X(block)x(block)3X(nwall) w - -",
-"Test Consumables": "4k/pppppppp/1pppppp1/2pppp2/X(bomb)2X(superbomb)/8/PPPPPPPP/4K w - -",
-"Test Diminished": "/1X(b4)5X(q4)//4X(b3)//3X(r3)X(honorablehorse)/2X(r4)/7X(q3) w - -",
-"Test Mix 1": "X(airplane)x(airplane)/3x(pawnattackrook)x(caliph)x(pope)X(elephantwarmachine)/8/8/8/4S/X(lance)fwZ1X(pawnattackrook)/AcDeIFvT w - -",
-"Test Mix 2": "//2/1X(silvergeneral)2X(mushroom)/3X(crab)X(wizard)/4X(barc)1X(goldgeneral)//7m w - -",
-"Test Mix 3": "x(zebracamel)//3X(2moveferz)//3X(bishop)1X(2movewazirferz)/2X(2movewazir) w - -",
-"Test Custom": "8/8/8/8/4X(custom)/8/8/8 w - -"
+"Test Royalty": "(royalrook)(royalknight)(royalbishop)xjk(royalbishop)(royalknight)(royalrook)/pppppppp/8/8/8/8/PPPPPPPP/(Royalrook)(Royalknight)(Royalbishop)XJK(Royalbishop)(Royalknight)(Royalrook) w KQkq -",
+"Test Projectiles": "(airplane)(Airplane)4(airplane)/(Allseeingeye)/1(bird)/2(bird)(bird)(bird)1(bird)/3(bird)(bird)/3(Archerzz3)(bird)/4(Archerzz2)(Archer)/(frog)1(Gun)3(Rocket) w - -",
+"Test Invincibles": "3(dummy)(dummy)/7(nwall)/(dummy)3(block)1(Fortress)/4K3/5(stone)(Fort)/8/1k(Block)1(Stone)/1(Block)(block)3(Nwall) w - -",
+"Test Consumables": "4k/pppppppp/1pppppp1/2pppp2/(Bomb)2(Superbomb)/8/PPPPPPPP/4K w - -",
+"Test Diminished": "/1(B4)5(Q4)//4(B3)//3(R3)(Honorablehorse)/2(R4)/7(Q3) w - -",
+"Test Mix 1": "(Airplane)(airplane)/3(pawnattackrook)(caliph)(pope)(Elephantwarmachine)/8/8/8/4S/(Lance)fwZ1(Pawnattackrook)/AcDeIFvT w - -",
+"Test Mix 2": "//2/1(Silvergeneral)2(Mushroom)/3(Crab)(Wizard)/4(Barc)1(Goldgeneral)//7m w - -",
+"Test Mix 3": "(zebracamel)//3(2moveferz)//3(Bishop)1(2movewazirferz)/2(2movewazir) w - -",
+"Test Custom": "8/8/8/8/4(Custom)/8/8/8 w - -"
     },
 
     "Test Rules": {
@@ -1780,7 +1780,7 @@ var SAVED_BOARDS = {
 "Test Stalemate (loss)":     "k7/2Q5/8/8/p7/1P6/8/8 w KQkq - fmvn=5 stalemate=loss",
 "Test Remove Check by Capture":     "4k3/1p6/2Q5/8/8/8/8/7K b - - 0 5",
 "Test Double-check": "4k/3N/2Q w - - -",
-"Test Promotion":     "K/1X(fiveriderpawn)1X(ccpawn)X(rrpawn)X(nnpawn)X(pkpawn)/8/PX(makrukpawn)/5X(makrukpawn).X(chinesepawn)/8/pppppppp/7k w - -",
+"Test Promotion":     "K/1(Fiveriderpawn)1(Ccpawn)(Rrpawn)(Nnpawn)(Pkpawn)/8/P(Makrukpawn)/5(Makrukpawn).(Chinesepawn)/8/pppppppp/7k w - -",
 "Test Promotion to Rook": "8/k1P5/p7/P3K3/8/8/8/8 w - - 0 53", // from http://chessteacher.110mb.com/2008/10/22/minor-promotion/
 "Test Promotion to Bishop": "8/5P1k/5K1p/7P/8/8/8/8 w - - 0 51",
 "Test En Passant (alone)":     "8/8/8/3pP3/8/8/8/8 w - d6",
@@ -1826,7 +1826,8 @@ var SAVED_BOARDS = {
 "Test Extended Position Description": "r/8/8/1N3b2/3PP3/1P1BBN/8/8 w - - hmvc=0 fmvn=17",
 "Test Bare King": "///4k//p/1P w - -"
     }
-};
+};//END
+
 
 // Opening positions along with extended ECO codes and common names
 // Extended ECO codes are from scid.eco, see http://scid.sourceforge.net/help/ECO.html
@@ -7715,7 +7716,7 @@ function piece_code_length(code)
 }
 // Decode Forsyth-Edwards Notation piece code, for example:
 //  r = black rook, R = white rook, N = white knight
-// Also allows extended names, X(elephant), x(elephant), etc.
+// Also allows extended names, (elephant), (Elephant), etc.
 // To encode, use color_piece_prefix().
 function decode_piece_letter(name)
 {
