@@ -3076,15 +3076,6 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
             }
             wxf_dest = file_from_perspective(color, move.x);
 
-
-            if (piece.type === "horse" || piece.type === "knight") {
-                console.log("wxf",color,starting_y_from_perspective,dest_y_from_perspective," ",
-                    //starting.x,starting.y,
-                    xy2filerank(starting),
-                    //move.x,move.y,
-                    xy2filerank(move),
-                    "dir",direction,wxf_dest);
-            }
         }
 
         // TODO: disambiguate if on same file! + and -, and special case for pawns; tandem positions
@@ -7977,13 +7968,19 @@ function highlight_moves(piece, enable, skip_legal)
 // square is labeled a8. The bottom-right square (8,1) is filerank's h1.
 function filerank2xy(code)
 {
-    // TODO: allow files after z, aa, ab, ...
-    var x = code.charCodeAt(0) - "a".charCodeAt(0) + 1; // corresponds to file (horizontal)
-    // TODO: allow ranks >9; xy2filerank can encode but this function cannot decode :(
-    var y = code.charCodeAt(1) - "1".charCodeAt(0) + 1; // corresponds to rank (vertical)
-    if (code.charAt(1) === "1" && code.charAt(2) === "0") {
-        y = 10;  // Hack to support a10..Xiangqi rank #10    Really important TODO: full support
-    }
+    var i = 0;
+    var letters = "", letter = "", digits, x, y;
+    do
+    {
+        letters += letter;
+        letter = code.charAt(i);
+        i += 1;
+    } while ("abcdefghijklmnopqrstuvwxyz".indexOf(letter) !== -1 && i < code.length);
+
+    digits = code.substring(i - 1);
+ 
+    x = repr2number("Latin", letters);
+    y = repr2number("Arabic", digits);
 
     //assert(x >= 1 && x <= GAME_STATE.files, "filerank2xy(" + code + "): bad x: " + x);
     //assert(y >= 1 && y <= GAME_STATE.ranks, "filerank2xy(" + code + "): bad y: " + y);
@@ -8039,6 +8036,33 @@ function number2repr(format, n)
     } else {
         // TODO: maybe support more? http://en.wikipedia.org/wiki/Number_names#Numeral_symbols
         assert(false, "number2repr(" + format + ", " + n + "): invalid format");
+    }
+}
+
+// Convert string representation to numerical value
+// Note: generally best avoided, should keep in native format when possible
+function repr2number(format, s)
+{
+    if (format === "Arabic") {
+        // 0-9
+        return parseInt(s, 10);
+    } else if (format === "Latin") {
+        var n = s.charCodeAt(0) - "a".charCodeAt(0) + 1;
+        if (s.length === 1) {
+            // a-z
+            return n;
+        } else if (s.length === 2) {
+            // aa-zz
+            if (s.charCodeAt(1) === s.charCodeAt(0)) {
+                return n + 26;
+            } else {
+                assert(false, "repr2number(Latin, " + s + "): unsupported 2-letter code, not aa-zz");
+            }
+        } else {
+            assert(false, "repr2number(Latin, " + s + "): unsupported letter length");
+        }
+    } else {
+        assert(false, "repr2number(" + format + ", " + s +"): unsupported format");
     }
 }
 
