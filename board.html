@@ -1056,7 +1056,7 @@ var PIECE_TYPES = {
     crownedrook: {parlett: "#rook, #advisor"},
     crownedcamel: {parlett: "#camel, #advisor"},
     camelking: {parlett: "#camel, #king", image:["simplecamelking", "cbjcamelking", "tinyscamelking"]},
-    // TODO: telepotency - can attack opposing general on same open file. Like a capture but only for specific piece. New need syntax, maybe c(king)n+? also needs to escape palace
+    // Can escape palace to attack other general across the board (telepotency)
     general: {image:{w:["general2", "general"], xw:"circle#將", xb:"circle#帥"}, parlett: "#wazir, {c(general)n>;telepotent}", royal: true, url:"pc:general", aka:["chineseking"], wxf_letter:"K", cn_letter:["帥", "將"]}, 
     // http://www.mayhematics.com/v/gm.htm has a different definition of wizard
     wizard: {parlett: "#camel, #advisor", image:"moon",  url:"pc:wizard", hex: "U+1F319"},
@@ -3075,13 +3075,23 @@ function calculate_notations(color, piece, moves, starting_filerank, ps, square_
                 direction = "-";
             }
             wxf_dest = file_from_perspective(color, move.x);
+
+
+            if (piece.type === "horse" || piece.type === "knight") {
+                console.log("wxf",color,starting_y_from_perspective,dest_y_from_perspective," ",
+                    //starting.x,starting.y,
+                    xy2filerank(starting),
+                    //move.x,move.y,
+                    xy2filerank(move),
+                    "dir",direction,wxf_dest);
+            }
         }
 
         // TODO: disambiguate if on same file! + and -, and special case for pawns; tandem positions
         var wxf_piece_letter = PIECE_TYPES[piece.type].wxf_letter || piece_letter;
 
         var wxf = wxf_piece_letter + file_from_perspective(color, starting.x) + direction + wxf_dest;
-
+        
         ps.wxf.push([piece, square, [wxf], move]);
 
         // Optional " xP" if capture
@@ -7971,6 +7981,9 @@ function filerank2xy(code)
     var x = code.charCodeAt(0) - "a".charCodeAt(0) + 1; // corresponds to file (horizontal)
     // TODO: allow ranks >9; xy2filerank can encode but this function cannot decode :(
     var y = code.charCodeAt(1) - "1".charCodeAt(0) + 1; // corresponds to rank (vertical)
+    if (code.charAt(1) === "1" && code.charAt(2) === "0") {
+        y = 10;  // Hack to support a10..Xiangqi rank #10    Really important TODO: full support
+    }
 
     //assert(x >= 1 && x <= GAME_STATE.files, "filerank2xy(" + code + "): bad x: " + x);
     //assert(y >= 1 && y <= GAME_STATE.ranks, "filerank2xy(" + code + "): bad y: " + y);
