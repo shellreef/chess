@@ -2585,6 +2585,17 @@ function mv(alg_move, is_not_immediate)
     execute_move(promote_to, choices, false, !is_not_immediate);
 }
 
+// Convenience method to show continuous popups to make it easy to enter a bunch of
+// moves, instead of having to manually type mv() in the console (Safari -> Develop -> Show Error Console)
+function mv_popup()
+{
+    var move_text = prompt("Move? ");
+    if (move_text) {
+        mv(move_text);
+        setTimeout(mv_popup, pref("movement_animation_time") * 2);
+    } 
+}
+
 // Find a legal move, given the move text, precalculated already with calculate_notations().
 // If lenient, replace or replace superfluous characters
 function find_legal_move(text, lenient)
